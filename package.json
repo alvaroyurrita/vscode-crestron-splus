@@ -1,208 +1,220 @@
 {
-	"name": "crestron-splus",
-	"displayName": "Crestron S+",
-	"description": "Syntax highlighting, formatting, build tasks.",
-	"version": "0.5.2",
-	"publisher": "sentry07",
-	"icon": "icons/crestron.png",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/sentry07/vscode-crestron-splus.git"
-	},
-	"license": "GPL-3.0",
-	"engines": {
-		"vscode": "^1.28.0"
-	},
-	"categories": [
-		"Programming Languages",
-		"Snippets",
-		"Formatters"
-	],
-	"activationEvents": [
-		"onCommand:splus.localHelp",
-		"onCommand:splus.webHelp",
-		"onCommand:workbench.action.tasks.runTask",
-		"onLanguage:splus-source"
-	],
-	"main": "out/extension.js",
-	"contributes": {
-		"commands": [
-			{
-				"command": "splus.localHelp",
-				"title": "Open S+ Help Reference"
-			},
-			{
-				"command": "splus.webHelp",
-				"title": "Open S+ Online Reference"
-			}
-		],
-		"configuration": [
-			{
-				"title": "Crestron S+",
-				"properties": {
-					"splus.compilerLocation": {
-						"type": "string",
-						"default": "C:\\Program Files (x86)\\Crestron\\SIMPL\\SPlusCC.exe",
-						"description": "Location of the S+ compiler. Please use double \\\\ for the path."
-					},
-					"splus.helpLocation": {
-						"type": "string",
-						"default": "C:\\Program Files (x86)\\Crestron\\Simpl\\Simpl+lr.chm",
-						"description": "Location of the S+ Help reference"
-					},
-					"splus.enable2series": {
-						"type": "boolean",
-						"default": false,
-						"description": "Enable 2-Series target for build tasks"
-					},
-					"splus.enable3series": {
-						"type": "boolean",
-						"default": true,
-						"description": "Enable 3-Series target for build tasks"
-					},
-					"splus.enable4series": {
-						"type": "boolean",
-						"default": false,
-						"description": "Enable 4-Series target for build tasks"
-					}
-				}
-			}
-		],
-		"menus": {
-			"editor/context": [
-				{
-					"command": "splus.localHelp",
-					"group": "navigation@1",
-					"when": "resourceLangId == splus-source"
-				},
-				{
-					"command": "splus.webHelp",
-					"group": "navigation@2",
-					"when": "resourceLangId == splus-source"
-				}
-			]
-		},
-		"keybindings": [
-			{
-				"command": "splus.localHelp",
-				"key": "ctrl+shift+f1",
-				"when": "resourceLangId == splus-source"
-			},
-			{
-				"command": "splus.webHelp",
-				"key": "ctrl+shift+f2",
-				"when": "resourceLangId == splus-source"
-			}
-		],
-		"languages": [
-			{
-				"aliases": [
-					"Crestron S+"
-				],
-				"id": "splus-source",
-				"extensions": [
-					".usp",
-					".usl",
-					".csp",
-					".csl"
-				],
-				"icon": {
-					"dark": "./icons/splusIcon.png",
-					"light": "./icons/splusIcon.png"
-				},
-				"configuration": "./language-configuration.json"
-			},
-			{
-				"aliases": [
-					"Crestron C# API"
-				],
-				"id": "splus-sharp_api",
-				"extensions": [
-					".api"
-				],
-				"icon": {
-					"dark": "./icons/splusIcon.png",
-					"light": "./icons/splusIcon.png"
-				},
-				"configuration": "./language-configuration.json"
-			}
-		],
-		"grammars": [
-			{
-				"language": "splus-source",
-				"scopeName": "source.splus",
-				"path": "./syntaxes/crestron-splus.tmLanguage.json"
-			},
-			{
-				"language": "splus-sharp_api",
-				"scopeName": "source.cs",
-				"path": "./syntaxes/csharp.tmLanguage.json"
-			}
-		],
-		"snippets": [
-			{
-				"language": "splus-source",
-				"path": "./snippets/snippets.json"
-			}
-		],
-		"taskDefinitions": [
-			{
-				"type": "splus-source",
-				"properties": {
-					"label": {
-						"type": "string"
-					}
-				}
-			}
-		],
-		"problemMatchers": [
-			{
-				"name": "splusCC",
-				"owner": "crestron-splus",
-				"fileLocation": [
-					"absolute"
-				],
-				"pattern": {
-					"regexp": "\\[([^\\]]*)\\]\\s*(?:Error)\\s*\\d*\\s*\\(Line (\\d*)\\)\\s*-\\s*(.*)$",
-					"file": 1,
-					"location": 2,
-					"message": 3
-				}
-			}
-		],
-		"configurationDefaults": {
-			"[splus-source]": {
-				"editor.wordBasedSuggestions": true,
-				"editor.suggest.snippetsPreventQuickSuggestions": false,
-				"editor.quickSuggestions": {
-					"other": true,
-					"comments": false,
-					"strings": false
-				},
-				"editor.snippetSuggestions": "top"
-			}
-		}
-	},
-	"scripts": {
-		"compile": "tsc -p ./",
-		"watch": "tsc -watch -p ./",
-		"postinstall": "node ./node_modules/vscode/bin/install",
-		"test": "npm run compile && node ./node_modules/vscode/bin/test"
-	},
-	"devDependencies": {
-		"@types/mocha": "^5.2.6",
-		"@types/node": "^11.15.53",
-		"tslint": "^5.14.0",
-		"typescript": "^3.9.9",
-		"vsce": "^2.6.7"
-	},
-	"__metadata": {
-		"id": "sentry07.crestron-splus",
-		"publisherId": "sentry07",
-		"publisherDisplayName": "Eric Walters"
-	},
-	"dependencies": {
-		"@types/vscode": "^1.64.0",
-		"@vscode/test-electron": "^1.5.2"
-	}
+  "name": "crestron-splus",
+  "displayName": "Crestron S+",
+  "description": "Syntax highlighting, formatting, build tasks.",
+  "version": "0.5.2",
+  "publisher": "sentry07",
+  "icon": "icons/crestron.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sentry07/vscode-crestron-splus.git"
+  },
+  "license": "GPL-3.0",
+  "engines": {
+    "vscode": "^1.93.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Snippets",
+    "Formatters"
+  ],
+  "activationEvents": [
+    "onCommand:splus.localHelp",
+    "onCommand:splus.webHelp",
+    "onCommand:workbench.action.tasks.runTask",
+    "onLanguage:splus-source"
+  ],
+  "main": "out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "splus.localHelp",
+        "title": "Open S+ Help Reference"
+      },
+      {
+        "command": "splus.webHelp",
+        "title": "Open S+ Online Reference"
+      }
+    ],
+    "configuration": [
+      {
+        "title": "Crestron S+",
+        "properties": {
+          "splus.compilerLocation": {
+            "type": "string",
+            "default": "C:\\Program Files (x86)\\Crestron\\SIMPL\\SPlusCC.exe",
+            "description": "Location of the S+ compiler. Please use double \\\\ for the path."
+          },
+          "splus.helpLocation": {
+            "type": "string",
+            "default": "C:\\Program Files (x86)\\Crestron\\Simpl\\Simpl+lr.chm",
+            "description": "Location of the S+ Help reference"
+          },
+          "splus.enable2series": {
+            "type": "boolean",
+            "default": false,
+            "description": "Enable 2-Series target for build tasks"
+          },
+          "splus.enable3series": {
+            "type": "boolean",
+            "default": true,
+            "description": "Enable 3-Series target for build tasks"
+          },
+          "splus.enable4series": {
+            "type": "boolean",
+            "default": false,
+            "description": "Enable 4-Series target for build tasks"
+          }
+        }
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "splus.localHelp",
+          "group": "navigation@1",
+          "when": "resourceLangId == splus-source"
+        },
+        {
+          "command": "splus.webHelp",
+          "group": "navigation@2",
+          "when": "resourceLangId == splus-source"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "splus.localHelp",
+        "key": "ctrl+shift+f1",
+        "when": "resourceLangId == splus-source"
+      },
+      {
+        "command": "splus.webHelp",
+        "key": "ctrl+shift+f2",
+        "when": "resourceLangId == splus-source"
+      }
+    ],
+    "languages": [
+      {
+        "aliases": [
+          "Crestron S+",
+          "SIMPL+",
+          "Crestron SIMPL+"
+        ],
+        "id": "splus-source",
+        "extensions": [
+          ".usp",
+          ".usl",
+          ".csp",
+          ".csl"
+        ],
+        "icon": {
+          "dark": "./icons/splusIcon.png",
+          "light": "./icons/splusIcon.png"
+        },
+        "configuration": "./language-configuration.json"
+      },
+      {
+        "aliases": [
+          "Crestron C# API",
+          "SIMPL# Library API"
+        ],
+        "id": "splus-sharp_api",
+        "extensions": [
+          ".api"
+        ],
+        "icon": {
+          "dark": "./icons/splusIcon.png",
+          "light": "./icons/splusIcon.png"
+        },
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "splus-source",
+        "scopeName": "source.splus",
+        "path": "./syntaxes/crestron-splus.tmLanguage.json"
+      },
+      {
+        "language": "splus-sharp_api",
+        "scopeName": "source.cs",
+        "path": "./syntaxes/csharp.tmLanguage.json"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "splus-source",
+        "path": "./snippets/snippets.json"
+      }
+    ],
+    "taskDefinitions": [
+      {
+        "type": "splus-source",
+        "properties": {
+          "label": {
+            "type": "string"
+          }
+        }
+      }
+    ],
+    "problemMatchers": [
+      {
+        "name": "splusCC",
+        "owner": "crestron-splus",
+        "fileLocation": [
+          "absolute"
+        ],
+        "pattern": {
+          "regexp": "\\[([^\\]]*)\\]\\s*(?:Error)\\s*\\d*\\s*\\(Line (\\d*)\\)\\s*-\\s*(.*)$",
+          "file": 1,
+          "location": 2,
+          "message": 3
+        }
+      }
+    ],
+    "configurationDefaults": {
+      "[splus-source]": {
+        "editor.wordBasedSuggestions": true,
+        "editor.suggest.snippetsPreventQuickSuggestions": false,
+        "editor.quickSuggestions": {
+          "other": true,
+          "comments": false,
+          "strings": false
+        },
+        "editor.snippetSuggestions": "top"
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "webpack",
+    "watch": "webpack --watch",
+    "package": "webpack --mode production --devtool hidden-source-map",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.7",
+    "@types/node": "^20.x",
+    "@types/vscode": "^1.93.0",
+    "@typescript-eslint/eslint-plugin": "^8.3.0",
+    "@typescript-eslint/parser": "^8.3.0",
+    "@vscode/test-cli": "^0.0.10",
+    "@vscode/test-electron": "^2.4.1",
+    "@vscode/vsce": "^3.1.0",
+    "eslint": "^9.9.1",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.5.4",
+    "webpack": "^5.94.0",
+    "webpack-cli": "^5.1.4"
+  },
+  "__metadata": {
+    "id": "sentry07.crestron-splus",
+    "publisherId": "sentry07",
+    "publisherDisplayName": "Eric Walters"
+  }
 }
