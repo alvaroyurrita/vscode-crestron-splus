@@ -45,11 +45,11 @@ export function activate(context: ExtensionContext) {
         commands.executeCommand("vscode.openFolder", Uri.parse(fileFolder));
     }
 
-    let localhelp_command = commands.registerCommand("splus.localHelp", () => {
+    let localHelp_command = commands.registerCommand("splus.localHelp", () => {
         callShellCommand(workspace.getConfiguration("splus").helpLocation);
     });
 
-    let webhelp_command = commands.registerCommand("splus.webHelp", openWebHelp);
+    let webHelp_command = commands.registerCommand("splus.webHelp", openWebHelp);
 
     function rebuildTaskList(): void {
         if (taskProvider) {
@@ -69,15 +69,15 @@ export function activate(context: ExtensionContext) {
                 resolveTask: () => {
                     return undefined;
                 }
-            })
+            });
         }
     }
 
     let thisFormatProvider = new formattingProvider(formatProvider);
     languages.registerDocumentFormattingEditProvider({ scheme: 'file', language: 'splus-source' }, thisFormatProvider);
 
-    context.subscriptions.push(localhelp_command);
-    context.subscriptions.push(webhelp_command);
+    context.subscriptions.push(localHelp_command);
+    context.subscriptions.push(webHelp_command);
 
     workspace.onDidChangeConfiguration(rebuildTaskList);
     workspace.onDidOpenTextDocument(rebuildTaskList);
@@ -201,15 +201,14 @@ function formatText(docText: string): string {
             startingSignalList = 1;
         }
 
-        
-        if (line == docLines.length - 1)
+        if (line === docLines.length - 1)
         {
             lineSuffix = '';
         }
 
         // Indent Increase Rules
-        if (inSignalList == 1) {
-            if (startingSignalList == 1) {
+        if (inSignalList === 1) {
+            if (startingSignalList === 1) {
                 outputText = outputText + thisLineTrimmed + lineSuffix;
                 startingSignalList = 0;
             }
@@ -323,7 +322,7 @@ function getApiInIncludeCommand(apiFileName: string, thisFileDir: string, includ
         if (fs.existsSync(workDir + "\\" + thisPath + apiFileName + ".dll")) {
             return "\"" + workDir + "splusheader.exe\" \"" + workDir + apiFileName + ".dll\" \"" + thisFileDir + apiFileName + ".api\"";
         }
-    })
+    });
 
     return "";
 }
@@ -341,7 +340,7 @@ function getBuildTask(doc: TextDocument, buildType: BuildType): Task {
             focus: true,
             clear: true
         }
-    }
+    };
 
     let executable = 'C:\\Windows\\System32\\cmd.exe';
     let command = new ShellExecution("\"" + taskDef.command + "\"", { executable: executable, shellArgs: ['/c'] });
@@ -359,7 +358,7 @@ async function getCompileTasks(): Promise<Task[]> {
     let doc = editor.document;
     let emptyTasks: Task[] = [];
 
-    let workspaceFolder = workspace.getWorkspaceFolder(doc.uri)
+    let workspaceFolder = workspace.getWorkspaceFolder(doc.uri);
     if (!workspaceFolder) {
         return emptyTasks;
     }
@@ -383,9 +382,10 @@ async function getCompileTasks(): Promise<Task[]> {
         if (sSharpLibs && sSharpLibs.length > 0) {
             sSharpLibs.forEach((regexMatch: string) => {
                 let fileName = "";
-                let tokens = regexMatch.match(/\S+/g)
-                if (tokens.length > 1)
+                let tokens = regexMatch.match(/\S+/g);
+                if (tokens.length > 1){
                     fileName = tokens[1].slice(1, -1);
+                }
 
                 let thisFileDir = doc.fileName.slice(0, doc.fileName.lastIndexOf("\\") + 1);
 
@@ -402,7 +402,7 @@ async function getCompileTasks(): Promise<Task[]> {
                             focus: true,
                             clear: true
                         }
-                    }
+                    };
 
                     let executable = 'C:\\Windows\\System32\\cmd.exe';
                     let command = new ShellExecution("\"" + taskDef.command + "\"", { executable: executable, shellArgs: ['/c'] });
@@ -413,7 +413,7 @@ async function getCompileTasks(): Promise<Task[]> {
 
                     result.push(task);
                 }
-            })
+            });
         }
 
         if (enable2SeriesCompile) {
