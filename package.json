@@ -97,9 +97,7 @@
     "languages": [
       {
         "aliases": [
-          "Crestron S+",
-          "SIMPL+",
-          "Crestron SIMPL+"
+          "Crestron S+"
         ],
         "id": "splus-source",
         "extensions": [
