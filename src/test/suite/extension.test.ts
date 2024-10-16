@@ -1,4 +1,6 @@
 import * as assert from 'assert';
+import * as sinon from "sinon";
+import * as fs from 'fs';
 import exp = require('constants');
 
 // You can import and use all API from the 'vscode' module
@@ -171,22 +173,37 @@ suite('Formatting', function () {
 });
 
 suite("Tasks", function () {
-  suiteSetup(async function () {
+  suiteTeardown(async function () {
+    await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
+  });
+  test("With Default Settings, it should have only Compile 3 Series Task", async () => {
     const currentWorkspace = vscode.workspace.workspaceFolders;
     const dirtyDocumentPath = vscode.Uri.joinPath(currentWorkspace[0].uri, "dirtyFile.csp");
     const dirtyDocument = await vscode.workspace.openTextDocument(dirtyDocumentPath);
     await vscode.window.showTextDocument(dirtyDocument);
     await delay(1000);
+    const splusTasks = await vscode.tasks.fetchTasks();
+    assert.strictEqual(splusTasks.length, 1);
+    assert.strictEqual(splusTasks[0].name, "Compile 3 Series");
   });
-  suiteTeardown(async function () {
-    await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
-  });
-  test("With Default Settings, it should have only Compile 3 Series Task", async () => {
+  test("With default settings and User Library, it should have Compile 3 Series Task and Generate API", async () => {
+    const fsStub = sinon.stub(fs,"existsSync").returns(true);
+    const currentWorkspace = vscode.workspace.workspaceFolders;
+    const dirtyDocumentPath = vscode.Uri.joinPath(currentWorkspace[0].uri, "fileWithUserLibrary.csp");
+    const dirtyDocument = await vscode.workspace.openTextDocument(dirtyDocumentPath);
+    await vscode.window.showTextDocument(dirtyDocument);
+    // const document = await vscode.workspace.openTextDocument({
+    //   language: "splus-source",
+    //   content: "#USER_SIMPLSHARP_LIBRARY \"My.Test-Library\"",
+    // });
+    await delay(1000);
     const splusTasks = await vscode.tasks.fetchTasks();
     splusTasks.forEach((task) => {
       console.log("Task", task.name);
     });
-    assert.strictEqual(splusTasks.length, 1);
-    assert.strictEqual(splusTasks[0].name, "Compile 3 Series");
-  });
+    assert.ok(fsStub.args.find(a=>a[0].toString().includes("My.Test-Library.dll")));
+    assert.ok(splusTasks.length > 0, "Should have at least one task");
+    assert.strictEqual(splusTasks[0].name, "Generate API file for My.Test-Library");
+    assert.strictEqual(splusTasks[1].name, "Compile 3 Series");
+   });
 });
