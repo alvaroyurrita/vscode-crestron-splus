@@ -12,6 +12,14 @@ function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+function removeWorkspaceCustomSettings() {
+  const currentWorkspace = vscode.workspace.workspaceFolders;
+  const dirtyDocumentPath = vscode.Uri.joinPath(currentWorkspace[0].uri, ".vscode");
+  if (fs.existsSync(dirtyDocumentPath.fsPath)) {
+    fs.rmSync(dirtyDocumentPath.fsPath, { recursive: true, force: true });
+  }
+}
+
 suite('Commands Test', function () {
   suiteSetup(async function () {
     const currentWorkspace = vscode.workspace.workspaceFolders;
@@ -173,21 +181,24 @@ suite('Formatting', function () {
 });
 
 suite("Tasks", function () {
+  suiteSetup(async function () {
+    removeWorkspaceCustomSettings();
+  });
   suiteTeardown(async function () {
     await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
+    removeWorkspaceCustomSettings();
   });
   test("With Default Settings, it should have only Compile 3 Series Task", async () => {
     const currentWorkspace = vscode.workspace.workspaceFolders;
     const dirtyDocumentPath = vscode.Uri.joinPath(currentWorkspace[0].uri, "dirtyFile.csp");
     const dirtyDocument = await vscode.workspace.openTextDocument(dirtyDocumentPath);
     await vscode.window.showTextDocument(dirtyDocument);
-    await delay(1000);
     const splusTasks = await vscode.tasks.fetchTasks();
     assert.strictEqual(splusTasks.length, 1);
     assert.strictEqual(splusTasks[0].name, "Compile 3 Series");
   });
   test("With default settings and User Library, it should have Compile 3 Series Task and Generate API", async () => {
-    const fsStub = sinon.stub(fs,"existsSync").returns(true);
+    const fsStub = sinon.stub(fs, "existsSync").returns(true);
     const currentWorkspace = vscode.workspace.workspaceFolders;
     const dirtyDocumentPath = vscode.Uri.joinPath(currentWorkspace[0].uri, "fileWithUserLibrary.csp");
     const dirtyDocument = await vscode.workspace.openTextDocument(dirtyDocumentPath);
@@ -196,14 +207,83 @@ suite("Tasks", function () {
     //   language: "splus-source",
     //   content: "#USER_SIMPLSHARP_LIBRARY \"My.Test-Library\"",
     // });
-    await delay(1000);
     const splusTasks = await vscode.tasks.fetchTasks();
-    splusTasks.forEach((task) => {
-      console.log("Task", task.name);
-    });
-    assert.ok(fsStub.args.find(a=>a[0].toString().includes("My.Test-Library.dll")));
+    assert.ok(fsStub.args.find(a => a[0].toString().includes("My.Test-Library.dll")));
     assert.ok(splusTasks.length > 0, "Should have at least one task");
     assert.strictEqual(splusTasks[0].name, "Generate API file for My.Test-Library");
     assert.strictEqual(splusTasks[1].name, "Compile 3 Series");
-   });
+  });
+  suite("With Modified Settings", function () {
+    suiteSetup(async function () {
+      const currentWorkspace = vscode.workspace.workspaceFolders;
+      const dirtyDocumentPath = vscode.Uri.joinPath(currentWorkspace[0].uri, "dirtyFile.csp");
+      const dirtyDocument = await vscode.workspace.openTextDocument(dirtyDocumentPath);
+      await vscode.window.showTextDocument(dirtyDocument);
+    });
+    const settingsToTest = [{
+      enable2series: false,
+      enable3series: false,
+      enable4series: false,
+      responses: []
+    },
+    {
+      enable2series: true,
+      enable3series: false,
+      enable4series: false,
+      responses: ["Compile 2 Series"]
+    },
+    {
+      enable2series: false,
+      enable3series: true,
+      enable4series: false,
+      responses: ["Compile 3 Series"]
+    },
+    {
+      enable2series: true,
+      enable3series: true,
+      enable4series: false,
+      responses: ["Compile 2 Series","Compile 2 & 3 Series","Compile 3 Series"]
+    },
+    {
+      enable2series: false,
+      enable3series: false,
+      enable4series: true,
+      responses: ["Compile 4 Series"]
+    },
+    {
+      enable2series: true,
+      enable3series: false,
+      enable4series: true,
+      responses: ["Compile 2 Series","Compile 4 Series"]
+    },
+    {
+      enable2series: false,
+      enable3series: true,
+      enable4series: true,
+      responses: ["Compile 3 Series","Compile 3 & 4 Series","Compile 4 Series"]
+    },
+    {
+      enable2series: true,
+      enable3series: true,
+      enable4series: true,
+      responses: ["Compile 2 Series","Compile 2 & 3 Series","Compile 3 Series","Compile 3 & 4 Series","Compile 4 Series", "Compile 2 & 3 & 4 Series"]
+    }];
+    settingsToTest.forEach(function (setting) {
+      test(`Series 2: ${setting.enable2series}, Series 3: ${setting.enable3series}, Series 4: ${setting.enable4series} it should have ${setting.responses.length} tasks`, async () => {
+        const configurationSplus = vscode.workspace.getConfiguration('splus');
+        await configurationSplus.update('enable2series', setting.enable2series);
+        await configurationSplus.update('enable3series', setting.enable3series);
+        await configurationSplus.update('enable4series', setting.enable4series);
+        const splusTasks = await vscode.tasks.fetchTasks();
+        assert.ok(splusTasks.length === setting.responses.length);
+        let index = 0;
+        setting.responses.forEach((response) => {
+          assert.strictEqual(splusTasks[index].name, response);
+          index++;
+        });
+      });
+    });
+  });
 });
+
+
