@@ -74,7 +74,7 @@ export function activate(context: ExtensionContext) {
     }
 
     let thisFormatProvider = new formattingProvider(formatProvider);
-    languages.registerDocumentFormattingEditProvider({ scheme: 'file', language: 'splus-source' }, thisFormatProvider);
+    languages.registerDocumentFormattingEditProvider({ language: 'splus-source' }, thisFormatProvider);
 
     context.subscriptions.push(localHelp_command);
     context.subscriptions.push(webHelp_command);
