@@ -1,13 +1,11 @@
 import * as assert from 'assert';
-import { delay } from './testFunctions';
+import { delay, OpenAndShowSPlusDocument } from '../testFunctions';
+import * as sinon from "sinon";
 import * as vscode from 'vscode';
 
 suiteSetup(async function () {
-    const currentWorkspace = vscode.workspace.workspaceFolders;
-    const dirtyDocumentPath = vscode.Uri.joinPath(currentWorkspace[0].uri, "dirtyFile.csp");
-    const dirtyDocument = await vscode.workspace.openTextDocument(dirtyDocumentPath);
-    await vscode.window.showTextDocument(dirtyDocument);
-    await delay(100);
+    OpenAndShowSPlusDocument("\/\/Nothing To See");
+    await delay(500);
 });
 suiteTeardown(async function () {
     await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
@@ -23,9 +21,39 @@ suite('Registration', function () {
     commandsToTest.forEach(function (command) {
         test(`${command.title} has been registered`, async function () {
             var commands = await vscode.commands.getCommands();
-            console.log(`commands count: ${commands.length}`);
-            console.log(`commands with splus ${commands.filter((c) => c.includes('splus'))}`);
             assert.ok(commands.includes(command.command));
         });
+    });
+});
+suite('Execution', function () {
+    test('Local Help should open the help file', async function () {
+        const fakeTerminal = sinon.spy({ sendText: function (text: string, addNewLine?: boolean) { } } as vscode.Terminal);
+        const fakeTerminalCreator = sinon.stub(vscode.window, 'createTerminal').callsFake(() => {
+            return fakeTerminal;
+        });
+        await vscode.commands.executeCommand('splus.localHelp');
+        await delay(500);
+        assert.ok(fakeTerminalCreator.args[0][0].toString().includes("splus"));
+        console.log(fakeTerminalCreator.args[0].length);
+        assert.ok(typeof fakeTerminalCreator.args !== undefined &&
+            fakeTerminalCreator.args[0] !== undefined &&
+            fakeTerminalCreator.args[0].length > 1 &&
+            //@ts-ignore
+            fakeTerminalCreator.args[0][1].includes('c:\\windows\\system32\\cmd.exe'
+            ));
+        assert.ok(fakeTerminal.sendText.calledTwice);
+        assert.ok(fakeTerminal.sendText.args[0].includes('"C:\\Program Files (x86)\\Crestron\\Simpl\\Simpl+lr.chm"'));
+        assert.ok(fakeTerminal.sendText.args[1].includes('exit'));
+
+    });
+    test('Web Help should open open a browser link', async function () {
+        const fakeShowBrowserCommand = sinon.stub(vscode.commands, 'executeCommand')
+            .callThrough()
+            .withArgs('simpleBrowser.show', sinon.match.any)
+            .returns(Promise.resolve());
+        await vscode.commands.executeCommand('splus.webHelp');
+        await delay(500);
+        assert.ok(fakeShowBrowserCommand.calledOnce);
+        assert.ok(fakeShowBrowserCommand.args[0][1].includes('http://help.crestron.com/simpl_plus'));
     });
 });

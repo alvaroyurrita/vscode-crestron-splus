@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import * as sinon from "sinon";
 import * as fs from 'fs';
-import { removeWorkspaceCustomSettings, OpenAndShowSPlusDocument } from './testFunctions';
+import { removeWorkspaceCustomSettings, OpenAndShowSPlusDocument } from '../testFunctions';
 import * as vscode from 'vscode';
 
 suiteTeardown(async function () {

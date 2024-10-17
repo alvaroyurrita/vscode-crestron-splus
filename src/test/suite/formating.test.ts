@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import { removeWorkspaceCustomSettings, OpenAndShowSPlusDocument } from './testFunctions';
+import { removeWorkspaceCustomSettings, OpenAndShowSPlusDocument } from '../testFunctions';
 import * as vscode from 'vscode';
 
 
