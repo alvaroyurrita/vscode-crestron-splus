@@ -1,4 +1,4 @@
-// This wrapes fs.existsSync so we can run stubs for unit testing
+// fsWrapper.ts
 import { existsSync as fsExistsSync } from 'fs';
 
 export const existsSync = (filePath: string): boolean => {
