@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import * as sinon from "sinon";
-import * as fs from 'fs';
-import { removeWorkspaceCustomSettings, OpenAndShowSPlusDocument } from '../testFunctions';
+import * as fsWrapper from '../../fsWrapper';
+import { removeWorkspaceCustomSettings, OpenAndShowSPlusDocument, delay } from '../testFunctions';
 import * as vscode from 'vscode';
 
 suiteTeardown(async function () {
@@ -9,11 +9,7 @@ suiteTeardown(async function () {
 });
 suite("With No Saved File", function () {
     test("It should return 0 tasks", async () => {
-        const document = await vscode.workspace.openTextDocument({
-            language: "splus-source",
-            content: "\/\/Nothing To See",
-        });
-        await vscode.window.showTextDocument(document);
+        await OpenAndShowSPlusDocument("\/\/Nothing To See");
         const splusTasks = await vscode.tasks.fetchTasks();
         assert.strictEqual(splusTasks.length, 0);
     });
@@ -34,17 +30,19 @@ suite("With Faked Saved File", function () {
             assert.strictEqual(splusTasks[0].name, "Compile 3 Series");
         });
         const libraries = ["USER", "CRESTRON"];
-        const fsExistSyncStub = sinon.stub(fs, "existsSync").returns(true);
         libraries.forEach(function (library) {
             test(`And file with ${library} Library, it should have Compile 3 Series Task only and Generate API`, async () => {
+                const fsExistSyncStub = sinon.stub(fsWrapper, "existsSync").returns(true);
                 await OpenAndShowSPlusDocument(`#${library}_SIMPLSHARP_LIBRARY \"My.Test-Library\";`);
                 const splusTasks = await vscode.tasks.fetchTasks();
                 assert.ok(splusTasks.length > 0, "Should have at least one task");
                 assert.ok(fsExistSyncStub.args.find(a => a[0].toString().includes("My.Test-Library.dll")));
                 assert.strictEqual(splusTasks[0].name, "Generate API file for My.Test-Library");
                 assert.strictEqual(splusTasks[1].name, "Compile 3 Series");
+                fsExistSyncStub.restore();
             });
         });
+
     });
     suite("With Modified Settings", function () {
         suiteSetup(async function () {

@@ -2,7 +2,7 @@
   "name": "crestron-splus",
   "displayName": "Crestron S+",
   "description": "Syntax highlighting, formatting, build tasks.",
-  "version": "0.5.2",
+  "version": "1.0.0",
   "publisher": "sentry07",
   "icon": "icons/crestron.png",
   "repository": {
@@ -19,10 +19,7 @@
     "Formatters"
   ],
   "activationEvents": [
-    "onCommand:splus.localHelp",
-    "onCommand:splus.webHelp",
-    "onCommand:workbench.action.tasks.runTask",
-    "onLanguage:splus-source"
+    "onCommand:workbench.action.tasks.runTask"
   ],
   "main": "out/extension.js",
   "contributes": {
@@ -173,7 +170,7 @@
     ],
     "configurationDefaults": {
       "[splus-source]": {
-        "editor.wordBasedSuggestions": true,
+        "editor.wordBasedSuggestions": "currentDocument",
         "editor.suggest.snippetsPreventQuickSuggestions": false,
         "editor.quickSuggestions": {
           "other": true,

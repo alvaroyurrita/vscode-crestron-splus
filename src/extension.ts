@@ -25,7 +25,7 @@ import {
     TextDocumentSaveReason
 } from "vscode";
 
-import * as fs from 'fs';
+import * as fsWrapper from './fsWrapper';
 
 let taskProvider: Disposable | undefined;
 
@@ -39,11 +39,12 @@ enum BuildType {
 
 export function activate(context: ExtensionContext) {
 
-    if (workspace.workspaceFolders === undefined) {
-        let fileName = window.activeTextEditor.document.uri.path;
-        let fileFolder = fileName.slice(0, fileName.lastIndexOf("/") + 1);
-        commands.executeCommand("vscode.openFolder", Uri.parse(fileFolder));
-    }
+    //commenting out block, doesn't seem to be needed
+    // if (workspace.workspaceFolders === undefined) {
+    //     let fileName = window.activeTextEditor.document.uri.path;
+    //     let fileFolder = fileName.slice(0, fileName.lastIndexOf("/") + 1);
+    //     commands.executeCommand("vscode.openFolder", Uri.parse(fileFolder));
+    // }
 
     let localHelp_command = commands.registerCommand("splus.localHelp", () => {
         callShellCommand(workspace.getConfiguration("splus").helpLocation);
@@ -56,7 +57,7 @@ export function activate(context: ExtensionContext) {
             taskProvider.dispose();
             taskProvider = undefined;
         }
-        if (!taskProvider && window.activeTextEditor.document.languageId === "splus-source") {
+        if (!taskProvider && window?.activeTextEditor?.document.languageId === "splus-source") {
             let splusPromise: Thenable<Task[]> | undefined = undefined;
             taskProvider = tasks.registerTaskProvider('splus', {
                 provideTasks: () => {
@@ -201,7 +202,7 @@ function formatText(docText: string): string {
             startingSignalList = 1;
         }
 
-        if (line === docLines.length - 1)
+        if (line === docLines.length - 1) 
         {
             lineSuffix = '';
         }
@@ -319,7 +320,7 @@ function getApiInIncludeCommand(apiFileName: string, thisFileDir: string, includ
         if (!thisPath.endsWith("\\")) {
             thisPath = thisPath + "\\";
         }
-        if (fs.existsSync(workDir + "\\" + thisPath + apiFileName + ".dll")) {
+        if (fsWrapper.existsSync(workDir + "\\" + thisPath + apiFileName + ".dll")) {
             return "\"" + workDir + "splusheader.exe\" \"" + workDir + apiFileName + ".dll\" \"" + thisFileDir + apiFileName + ".api\"";
         }
     });
@@ -355,9 +356,10 @@ function getBuildTask(doc: TextDocument, buildType: BuildType): Task {
 async function getCompileTasks(): Promise<Task[]> {
     let result: Task[] = [];
     let editor = window.activeTextEditor;
-    let doc = editor.document;
+    let doc = editor?.document;
     let emptyTasks: Task[] = [];
 
+    if (doc === undefined) { return emptyTasks; }
     let workspaceFolder = workspace.getWorkspaceFolder(doc.uri);
     if (!workspaceFolder) {
         return emptyTasks;
@@ -383,13 +385,13 @@ async function getCompileTasks(): Promise<Task[]> {
             sSharpLibs.forEach((regexMatch: string) => {
                 let fileName = "";
                 let tokens = regexMatch.match(/\S+/g);
-                if (tokens.length > 1){
+                if (tokens != null && tokens.length > 1) {
                     fileName = tokens[1].slice(1, -1);
                 }
 
                 let thisFileDir = doc.fileName.slice(0, doc.fileName.lastIndexOf("\\") + 1);
 
-                if (fs.existsSync(thisFileDir + "SPlsWork\\" + fileName + ".dll")) {
+                if (fsWrapper.existsSync(thisFileDir + "SPlsWork\\" + fileName + ".dll")) {
                     let buildCommand = getApiCommand(fileName, thisFileDir);
 
                     let taskDef: TaskDefinition = {
@@ -445,12 +447,8 @@ async function getCompileTasks(): Promise<Task[]> {
         let channel = getOutputChannel();
         console.log(err);
 
-        if (err.stderr) {
-            channel.appendLine(err.stderr);
-        }
-
-        if (err.stdout) {
-            channel.appendLine(err.stdout);
+        if (err instanceof Error) {
+            channel.appendLine(err.message);
         }
 
         channel.appendLine('SIMPL+ compile failed');

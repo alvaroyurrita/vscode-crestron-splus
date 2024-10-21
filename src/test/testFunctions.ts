@@ -8,6 +8,7 @@ export function delay(ms: number) {
 export async function removeWorkspaceCustomSettings() {
     await vscode.commands.executeCommand('workbench.action.closeAllGroups');
     const currentWorkspace = vscode.workspace.workspaceFolders;
+    //@ts-ignore
     const dirtyDocumentPath = vscode.Uri.joinPath(currentWorkspace[0].uri, ".vscode");
     if (fs.existsSync(dirtyDocumentPath.fsPath)) {
         fs.rmSync(dirtyDocumentPath.fsPath, { recursive: true, force: true });
@@ -20,5 +21,5 @@ export async function OpenAndShowSPlusDocument(documentContent: string) {
         content: documentContent,
     });
     await vscode.window.showTextDocument(document);
-    await delay(50);
+    await delay(100);
 }
