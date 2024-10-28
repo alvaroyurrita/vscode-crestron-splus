@@ -3,8 +3,8 @@ import * as vscode from 'vscode';
 
 suite('default Settings', function () {
     const settingsToTest = [{
-        uri: 'compilerLocation',
-        defaultValue: 'C:\\Program Files (x86)\\Crestron\\SIMPL\\SPlusCC.exe'
+        uri: 'simplDirectory',
+        defaultValue: 'C:\\Program Files (x86)\\Crestron\\Simpl'
     }, {
         uri: 'enable2series',
         defaultValue: false
@@ -14,9 +14,6 @@ suite('default Settings', function () {
     }, {
         uri: 'enable4series',
         defaultValue: false
-    }, {
-        uri: 'helpLocation',
-        defaultValue: 'C:\\Program Files (x86)\\Crestron\\Simpl\\Simpl+lr.chm'
     }];
     const configurationSplus = vscode.workspace.getConfiguration('splus');
     settingsToTest.forEach(function (setting) {

@@ -48,7 +48,6 @@ export class SimplPlusKeywordHelp {
         }
     }
 
-
     public async GetSimplHelp(keyword: string): Promise<MarkdownString | undefined> {
         var helpUrlEntry = this.helpUrls.find((entry) => entry.functionName === keyword.toLowerCase());
         if (helpUrlEntry === undefined || helpUrlEntry.url === undefined) { return undefined; }

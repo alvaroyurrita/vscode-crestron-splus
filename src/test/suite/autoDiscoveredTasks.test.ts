@@ -36,7 +36,7 @@ suite("With Faked Saved File", function () {
                 await OpenAndShowSPlusDocument(`#${library}_SIMPLSHARP_LIBRARY \"My.Test-Library\";`);
                 const splusTasks = await vscode.tasks.fetchTasks();
                 assert.ok(splusTasks.length > 0, "Should have at least one task");
-                assert.ok(fsExistSyncStub.args.find(a => a[0].toString().includes("My.Test-Library.dll")));
+                assert.ok(fsExistSyncStub.args.find(a => a[0].toString().includes("My.Test-Library.clz")));
                 assert.strictEqual(splusTasks[0].name, "Generate API file for My.Test-Library");
                 assert.strictEqual(splusTasks[1].name, "Compile 3 Series");
                 fsExistSyncStub.restore();
@@ -62,46 +62,106 @@ suite("With Faked Saved File", function () {
             enable2series: true,
             enable3series: false,
             enable4series: false,
-            responses: ["Compile 2 Series"]
+            responses: [{
+                label: "Compile 2 Series",
+                parameter: "series2"
+            }],
         },
         {
             enable2series: false,
             enable3series: true,
             enable4series: false,
-            responses: ["Compile 3 Series"]
+            responses: [{
+                label: "Compile 3 Series",
+                parameter: "series3"
+            }]
         },
         {
             enable2series: true,
             enable3series: true,
             enable4series: false,
-            responses: ["Compile 2 Series", "Compile 2 & 3 Series", "Compile 3 Series"]
+            responses: [{
+                label: "Compile 2 & 3 Series",
+                parameter: "series2 series3"
+            },
+            {
+                label: "Compile 2 Series",
+                parameter: "series2"
+            },
+            {
+                label: "Compile 3 Series",
+                parameter: "series3"
+            }]
         },
         {
             enable2series: false,
             enable3series: false,
             enable4series: true,
-            responses: ["Compile 4 Series"]
+            responses: [{
+                label: "Compile 4 Series",
+                parameter: "series4"
+            }]
         },
         {
             enable2series: true,
             enable3series: false,
             enable4series: true,
-            responses: ["Compile 2 Series", "Compile 4 Series"]
+            responses: [{
+                label: "Compile 2 & 4 Series",
+                parameter: "series2 series4"
+            },
+            {
+                label: "Compile 2 Series",
+                parameter: "series2"
+            },
+            {
+                label: "Compile 4 Series",
+                parameter: "series4"
+            }],
         },
         {
             enable2series: false,
             enable3series: true,
             enable4series: true,
-            responses: ["Compile 3 Series", "Compile 3 & 4 Series", "Compile 4 Series"]
+            responses: [{
+                label: "Compile 3 & 4 Series",
+                parameter: "series3 series4"
+            },
+            {
+                label: "Compile 3 Series",
+                parameter: "series3"
+            },
+            {
+                label: "Compile 4 Series",
+                parameter: "series4"
+            }]
         },
         {
             enable2series: true,
             enable3series: true,
             enable4series: true,
-            responses: ["Compile 2 Series", "Compile 2 & 3 Series", "Compile 3 Series", "Compile 3 & 4 Series", "Compile 4 Series", "Compile 2 & 3 & 4 Series"]
+            responses: [{
+                label: "Compile 2 & 3 & 4 Series",
+                parameter: "series2 series3 series4"
+            },
+            {
+                label: "Compile 2 Series",
+                parameter: "series2"
+            },
+            {
+                label: "Compile 3 Series",
+                parameter: "series3"
+            },
+            {
+                label: "Compile 4 Series",
+                parameter: "series4"
+            }]
         }];
         settingsToTest.forEach(function (setting) {
             test(`Series 2: ${setting.enable2series}, Series 3: ${setting.enable3series}, Series 4: ${setting.enable4series} it should have ${setting.responses.length} tasks`, async () => {
+                let label: string[] = [];
+                let parameter: string[] = [];
+
                 const configurationSplus = vscode.workspace.getConfiguration('splus');
                 await configurationSplus.update('enable2series', setting.enable2series);
                 await configurationSplus.update('enable3series', setting.enable3series);
@@ -110,7 +170,9 @@ suite("With Faked Saved File", function () {
                 assert.ok(splusTasks.length === setting.responses.length);
                 let index = 0;
                 setting.responses.forEach((response) => {
-                    assert.strictEqual(splusTasks[index].name, response);
+                    assert.strictEqual(splusTasks[index].name, response.label);
+                    const compileCommand = `\"C:\\Program Files (x86)\\Crestron\\Simpl\\SPlusCC.exe\" \\rebuild Untitled-1 \\target ${response.parameter}`;
+                    assert.ok(splusTasks[index].definition?.id?.includes(compileCommand));
                     index++;
                 });
             });

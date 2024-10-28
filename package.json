@@ -37,15 +37,10 @@
       {
         "title": "Crestron S+",
         "properties": {
-          "splus.compilerLocation": {
+          "splus.simplDirectory": {
             "type": "string",
-            "default": "C:\\Program Files (x86)\\Crestron\\SIMPL\\SPlusCC.exe",
-            "description": "Location of the S+ compiler. Please use double \\\\ for the path."
-          },
-          "splus.helpLocation": {
-            "type": "string",
-            "default": "C:\\Program Files (x86)\\Crestron\\Simpl\\Simpl+lr.chm",
-            "description": "Location of the S+ Help reference"
+            "default": "C:\\Program Files (x86)\\Crestron\\Simpl",
+            "description": "Location of the Crestron SIMPL Directory. Please use double \\\\ for the path."
           },
           "splus.enable2series": {
             "type": "boolean",

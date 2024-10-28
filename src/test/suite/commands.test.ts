@@ -47,13 +47,11 @@ suite('Execution', function () {
 
     });
     test('Web Help should open open a browser link', async function () {
-        const fakeShowBrowserCommand = sinon.stub(vscode.commands, 'executeCommand')
-            .callThrough()
-            .withArgs('simpleBrowser.show', sinon.match.any)
-            .returns(Promise.resolve());
+        const fakeShowBrowserCommand = sinon.stub(vscode.env, 'openExternal')
+            .returns(Promise.resolve(true));
         await vscode.commands.executeCommand('splus.webHelp');
         await delay(500);
         assert.ok(fakeShowBrowserCommand.calledOnce);
-        assert.ok(fakeShowBrowserCommand.args[0][1].includes('http://help.crestron.com/simpl_plus'));
+        assert.ok(fakeShowBrowserCommand.args[0][0].toString() === 'https://help.crestron.com/simpl_plus');
     });
 });

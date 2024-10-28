@@ -4,20 +4,20 @@ import {
     workspace,
     window,
     commands,
-    MarkdownString,
-    Hover,
+    env,
+    Uri
 } from "vscode";
 
-import { FormattingProvider, FormatProvider } from './formattingProvider';
+import { SimplPlusFormattingProvider } from './SimplPlusFormattingProvider';
 import { SimplPlusHoverProvider } from "./simplPlusHoverProvider";
 
 
-import { buildExtensionTasks, clearExtensionTasks } from './taskProvider';
+import { buildExtensionTasks, clearExtensionTasks } from './buildExtensionTasks';
 
 // Creates a terminal, calls the command, then closes the terminal
 function callShellCommand(shellCommand: string): void {
     let term = window.createTerminal('splus', 'c:\\windows\\system32\\cmd.exe');
-    term.sendText("\"" + shellCommand + "\"", true);
+    term.sendText(`\"${shellCommand}\"`, true);
     term.sendText("exit", true);
 }
 
@@ -32,20 +32,21 @@ export async function activate(context: ExtensionContext) {
 
 
     let localHelp_command = commands.registerCommand("splus.localHelp", () => {
-        callShellCommand(workspace.getConfiguration("splus").helpLocation);
+        const helpLocation = `${workspace.getConfiguration("splus").simplDirectory}\\Simpl+lr.chm`;
+        callShellCommand(helpLocation);
     });
 
-    function openWebHelp(): void {
-        commands.executeCommand('simpleBrowser.show', 'http://help.crestron.com/simpl_plus');
-    }
-    let webHelp_command = commands.registerCommand("splus.webHelp", openWebHelp);
+    let webHelp_command = commands.registerCommand("splus.webHelp", ()=>{
+        env.openExternal(Uri.parse('https://help.crestron.com/simpl_plus'));
+    });
 
-    let thisFormatProvider = new FormattingProvider(FormatProvider);
+    let thisFormatProvider = new SimplPlusFormattingProvider();
+    const formatProvider = languages.registerDocumentFormattingEditProvider({ language: 'splus-source' }, thisFormatProvider);
+
     let thisHoverProvider = new SimplPlusHoverProvider();
-
-    languages.registerDocumentFormattingEditProvider({ language: 'splus-source' }, thisFormatProvider);
     const hoverProvider = languages.registerHoverProvider({ language: 'splus-source' }, thisHoverProvider);
 
+    context.subscriptions.push(formatProvider);
     context.subscriptions.push(hoverProvider);
     context.subscriptions.push(localHelp_command);
     context.subscriptions.push(webHelp_command);
@@ -54,7 +55,6 @@ export async function activate(context: ExtensionContext) {
     workspace.onDidOpenTextDocument(buildExtensionTasks);
     workspace.onDidSaveTextDocument(buildExtensionTasks);
     window.onDidChangeActiveTextEditor(buildExtensionTasks);
-
 
     buildExtensionTasks();
 }
