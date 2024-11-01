@@ -1,0 +1,845 @@
+/*******************************************************************************************
+  MultiLine Comment
+*******************************************************************************************/
+
+// Single Line Comment
+
+
+#ANALOG_SERIAL_EXPAND Separately
+#CATEGORY "6" 
+//#DEFAULT_NONVOLATILE 
+#DEFAULT_VOLATILE 
+#DEFINE_CONSTANT HELLO 5
+//#DIGITAL_EXPAND 
+//#ENABLE_DYNAMIC
+//#ENABLE_STACK_CHECKING 
+#ENABLE_TRACE 
+#ENCODING_ASCII 
+//#ENCODING_INHERIT_FROM_PARENT 
+//#ENCODING_INHERIT_FROM_PROGRAM 
+//#ENCODING_UTF16 
+#HELP "The Help"
+#HINT "The Hint"
+
+
+#INCLUDEPATH "."
+#LARGE_STACK 
+//#MAX_INTERNAL_BUFFER_SIZE 
+#OUTPUT_SHIFT 5
+#PRINT_TO_TRACE 
+#SYMBOL_NAME "My Name"
+
+//  Include Libraries
+//#CRESTRON_LIBRARY "KnobAnalogHandler"
+#USER_LIBRARY "SampleLibrary"
+//#CRESTRON_SIMPLSHARP_LIBRARY "ZunExternal"
+#USER_SIMPLSHARP_LIBRARY "SampleSimplSharpLibrary"
+
+//DIGITAL, ANALOG and SERIAL INPUTS and OUTPUTS
+STRING_INPUT StringInput1[20];//, StringInput2[4][20], _SKIP_, StringInput3[4,2][20];
+BUFFER_INPUT BufferInput1[20];
+DIGITAL_INPUT DigitalInput1, DigitalInput2[4], _SKIP_, DigitalInput3[4,2];
+ANALOG_INPUT AnalogInput1, AnalogInput2[4], _SKIP_, AnalogInput3[4,2];
+STRING_INPUT StringInput2[4][20], _SKIP_, StringInput3[4,2][20];
+BUFFER_INPUT BufferInput2[4][20], _SKIP_, BufferInput3[4,2][20];
+STRING_OUTPUT StringOutput1;
+DIGITAL_OUTPUT DigitalOutput1, DigitalOutput2[4], _SKIP_, DigitalOutput3[4,2];
+ANALOG_OUTPUT AnalogOutput1, AnalogOutput2[4], _SKIP_, AnalogOutput3[4,2];
+STRING_OUTPUT StringOutput2[4], _SKIP_, StringOutput3[4,2];
+
+// Class Definitions
+SampleClass CustomClass;
+CEvent cEventClass;
+CMutex cMutexClass;
+
+
+// Sockets
+TCP_CLIENT TcpClient[100];
+TCP_SERVER TcpServer[100];
+UDP_SOCKET UdpSocket[100];
+
+// Parameters
+INTEGER_PARAMETER IntegerParameter1, IntegerParameter2[4];
+SIGNED_INTEGER_PARAMETER SignedIntegerParameter1, SignedIntegerParameter2[4];
+LONG_INTEGER_PARAMETER LongIntgerParameter1, LongIntgerParameter2[4];
+SIGNED_LONG_INTEGER_PARAMETER SignedLongIntegerParameter1, SignedLongIntegerParameter2[4];
+STRING_PARAMETER StringParameter1[50], StringParameter2[4][50];
+
+//Parameter Properties
+
+#BEGIN_PARAMETER_PROPERTIES StringParameter1
+propValidUnits =  unitString;
+propDefaultUnit =  unitString;
+propDefaultValue =  "";
+propList = { "hello" , "helloLabel" } , { "goodby" , "goodbylabel" };
+propShortDescription = "status_bar_hint_text for StringParameter1";
+#BEGIN_PROP_FULL_DESCRIPTION  
+line_1...  
+line_2...  
+line_n  
+#END_PROP_FULL_DESCRIPTION
+#BEGIN_PROP_NOTES 
+line_1...  
+line_2...  
+line_n  
+#END_PROP_NOTES
+#END_PARAMETER_PROPERTIES
+
+#BEGIN_PARAMETER_PROPERTIES IntegerParameter1
+propValidUnits = unitDecimal|unitHex|unitPercent|unitCharacter|unitTime|unitTicks;
+propDefaultUnit =  unitDecimal;
+propBounds = 5d , 10d;
+propDefaultValue = 5d;  
+propShortDescription = "status_bar_hint_text for IntegerParameter1";
+#BEGIN_PROP_FULL_DESCRIPTION  
+line_1...  
+line_2...  
+line_n  
+#END_PROP_FULL_DESCRIPTION
+#BEGIN_PROP_NOTES 
+line_1...  
+line_2...  
+line_n  
+#END_PROP_NOTES
+#END_PARAMETER_PROPERTIES
+
+
+
+//Structure Definitions
+
+STRUCTURE StructureExample
+{
+	INTEGER StructureIntegerVar1;
+};
+
+StructureExample struct;
+
+//Declarations
+INTEGER IntegerVariable1, IntegerVariable2[4], IntegerVariable3[4][2];
+LONG_INTEGER LongIntgerVariable1, LongIntgerVariable2[4], LongIntgerVariable3[4][2];
+SIGNED_INTEGER SignedIntegerVariable1, SignedIntegerVariable2[4], SignedIntegerVariable3[4][2];
+SIGNED_LONG_INTEGER SignedLongIntegerVariable1, SignedLongIntegerVariable2[4], SignedLongIntegerVariable3[4][2];
+STRING StringVariable1[50], StringVariable2[4][50];
+DYNAMIC STRING DynamicString[10];
+VOLATILE STRING VolatileString[10];
+NONVOLATILE STRING NonVolatileString[10];
+ASCII STRING AsiiString[10];
+UTF16 string Utf16String[10];
+INHERIT STRING InheritString[10];
+
+//Functions
+
+FUNCTION MyFunction1()
+{
+	INTEGER int1, int2, int3;
+	//Operators
+	//Arithmetic Operators
+	int3 = -int1; //negation
+	int3 = int1 * int2; //multiplications
+	int3 = int1 / int2; //division
+	int3 = int1 S/ int2; //Signed Divition
+	int3 = int1 MOD int2; //Signed Modulo
+	int3 = int1 UMOD int2; //Unsigned Modulo
+	int3 = int1 % int2; // Singed Module
+	int3 = int1 + int2; // Addition
+	int3 = int1 - int2; // Substraction
+	int3 = int1 + int2; // Addition
+	int3 = int1 + int2; // Addition
+	int3 = int1 + int2; // Addition
+	int3 = int1 + int2; // Addition
+	int3 = int1 + int2; // Addition
+	int3 = int1 + int2; // Addition
+	
+	//Bitwise Operators
+	int3 = int1 << 1; // Shift Left
+	int3 = int1 >> 1; // Shift Right
+	int3 = int1 {{ 1; // Rotate LEft
+			int3 = int1 }} 1; // Rotate Right
+	int3 = Not(int1); // 1's Complement
+	int3 = int1 & int2; // Bitwise AND
+	int3 = int1 | int2; // Bitwise OR
+	int3 = int1 ^ int2; // Bitwise XOR
+	
+	//Relational Operators
+	int3 = int1 = int2; // Assignment then Comparisone
+	int3 = !int2; //Complement;
+	int3 = int1 <> int2; //Not Equal
+	int3 = int1 < int2; //Unsigned Less Than
+	int3 = int1 > int2; //Unsigned Greater Than
+	int3 = int1 <= int2; //Unsigned Less Than or Equal
+	int3 = int1 >= int2; //Unsigned Greater Than or Equal
+	int3 = int1 && int2; //Logical AND
+	int3 = int1 || int2; //Logical OR
+}
+
+
+
+INTEGER_FUNCTION  MyIntFunction1()
+{
+	#IF_DEFINED MyIntFunction1
+	PRINT("");
+	#ENDIF 
+	#IF_NOT_DEFINED MyIntFunction1
+	PRINT("");
+	#ENDIF 
+	
+	#IF_SERIES2 
+	PRINT("");
+	#ENDIF 
+	
+	// #IF_SERIES3 
+	// PRINT("");
+	// #ENDIF 
+	
+	#IF_SERIES4 
+	PRINT("");
+	#ENDIF 
+	
+	Return (0);
+}
+
+LONG_INTEGER_FUNCTION LongIntegerFunction1()
+{
+	Return (0);
+}
+
+FUNCTION LoopingConstructs()
+{
+	INTEGER a;
+	
+	FOR (a = 1 TO 5 STEP 1)
+	{
+		PRINT("");
+		CONTINUE;
+	}
+	a = 0;
+	WHILE(a<5)
+	{
+		a=a+1;
+		PRINT("");
+	}
+	
+	a=0;
+	do
+	{
+		a=a+1;
+	}
+	until(a=5);
+}
+
+FUNCTION ArrayOperators()
+{
+	INTEGER a,e;
+	INTEGER g[10],c,d;
+	INTEGER b[10][10];
+	DYNAMIC INTEGER f[10];
+	DYNAMIC StructureExample testStruct[10];
+	
+	SetArray(g,3);
+	c = GetNumArrayCols(b);
+	c = GetNumArrayRows(b);
+	c = GetNumStructureArrayCols(testStruct);
+	e = ResizeArray(g,20);
+	e = ResizeStructureArray(testStruct,20);
+}
+
+FUNCTION CrestronClases()
+{
+	SIGNED_LONG_INTEGER h;
+	
+	cEventClass.Close();
+	h = cEventClass.Reset();
+	h = cEventClass.Set();
+	h = cEventClass.Wait(10);
+	
+	cMutexClass.Close();
+	cMutexClass.ReleaseMutex();
+	h = cMutexClass.WaitForMutex();
+}
+
+FUNCTION DataConversionFunctions(){
+	
+	INTEGER a;
+	LONG_INTEGER c;
+	SIGNED_INTEGER d;
+	SIGNED_LONG_INTEGER e;
+	STRING b[30];
+	
+	a = ATOI("Hello");
+	c = ATOL("Hello");
+	b = Chr(10);
+	a = HexToI("ABCD");
+	c = HexToL("ABCDabcd");
+	d = HexToSI ("ABCD");
+	e = HexToSL ("ABCDabcd");
+	b = ITOA(25);
+	b = ITOHex(14);
+	b = LtoA(10000000);
+	b = LtoHex(10000000); 
+}
+
+Function RandomFunctions()
+{
+	INTEGER a;
+	SEED(10);
+	a = RND();
+	a = RANDOM(5,10);
+}
+
+callback GatherEventHandler MyGatherCallback(GatherEventArgs Args)
+{
+	STRING a[20];
+	SIGNED_INTEGER c;
+	
+	a=Args.RxString;
+	c = Args.Results;
+	RearmGatherAsync(Args.Input);
+}
+
+Function StringParsingAndManipulations()
+{
+	STRING a[10],b[10];
+	INTEGER d;
+	SIGNED_INTEGER c;
+	
+	ClearBuffer(BufferInput1);
+	c =CompareStrings(a,b);
+	c = CompareStringsNoCase(a,b);
+	d = Find("a",a,1);
+	d = FindNoCase("a",a,1);
+	a = Gather("a",BufferInput1,10);
+	c = GatherAsync("a",BufferInput1,MyGatherCallback,10);
+	c = GatherAsyncByLength(5,BufferInput1,MyGatherCallback,10);
+	b = GatherByLength(5,BufferInput1,10);
+	c = GatherByLengthWithDest(5,BufferInput1,b,10);
+	d = GetEncoding(a);
+	a = Left(a,3);
+	d = Len(a);
+	b = Lower(a);
+	a = Mid(a,1,2);
+	c = RearmGatherAsync(BufferInput1);
+	b = Remove("a",a,1);
+	b = RemoveByLength(3,a);
+	c = RemoveGatherAsync(BufferInput1);
+	c = ResizeString(a,20);
+	d = ReverseFind(a,"d",0);
+	d = ReverseFindNoCase(a,"d",0); 
+	b = Right(a,5);
+	SetEncoding(a,ENCODING_ASCII);
+	b = ToASCII(a);
+	b = ToUTF16(a);
+	b = Upper(a);
+}
+
+FUNCTION SystemControl()
+{
+	Pulse(5,DigitalOutput1);
+	PROCESSLOGIC();
+	DELAY(6);
+}
+
+FUNCTION SystemInterfaceing()
+{
+	INTEGER a;
+	STRING b[10];
+	
+	b=GetModelNumber();
+	a=GetSeries();
+	b=GetSymbolInstanceName();
+	b=GetSymbolReferenceName();
+	a=IsSignalDefined(DigitalInput2[2]);
+	b=MakeProgramFilename("\\a");
+	SendCresnetPacket("\xFF");
+	SendPacketToCPU("\xFF");
+}
+
+FUNCTION WaitEvents()
+{
+	WAIT(10,MyWait)
+	{
+		PRINT("");
+	}
+	CANCELWAIT(MyWait);
+	CANCELALLWAIT();
+	PAUSEWAIT(MyWait);
+	RESUMEALLWAIT();
+	PAUSEALLWAIT();
+	RETIMEWAIT(5,MyWait);
+	RESUMEWAIT(MyWait);
+}
+
+FUNCTION MathematicalFunctions()
+{
+	INTEGER a,b,c;
+	
+	a = SMIN(a,b);
+	a = SMAX(a,b);
+	a = MULDIV(a,b,c);
+	a = MIN(a,b);
+	a = MAX(a,b);
+	a = ABS(a);
+}
+
+FUNCTION StringFormatting()
+{
+	STRING a[10],b[10];
+	INTEGER c;
+	
+	MakeString(a,"Hello World %s",a);
+	Print("Hello World %s",a);
+	a = "Hello"+"Worlds";
+	If(a=b){Print("");};
+	If(a<>b){Print("");};
+	If(a<b){Print("");};
+	If(a>b){Print("");};
+	Trace("Hello World %s",a); 
+}
+
+Function BranchingFunctions()
+{
+	INTEGER a;
+	STRING b[10];
+	
+	CSWITCH (a)
+	{
+		CASE (1):
+		{
+			Print("");
+			break;
+		}
+		CASE (2):
+		{
+			Print("");
+			break;
+		}
+		DEFAULT:
+		{
+			Print("");
+			break;
+		}
+	}
+	
+	SWITCH (a)
+	{
+		CASE (1):
+		{
+			Print("");
+		}
+		CASE (2):
+		{
+			Print("");
+		}
+		DEFAULT:
+		{
+			Print("");
+		}
+	}
+}
+
+FUNCTION BitAndByteFunctions()
+{
+	INTEGER a,b;
+	STRING c[10];
+	LONG_INTEGER d;
+	
+	a= Bit("abc",1,2);
+	a= Byte("abc",1);
+	a= High(a);
+	a= HighWord(d);
+	a= Low(a);
+	a= LowWord(d);
+	a= LowerChar(12);
+	a= UpperChar(12);
+	a= SetByte(c,1,2);
+}
+
+FUNCTION FileFunctions()
+{
+	SIGNED_INTEGER a;
+	SIGNED_INTEGER nNumWritten, nFileHandle, iErrorCode, nTotalBytesRead;
+	STRING sBuf[4096];
+	FILE_INFO FileInfo;
+	SIGNED_INTEGER Found, si;
+	STRING s[100][100];
+	STRING s2[100];
+	SIGNED_INTEGER isArray[10][5];
+	SIGNED_LONG_INTEGER sli;
+	LONG_INTEGER li;
+	INTEGER i;
+	SIGNED_LONG_INTEGER sliArray[10][5];
+	INTEGER iArray[10];
+	LONG_INTEGER ilArray[10];
+	
+	a = IsNull(cMutexClass);
+	
+	a=StartFileOperations();
+	nFileHandle = FileOpen ( "\\CF0\\MyFile", _O_WRONLY | _O_TEXT );
+	if ( nFileHandle >= 0 )
+	{
+		sBuf = "Hello World!";
+		nNumWritten=FileWrite( nFileHandle, sBuf, 500 );
+		if(nNumWritten<0) Print ("WriteError");
+		FileClose( nFileHandle );
+	}
+	a=EndFileOperations();
+	
+	a=StartFileOperations();
+	nFileHandle = FileOpen ( "\\CF0\\MyFile", _O_RDONLY | _O_TEXT);
+	IF (nFileHandle < 0)
+	{
+		PRINT("Error Opening File MyFile\n");
+		return;
+	}
+	IF ( FileEOF ( nFileHandle ) = 1 )
+	PRINT ( "End of file reached\n" );
+	a= SEEK_SET | SEEK_CUR | SEEK_END;
+	IF (FileSeek( nFileHandle, 0, SEEK_SET) < 0 )
+	PRINT ( "Error seeking file\n" );
+	IF ( FileClose ( nFileHandle ) <> 0 )
+	PRINT ( "Error closing file\n" );
+	a=EndFileOperations();
+	
+	a=StartFileOperations();    
+	IF ( FileDelete ( "\\CF0\\MyFile" ) <> 0 )
+	PRINT ( "Error deleting file\n" );
+	a=EndFileOperations();
+	
+	StartFileOperations();
+	nFileHandle = FileOpen ( "\\CF0\\MyFile", _O_RDONLY | _O_TEXT);
+	IF (nFileHandle < 0)
+	{
+		PRINT("Error Opening File MyFile\n");
+		return;
+	}
+	IF ( FileBOF ( nFileHandle )  = 1 )
+	PRINT ( "Beginning of file reached\n" );
+	IF ( FileClose ( nFileHandle ) <> 0 )
+	PRINT ( "Error closing file" );
+	EndFileOperations();
+	
+	
+	StartFileOperations();
+	nFileHandle = FileOpen ( "\\CF0\\MyFile", _O_RDONLY | _O_TEXT);
+	IF (nFileHandle >= 0)
+	{
+		PRINT ( "Length of file = %d\n", FileLength ( nFileHandle ) );
+		WHILE (FileRead(nFileHandle, sBuf, 4096) > 0)
+		PRINT ( "Read from file: %s\n", sBuf );
+		IF ( FileClose ( nFileHandle ) <> 0 )
+		PRINT ( "Error closing file\n" );
+		iErrorCode = ReadString( nFileHandle, s2);
+		iErrorCode = WriteStringArray( nFileHandle, s);
+		iErrorCode = ReadStringArray( nFileHandle, s);
+		iErrorCode = WriteSignedLongInteger(nFileHandle, sli);
+		iErrorCode = WriteLongInteger(nFileHandle, li);
+		iErrorCode = WriteInteger(nFileHandle, i);
+		iErrorCode = WriteString( nFileHandle, s2);
+		iErrorCode = ReadSignedLongIntegerArray(nFileHandle, sliArray);
+		iErrorCode = ReadIntegerArray(nFileHandle, iArray);
+		iErrorCode = ReadSignedIntegerArray(nFileHandle, isArray);
+		iErrorCode = ReadLongIntegerArray(nFileHandle, ilArray);
+		iErrorCode = ReadIntegerArray(nFileHandle, iArray);
+		iErrorCode = ReadSignedLongInteger(nFileHandle, sli);
+		iErrorCode = ReadSignedInteger(nFileHandle, si);
+		iErrorCode = ReadLongInteger(nFileHandle, li);
+		iErrorCode = ReadInteger(nFileHandle, i);
+		ReadStructure( nFileHandle, struct, nTotalBytesRead );
+		
+		if ( WaitForNewDisk() < 0 )
+		PRINT ( "Wait for new disk\n" );
+		
+		IF ( FileDeleteShared ( "\\CF0\\MyFile" ) <> 0 )
+		PRINT ( "Error deleting file\n" );
+		
+		a = ARDONLY | AHIDDEN | ASYSTEM | AVOLUME | ADIRENT | ARCHIVE  ;      
+		
+		IF ((FileInfo.iAttributes & ADIRENT)<>0)
+		PRINT ( "%s is a directory\n",FileInfo.Name);
+		
+		IF ( CheckForNVRAMDisk() = 1 )
+		PRINT ( "NVRAM Disk found" );
+		
+		IF( MakeDirectoryShared("NewDirect") < 0)
+		PRINT("Error occurred creating directory\n");
+		
+		IF( RemoveDirectoryShared("\\CF0\\NewDirect") < 0)
+		PRINT("Error occurred deleting directory\n");
+		
+	}
+	EndFileOperations();
+	
+	StartFileOperations(); 
+	IF ( CheckForDisk () = 1 )
+	PRINT ( "compact flash card found" );
+	EndFileOperations();
+	
+	PRINT( "The current directory =  %s\n", GetCurrentDirectory());
+	
+	IF( SetCurrentDirectory("\\CF0\\NewDirect") < 0)
+	PRINT("Error occurred creating directory\n");
+	PRINT("Directory is now: %s\n", GetCurrentDirectory());
+	
+	IF( RemoveDirectory("\\CF0\\NewDirect") < 0)
+	PRINT("Error occurred deleting directory\n");
+	
+	IF( MakeDirectory("NewDirect") < 0)
+	PRINT("Error occurred creating directory\n");
+	
+	StartFileOperations();
+	Found = FindFirst("*.dat", FileInfo );
+	WHILE (Found = 0)
+	{
+		if (IsVolume(FileInfo))
+		PRINT( "volume label = %s\n", FileInfo.Name );
+		if (IsSystem(FileInfo))
+		PRINT( "%s is a system file\n", FileInfo.Name );
+		if (IsReadOnly(FileInfo))
+		PRINT( "%s is read-only\n", FileInfo.Name );
+		Found = FindNext(FileInfo);
+		if (IsDirectory(FileInfo))
+		PRINT( "%s is a directory\n", FileInfo.Name );
+		if (IsHidden(FileInfo))
+		PRINT( "%s is hidden\n", FileInfo.Name );
+		iErrorCode = WriteSignedIntegerArray(nFileHandle, isArray);
+	}
+	IF ( FindClose() < 0 )
+	PRINT ( "Error in closing find operation\n" );
+	EndFileOperations();
+	
+	a = _O_APPEND | _O_CREAT | _O_EXCL | _O_TRUNC | _O_TEXT | _O_BINARY | _O_RDONLY | _O_RDWR | _O_WRONLY;
+	
+	s2 = FileInfo.Name;
+	a = FileInfo.iAttributes;
+	a = FileInfo.iTime;
+	a = FileInfo.iDate;
+	li = FileInfo.lSize;
+	
+}
+
+
+FUNCTION TimeAndDateFunctions()
+{
+	STRING a[10];
+	FILE_INFO FileInfo;
+	SIGNED_INTEGER b;
+	INTEGER c;
+	
+	
+	a = Date(1);
+	a = Day();
+	a = FileDate(FileInfo, 1);
+	a = FileDay(FileInfo);
+	b = FileGetDateNum(FileInfo);
+	b = FileGetDayOfWeekNum(FileInfo);
+	b = FileGetHourNum(FileInfo);
+	b = FileGetMinutesNum(FileInfo);
+	b = FileGetMonthNum(FileInfo);
+	b = FileGetSecondsNum(FileInfo);
+	b = FileGetYearNum(FileInfo);
+	a = FileMonth(FileInfo);
+	a = FileTime(FileInfo);
+	c = GetDateNum();
+	c = GetDayOfWeekNum();
+	c = GetDst();
+	b = GetGmtOffset();
+	c = GetHourNum();
+	c = GetHSeconds();
+	c = GetMinutesNum();
+	c = GetMonthNum();
+	c = GetSecondsNum();
+	c = GetTicks();
+	c = GetYearNum();
+	a = Month();
+	SetClock(1,1,1);  //No Help?
+	SetDate(1,1,1);
+	b = SetGmtOffset(1);
+	a = Time();
+}
+
+FUNCTION SendMailFunctions()
+{
+	SIGNED_INTEGER nErr;
+	
+	nErr = SendMail( "192.168.16.3",
+		"UserLogonName",
+		"UserLogonPassword",                   
+		"SenderEmailAddress@crestron.com",
+		"RecipientEmailAddress@crestron.com",
+		"ccEmailAddress@crestron.com",
+		"This is the subject",
+		"This is the message" );
+	nErr = SendMailWithAttachments( "192.168.16.3",
+		"UserLogonName",
+		"UserLogonPassword",                   
+		"SenderEmailAddress@crestron.com",
+		"RecipientEmailAddress@crestron.com",
+		"ccEmailAddress@crestron.com",
+		"This is the subject",
+		"This is the message",
+		2,
+		"\\CF0\\test.pdf;\\CF0\\test.img" );
+	nErr = SendMailAdvance( "192.168.16.3",
+		80,
+		"UserLogonName",
+		"UserLogonPassword",                   
+		"SenderEmailAddress@crestron.com",
+		"RecipientEmailAddress@crestron.com",
+		"ccEmailAddress@crestron.com",
+		"This is the subject",
+		"This is the message",
+		2,
+		"\\CF0\\test.pdf;\\CF0\\test.img" );
+}
+
+FUNCTION RampingFunctions()
+{
+	RAMP_INFO InputRampInfo, InputRampInfo2[3];
+	SIGNED_INTEGER status;
+	
+	InputRampInfo.rampLowerBound=0;
+	InputRampInfo.rampUpperBound=65535;
+	InputRampInfo.rampBaseValue=100000;
+	InputRampInfo.rampTargetValue=65535;
+	InputRampInfo.rampTransitionTime=500;
+	InputRampInfo.rampIsAbsolute=0;
+	InputRampInfo.rampIsRunnable=1;
+	
+	status = CreateRamp(AnalogOutput1,InputRampInfo);
+	status = StopRamp(AnalogOutput1);
+	status = IsRamping(AnalogOutput1) ;
+	status = GetRampInfo(AnalogOutput1,InputRampInfo) ;
+	status = CompareRampsByAttribute(AnalogOutput1,InputRampInfo);
+	status = CompareRampsByID (AnalogOutput1,4) ;
+	InitializeRampInfo(InputRampInfo);
+	InitializeRampInfoArray(InputRampInfo2) ;
+	
+}
+
+FUNCTION TryAndCatchHandling()
+{
+	INTEGER intArr[10];
+	TRY
+	{
+		intArr[1] = 1;
+		Print( "array index set" );
+	}
+	CATCH
+	{
+		Print( "Exception thrown: %s", GetExceptionMessage() );
+	}
+}
+
+SIGNED_INTEGER_FUNCTION SignedIntegerFunction1()
+{
+	Return (0);
+}
+
+SIGNED_LONG_INTEGER_FUNCTION SignedLongIntegerFunction1()
+{
+	Return (0);
+}
+
+
+STRING_FUNCTION StringFunction1()
+{
+	Return ("");
+}
+
+
+//Event Handlers
+
+PUSH DigitalInput1
+{
+	TERMINATEEVENT;
+}
+
+
+
+RELEASE DigitalInput1
+{
+	// TODO:  Add code here
+}
+
+
+
+CHANGE DigitalInput1
+{
+	// TODO:  Add code here
+}
+
+THREADSAFE CHANGE DigitalInput2
+{
+	// TODO:  Add code here
+}
+
+
+
+EVENT
+{
+	SIGNED_INTEGER status;
+	SIGNED_LONG_INTEGER a;
+	STRING soUDP_Rx[10];
+	STRING siUDP_Tx[10];
+	STRING S[300];
+	status = SocketConnectClient (TcpClient, "1.1.1.1", 20, 1);
+	status = SocketDisconnectClient (TcpClient);
+	status = SocketServerStartListen(TcpServer, S, 20);
+	status = SocketServerStopListen(TcpServer);
+	status = SocketUDP_Enable(UdpSocket, "1.1.1.1", 20);
+	status = SocketUDP_Disable (UdpSocket);
+	status = SocketSend(TcpClient, siUDP_Tx );
+	a = SocketGetPortNumber(TcpClient);
+	status = SocketGetRemoteIPAddress(TcpClient, S);
+	status = SocketGetAddressAsRequested(TcpClient, S);
+	status = SocketIsBroadcast(UdpSocket);
+	status = SocketIsMulticast(UdpSocket);
+	if (Len(UdpSocket.SocketRxBuf) < 256)
+	Print("Rx: %s", UdpSocket.SocketRxBuf);
+	soUDP_Rx = UdpSocket.SocketRxBuf;
+	ClearBuffer(UdpSocket.SocketRxBuf);
+	status = SocketSend(UdpSocket, siUDP_Tx );
+}
+
+
+
+SOCKETCONNECT TcpClient
+{
+}
+
+
+
+SOCKETDISCONNECT TcpClient
+{
+	// TODO:  Add code here
+}
+
+
+
+SOCKETRECEIVE TcpClient
+{
+	signed_integer iStatus;
+	STRING siClientTx[10];
+	STRING soClientRx[10];
+	STRING S[300];
+	iStatus = SocketGetSenderIPAddress(UdpSocket, S);
+	iStatus = TcpClient.SocketStatus;
+	soClientRx = TcpClient.SocketRxBuf;
+}
+
+
+
+SOCKETSTATUS TcpClient
+{
+	signed_integer iStatus;
+	iStatus = SocketGetStatus();
+}
+
+
+
+Function Main()
+{
+	
+	WaitForInitializationComplete();
+}
+
+

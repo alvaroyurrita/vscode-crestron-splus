@@ -1,4 +1,3 @@
-
 import {
     workspace,
     Task,
@@ -6,11 +5,11 @@ import {
     TaskGroup,
     TaskPanelKind,
     ShellExecution,
-    window
+    window,
+    extensions
 } from "vscode";
 import { TaskCreator, TaskArguments } from "./taskCreator";
 import path from "path";
-import { getApiCommand } from './apiGenerator';
 import * as fsWrapper from './fsWrapper';
 
 export function simplPlusIncludeLibraryTasks(): Task[] {
@@ -20,31 +19,31 @@ export function simplPlusIncludeLibraryTasks(): Task[] {
     let emptyTasks: Task[] = [];
 
     if (activeDocument === undefined) { return emptyTasks; }
-    let sSharpLibRegEx = /(?:#(?:USER|CRESTRON)_SIMPLSHARP_LIBRARY)\s*\"(?<clz>[\w\.\-]*)\"/gmi;
-    let sSharpIncludeRegEx = /#INCLUDEPATH\s*\"([\w\.\-]*)\"/gmi;
+    let sSharpLibRegEx = /(?:#(?:USER|CRESTRON)_SIMPLSHARP_LIBRARY)\s*\"(?<libraryName>[\w\.\-]*)\"/gmi;
 
     let sSharpLibraryMatches = activeDocument.getText().matchAll(sSharpLibRegEx);
-    let sSharpIncludes = activeDocument.getText().match(sSharpIncludeRegEx);
 
 
     if (!!sSharpLibraryMatches) {
         for (const match of sSharpLibraryMatches) {
-            const library = match.groups?.clz;
+            const library = match.groups?.libraryName;
             const fileNamePath = path.parse(activeDocument.uri.fsPath);
-            const thisFileDir = fileNamePath.dir;
-            const splsWorkDir = path.join(thisFileDir, "SPlsWork");
+            const thisFileDir =  fileNamePath.dir;
             const libraryClzDir = path.join(thisFileDir, `${library}.clz`);
             const simplDirectory = workspace.getConfiguration("splus").simplDirectory;
+            const extensionPath = extensions.getExtension("sentry07.crestron-splus")?.extensionPath;
+            if (extensionPath === undefined) { return emptyTasks; }
+            const simpPlusApiGeneratorPath = path.join(extensionPath, "ApiGenerator", "SimplPlusApiGenerator.exe");
 
             if (fsWrapper.existsSync(libraryClzDir)) {
-                let buildCommand = getApiCommand(libraryClzDir, thisFileDir);
+                let buildCommand = `\"${simpPlusApiGeneratorPath}" \"${libraryClzDir}\" \"${simplDirectory}\"`;
 
                 const taskProperties: TaskArguments = {
                     name: `Generate API file for ${library}`,
                     scope: TaskScope.Workspace,
                     source: 'Crestron S+',
                     taskDefinition: { type: "shell" },
-                    execution: new ShellExecution(`\"${buildCommand}\:`, { executable: 'C:\\Windows\\System32\\cmd.exe', shellArgs: ['/c'] }),
+                    execution: new ShellExecution(`\"${buildCommand}\"`, { executable: 'C:\\Windows\\System32\\cmd.exe', shellArgs: ['/C'] }),
                     problemMatchers: [],
                     group: TaskGroup.Build,
                     presentationOptions: { panel: TaskPanelKind.Shared, focus: true, clear: true }
@@ -58,3 +57,5 @@ export function simplPlusIncludeLibraryTasks(): Task[] {
 
     return tasks;
 }
+
+

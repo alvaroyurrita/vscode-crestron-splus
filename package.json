@@ -96,21 +96,7 @@
           ".usp",
           ".usl",
           ".csp",
-          ".csl"
-        ],
-        "icon": {
-          "dark": "./icons/splusIcon.png",
-          "light": "./icons/splusIcon.png"
-        },
-        "configuration": "./language-configuration.json"
-      },
-      {
-        "aliases": [
-          "Crestron C# API",
-          "SIMPL# Library API"
-        ],
-        "id": "splus-sharp_api",
-        "extensions": [
+          ".csl",
           ".api"
         ],
         "icon": {
@@ -125,11 +111,6 @@
         "language": "splus-source",
         "scopeName": "source.splus",
         "path": "./syntaxes/crestron-splus.tmLanguage.json"
-      },
-      {
-        "language": "splus-sharp_api",
-        "scopeName": "source.cs",
-        "path": "./syntaxes/csharp.tmLanguage.json"
       }
     ],
     "snippets": [
@@ -186,6 +167,7 @@
     "pretest": "npm run compile-tests && npm run compile && npm run lint",
     "lint": "eslint src",
     "test": "vscode-test",
+    "yaml2json-watch": "yaml2json syntaxes --save --pretty --recursive --watch",
     "test-with-coverage": "vscode-test --coverage"
   },
   "devDependencies": {
@@ -203,7 +185,8 @@
     "ts-loader": "^9.5.1",
     "typescript": "^5.5.4",
     "webpack": "^5.94.0",
-    "webpack-cli": "^5.1.4"
+    "webpack-cli": "^5.1.4",
+    "yamljs": "^0.3.0"
   },
   "__metadata": {
     "id": "sentry07.crestron-splus",

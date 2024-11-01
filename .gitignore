@@ -7,3 +7,4 @@ coverage/
 *.vsix
 SPlsWork/
 .vscode/
+*.ush

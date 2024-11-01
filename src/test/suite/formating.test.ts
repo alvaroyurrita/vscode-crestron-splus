@@ -13,9 +13,9 @@ suite("Formatting File", function () {
   test("Formatting a dirty file should be the same as the pre-existing formatted file", async () => {
     const currentWorkspace = vscode.workspace.workspaceFolders;
     //@ts-ignore
-    const dirtyDocumentPath = vscode.Uri.joinPath(currentWorkspace[0].uri, "dirtyFile.csp");
+    const dirtyDocumentPath = vscode.Uri.joinPath(currentWorkspace[0].uri, "dirtyFile.usp");
     //@ts-ignore
-    const formattedDocumentPath = vscode.Uri.joinPath(currentWorkspace[0].uri, "formattedFile.csp");
+    const formattedDocumentPath = vscode.Uri.joinPath(currentWorkspace[0].uri, "formattedFile.usp");
     try {
       const expectedFormattedText = (await vscode.workspace.fs.readFile(formattedDocumentPath)).toLocaleString();
 
