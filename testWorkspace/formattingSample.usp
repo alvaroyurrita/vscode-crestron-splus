@@ -73,7 +73,6 @@ propDefaultValue =  "";
 propList = { "hello" , "helloLabel" } , { "goodby" , "goodbylabel" };
 propShortDescription = "status_bar_hint_text for StringParameter1";
 #BEGIN_PROP_FULL_DESCRIPTION  
-#temp  
 line_1...  
 line_2...  
 line_n  

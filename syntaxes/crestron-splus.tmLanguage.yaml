@@ -389,16 +389,24 @@ repository:
           "0":
             name: punctuation.definition.comment.cs
       - contentName: comment.block.documentation.cs
-        begin: (?i)\s*(\#help_begin)\s*$
+        begin: (?i)(?:(help_begin)|(begin_prop_full_description)|(begin_prop_notes))
         beginCaptures:
           "1":
-            patterns:
-              - include: "preprocessor"
-        end: (?i)s*(\#help_end)\s*$
+            name: keyword.preprocessor.helpbegin.cs
+          "2":
+            name: keyword.preprocessor.beginpropfulldescription.cs
+          "3":
+            name: keyword.preprocessor.beginpropnotes.cs
+        end: (?i)(\#)(?:(help_end)|(end_prop_full_description)|(end_prop_notes))$
         endCaptures:
           "1":
-            patterns:
-              - include: "preprocessor"
+            name: punctuation.separator.hash.cs
+          "2":
+            name: keyword.preprocessor.helpend.cs
+          "3":
+            name: keyword.preprocessor.endpropfulldescription.cs
+          "4":
+            name: keyword.preprocessor.endpropnotes.cs
 
   punctuation-comma:
     match: ","
@@ -458,8 +466,6 @@ repository:
       - include: "#preprocessor-category"
       - include: "#preprocessor-library"
       - include: "#preprocessor-include-path"
-      - include: "#preprocessor-help-begin"
-      - include: "#preprocessor-help-end"
       - include: "#preprocessor-symbol-name"
       - include: "#preprocessor-hint"
       - include: "#preprocessor-help"
@@ -470,10 +476,6 @@ repository:
       - include: "#preprocessor-single"
       - include: "#preprocessor-begin-parameter-properties"
       - include: "#preprocessor-end-parameter-properties"
-      - include: "#preprocessor-begin-prop-full-description"
-      - include: "#preprocessor-end-prop-full-description"
-      - include: "#preprocessor-begin-prop-notes"
-      - include: "#preprocessor-end-prop-notes"
 
   preprocessor-define-constant:
     begin: >
@@ -561,20 +563,6 @@ repository:
     patterns:
       - match: \G(\".*?\")
         name: string.quoted.double.cs
-  preprocessor-help-begin:
-    match: >
-      (?ix)\G
-        \b(help_begin)\b$ #Directive
-    captures:
-      "1":
-        name: keyword.preprocessor.helpbegin.cs
-  preprocessor-help-end:
-    match: >
-      (?ix)\G
-        \b(help_end)\b$ #Directive
-    captures:
-      "1":
-        name: keyword.preprocessor.helpend.cs
   preprocessor-symbol-name:
     begin: >
       (?ix)\G
@@ -707,35 +695,7 @@ repository:
         \b(end_parameter_properties)\b #directive
     captures:
       "1":
-        name: keyword.preprocessor.endparameterproperties.cs
-  preprocessor-begin-prop-full-description:
-    match: >
-      (?ix)\G
-        \b(begin_prop_full_description)\b #directive
-    captures:
-      "1":
-        name: keyword.preprocessor.beginpropfulldescription.cs
-  preprocessor-end-prop-full-description:
-    match: >
-      (?ix)\G
-        \b(end_prop_full_description)\b #directive
-    captures:
-      "1":
-        name: keyword.preprocessor.endpropfulldescription.cs
-  preprocessor-begin-prop-notes:
-    match: >
-      (?ix)\G
-        \b(begin_prop_notes)\b #directive
-    captures:
-      "1":
-        name: keyword.preprocessor.beginpropnotes.cs
-  preprocessor-end-prop-notes:
-    match: >
-      (?ix)\G
-        \b(end_prop_notes)\b #directive
-    captures:
-      "1":
-        name: keyword.preprocessor.endpropnotes.cs                         
+        name: keyword.preprocessor.endparameterproperties.cs                        
   
   expression-operator-expression:
     begin: (\()
