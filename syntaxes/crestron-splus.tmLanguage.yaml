@@ -141,6 +141,7 @@ repository:
       #     #   - include: "#conditional-operator"
       - include: "#assignment-expression"
       - include: "#expression-operators"
+      - include: "#string-literal"
       #     #   - include: "#await-expression"
       #     #   - include: "#query-expression"
       #     #   - include: "#as-expression"
@@ -149,19 +150,17 @@ repository:
       #     #   - include: "#object-creation-expression"
       #     #   - include: "#array-creation-expression"
       #     #   - include: "#anonymous-object-creation-expression"
-      #       - include: "#invocation-expression"
+      - include: "#invocation-function"
       #     #   - include: "#member-access-expression"
       #     #   - include: "#element-access-expression"
       #     #   - include: "#cast-expression"
       #     #   - include: "#literal"
-      #     #   - include: "#parenthesized-expression"
+      - include: "#parenthesized-expression"
       #     #   - include: "#tuple-deconstruction-assignment"
       #     #   - include: "#initializer-expression"
       - include: "#identifier"
 
-  identifier:
-    name: "variable.other.readwrite.cs"
-    match: "[\\_[:alpha:]][\\_\\#\\_\\$[:alnum:]]*"
+
 
   #   string:
   #     patterns:
@@ -372,48 +371,8 @@ repository:
   #     match: "\\b((0x[a-fA-F0-9]{1,8})|([0-9]+))\\b"
   #     name: constant.numeric.usp
 
-  comment:
-    patterns:
-      - name: comment.line.double-slash.cs
-        begin: (^\s+)?(\/\/).*$
-        while: ^(\s*)(\/\/).*$
-        captures:
-          "1":
-            name: punctuation.whitespace.comment.leading.cs
-          "2":
-            name: punctuation.definition.comment.cs
-      - name: comment.block.cs
-        begin: \/\*
-        end: \*\/
-        captures:
-          "0":
-            name: punctuation.definition.comment.cs
-      - contentName: comment.block.documentation.cs
-        begin: (?i)(?:(help_begin)|(begin_prop_full_description)|(begin_prop_notes))
-        beginCaptures:
-          "1":
-            name: keyword.preprocessor.helpbegin.cs
-          "2":
-            name: keyword.preprocessor.beginpropfulldescription.cs
-          "3":
-            name: keyword.preprocessor.beginpropnotes.cs
-        end: (?i)(\#)(?:(help_end)|(end_prop_full_description)|(end_prop_notes))$
-        endCaptures:
-          "1":
-            name: punctuation.separator.hash.cs
-          "2":
-            name: keyword.preprocessor.helpend.cs
-          "3":
-            name: keyword.preprocessor.endpropfulldescription.cs
-          "4":
-            name: keyword.preprocessor.endpropnotes.cs
 
-  punctuation-comma:
-    match: ","
-    name: punctuation.separator.comma.usp
-  punctuation-semicolon:
-    match: ";"
-    name: punctuation.terminator.statement.usp
+
 
   #   invocation-expression:
   #     begin: >
@@ -425,9 +384,9 @@ repository:
   #       (?=\\()                                           # open paren of argument list
   #     beginCaptures:
   #       "1":
-  #         name: "punctuation.accessor.cs"
+  #         name: "punctuation.accessor.usp"
   #       "2":
-  #         name: "entity.name.function.cs"
+  #         name: "entity.name.function.usp"
   #     end: "(?<=\\))"
   #     patterns:
   #       - include: "#argument-list"
@@ -436,27 +395,34 @@ repository:
   #     begin: "\\("
   #     beginCaptures:
   #       "0":
-  #         name: "punctuation.parenthesis.open.cs"
+  #         name: "punctuation.parenthesis.open.usp"
   #     end: "\\)"
   #     endCaptures:
   #       "0":
-  #         name: "punctuation.parenthesis.close.cs"
+  #         name: "punctuation.parenthesis.close.usp"
   #     patterns:
   #       - include: "#argument"
   #       - include: "#punctuation-comma"
 
   #   argument:
   #     patterns:
-  #       - name: "storage.modifier.$1.cs"
+  #       - name: "storage.modifier.$1.usp"
   #         match: "(?i)\\b(ByRef|ByVal|ReadOnlyByRef)\\b"
   #       - include: "#expression"
 
+#Groups
+  intrusive:
+    patterns:
+    - include: "#preprocessor"
+    - include: "#comment"
+
+#Directives and Preprocessor
   preprocessor:
-    name: meta.preprocessor.cs
+    name: meta.preprocessor.usp
     begin: ^\s*(\#)
     beginCaptures:
       "1":
-        name: punctuation.separator.hash.cs
+        name: punctuation.separator.hash.usp
     end: (?<=$)
     patterns:
       - include: "#comment"
@@ -476,7 +442,6 @@ repository:
       - include: "#preprocessor-single"
       - include: "#preprocessor-begin-parameter-properties"
       - include: "#preprocessor-end-parameter-properties"
-
   preprocessor-define-constant:
     begin: >
       (?ix)\G
@@ -485,54 +450,54 @@ repository:
     end: (?=$)
     beginCaptures:
       "1":
-        name: keyword.preprocessor.defineconstant.cs
+        name: keyword.preprocessor.defineconstant.usp
       "2":
-        name: entity.name.variable.preprocessor.symbol.cs
+        name: entity.name.variable.preprocessor.symbol.usp
     patterns:
       - match: (\G0[xX])([[:xdigit:]]{1,4})
         captures:
           "1":
-            name: constant.numeric.other.prefix.hex.cs
+            name: constant.numeric.other.prefix.hex.usp
           "2":
-            name: constant.numeric.hex.cs
+            name: constant.numeric.hex.usp
       - match: (\G[0-9]+)
-        name: constant.numeric.decimal.cs
+        name: constant.numeric.decimal.usp
       - match: (\G\'.\')
-        name: constant.character.cs
+        name: constant.character.usp
       - match: (\G\".*?\")
-        name: string.quoted.double.cs
+        name: string.quoted.double.usp
   preprocessor-if-ifnot-defined:
     begin: >
       (?ix)\G
         \b(if_defined)|(if_not_defined)\b #Directive
     beginCaptures:
       "1":
-        name: keyword.preprocessor.ifdefined.cs
+        name: keyword.preprocessor.ifdefined.usp
       "2":
-        name: keyword.preprocessor.ifnotdefined.cs
+        name: keyword.preprocessor.ifnotdefined.usp
     end: (?=$)
     patterns:
       - include: "#comment"
       - match: "\\b([_[:alpha:]][\\#\\$\\_[:alnum:]]*)\\b"
-        name: entity.name.variable.preprocessor.symbol.cs
+        name: entity.name.variable.preprocessor.symbol.usp
   preprocessor-endif:
     match: >
       (?ix)\G
         \b(endif)\b #Directive
     captures:
       "1":
-        name: keyword.preprocessor.endif.cs
+        name: keyword.preprocessor.endif.usp
   preprocessor-category:
     begin: >
       (?ix)\G
         \b(category)\b\s* #Directive
     beginCaptures:
       "1":
-        name: keyword.preprocessor.category.cs
+        name: keyword.preprocessor.category.usp
     end: (?=$)
     patterns:
       - match: \G\"[0-9]*?\"
-        name: constant.numeric.category.cs
+        name: constant.numeric.category.usp
   preprocessor-library:
     begin: >
       (?ix)\G
@@ -541,70 +506,70 @@ repository:
       "1":
         patterns:
           - match: (?i)((?:user_simplsharp).*)
-            name: keyword.preprocessor.usersimplsharplibrary.cs
+            name: keyword.preprocessor.usersimplsharplibrary.usp
           - match: (?i)((?:crestron_simplsharp).*)
-            name: keyword.preprocessor.crestronsimplsharplibrary.cs
+            name: keyword.preprocessor.crestronsimplsharplibrary.usp
           - match: (?i)((?:user).*)
-            name: keyword.preprocessor.userlibrary.cs
+            name: keyword.preprocessor.userlibrary.usp
           - match: (?i)((?:crestron).*)
-            name: keyword.preprocessor.crestronlibrary.cs
+            name: keyword.preprocessor.crestronlibrary.usp
     end: (?=$)
     patterns:
       - match: \G(\".*?\")
-        name: string.quoted.double.cs
+        name: string.quoted.double.usp
   preprocessor-include-path:
     begin: >
       (?ix)\G
         \b(includepath)\b\s* #Directive
     beginCaptures:
       "1":
-        name: keyword.preprocessor.includepath.cs
+        name: keyword.preprocessor.includepath.usp
     end: (?=$)
     patterns:
       - match: \G(\".*?\")
-        name: string.quoted.double.cs
+        name: string.quoted.double.usp
   preprocessor-symbol-name:
     begin: >
       (?ix)\G
         \b(symbol_name)\b\s* #Directive
     beginCaptures:
       '1':
-        name: keyword.preprocessor.symbolname.cs
+        name: keyword.preprocessor.symbolname.usp
     end: (?=$)
     patterns:
       - match: \G(\".*?\")
-        name: string.quoted.double.cs
+        name: string.quoted.double.usp
   preprocessor-hint:
     begin: >
       (?ix)\G
         \b(hint)\b\s* #Directive
     beginCaptures:
       '1':
-        name: keyword.preprocessor.hint.cs
+        name: keyword.preprocessor.hint.usp
     end: (?=$)
     patterns:
       - match: \G(\".*?\")
-        name: string.quoted.double.cs
+        name: string.quoted.double.usp
   preprocessor-help:
     begin: >
       (?ix)\G
         \b(help)\b\s* #Directive
     beginCaptures:
       '1':
-        name: keyword.preprocessor.help.cs
+        name: keyword.preprocessor.help.usp
     end: (?=$)
     patterns:
       - match: \G(\".*?\")
-        name: string.quoted.double.cs
+        name: string.quoted.double.usp
   preprocessor-default-nonvolatile-volatile:
     match: >
       (?ix)\G
         \b(default_nonvolatile)|(default_volatile)\b #Directive
     captures:
       '1':
-        name: keyword.preprocessor.defaultnonvolatile.cs
+        name: keyword.preprocessor.defaultnonvolatile.usp
       '2':
-        name: keyword.preprocessor.defaultvolatile.cs
+        name: keyword.preprocessor.defaultvolatile.usp
   preprocessor-analog-digital-expand:
     begin: >
       (?ix)\G
@@ -612,14 +577,14 @@ repository:
     end: (?=$)
     beginCaptures:
       '1':
-        name: keyword.preprocessor.analogserialexpand.cs
+        name: keyword.preprocessor.analogserialexpand.usp
       '2':
-        name: keyword.preprocessor.digitalexpand.cs
+        name: keyword.preprocessor.digitalexpand.usp
     patterns:
       - match: >
           (?ix)\G
             ([a-z]+)$
-        name: keyword.control.option.cs
+        name: keyword.control.option.usp
   preprocessor-output-shift:
     begin: >
       (?ix)\G
@@ -627,10 +592,10 @@ repository:
     end: (?=$)
     beginCaptures:
       '1':
-        name: keyword.preprocessor.outputshift.cs
+        name: keyword.preprocessor.outputshift.usp
     patterns:
       - match: \G[0-9]+
-        name: constant.numeric.decimal.cs
+        name: constant.numeric.decimal.usp
   preprocessor-max-internal-buffer-size:
     begin: >
       (?ix)\G
@@ -638,10 +603,10 @@ repository:
     end: (?=$)
     beginCaptures:
       '1':
-        name: keyword.preprocessor.outputshift.cs
+        name: keyword.preprocessor.outputshift.usp
     patterns:
       - match: \G[0-9]+
-        name: constant.numeric.decimal.cs
+        name: constant.numeric.decimal.usp
   preprocessor-single:
     begin: >
       (?ix)\G
@@ -661,30 +626,30 @@ repository:
     end: (?=$)
     beginCaptures:
       '1':
-        name: keyword.preprocessor.printtotrace.cs
+        name: keyword.preprocessor.printtotrace.usp
       '2':
-        name: keyword.preprocessor.enabledynamic.cs
+        name: keyword.preprocessor.enabledynamic.usp
       '3':
-        name: keyword.preprocessor.enablestackchecking.cs
+        name: keyword.preprocessor.enablestackchecking.usp
       '4':
-        name: keyword.preprocessor.largestack.cs
+        name: keyword.preprocessor.largestack.usp
       '5':
-        name: keyword.preprocessor.enabletrace.cs
+        name: keyword.preprocessor.enabletrace.usp
       '6':
-        name: keyword.preprocessor.encodingascii.cs
+        name: keyword.preprocessor.encodingascii.usp
       '7':
-        name: keyword.preprocessor.encodinginheritfromparent.cs
+        name: keyword.preprocessor.encodinginheritfromparent.usp
       '8':
-        name: keyword.preprocessor.encodinginheritfromprogram.cs
+        name: keyword.preprocessor.encodinginheritfromprogram.usp
       '9':
-        name: keyword.preprocessor.encodingutf16.cs
+        name: keyword.preprocessor.encodingutf16.usp
   preprocessor-begin-parameter-properties:
     begin: >
       (?ix)\G
         \b(begin_parameter_properties)\b #Directive
     beginCaptures:
       "1":
-        name: keyword.preprocessor.beginparameterproperties.cs
+        name: keyword.preprocessor.beginparameterproperties.usp
     end: (?=$)
     patterns:
       - include: "#identifier"
@@ -695,22 +660,181 @@ repository:
         \b(end_parameter_properties)\b #directive
     captures:
       "1":
-        name: keyword.preprocessor.endparameterproperties.cs                        
-  
+        name: keyword.preprocessor.endparameterproperties.usp                        
+
+
   expression-operator-expression:
     begin: (\()
     beginCaptures:
       "1":
-        name: punctuation.parenthesis.open.cs
+        name: punctuation.parenthesis.open.usp
     end: \)
     endCaptures:
       "0":
-        name: punctuation.parenthesis.close.cs
+        name: punctuation.parenthesis.close.usp
     patterns:
       - include: "#expression"
 
+  
+
+  constant-pattern:
+    patterns:
+    # - include: "#boolean-literal"
+    # - include: "#null-literal"
+    # - include: "#numeric-literal"
+    # - include: "#char-literal"
+    - include: "#string-literal"
+    # - include: "#raw-string-literal"
+    # - include: "#verbatim-string-literal"
+    # - include: "#type-operator-expression"
+    # - include: "#expression-operator-expression"
+    - include: "#expression-operators"
+    # - include: "#casted-constant-pattern"
+
+
+
+#Functions
+  invocation-function:
+    begin: |-
+      (?ix)
+      (?:
+        (\.)\s*|                                        # preceding dot?
+      )?
+      (@?[_[:alpha:]][\#\$\_[:alnum:]]*)\s*                  # method name
+      (?=\()                                            # open paren of argument list
+    beginCaptures:
+      '1':
+        name: punctuation.accessor.usp
+      '2':
+        name: entity.name.function.usp
+    end: "(?<=\\))"
+    patterns:
+    - include: "#argument-list"
+  parenthesized-parameter-list:
+    begin: "(\\()"
+    beginCaptures:
+      '0':
+        name: punctuation.parenthesis.open.usp
+    end: "(\\))"
+    endCaptures:
+      '0':
+        name: punctuation.parenthesis.close.usp
+    patterns:
+    - include: "#comment"
+    - include: "#attribute-section"
+    - include: "#parameter"
+    - include: "#punctuation-comma"
+  parameter:
+    match: |-
+      (?ix)
+      (?:(?:\b(ByRef|ByVal|ReadOnlyByRef)\b)\s+)?
+      (?<type_name>
+       (?:
+          (?:
+            (?<identifier>[_[:alpha:]][\#\$\_[:alnum:]]*)
+            (?:\s*\.\s*\g<identifier>)* | # Are there any more names being dotted into?
+          )
+          (?:\s* # array suffix?
+            \[
+              (?:\s*,\s*)* # commata for multi-dimensional arrays
+            \]
+            \s*
+          )*
+        )
+      )\s+
+      (\g<identifier>)/ixg
+    captures:
+      '1':
+        name: storage.modifier.$1.usp
+      '2':
+        patterns:
+        - include: "#type"
+      '4':
+        name: entity.name.variable.parameter.usp
+
+  bracketed-argument-list:
+    begin: \[
+    beginCaptures:
+      '0':
+        name: punctuation.squarebracket.open.usp
+    end: \]
+    endCaptures:
+      '0':
+        name: punctuation.squarebracket.close.usp
+    patterns:
+    - include: "#argument"
+    - include: "#punctuation-comma"
+  argument-list:
+    begin: \(
+    beginCaptures:
+      '0':
+        name: punctuation.parenthesis.open.usp
+    end: \)
+    endCaptures:
+      '0':
+        name: punctuation.parenthesis.close.usp
+    patterns:
+    - include: "#argument"
+    - include: "#punctuation-comma"
+  argument:
+    patterns:
+    - name: storage.modifier.$1.usp
+      match: (?i)\b(ByRef|ByVal|ReadOnlyByRef)\\b"
+    - include: "#expression"
+
+
+#Types
+  type:
+    patterns:
+    - include: "#comment"
+    - include: "#ref-modifier"
+    - include: "#type-builtin"
+    - include: "#type-name"
+
+  type-builtin:
+    match: (?ix)\b(integer|long_integer|signed_integer|signed_long_integer|string|structure|cmutex|cevent|file_info)\b
+    comment: Crestron Built In Types
+    name: keyword.type.$1.usp
+  type-name:
+    patterns:
+    - match: (?(@?[_[:alpha:]][\_\#\_\$[:alnum:]]*)\s*(\.))
+      captures:
+        '1':
+          name: entity.name.type.usp
+        '2':
+          name: punctuation.accessor.usp
+    - match: (?:(\.)\s*(@?[_[:alpha:]][\_\#\_\$_[:alnum:]]*))
+      captures:
+        '1':
+          name: punctuation.accessor.usp
+        '2':
+          name: entity.name.type.usp
+    - name: entity.name.type.usp
+      match: (@?[_[:alpha:]][\_\#\_\$_[:alnum:]]*)
+
+#Constructs
+  type-array-suffix:
+    begin: \[
+    beginCaptures:
+      '0':
+        name: punctuation.squarebracket.open.usp
+    end: \]
+    endCaptures:
+      '0':
+        name: punctuation.squarebracket.close.usp
+    patterns:
+    - include: "#intrusive"
+    - include: "#punctuation-comma"
+
+#Variables
+  identifier:
+    match: ([\_[:alpha:]][\_\#\_\$[:alnum:]]*)
+    name: "variable.other.readwrite.usp"
+
+
+#Expressions
   assignment-expression:
-    begin: \=
+    begin: \=(?!=|>)"
     beginCaptures:
       "0":
         patterns:
@@ -718,24 +842,127 @@ repository:
     end: (?=[,\)\];}])
     patterns:
       - include: "#expression"
+  parenthesized-expression:
+    begin: \(
+    beginCaptures:
+      '0':
+        name: punctuation.parenthesis.open.usp
+    end: \)
+    endCaptures:
+      '0':
+        name: punctuation.parenthesis.close.usp
+    patterns:
+    - include: "#expression"
 
+#Math Assignment Operators
   assignment-operators:
     patterns:
-      - name: keyword.operator.assignment.cs
+      - name: keyword.operator.assignment.usp
         match: "\\="
+
+
+#Math Operators
   expression-operators:
     patterns:
-      - name: keyword.operator.bitwise.shift.cs
+      - name: keyword.operator.bitwise.shift.usp
         match: "(?i)<<|>>"
-      - name: keyword.operator.bitwise.rotate.cs
+      - name: keyword.operator.bitwise.rotate.usp
         match: "{{|}}"
-      - name: keyword.operator.comparison.cs
+      - name: keyword.operator.comparison.usp
         match: "=|<>"
-      - name: keyword.operator.relational.cs
+      - name: keyword.operator.relational.usp
         match: "<=|>=|<|>|S<=|S>=|S<|S>"
-      - name: keyword.operator.logical.cs
+      - name: keyword.operator.logical.usp
         match: "\\!|&&|\\|\\|"
-      - name: keyword.operator.bitwise.cs
+      - name: keyword.operator.bitwise.usp
         match: "(?i)\\&|not|\\^|\\|"
-      - name: keyword.operator.arithmetic.cs
+      - name: keyword.operator.arithmetic.usp
         match: "(?i)\\+|-(?!>)|\\*|\\/|S\\/|%|mod|umod"
+
+
+#Punctuation
+
+  string-literal:
+    name: string.quoted.double.cs
+    begin: \"
+    beginCaptures:
+      '0':
+        name: punctuation.definition.string.begin.cs
+    end: (")|((?:[^\\\n])$)
+    endCaptures:
+      '1':
+        name: punctuation.definition.string.end.cs
+      '2':
+        name: invalid.illegal.newline.cs
+    patterns:
+    - include: "#string-character-escape"
+  string-character-escape:
+    name: constant.character.escape.usp
+    match: >
+      (?x)
+        (\\ #escape initializer character
+          (?:
+            [abefnrtv\'\"\\]| #Static Specification String
+            x[0-9A-Fa-f]{2}| #Hexadecimal Constant
+          )|
+          %(?:[0-9]?[0-9])? #[[pad]width]
+            (?:
+              d| #Signed Analog_Input, Analog_Output or Integer as decimal
+              s| #Buffer_Input, String_Input or String
+              u| #Unsigned Analog_Input, Analog_Output or integer
+              ld| #Long_Integer as decimal
+              lu| #Long_Unsigned_Integer as decimal
+              %   #Prints % 
+            )| #Print Formatters %[[pad]width]specifier
+          %(?:
+              x| #Analog_Input, Analog_Output or Integer as lowercase hexadecimal
+              X| #Analog_Input, Analog_Output or Integer as uppercase hexadecimal
+          )
+        )
+  punctuation-comma:
+    match: \,
+    name: punctuation.separator.comma.usp
+  punctuation-semicolon:
+    match: \;
+    name: punctuation.terminator.statement.usp
+  punctuation-accessor:
+    match: \.
+    name: punctuation.accessor.usp
+
+#Comments
+  comment:
+    patterns:
+      - name: comment.line.double-slash.usp
+        begin: (^\s+)?(\/\/).*$
+        while: ^(\s*)(\/\/).*$
+        captures:
+          "1":
+            name: punctuation.whitespace.comment.leading.usp
+          "2":
+            name: punctuation.definition.comment.usp
+      - name: comment.block.usp
+        begin: \/\*
+        end: \*\/
+        captures:
+          "0":
+            name: punctuation.definition.comment.usp
+      - contentName: comment.block.documentation.usp
+        begin: (?i)(?:(help_begin)|(begin_prop_full_description)|(begin_prop_notes))
+        beginCaptures:
+          "1":
+            name: keyword.preprocessor.helpbegin.usp
+          "2":
+            name: keyword.preprocessor.beginpropfulldescription.usp
+          "3":
+            name: keyword.preprocessor.beginpropnotes.usp
+        end: (?i)(\#)(?:(help_end)|(end_prop_full_description)|(end_prop_notes))$
+        endCaptures:
+          "1":
+            name: punctuation.separator.hash.usp
+          "2":
+            name: keyword.preprocessor.helpend.usp
+          "3":
+            name: keyword.preprocessor.endpropfulldescription.usp
+          "4":
+            name: keyword.preprocessor.endpropnotes.usp
+

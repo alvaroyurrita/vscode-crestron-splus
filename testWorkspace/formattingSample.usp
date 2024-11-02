@@ -329,7 +329,15 @@ callback GatherEventHandler MyGatherCallback(GatherEventArgs Args)
 	a=Args.RxString;
 	c = Args.Results;
 	RearmGatherAsync(Args.Input);
+	Test2.Test1(one, "2", three[1])
+	Test("test %d %s %u %s %x %X %ld %lu %% %adf");
+	Test("test %1d %12s %3u %32s %x %X %2ld %1lu %%");
+	Test("test %133d %1233s %3333u %32333s %33x %33X %2333ld %3331lu %%");
+    Test("\n \t \b \r \f\ \a \\ \' \" \x23 ");
 }
+
+Function Test1(byRef Param1, byval Param2, ReadOnlyByRef Param3)
+{}
 
 Function StringParsingAndManipulations()
 {
