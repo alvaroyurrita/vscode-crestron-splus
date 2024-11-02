@@ -96,7 +96,7 @@
     },
     "preprocessor": {
       "name": "meta.preprocessor.cs",
-      "begin": "^\\s*(\\#)\\s*",
+      "begin": "^\\s*(\\#)",
       "beginCaptures": {
         "1": {
           "name": "punctuation.separator.hash.cs"
@@ -109,11 +109,23 @@
         },
         {
           "include": "#preprocessor-define-constant"
+        },
+        {
+          "include": "#preprocessor-if-defined"
+        },
+        {
+          "include": "#preprocessor-endif"
+        },
+        {
+          "include": "#preprocessor-category"
+        },
+        {
+          "include": "#preprocessor-library"
         }
       ]
     },
     "preprocessor-define-constant": {
-      "begin": "(?ix)  \\b(define_constant)\\b\\s*  #Directive\n  \\b([_[:alpha:]][\\#\\$\\_[:alnum:]]*)\\b\\s* #Constant Name\n",
+      "begin": "(?ix)\\G  \\b(define_constant)\\b\\s*  #Directive\n  \\b([_[:alpha:]][\\#\\$\\_[:alnum:]]*)\\b\\s* #Constant Name\n",
       "end": "$",
       "beginCaptures": {
         "1": {
@@ -145,6 +157,62 @@
         },
         {
           "match": "(\\G\\\".*?\\\")",
+          "name": "string.quoted.double.cs"
+        }
+      ]
+    },
+    "preprocessor-if-defined": {
+      "begin": "(?ix)\\G  \\b(if_defined)\\b #Directive\n",
+      "beginCaptures": {
+        "1": {
+          "name": "keyword.preprocessor.ifdefined.cs"
+        }
+      },
+      "end": "(?=$)",
+      "patterns": [
+        {
+          "include": "#comment"
+        },
+        {
+          "match": "\\b([_[:alpha:]][\\#\\$\\_[:alnum:]]*)\\b",
+          "name": "entity.name.variable.preprocessor.symbol.cs"
+        }
+      ]
+    },
+    "preprocessor-endif": {
+      "match": "(?ix)\\G  \\b(endif)\\b #Directive\n",
+      "captures": {
+        "1": {
+          "name": "keyword.preprocessor.endif.cs"
+        }
+      }
+    },
+    "preprocessor-category": {
+      "begin": "(?ix)\\G  \\b(category)\\b #Directive\n",
+      "beginCaptures": {
+        "1": {
+          "name": "keyword.preprocessor.category.cs"
+        }
+      },
+      "end": "(?=$)",
+      "patterns": [
+        {
+          "match": "(\\G\\s*\\\"[0-9]*?\\\")",
+          "name": "constant.numeric.category.cs"
+        }
+      ]
+    },
+    "preprocessor-library": {
+      "begin": "(?ix)\\G  \\b((?:([a-z]*)_)?([a-z]*)_library)\\b #Directive\n",
+      "beginCaptures": {
+        "1": {
+          "name": "keyword.preprocessor.library.cs"
+        }
+      },
+      "end": "(?=$)",
+      "patterns": [
+        {
+          "match": "(\\G\\s*\\\".*?\\\")",
           "name": "string.quoted.double.cs"
         }
       ]

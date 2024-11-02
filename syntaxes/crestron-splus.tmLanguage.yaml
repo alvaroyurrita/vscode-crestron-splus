@@ -204,16 +204,16 @@ repository:
   comment:
     patterns:
     - name: comment.line.double-slash.cs
-      begin: "(^\\s+)?(\\/\\/).*$"
-      while: "^(\\s*)(\\/\\/).*$"
+      begin: (^\s+)?(\/\/).*$
+      while: ^(\s*)(\/\/).*$
       captures:
         '1':
           name: punctuation.whitespace.comment.leading.cs
         '2':
           name: punctuation.definition.comment.cs
     - name: comment.block.cs
-      begin: "\\/\\*"
-      end: "\\*\\/"
+      begin: \/\*
+      end: \*\/
       captures:
         '0':
           name: punctuation.definition.comment.cs
@@ -433,17 +433,18 @@ repository:
 
   preprocessor:
       name: meta.preprocessor.cs
-      begin: "^\\s*(\\#)\\s*"
+      begin: ^\s*(\#)
       beginCaptures:
         '1':
           name: punctuation.separator.hash.cs
-      end: "(?<=$)"
+      end: (?<=$)
       patterns:
       - include: "#comment"
       - include: "#preprocessor-define-constant"
-      # - include: "#preprocessor-if-or-elif"
-      # - include: "#preprocessor-else-or-endif"
-      # - include: "#preprocessor-warning-or-error"
+      - include: "#preprocessor-if-defined"
+      - include: "#preprocessor-endif"
+      - include: "#preprocessor-category"
+      - include: "#preprocessor-library"
       # - include: "#preprocessor-region"
       # - include: "#preprocessor-endregion"
       # - include: "#preprocessor-load"
@@ -453,10 +454,10 @@ repository:
       # - include: "#preprocessor-pragma-checksum"
   preprocessor-define-constant:
     begin: >
-      (?ix)
+      (?ix)\G
         \b(define_constant)\b\s*  #Directive
         \b([_[:alpha:]][\#\$\_[:alnum:]]*)\b\s* #Constant Name
-    end: "$"
+    end: $
     beginCaptures:
       '1':
         name: keyword.preprocessor.defineconstant.cs
@@ -475,14 +476,54 @@ repository:
         name: constant.character.cs
       - match: (\G\".*?\")
         name: string.quoted.double.cs
-
+  preprocessor-if-defined:
+    begin: >
+      (?ix)\G
+        \b(if_defined)\b #Directive
+    beginCaptures:
+      '1':
+        name: keyword.preprocessor.ifdefined.cs
+    end: (?=$)
+    patterns:
+    - include: "#comment"
+    - match: "\\b([_[:alpha:]][\\#\\$\\_[:alnum:]]*)\\b"
+      name: entity.name.variable.preprocessor.symbol.cs
+  preprocessor-endif:
+    match: >
+      (?ix)\G
+        \b(endif)\b #Directive
+    captures:
+      '1':
+        name: keyword.preprocessor.endif.cs
+  preprocessor-category:
+    begin: >
+      (?ix)\G
+        \b(category)\b #Directive
+    beginCaptures:
+      '1':
+        name: keyword.preprocessor.category.cs
+    end: (?=$)
+    patterns:
+      - match: (\G\s*\"[0-9]*?\")
+        name: constant.numeric.category.cs
+  preprocessor-library:
+    begin: >
+      (?ix)\G
+        \b((?:([a-z]*)_)?([a-z]*)_library)\b #Directive
+    beginCaptures:
+      '1':
+        name: keyword.preprocessor.library.cs
+    end: (?=$)
+    patterns:
+      - match: (\G\s*\".*?\")
+        name: string.quoted.double.cs
 
   expression-operator-expression:
-    begin: "(\\()"
+    begin: (\()
     beginCaptures:
       "1":
         name: punctuation.parenthesis.open.cs
-    end: "\\)"
+    end: \)
     endCaptures:
       "0":
         name: punctuation.parenthesis.close.cs
@@ -490,12 +531,12 @@ repository:
       - include: "#expression"
 
   assignment-expression:
-    begin: "\\="
+    begin: \=
     beginCaptures:
       "0":
         patterns:
           - include: "#assignment-operators"
-    end: "(?=[,\\)\\];}])"
+    end: (?=[,\)\];}])
     patterns:
       - include: "#expression"
 
