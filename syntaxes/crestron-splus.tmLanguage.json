@@ -83,6 +83,29 @@
               "name": "punctuation.definition.comment.cs"
             }
           }
+        },
+        {
+          "contentName": "comment.block.documentation.cs",
+          "begin": "(?i)\\s*(\\#help_begin)\\s*$",
+          "beginCaptures": {
+            "1": {
+              "patterns": [
+                {
+                  "include": "preprocessor"
+                }
+              ]
+            }
+          },
+          "end": "(?i)s*(\\#help_end)\\s*$",
+          "endCaptures": {
+            "1": {
+              "patterns": [
+                {
+                  "include": "preprocessor"
+                }
+              ]
+            }
+          }
         }
       ]
     },
@@ -111,7 +134,7 @@
           "include": "#preprocessor-define-constant"
         },
         {
-          "include": "#preprocessor-if-defined"
+          "include": "#preprocessor-if-ifnot-defined"
         },
         {
           "include": "#preprocessor-endif"
@@ -121,12 +144,63 @@
         },
         {
           "include": "#preprocessor-library"
+        },
+        {
+          "include": "#preprocessor-include-path"
+        },
+        {
+          "include": "#preprocessor-help-begin"
+        },
+        {
+          "include": "#preprocessor-help-end"
+        },
+        {
+          "include": "#preprocessor-symbol-name"
+        },
+        {
+          "include": "#preprocessor-hint"
+        },
+        {
+          "include": "#preprocessor-help"
+        },
+        {
+          "include": "#preprocessor-default-nonvolatile-volatile"
+        },
+        {
+          "include": "#preprocessor-analog-digital-expand"
+        },
+        {
+          "include": "#preprocessor-output-shift"
+        },
+        {
+          "include": "#preprocessor-max-internal-buffer-size"
+        },
+        {
+          "include": "#preprocessor-single"
+        },
+        {
+          "include": "#preprocessor-begin-parameter-properties"
+        },
+        {
+          "include": "#preprocessor-end-parameter-properties"
+        },
+        {
+          "include": "#preprocessor-begin-prop-full-description"
+        },
+        {
+          "include": "#preprocessor-end-prop-full-description"
+        },
+        {
+          "include": "#preprocessor-begin-prop-notes"
+        },
+        {
+          "include": "#preprocessor-end-prop-notes"
         }
       ]
     },
     "preprocessor-define-constant": {
       "begin": "(?ix)\\G  \\b(define_constant)\\b\\s*  #Directive\n  \\b([_[:alpha:]][\\#\\$\\_[:alnum:]]*)\\b\\s* #Constant Name\n",
-      "end": "$",
+      "end": "(?=$)",
       "beginCaptures": {
         "1": {
           "name": "keyword.preprocessor.defineconstant.cs"
@@ -161,11 +235,14 @@
         }
       ]
     },
-    "preprocessor-if-defined": {
-      "begin": "(?ix)\\G  \\b(if_defined)\\b #Directive\n",
+    "preprocessor-if-ifnot-defined": {
+      "begin": "(?ix)\\G  \\b(if_defined)|(if_not_defined)\\b #Directive\n",
       "beginCaptures": {
         "1": {
           "name": "keyword.preprocessor.ifdefined.cs"
+        },
+        "2": {
+          "name": "keyword.preprocessor.ifnotdefined.cs"
         }
       },
       "end": "(?=$)",
@@ -188,7 +265,7 @@
       }
     },
     "preprocessor-category": {
-      "begin": "(?ix)\\G  \\b(category)\\b #Directive\n",
+      "begin": "(?ix)\\G  \\b(category)\\b\\s* #Directive\n",
       "beginCaptures": {
         "1": {
           "name": "keyword.preprocessor.category.cs"
@@ -197,25 +274,267 @@
       "end": "(?=$)",
       "patterns": [
         {
-          "match": "(\\G\\s*\\\"[0-9]*?\\\")",
+          "match": "\\G\\\"[0-9]*?\\\"",
           "name": "constant.numeric.category.cs"
         }
       ]
     },
     "preprocessor-library": {
-      "begin": "(?ix)\\G  \\b((?:([a-z]*)_)?([a-z]*)_library)\\b #Directive\n",
+      "begin": "(?ix)\\G  \\b((?:(?:user_simplsharp|crestron_simplsharp|user|crestron)_)library)\\b\\s*\n",
       "beginCaptures": {
         "1": {
-          "name": "keyword.preprocessor.library.cs"
+          "patterns": [
+            {
+              "match": "(?i)((?:user_simplsharp).*)",
+              "name": "keyword.preprocessor.usersimplsharplibrary.cs"
+            },
+            {
+              "match": "(?i)((?:crestron_simplsharp).*)",
+              "name": "keyword.preprocessor.crestronsimplsharplibrary.cs"
+            },
+            {
+              "match": "(?i)((?:user).*)",
+              "name": "keyword.preprocessor.userlibrary.cs"
+            },
+            {
+              "match": "(?i)((?:crestron).*)",
+              "name": "keyword.preprocessor.crestronlibrary.cs"
+            }
+          ]
         }
       },
       "end": "(?=$)",
       "patterns": [
         {
-          "match": "(\\G\\s*\\\".*?\\\")",
+          "match": "\\G(\\\".*?\\\")",
           "name": "string.quoted.double.cs"
         }
       ]
+    },
+    "preprocessor-include-path": {
+      "begin": "(?ix)\\G  \\b(includepath)\\b\\s* #Directive\n",
+      "beginCaptures": {
+        "1": {
+          "name": "keyword.preprocessor.includepath.cs"
+        }
+      },
+      "end": "(?=$)",
+      "patterns": [
+        {
+          "match": "\\G(\\\".*?\\\")",
+          "name": "string.quoted.double.cs"
+        }
+      ]
+    },
+    "preprocessor-help-begin": {
+      "match": "(?ix)\\G  \\b(help_begin)\\b$ #Directive\n",
+      "captures": {
+        "1": {
+          "name": "keyword.preprocessor.helpbegin.cs"
+        }
+      }
+    },
+    "preprocessor-help-end": {
+      "match": "(?ix)\\G  \\b(help_end)\\b$ #Directive\n",
+      "captures": {
+        "1": {
+          "name": "keyword.preprocessor.helpend.cs"
+        }
+      }
+    },
+    "preprocessor-symbol-name": {
+      "begin": "(?ix)\\G  \\b(symbol_name)\\b\\s* #Directive\n",
+      "beginCaptures": {
+        "1": {
+          "name": "keyword.preprocessor.symbolname.cs"
+        }
+      },
+      "end": "(?=$)",
+      "patterns": [
+        {
+          "match": "\\G(\\\".*?\\\")",
+          "name": "string.quoted.double.cs"
+        }
+      ]
+    },
+    "preprocessor-hint": {
+      "begin": "(?ix)\\G  \\b(hint)\\b\\s* #Directive\n",
+      "beginCaptures": {
+        "1": {
+          "name": "keyword.preprocessor.hint.cs"
+        }
+      },
+      "end": "(?=$)",
+      "patterns": [
+        {
+          "match": "\\G(\\\".*?\\\")",
+          "name": "string.quoted.double.cs"
+        }
+      ]
+    },
+    "preprocessor-help": {
+      "begin": "(?ix)\\G  \\b(help)\\b\\s* #Directive\n",
+      "beginCaptures": {
+        "1": {
+          "name": "keyword.preprocessor.help.cs"
+        }
+      },
+      "end": "(?=$)",
+      "patterns": [
+        {
+          "match": "\\G(\\\".*?\\\")",
+          "name": "string.quoted.double.cs"
+        }
+      ]
+    },
+    "preprocessor-default-nonvolatile-volatile": {
+      "match": "(?ix)\\G  \\b(default_nonvolatile)|(default_volatile)\\b #Directive\n",
+      "captures": {
+        "1": {
+          "name": "keyword.preprocessor.defaultnonvolatile.cs"
+        },
+        "2": {
+          "name": "keyword.preprocessor.defaultvolatile.cs"
+        }
+      }
+    },
+    "preprocessor-analog-digital-expand": {
+      "begin": "(?ix)\\G  \\b(?:(analog_serial_expand)|(digital_expand))\\b\\s* #Directive\n",
+      "end": "(?=$)",
+      "beginCaptures": {
+        "1": {
+          "name": "keyword.preprocessor.analogserialexpand.cs"
+        },
+        "2": {
+          "name": "keyword.preprocessor.digitalexpand.cs"
+        }
+      },
+      "patterns": [
+        {
+          "match": "(?ix)\\G  ([a-z]+)$\n",
+          "name": "keyword.control.option.cs"
+        }
+      ]
+    },
+    "preprocessor-output-shift": {
+      "begin": "(?ix)\\G  \\b(output_shift)\\b\\s* #Directive\n",
+      "end": "(?=$)",
+      "beginCaptures": {
+        "1": {
+          "name": "keyword.preprocessor.outputshift.cs"
+        }
+      },
+      "patterns": [
+        {
+          "match": "\\G[0-9]+",
+          "name": "constant.numeric.decimal.cs"
+        }
+      ]
+    },
+    "preprocessor-max-internal-buffer-size": {
+      "begin": "(?ix)\\G  \\b(max_internal_buffer_size)\\b\\s* #Directive\n",
+      "end": "(?=$)",
+      "beginCaptures": {
+        "1": {
+          "name": "keyword.preprocessor.outputshift.cs"
+        }
+      },
+      "patterns": [
+        {
+          "match": "\\G[0-9]+",
+          "name": "constant.numeric.decimal.cs"
+        }
+      ]
+    },
+    "preprocessor-single": {
+      "begin": "(?ix)\\G  (?:\\b\n    (?:\n      (print_to_trace)|\n      (enable_dynamic)|\n      (enable_stack_checking)|\n      (large_stack)|\n      (enable_trace)|\n      (encoding_ascii)|\n      (encoding_inherit_from_parent)|\n      (encoding_inherit_from_program)|\n      (encoding_utf16)\n    )\\b)\n    \\s* #Directive\n",
+      "end": "(?=$)",
+      "beginCaptures": {
+        "1": {
+          "name": "keyword.preprocessor.printtotrace.cs"
+        },
+        "2": {
+          "name": "keyword.preprocessor.enabledynamic.cs"
+        },
+        "3": {
+          "name": "keyword.preprocessor.enablestackchecking.cs"
+        },
+        "4": {
+          "name": "keyword.preprocessor.largestack.cs"
+        },
+        "5": {
+          "name": "keyword.preprocessor.enabletrace.cs"
+        },
+        "6": {
+          "name": "keyword.preprocessor.encodingascii.cs"
+        },
+        "7": {
+          "name": "keyword.preprocessor.encodinginheritfromparent.cs"
+        },
+        "8": {
+          "name": "keyword.preprocessor.encodinginheritfromprogram.cs"
+        },
+        "9": {
+          "name": "keyword.preprocessor.encodingutf16.cs"
+        }
+      }
+    },
+    "preprocessor-begin-parameter-properties": {
+      "begin": "(?ix)\\G  \\b(begin_parameter_properties)\\b #Directive\n",
+      "beginCaptures": {
+        "1": {
+          "name": "keyword.preprocessor.beginparameterproperties.cs"
+        }
+      },
+      "end": "(?=$)",
+      "patterns": [
+        {
+          "include": "#identifier"
+        },
+        {
+          "include": "#punctuation-comma"
+        }
+      ]
+    },
+    "preprocessor-end-parameter-properties": {
+      "match": "(?ix)\\G  \\b(end_parameter_properties)\\b #directive\n",
+      "captures": {
+        "1": {
+          "name": "keyword.preprocessor.endparameterproperties.cs"
+        }
+      }
+    },
+    "preprocessor-begin-prop-full-description": {
+      "match": "(?ix)\\G  \\b(begin_prop_full_description)\\b #directive\n",
+      "captures": {
+        "1": {
+          "name": "keyword.preprocessor.beginpropfulldescription.cs"
+        }
+      }
+    },
+    "preprocessor-end-prop-full-description": {
+      "match": "(?ix)\\G  \\b(end_prop_full_description)\\b #directive\n",
+      "captures": {
+        "1": {
+          "name": "keyword.preprocessor.endpropfulldescription.cs"
+        }
+      }
+    },
+    "preprocessor-begin-prop-notes": {
+      "match": "(?ix)\\G  \\b(begin_prop_notes)\\b #directive\n",
+      "captures": {
+        "1": {
+          "name": "keyword.preprocessor.beginpropnotes.cs"
+        }
+      }
+    },
+    "preprocessor-end-prop-notes": {
+      "match": "(?ix)\\G  \\b(end_prop_notes)\\b #directive\n",
+      "captures": {
+        "1": {
+          "name": "keyword.preprocessor.endpropnotes.cs"
+        }
+      }
     },
     "expression-operator-expression": {
       "begin": "(\\()",

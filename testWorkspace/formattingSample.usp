@@ -2,49 +2,92 @@
   MultiLine Comment
 *******************************************************************************************/
 
-#ANALOG_SERIAL_EXPAND Separately
-
-
 // Single Line Comment
 
-
-#CATEGORY "6" 
-//#DEFAULT_NONVOLATILE 
-#DEFAULT_VOLATILE 
+//preprocessor-define-constant
 #DEFINE_CONSTANT HELLO 534343
 #DEFINE_CONSTANT HELLO2 "Something"
 #DEFINE_CONSTANT HELLO3 0x03
 #DEFINE_CONSTANT HELLO4 'A'
-//#DIGITAL_EXPAND 
-//#ENABLE_DYNAMIC
-//#ENABLE_STACK_CHECKING 
-#ENABLE_TRACE 
-#ENCODING_ASCII 
-//#ENCODING_INHERIT_FROM_PARENT 
-//#ENCODING_INHERIT_FROM_PROGRAM 
-//#ENCODING_UTF16 
-#HELP "The Help"
-#HINT "The Hint"
 
+//preprocessor-category
+#CATEGORY "6" 
+
+//preprocessor-library
+#CRESTRON_LIBRARY "KnobAnalogHandler"
+#USER_LIBRARY "SampleLibrary"
+#CRESTRON_SIMPLSHARP_LIBRARY "ZunExternal"
+#USER_SIMPLSHARP_LIBRARY "SampleSimplSharpLibrary"
+
+//preprocessor-inludepath
+#INCLUDEPATH ".//somewhere"
+
+//preprocessor-help-begin
 #HELP_BEGIN
 line_1...  
 line_2...  
 line_n  
+//preprocessor-help-end
 #HELP_END
 
-
-#INCLUDEPATH "."
-#LARGE_STACK 
-//#MAX_INTERNAL_BUFFER_SIZE 
-#OUTPUT_SHIFT 5
-#PRINT_TO_TRACE 
+//preprocessor-symbol-name
 #SYMBOL_NAME "My Name"
 
-//  Include Libraries
-//#CRESTRON_LIBRARY "KnobAnalogHandler"
-#USER_LIBRARY "SampleLibrary"
-//#CRESTRON_SIMPLSHARP_LIBRARY "ZunExternal"
-#USER_SIMPLSHARP_LIBRARY "SampleSimplSharpLibrary"
+//preprocessor-hint
+#HINT "The Hint"
+
+//preprocessor-help
+#HELP "The Help"
+
+//preprocessor-default-nonvolatile-volatile
+#DEFAULT_NONVOLATILE 
+#DEFAULT_VOLATILE 
+
+//preprocessor-analog-digital-expand
+#ANALOG_SERIAL_EXPAND Separately
+#DIGITAL_EXPAND PWithIxorO
+
+//preprocessor-output-shift
+#OUTPUT_SHIFT 5
+
+//preprocessor-max-internal-buffer-size
+#MAX_INTERNAL_BUFFER_SIZE 1000
+
+//preprocessor-single
+#PRINT_TO_TRACE 
+#ENABLE_DYNAMIC
+#ENABLE_STACK_CHECKING 
+#LARGE_STACK 
+#ENABLE_TRACE 
+#ENCODING_ASCII 
+#ENCODING_INHERIT_FROM_PARENT 
+#ENCODING_INHERIT_FROM_PROGRAM 
+#ENCODING_UTF16 
+
+
+//Parameter Properties
+#BEGIN_PARAMETER_PROPERTIES StringParameter1, StringParameter2
+propValidUnits =  unitString;
+propDefaultUnit =  unitString;
+propDefaultValue =  "";
+propList = { "hello" , "helloLabel" } , { "goodby" , "goodbylabel" };
+propShortDescription = "status_bar_hint_text for StringParameter1";
+#BEGIN_PROP_FULL_DESCRIPTION  
+#temp  
+line_1...  
+line_2...  
+line_n  
+#END_PROP_FULL_DESCRIPTION
+#BEGIN_PROP_NOTES 
+line_1...  
+line_2...  
+line_n  
+#END_PROP_NOTES
+#END_PARAMETER_PROPERTIES
+
+
+
+
 
 //DIGITAL, ANALOG and SERIAL INPUTS and OUTPUTS
 STRING_INPUT StringInput1[20];//, StringInput2[4][20], _SKIP_, StringInput3[4,2][20];
@@ -76,25 +119,7 @@ LONG_INTEGER_PARAMETER LongIntgerParameter1, LongIntgerParameter2[4];
 SIGNED_LONG_INTEGER_PARAMETER SignedLongIntegerParameter1, SignedLongIntegerParameter2[4];
 STRING_PARAMETER StringParameter1[50], StringParameter2[4][50];
 
-//Parameter Properties
 
-#BEGIN_PARAMETER_PROPERTIES StringParameter1
-propValidUnits =  unitString;
-propDefaultUnit =  unitString;
-propDefaultValue =  "";
-propList = { "hello" , "helloLabel" } , { "goodby" , "goodbylabel" };
-propShortDescription = "status_bar_hint_text for StringParameter1";
-#BEGIN_PROP_FULL_DESCRIPTION  
-line_1...  
-line_2...  
-line_n  
-#END_PROP_FULL_DESCRIPTION
-#BEGIN_PROP_NOTES 
-line_1...  
-line_2...  
-line_n  
-#END_PROP_NOTES
-#END_PARAMETER_PROPERTIES
 
 #BEGIN_PARAMETER_PROPERTIES IntegerParameter1
 propValidUnits = unitDecimal|unitHex|unitPercent|unitCharacter|unitTime|unitTicks;
