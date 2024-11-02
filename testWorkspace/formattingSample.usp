@@ -2,14 +2,19 @@
   MultiLine Comment
 *******************************************************************************************/
 
+#ANALOG_SERIAL_EXPAND Separately
+
+
 // Single Line Comment
 
 
-#ANALOG_SERIAL_EXPAND Separately
 #CATEGORY "6" 
 //#DEFAULT_NONVOLATILE 
 #DEFAULT_VOLATILE 
-#DEFINE_CONSTANT HELLO 5
+#DEFINE_CONSTANT HELLO 534343
+#DEFINE_CONSTANT HELLO2 "Something"
+#DEFINE_CONSTANT HELLO3 0x03
+#DEFINE_CONSTANT HELLO4 'A'
 //#DIGITAL_EXPAND 
 //#ENABLE_DYNAMIC
 //#ENABLE_STACK_CHECKING 
@@ -20,6 +25,12 @@
 //#ENCODING_UTF16 
 #HELP "The Help"
 #HINT "The Hint"
+
+#HELP_BEGIN
+line_1...  
+line_2...  
+line_n  
+#HELP_END
 
 
 #INCLUDEPATH "."
@@ -161,10 +172,10 @@ FUNCTION MyFunction1()
 	int3 = int1 ^ int2; // Bitwise XOR
 	
 	//Relational Operators
-	int3 = int1 = int2; // Assignment then Comparisone
+	int3 = int1 = int2; // Assignment then Comparison
 	int3 = !int2; //Complement;
 	int3 = int1 <> int2; //Not Equal
-	int3 = int1 < int2; //Unsigned Less Than
+	int3 = int1 S< int2; //Unsigned Less Than
 	int3 = int1 > int2; //Unsigned Greater Than
 	int3 = int1 <= int2; //Unsigned Less Than or Equal
 	int3 = int1 >= int2; //Unsigned Greater Than or Equal

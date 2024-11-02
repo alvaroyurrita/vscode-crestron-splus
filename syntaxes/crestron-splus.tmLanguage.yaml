@@ -1,256 +1,521 @@
 ---
 scopeName: source.splus
 fileTypes:
-- usp
-- usl
-- csp
-- csl
+  - usp
+  - usl
+  - csp
+  - csl
 name: Crestron
 patterns:
-- include: "#crestron_keywords"
-- include: "#comments"
-- include: "#numbers"
-- include: "#string"
-- comment: help text highlighting
-  begin: "(?i)(#help_begin)"
-  beginCaptures:
-    '1':
-      name: keyword.other.preprocessor.usp
-  end: "(?i)(#help_end)"
-  endCaptures:
-    '1':
-      name: keyword.other.preprocessor.usp
-  name: comment.block.usp
-- match: "(?i)\\s*(push|change|release)\\s+(([\\w_$]+\\s*,?\\s*)+)"
-  captures:
-    '1':
-      name: keyword.control.usp
-    '2':
-      name: entity.name.function.usp
-  comment: named event name highlighting
-  name: meta.function.usp
-  patterns:
-  - include: "#comments"
-  - include: "#parens"
-- match: "(?i)\\b(event)\\b"
-  captures:
-    '1':
-      name: keyword.control.usp
-  comment: generic event name highlighting
-  name: meta.function.usp
-  patterns:
-  - include: "#comments"
-  - include: "#parens"
-- begin: "(?i)(function|integer_function|signed_integer_function|long_integer_function|signed_long_integer_function|string_function|callback
-    function|callback integer_function|callback signed_integer_function|callback long_integer_function|callback
-    signed_long_integer_function|callback gathereventhandler|eventhandler)\\s+([\\w_]*)"
-  beginCaptures:
-    '1':
-      name: support.class.usp
-    '2':
-      name: keyword.control.usp
-    '3':
-      name: entity.name.function.usp
-  comment: function name highlighting
-  end: "(\\()|({)|(?<=\\})|(?=#)|(;)"
-  name: meta.function.usp
-  patterns:
-  - include: "#comments"
-  - include: "#parens"
-- comment: Function use highlighting
-  match: "([\\w]*\\.)?([\\w]*)\\s*\\((.{0,})\\)"
-  captures:
-    '1':
-      name: support.class
-    '2':
-      name: support.function.usp
-    '3':
-      name: function.parameter.usp
-      patterns:
-      - include: "#string"
-- comment: Define Constants
-  match: "(?i)(#define_constant)\\s+(\\w+)"
-  captures:
-    '1':
-      name: keyword.other.preprocessor.usp
-    '2':
-      name: variable.other.usp
-- begin: "(?i)\\b(digital_input|analog_input|analog_output|buffer_input|digital_output|string_input|string_output)\\b"
-  beginCaptures:
-    '1':
-      name: keyword.other.preprocessor.usp
-  end: "(;)"
-  endCaptures:
-    '1':
-      name: punctuation.terminator.statement.usp
-  name: entity.name.function.usp
-  patterns:
-  - include: "#crestron_keywords"
-  - include: "#comments"
-  - include: "#punctuation-comma"
+  - include: "#preprocessor"
+  - include: "#script-top-level"
+  - include: "#comment"
+# - include: "#directives"
+# - include: "#declarations"
+# - include: "#script-top-level"
+
+# - include: "#crestron_keywords"
+# - include: "#comments"
+# - include: "#numbers"
+# - include: "#string"
+# - include: "#expression"
+
+# - comment: help text highlighting
+#   begin: "(?i)(#help_begin)"
+#   beginCaptures:
+#     '1':
+#       name: keyword.other.preprocessor.usp
+#   end: "(?i)(#help_end)"
+#   endCaptures:
+#     '1':
+#       name: keyword.other.preprocessor.usp
+#   name: string.unquoted.usp
+
+# - comment: Properties Description Highlight
+#   begin: "(?i)(#\\b(BEGIN_PROP_FULL_DESCRIPTION|BEGIN_PROP_NOTES)\\b)"
+#   beginCaptures:
+#     '1':
+#       name: keyword.other.preprocessor.usp
+#   end: "(?i)(#\\b(END_PROP_FULL_DESCRIPTION|END_PROP_NOTES)\\b)"
+#   endCaptures:
+#     '1':
+#       name: keyword.other.preprocessor.usp
+#   name: string.unquoted.usp
+
+# - match: "(?i)\\s*(push|change|release)\\s+(([\\w_$]+\\s*,?\\s*)+)"
+#   captures:
+#     '1':
+#       name: keyword.control.usp
+#     '2':
+#       name: entity.name.function.usp
+#   comment: named event name highlighting
+#   name: meta.function.usp
+#   patterns:
+#   - include: "#comments"
+#   - include: "#parens"
+
+# - match: "(?i)\\b(event)\\b"
+#   captures:
+#     '1':
+#       name: keyword.control.usp
+#   comment: generic event name highlighting
+#   name: meta.function.usp
+#   patterns:
+#   - include: "#comments"
+#   - include: "#parens"
+
+# - begin: "(?i)(function|integer_function|signed_integer_function|long_integer_function|signed_long_integer_function|string_function|callback
+#     function|callback integer_function|callback signed_integer_function|callback long_integer_function|callback
+#     signed_long_integer_function|callback gathereventhandler|eventhandler)\\s+([\\w_]*)"
+#   beginCaptures:
+#     '1':
+#       name: support.class.usp
+#     '2':
+#       name: keyword.control.usp
+#     '3':
+#       name: entity.name.function.usp
+#   comment: function name highlighting
+#   end: "(\\()|({)|(?<=\\})|(?=#)|(;)"
+#   name: meta.function.usp
+#   patterns:
+#   - include: "#comments"
+#   - include: "#parens"
+
+# # - comment: Function use highlighting
+# #   match: "([\\w]*\\.)?([\\w]*)\\s*\\((.{0,})\\)"
+# #   captures:
+# #     '1':
+# #       name: support.class
+# #     '2':
+# #       name: support.function.usp
+# #     '3':
+# #       name: function.parameter.usp
+# #       patterns:
+# #       - include: "#string"
+
+# - comment: Define Constants
+#   match: "(?i)(#define_constant)\\s+(\\w+)"
+#   captures:
+#     '1':
+#       name: keyword.other.preprocessor.usp
+#     '2':
+#       name: variable.other.usp
+
+# - begin: "(?i)\\b(digital_input|analog_input|analog_output|buffer_input|digital_output|string_input|string_output)\\b"
+#   beginCaptures:
+#     '1':
+#       name: keyword.other.preprocessor.usp
+#   end: "(;)"
+#   endCaptures:
+#     '1':
+#       name: punctuation.terminator.statement.usp
+#   name: entity.name.function.usp
+#   patterns:
+#   - include: "#crestron_keywords"
+#   - include: "#comments"
+#   - include: "#punctuation-comma"
+
 repository:
-  string:
+  script-top-level:
     patterns:
-    - include: "#qstring-single"
-    - include: "#qstring-double"
-  qstring-double:
-    name: string.quoted.double.usp
-    begin: "\""
-    beginCaptures:
-      '0':
-        name: punctuation.definition.string.begin.usp
-    end: (")|((?:[^\\\n])$)
-    endCaptures:
-      '1':
-        name: punctuation.definition.string.end.usp
-      '2':
-        name: invalid.illegal.newline.usp
+      - include: "#statement"
+  statement:
     patterns:
-    - include: "#string-character-escape"
-  qstring-single:
-    name: string.quoted.single.usp
-    begin: "'"
-    beginCaptures:
-      '0':
-        name: punctuation.definition.string.begin.usp
-    end: "(')|(?<!\\\\)(?=\\s*\\n)"
-    endCaptures:
-      '1':
-        name: punctuation.definition.string.end.usp
-      '2':
-        name: invalid.illegal.newline.usp
+      - include: "#expression"
+
+  expression:
     patterns:
-    - include: "#string-character-escape"
-  string-character-escape:
-    name: constant.character.escape.usp
-    match: \\(?:[abefnrtv'"\\]|x[0-9A-Fa-f]{2}|u[0-9A-Fa-f]{4}|[0-1]\d{2}|25[0-5]|2[0-4][0-9]|$)|%(?:(?:\d+)?(?:\.\d+)?)?(?:d|i|f|s|u|hi|hu|ld|li|lu)|%(?:\d+)?[xX]|%[%cno]
-  comments:
+      - include: "#preprocessor"
+      - include: "#comment"
+      - include: "#expression-operator-expression"
+      #     #   - include: "#type-operator-expression"
+      #     #   - include: "#default-literal-expression"
+      #     #   - include: "#throw-expression"
+      #     #   - include: "#raw-interpolated-string"
+      #     #   - include: "#interpolated-string"
+      #     #   - include: "#verbatim-interpolated-string"
+      #     #   - include: "#type-builtin"
+      #     #   - include: "#language-variable"
+      #     #   - include: "#switch-statement-or-expression"
+      #     #   - include: "#with-expression"
+      #     #   - include: "#conditional-operator"
+      - include: "#assignment-expression"
+      - include: "#expression-operators"
+      #     #   - include: "#await-expression"
+      #     #   - include: "#query-expression"
+      #     #   - include: "#as-expression"
+      #     #   - include: "#is-expression"
+      #     #   - include: "#anonymous-method-expression"
+      #     #   - include: "#object-creation-expression"
+      #     #   - include: "#array-creation-expression"
+      #     #   - include: "#anonymous-object-creation-expression"
+      #       - include: "#invocation-expression"
+      #     #   - include: "#member-access-expression"
+      #     #   - include: "#element-access-expression"
+      #     #   - include: "#cast-expression"
+      #     #   - include: "#literal"
+      #     #   - include: "#parenthesized-expression"
+      #     #   - include: "#tuple-deconstruction-assignment"
+      #     #   - include: "#initializer-expression"
+      - include: "#identifier"
+
+  identifier:
+    name: "variable.other.readwrite.cs"
+    match: "[\\_[:alpha:]][\\_\\#\\_\\$[:alnum:]]*"
+
+  #   string:
+  #     patterns:
+  #     - include: "#qstring-single"
+  #     - include: "#qstring-double"
+
+  #   qstring-double:
+  #     name: string.quoted.double.usp
+  #     begin: "\""
+  #     beginCaptures:
+  #       '0':
+  #         name: punctuation.definition.string.begin.usp
+  #     end: (")|((?:[^\\\n])$)
+  #     endCaptures:
+  #       '1':
+  #         name: punctuation.definition.string.end.usp
+  #       '2':
+  #         name: invalid.illegal.newline.usp
+  #     patterns:
+  #     - include: "#string-character-escape"
+
+  #   qstring-single:
+  #     name: string.quoted.single.usp
+  #     begin: "'"
+  #     beginCaptures:
+  #       '0':
+  #         name: punctuation.definition.string.begin.usp
+  #     end: "(')|(?<!\\\\)(?=\\s*\\n)"
+  #     endCaptures:
+  #       '1':
+  #         name: punctuation.definition.string.end.usp
+  #       '2':
+  #         name: invalid.illegal.newline.usp
+  #     patterns:
+  #     - include: "#string-character-escape"
+
+  #   string-character-escape:
+  #     name: constant.character.escape.usp
+  #     match: \\(?:[abefnrtv'"\\]|x[0-9A-Fa-f]{2}|u[0-9A-Fa-f]{4}|[0-1]\d{2}|25[0-5]|2[0-4][0-9]|$)|%(?:(?:\d+)?(?:\.\d+)?)?(?:d|i|f|s|u|hi|hu|ld|li|lu)|%(?:\d+)?[xX]|%[%cno]
+  comment:
     patterns:
-    - captures:
-        '1':
-          name: comment
-      match: "^/\\* =(\\s*.*?)\\s*= \\*/$\\n?"
-      name: comment.block.usp
-    - begin: "/\\*"
+    - name: comment.line.double-slash.cs
+      begin: "(^\\s+)?(\\/\\/).*$"
+      while: "^(\\s*)(\\/\\/).*$"
       captures:
         '1':
-            name: comment
-      end: "\\*/"
-      name: comment.block
-    - match: "\\*/.*\\n"
-      name: comment
-    - captures:
-        '1':
-          name: comment
-      match: "^// =(\\s*.*?)\\s*=\\s*$\\n?"
-      name: comment.line
-    - begin: "//"
-      beginCaptures:
-        '1':
-            name: comment
-      end: "(?=$)"
-      name: comment.line.double-slash
-  crestron_keywords:
-    patterns:
-    - comment: Crestron Compiler Directives
-      match: "(?i)(#\\b(symbol_name|large_stack|print_to_trace|max_internal_buffer_size|digital_expand|analog_serial_expand|output_shift|category|user_library|crestron_library|user_simplsharp_library|crestron_simplsharp_library|includepath|default_volatile|default_nonvolatile|enable_trace|enable_dynamic|enable_stack_checking|encoding_ascii|encoding_utf16|encoding_inherit_from_parent|encoding_inherit_from_program|help|help_pdf_file|hint|if_defined|if_not_defined|endif|if_series2|if_series3|if_series4)\\b)"
-      name: keyword.other.preprocessor.usp
-    - comment: Crestron Parameter Properties
-      match: "(?i)(#\\b(begin_parameter_properties|end_parameter_properties|begin_prop_full_description|end_prop_full_description|begin_prop_notes|end_prop_notes)\\b)"
-      name: keyword.other.preprocessor.usp
-    - comment: Crestron Joins
-      match: "(?i)(#\\b(analog_input_join|analog_output_join|digital_input_join|digital_output_join|string_input_join|string_output_join)\\b)"
-      name: keyword.other.preprocessor.usp
-    - comment: Crestron I/O Declarations
-      match: "(?i)\\b(integer_parameter|long_integer_parameter|volatile|nonvolatile|signed_integer_parameter|signed_long_integer_parameter|string_parameter|structure)\\b"
-      name: keyword.other.preprocessor.usp
-    - comment: Crestron Socket Declarations
-      match: "(?i)\\b(tcp_client|tcp_server|udp_socket)\\b"
-      name: keyword.other.preprocessor.usp
-    - comment: Crestron Variable Types
-      match: "(?i)\\b(integer|long_integer|signed_integer|signed_long_integer|string|structure|cmutex)\\b"
-      name: storage.type.usp
-    - comment: Crestron Threadsafe
-      match: "(?i)\\b(threadsafe)\\b"
-      name: storage.type.usp
-    - comment: Crestron Skip Type
-      match: "(?i)\\b(_skip_)\\b"
-      name: storage.type.skip.usp
-    - comment: Crestron Boolean Types
-      match: "(?i)\\b(true|false)\\b"
-      name: constant.language.boolean.usp
-    - comment: Crestron Statements
-      match: "(?i)\\b(return|case|default)\\b"
-      name: keyword.control.usp
-    - comment: Crestron Exceptions
-      match: "(?i)\\b(try|catch)\\b"
-      name: keyword.control.usp
-    - comment: Crestron Exception Functions
-      match: "(?i)\\b(GetExceptionCode|GetExceptionMessage)\\b"
-      name: support.function.usp
-    - comment: Crestron Conditionals
-      match: "(?i)\\b(break|continue|switch|cswitch|if|else|do|until|for|while)\\b"
-      name: keyword.control.usp
-    - comment: Crestron Array Functions
-      match: "(?i)\\b(GetLastModifiedArrayIndex|GetNumArrayCols|GetNumArrayRows|GetNumStructureArrayCols|ResizeArray|ResizeStructureArray|SetArray)\\b"
-      name: support.function.usp
-    - comment: Crestron Bit/Byte Functions
-      match: "(?i)\\b(Bit|Byte|High|HighWord|Low|LowWord|LowerChar|RotateLeft|RotateLeftLong|RotateRight|RotateRightLong|SetByte|UpperChar)\\b"
-      name: support.function.usp
-    - comment: Crestron CEN-OEM Functions
-      match: "(?i)\\b(_oem_break|_oem_cd|_oem_cts|_oem_dtr|_oem_long_break|_oem_max_string|_oem_pacing|_oem_rts|_oem_str_in|_oem_str_out)\\b"
-      name: support.function.cen-oem.usp
-    - comment: Crestron Data Conversion Functions
-      match: "(?i)\\b(Atoi|Atosi|Atol|Atosl|Chr|HexToI|HexToL|HexToSI|HexToSL|Itoa|Itohex|Ltoa|Ltohex)\\b"
-      name: support.function.usp
-    - comment: Crestron Socket Access Functions
-      match: "(?i)\\b(SocketConnect|SocketConnectClient|SocketDisconnect|SocketDisconnectClient|SocketGetAddressAsRequested|SocketGetPortNumber|SocketGetRemoteIPAddress|SocketGetSenderIPAddress|SocketGetStatus|SocketIsBroadcast|SocketIsMulticast|SocketReceive|SocketSend|SocketServerStartListen|SocketServerStopListen|SocketStatus|SocketUDP_Disable|SocketUDP_Enable)\\b"
-      name: support.function.usp
-    - comment: Crestron Email Functions
-      match: "(?i)\\b(SendMail|SendMailAdvance|SendMailWithAttachments)\\b"
-      name: support.function.usp
-    - comment: Crestron Encoding Functions
-      match: "(?i)\\b(GetEncoding|SetEncoding|Inherit|Ascii|ToAscii|Utf16|ToUtf16)\\b"
-      name: support.function.usp
-    - comment: Crestron File Functions
-      match: "(?i)\\b(FILE_INFO|FileBOF|FileClose|FileDelete|FileDeleteShared|FileEOF|FileLength|FileOpen|FileOpenShared|FileRead|FileSeek|FileWrite|FindClose|FindFirst|FindFirstShared|FindNext|GetCurrentDirectory|IsDirectory|IsHidden|IsReadOnly|IsSystem|IsVolume|MakeDirectory|MakeDirectoryShared|ReadInteger|ReadIntegerArray|ReadLongInteger|ReadLongIntegerArray|ReadSignedInteger|ReadSignedIntegerArray|ReadSignedLongInteger|ReadSignedLongIntegerArray|ReadString|ReadStringArray|ReadStructure|RemoveDirectory|RemoveDirectoryShared|SetCurrentDirectory|StartFileOperations|WaitForNewDisk|WriteInteger|WriteIntegerArray|WriteLongInteger|WriteLongIntegerArray|WriteSignedInteger|WriteSignedIntegerArray|WriteSignedLongInteger|WriteSignedLongIntegerArray|WriteString|WriteStringArray|WriteStructure)\\b"
-      name: support.function.usp
-    - comment: Crestron Math Functions
-      match: "(?i)\\b(abs|max|min|muldiv|smax|smin)\\b"
-      name: support.function.usp
-    - comment: Crestron Ramp Functions
-      match: "(?i)\\b(CompareRampsByAttribute|CompareRampsByID|CreateRamp|GetRampInfo|InitializeRampInfo|InitializeRampInfoArray|IsRamping|RAMP_INFO|StopRamp)\\b"
-      name: support.function.usp
-    - comment: Crestron Random Number Functions
-      match: "(?i)\\b(Random|Rnd|Seed)\\b"
-      name: support.function.usp
-    - comment: Crestron String Functions
-      match: "(?i)\\b(Makestring|Print|Trace|ClearBuffer|CompareStrings|CompareStringsNoCase|Find|FindNoCase|Gather|GatherByLength|GatherAsync|GatherAsyncByLength|ReArmGatherAsync|RemoveGatherAsync|GetC|Left|Len|Lower|Upper|Mid|Remove|RemoveByLength|ResizeString|ReverseFind|ReverseFindNoCase|Right|SetString)\\b"
-      name: support.function.usp
-    - comment: Crestron System Control Functions
-      match: "(?i)\\b(delay|ProcessLogic|pulse|TerminateEvent|WaitForInitializationComplete)\\b"
-      name: support.function.usp
-    - comment: Crestron System Initialization Functions
-      match: "(?i)\\b(GenerateUserError|GenerateUserNotice|GenerateUserWarning|GetCIP|GetCrestnet|GetModelNumber|GetProgramNumber|GetSeries|GetSlot|GetSymbolInstanceName|GetSymbolReferenceName|IsSignalDefined|MakeProgramFilename|SendCresnetPacket|SendPacketToCPU|SetCIP|SetCresnet|SetSlot|RegisterDelegate|RegisterEvent)\\b"
-      name: support.function.usp
-    - comment: Crestron Time/Date Functions
-      match: "(?i)\\b(Date|Day|FileDate|FileDay|FileGetDateNum|FileGetDayOfWeekNum|FileGetHourNum|FileGetMinutesNum|FileGetMonthNum|FileGetSecondsNum|FileGetYearNum|FileMonth|FileTime|GetDateNum|GetDayOfWeekNum|GetDST|GetGMTOffset|GetHourNum|GetHSeconds|GetMinutesNum|GetMonthNum|GetSecondsNum|GetTicks|GetYearNum|month|SetClock|SetDate|SetGMTOffset|Time)\\b"
-      name: support.function.usp
-    - comment: Crestron Wait Functions
-      match: "(?i)\\b(CancelAllWait|CancelWait|PauseAllWait|PauseWait|ResumeAllWait|ResumeWait|RetimeWait|Wait)\\b"
-      name: support.function.wait.usp
-  parens:
-    begin: "\\("
-    end: "\\)"
-    name: meta.parens.usp
-    patterns:
-    - include: "$base"
-  numbers:
-    match: "\\b((0x[a-fA-F0-9]{1,8})|([0-9]+))\\b"
-    name: constant.numeric.usp
+          name: punctuation.whitespace.comment.leading.cs
+        '2':
+          name: punctuation.definition.comment.cs
+    - name: comment.block.cs
+      begin: "\\/\\*"
+      end: "\\*\\/"
+      captures:
+        '0':
+          name: punctuation.definition.comment.cs
+
+  #   crestron_keywords:
+  #     patterns:
+
+  #     - comment: Crestron Compiler Directives
+  #       match: "(?ix)(\\#\\b(analog_serial_expand|symbol_name|large_stack|print_to_trace|max_internal_buffer_size|digital_expand|
+  #         analog_serial_expand|output_shift|category|user_library|crestron_library|user_simplsharp_library|
+  #         crestron_simplsharp_library|includepath|default_volatile|default_nonvolatile|enable_trace|
+  #         enable_dynamic|enable_stack_checking|encoding_ascii|encoding_utf16|encoding_inherit_from_parent|
+  #         encoding_inherit_from_program|help|help_pdf_file|hint|if_defined|if_not_defined|endif|if_series2|if_series3|if_series4)\\b)"
+  #       name: keyword.other.preprocessor.usp
+
+  #     - comment: Crestron Parameter Properties
+  #       match: "(?ix)(\\#\\b(begin_parameter_properties|end_parameter_properties|propValidUnits|propDefaultUnit|propList|
+  #         propShortDescription|propBounds|propShortDescription)\\b)"
+  #       name: keyword.other.preprocessor.usp
+
+  #     - comment: Crestron Parameter Properties
+  #       match: "(?ix)(\\b(propValidUnits|propDefaultUnit|propDefaultValue|propList|propShortDescription|propBounds|propShortDescription)\\b)"
+  #       name: keyword.other.preprocessor.usp
+
+  #     - comment: Crestron Joins
+  #       match: "(?ix)(\\#\\b(analog_input_join|analog_output_join|digital_input_join|digital_output_join|string_input_join|string_output_join)\\b)"
+  #       name: keyword.other.preprocessor.usp
+
+  #     - comment: Crestron I/O Declarations
+  #       match: "(?ix)\\b(integer_parameter|signed_long_integer_parameter|long_integer_parameter|volatile
+  #         |dynamic|nonvolatile|volatile|signed_integer_parameter|
+  #         signed_long_integer_parameter|string_parameter|structure)\\b"
+  #       name: keyword.other.preprocessor.usp
+
+  #     - comment: Crestron Declarations Modifiers
+  #       match: "(?x)\\b(ascii|utf16|inherit)\\b"
+  #       name: keyword.other.preprocessor.usp
+
+  #     - comment: Crestron Socket Declarations
+  #       match: "(?ix)\\b(tcp_client|tcp_server|udp_socket)\\b"
+  #       name: keyword.other.preprocessor.usp
+
+  #     - comment: Crestron Variable Types
+  #       match: "(?ix)\\b(integer|long_integer|signed_integer|signed_long_integer|string|structure|cmutex|cevent|file_info)\\b"
+  #       name: storage.type.usp
+
+  #     - comment: Crestron Threadsafe
+  #       match: "(?ix)\\b(threadsafe)\\b"
+  #       name: storage.type.usp
+
+  #     - comment: Crestron Skip Type
+  #       match: "(?i)\\b(_skip_)\\b"
+  #       name: storage.type.skip.usp
+
+  #     - comment: Crestron Boolean Types
+  #       match: "(?ix)\\b(true|false)\\b"
+  #       name: constant.language.boolean.usp
+
+  #     - comment: Crestron Statements
+  #       match: "(?ix)\\b(return|case|default)\\b"
+  #       name: keyword.control.usp
+
+  #     - comment: Crestron Exceptions
+  #       match: "(?ix)\\b(try|catch)\\b"
+  #       name: keyword.control.usp
+
+  #     - comment: Crestron Exception Functions
+  #       match: "(?ix)\\b(GetExceptionCode|GetExceptionMessage)\\b"
+  #       name: support.function.usp
+
+  #     - comment: Crestron constants
+  #       match: "(?ix)\\b(_O_APPEND|_O_CREAT|_O_EXCL|_O_TRUNC|_O_TEXT|_O_BINARY|_O_RDONLY|_O_RDWR|_O_WRONLY|ARDONLY|AHIDDEN|ASYSTEM|AVOLUME|ADIRENT|ARCHIVE)\\b"
+  #       name: support.constant.media.usp
+
+  #     - comment: Crestron Conditionals
+  #       match: "(?ix)\\b(break|continue|switch|cswitch|if|else|do|until|for|while)\\b"
+  #       name: keyword.control.usp
+
+  #     - comment: Crestron Array Functions
+  #       match: "(?ix)\\b(GetLastModifiedArrayIndex|GetNumArrayCols|GetNumArrayRows|GetNumStructureArrayCols|
+  #         ResizeArray|ResizeStructureArray|SetArray)\\b"
+  #       name: support.function.usp
+
+  #     - comment: Crestron Bit/Byte Functions
+  #       match: "(?ix)\\b(Bit|Byte|High|HighWord|Low|LowWord|LowerChar|RotateLeft|RotateLeftLong|RotateRight|
+  #         RotateRightLong|SetByte|UpperChar)\\b"
+  #       name: support.function.usp
+
+  #     - comment: Crestron CEN-OEM Functions
+  #       match: "(?ix)\\b(_oem_break|_oem_cd|_oem_cts|_oem_dtr|_oem_long_break|_oem_max_string|_oem_pacing|
+  #         _oem_rts|_oem_str_in|_oem_str_out)\\b"
+  #       name: support.function.cen-oem.usp
+
+  #     - comment: Crestron Data Conversion Functions
+  #       match: "(?ix)\\b(Atoi|Atosi|Atol|Atosl|Chr|HexToI|HexToL|HexToSI|HexToSL|Itoa|Itohex|Ltoa|Ltohex)\\b"
+  #       name: support.function.usp
+
+  #     - comment: Crestron Socket Access Functions
+  #       match: "(?ix)\\b(SocketConnect|SocketConnectClient|SocketDisconnect|SocketDisconnectClient|
+  #         SocketGetAddressAsRequested|SocketGetPortNumber|SocketGetRemoteIPAddress|SocketGetSenderIPAddress|
+  #         SocketGetStatus|SocketIsBroadcast|SocketIsMulticast|SocketReceive|SocketSend|SocketServerStartListen|
+  #         SocketServerStopListen|SocketStatus|SocketUDP_Disable|SocketUDP_Enable)\\b"
+  #       name: support.function.usp
+
+  #     - comment: Crestron Email Functions
+  #       match: "(?ix)\\b(SendMail|SendMailAdvance|SendMailWithAttachments)\\b"
+  #       name: support.function.usp
+
+  #     - comment: Crestron Encoding Functions
+  #       match: "(?ix)\\b(GetEncoding|SetEncoding|ToAscii|ToUtf16)\\b"
+  #       name: support.function.usp
+
+  #     - comment: Crestron File Functions
+  #       match: "(?ix)\\b(FILE_INFO|FileBOF|FileClose|FileDelete|FileDeleteShared|FileEOF|FileLength|
+  #         FileOpen|FileOpenShared|FileRead|FileSeek|FileWrite|FindClose|FindFirst|FindFirstShared|FindNext|
+  #         IsDirectory|IsHidden|IsReadOnly|IsSystem|IsVolume|MakeDirectory|MakeDirectoryShared|ReadInteger|
+  #         ReadIntegerArray|ReadLongInteger|ReadLongIntegerArray|ReadSignedInteger|ReadSignedIntegerArray|
+  #         ReadSignedLongInteger|ReadSignedLongIntegerArray|ReadString|ReadStringArray|ReadStructure|
+  #         RemoveDirectory|RemoveDirectoryShared|SetCurrentDirectory|StartFileOperations|EndFileOperations|WaitForNewDisk|
+  #         WriteInteger|WriteIntegerArray|WriteLongInteger|WriteLongIntegerArray|WriteSignedInteger|
+  #         WriteSignedIntegerArray|WriteSignedLongInteger|WriteSignedLongIntegerArray|WriteString|WriteStringArray|WriteStructure)\\b"
+  #       name: support.function.usp
+
+  #     - comment: Crestron Math Functions
+  #       match: "(?ix)\\b(abs|max|min|muldiv|smax|smin)\\b"
+  #       name: support.function.usp
+
+  #     - comment: Crestron Ramp Functions
+  #       match: "(?i)\\b(CompareRampsByAttribute|CompareRampsByID|CreateRamp|GetRampInfo|InitializeRampInfo|
+  #         InitializeRampInfoArray|IsRamping|RAMP_INFO|StopRamp)\\b"
+  #       name: support.function.usp
+
+  #     - comment: Crestron Random Number Functions
+  #       match: "(?ix)\\b(Random|Rnd|Seed)\\b"
+  #       name: support.function.usp
+
+  #     - comment: Crestron String Functions
+  #       match: "(?ix)\\b(Makestring|Print|Trace|ClearBuffer|CompareStrings|CompareStringsNoCase|Find|
+  #         FindNoCase|Gather|GatherByLength|GatherAsync|GatherAsyncByLength|GatherByLengthWithDest|ReArmGatherAsync|RemoveGatherAsync|
+  #         GetC|Left|Len|Lower|Upper|Mid|Remove|RemoveByLength|ResizeString|ReverseFind|ReverseFindNoCase|Right|SetString)\\b"
+  #       name: support.function.usp
+
+  #     - comment: Crestron System Control Functions
+  #       match: "(?ix)\\b(delay|ProcessLogic|pulse|TerminateEvent|WaitForInitializationComplete)\\b"
+  #       name: support.function.usp
+
+  #     - comment: Crestron System Initialization Functions
+  #       match: "(?ix)\\b(GenerateUserError|GenerateUserNotice|GenerateUserWarning|GetCIP|GetCrestnet|
+  #         GetModelNumber|GetProgramNumber|GetSeries|GetSlot|GetSymbolInstanceName|GetSymbolReferenceName|
+  #         IsSignalDefined|MakeProgramFilename|SendCresnetPacket|SendPacketToCPU|SetCIP|SetCresnet|SetSlot|RegisterDelegate|RegisterEvent)\\b"
+  #       name: support.function.usp
+
+  #     - comment: Crestron Time/Date Functions
+  #       match: "(?ix)\\b(Date|Day|FileDate|FileDay|FileGetDateNum|FileGetDayOfWeekNum|FileGetHourNum|
+  #         FileGetMinutesNum|FileGetMonthNum|FileGetSecondsNum|FileGetYearNum|FileMonth|FileTime|GetDateNum|
+  #         GetDayOfWeekNum|GetDST|GetGMTOffset|GetHourNum|GetHSeconds|GetMinutesNum|GetMonthNum|GetSecondsNum|
+  #         GetTicks|GetYearNum|month|SetClock|SetDate|SetGMTOffset|Time)\\b"
+  #       name: support.function.usp
+
+  #     - comment: Crestron Wait Functions
+  #       match: "(?ix)\\b(CancelAllWait|CancelWait|PauseAllWait|PauseWait|ResumeAllWait|ResumeWait|RetimeWait|Wait)\\b"
+  #       name: support.function.wait.usp
+
+  #   parens:
+  #     begin: "\\("
+  #     end: "\\)"
+  #     name: meta.parens.usp
+  #     patterns:
+  #     - include: "$base"
+
+  #   numbers:
+  #     match: "\\b((0x[a-fA-F0-9]{1,8})|([0-9]+))\\b"
+  #     name: constant.numeric.usp
+
   punctuation-comma:
     match: ","
     name: punctuation.separator.comma.usp
   punctuation-semicolon:
     match: ";"
     name: punctuation.terminator.statement.usp
+
+  #   invocation-expression:
+  #     begin: >
+  #       (?x)
+  #       (?:
+  #         (\\.)\\s*                                       # preceding dot?
+  #       )?
+  #       ([\\_[:alpha:]][\\_[:alnum:]]*)\\s*               # method name
+  #       (?=\\()                                           # open paren of argument list
+  #     beginCaptures:
+  #       "1":
+  #         name: "punctuation.accessor.cs"
+  #       "2":
+  #         name: "entity.name.function.cs"
+  #     end: "(?<=\\))"
+  #     patterns:
+  #       - include: "#argument-list"
+
+  #   argument-list:
+  #     begin: "\\("
+  #     beginCaptures:
+  #       "0":
+  #         name: "punctuation.parenthesis.open.cs"
+  #     end: "\\)"
+  #     endCaptures:
+  #       "0":
+  #         name: "punctuation.parenthesis.close.cs"
+  #     patterns:
+  #       - include: "#argument"
+  #       - include: "#punctuation-comma"
+
+  #   argument:
+  #     patterns:
+  #       - name: "storage.modifier.$1.cs"
+  #         match: "(?i)\\b(ByRef|ByVal|ReadOnlyByRef)\\b"
+  #       - include: "#expression"
+
+  preprocessor:
+      name: meta.preprocessor.cs
+      begin: "^\\s*(\\#)\\s*"
+      beginCaptures:
+        '1':
+          name: punctuation.separator.hash.cs
+      end: "(?<=$)"
+      patterns:
+      - include: "#comment"
+      - include: "#preprocessor-define-constant"
+      # - include: "#preprocessor-if-or-elif"
+      # - include: "#preprocessor-else-or-endif"
+      # - include: "#preprocessor-warning-or-error"
+      # - include: "#preprocessor-region"
+      # - include: "#preprocessor-endregion"
+      # - include: "#preprocessor-load"
+      # - include: "#preprocessor-r"
+      # - include: "#preprocessor-line"
+      # - include: "#preprocessor-pragma-warning"
+      # - include: "#preprocessor-pragma-checksum"
+  preprocessor-define-constant:
+    begin: >
+      (?ix)
+        \b(define_constant)\b\s*  #Directive
+        \b([_[:alpha:]][\#\$\_[:alnum:]]*)\b\s* #Constant Name
+    end: "$"
+    beginCaptures:
+      '1':
+        name: keyword.preprocessor.defineconstant.cs
+      '2':
+        name: entity.name.variable.preprocessor.symbol.cs
+    patterns:
+      - match: (\G0[xX])([[:xdigit:]]{1,4})
+        captures:
+          '1':
+            name: constant.numeric.other.prefix.hex.cs
+          '2':
+            name: constant.numeric.hex.cs
+      - match: (\G[0-9]+)
+        name: constant.numeric.decimal.cs
+      - match: (\G\'.\')
+        name: constant.character.cs
+      - match: (\G\".*?\")
+        name: string.quoted.double.cs
+
+
+  expression-operator-expression:
+    begin: "(\\()"
+    beginCaptures:
+      "1":
+        name: punctuation.parenthesis.open.cs
+    end: "\\)"
+    endCaptures:
+      "0":
+        name: punctuation.parenthesis.close.cs
+    patterns:
+      - include: "#expression"
+
+  assignment-expression:
+    begin: "\\="
+    beginCaptures:
+      "0":
+        patterns:
+          - include: "#assignment-operators"
+    end: "(?=[,\\)\\];}])"
+    patterns:
+      - include: "#expression"
+
+  assignment-operators:
+    patterns:
+      - name: keyword.operator.assignment.cs
+        match: "\\="
+  expression-operators:
+    patterns:
+      - name: keyword.operator.bitwise.shift.cs
+        match: "(?i)<<|>>"
+      - name: keyword.operator.bitwise.rotate.cs
+        match: "{{|}}"
+      - name: keyword.operator.comparison.cs
+        match: "=|<>"
+      - name: keyword.operator.relational.cs
+        match: "<=|>=|<|>|S<=|S>=|S<|S>"
+      - name: keyword.operator.logical.cs
+        match: "\\!|&&|\\|\\|"
+      - name: keyword.operator.bitwise.cs
+        match: "(?i)\\&|not|\\^|\\|"
+      - name: keyword.operator.arithmetic.cs
+        match: "(?i)\\+|-(?!>)|\\*|\\/|S\\/|%|mod|umod"
