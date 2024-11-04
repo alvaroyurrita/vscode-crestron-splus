@@ -1,0 +1,46 @@
+@startmindmap
++ Operands
+++ built in constants
++++_ _O_APPEND
++++_ _O_CREAT
++++_ _O_EXCL
++++_ _O_TRUNC
++++_ _O_TEXT
++++_ _O_BINARY
++++_ _O_RDONLY
++++_ _O_RDWR
++++_ _O_WRONLY
++++_ ARDONLY
++++_ AHIDDEN
++++_ ASYSTEM
++++_ AVOLUME
++++_ ADIRENT
++++_ ARCHIVE
+++ user constants
+++ variables
+++ build in variables
++++_ STURCTURE socket_struct
++++_ STRUCTURE ramp_info
++++_ STRUCTURE file_info
+++ numbers
+++ strings
+-- expression
+-- user define functions
+---_ function(argument list)
+-- built in functions
+---_ data conversion
+---_ random number
+---_ string parsing
+---_ mathematical
+---_ string formating and printing
+---_ bit and byte
+---_ file
+---_ time & date
+---_ direct socket access
+---_ email
+---_ ramping
+---_ encoding
+---_ exception handling
+---_ delegate handling
+---_ event handling
+@endmindmap

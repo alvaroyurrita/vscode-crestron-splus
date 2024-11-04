@@ -1,0 +1,14 @@
+@startmindmap
++ events
+++_ [THREADSAFE] PUSH identifier, identifier { declarations, statements; }
+++_ [THREADSAFE] EVENT identifier, identifier { declarations, statements; }
+++_ [THREADSAFE] CHANGE identifier, identifier { declarations, statements; }
+++_ [THREADSAFE] RELEASE identifier, identifier { declarations, statements; }
+++_ [THREADSAFE] SOCKETCONNECT identifier, identifier { declarations, statements; }
+++_ [THREADSAFE] SOCKETDISCONNECT identifier, identifier { declarations, statements; }
+++_ [THREADSAFE] SOCKETRECEIVE identifier, identifier { declarations, statements; }
+++_ [THREADSAFE] SOCKETSTATUS identifier, identifier { declarations, statements; }
+++_ EVENTHANDLER identifier(CLASS identifier, EVENTARGS identifier) { declarations, statements; }
+++_ CALLBACK [type] identifier(parameters) { declarations, statements; }
+
+@endmindmap

@@ -1,0 +1,72 @@
+@startmindmap
+*: declarations
+<code>
+introduces an identifier into the language
+and identifier syntax is
+a-z, A-Z, 0-9, #, _, and $ but may not begin with 0-9
+</code>
+;
+++ input
++++_ DIGITAL_INPUT identifier[size[,min]], ... ;
++++_ ANALOG_INPUT identifier[size[,min]], ... ;
++++_ STRING_INPUT identifier[size[,min]][max_chars], ... ;
++++_ BUFFER_INPUT identifier[size[,min]][max_chars], ... ;
+++ output
++++_ DIGITAL_OUTPUT identifier[size[,min]], ... ;
++++_ ANALOG_OUTPUT identifier[size[,min]], ... ;
++++_ STRING_OUTPUT identifier[size[,min]][max_chars], ... ;
+++ parameter
++++_ INTEGER_PARAMETER identifier[size], ... ;
++++_ SIGNED_INTEGER_PARAMETER identifier[size], ... ;
++++_ LONG_INTEGER_PARAMETER identifier[size], ... ;
++++_ SIGNED_LONG_INTEGER_PARAMETER identifier[size], ... ;
++++_ STRING_PARAMETER identifier[size][max_chars], ... ;
+**: variables
+<code>
+modifiers are VOLATILE, NONVOLATILE,
+DYNAMIC (for arrays only)
+ASCII, UTF16, INHERIT (for string only)
+</code>
+;
++++_ [modifier] INTEGER identifier[size], ... ;
++++_ [modifier] SIGNED_INTEGER identifier[size], ... ;
++++_ [modifier] LONG_INTEGER identifier[size], ... ;
++++_ [modifier] SIGNED_LONG_INTEGER identifier[size], ... ;
++++_ [modifier] STRING identifier[size][max_chars], ... ;
++++_ [modifier] STRUCTURE identifier[size]{declaration;...};
+++ object instance
++++_ user_class_object identifier, ... ;
++++_ CEVENT identifier, ... ;
++++_ CMUTEX identifier, ... ;
+++ function
++++_ FUNCTION identifier(parameter list){ statements;  };
++++_ INTEGER_FUNCTION identifier(parameter list){ statements; RETURN expression; };
++++_ SIGNED_INTEGER_FUNCTION identifier(parameter list){ statements; RETURN expression; };
++++_ LONG_INTEGER_FUNCTION identifier(parameter list){ statements; RETURN expression; };
++++_ SIGNED_LONG_INTEGER_FUNCTION identifier(parameter list){ statements; RETURN expression; };
++++_ STRING_FUNCTION identifier(parameter list){ statements; RETURN expression; };
++++_ SIMPLSHARPSTRING_FUNCTION identifier(parameter list){ statements; RETURN expression; };
+++ SIMPL#
++++_ [static] CLASS identifier{declaration;...};
++++_ NAMESPACE identifier{declaration;...};
++++ class delegate
+++++_ [static] DELEGATE FUNCTION  identifier(parameter list);
+++++_ [static] DELEGATE SIGNED_LONG_INTEGER_FUNCTION identifier(parameter list);
+++++_ [static] DELEGATE STRING_FUNCTION identifier(parameter list);
+++++_ [static] DELEGATE SIMPLSHARPSTRING_FUNCTION identifier(parameter list);
+++++_ [static] DELEGATE LONG_INTEGER_FUNCTION identifier(parameter list);
+++++_ [static] DELEGATE INTEGER_FUNCTION identifier(parameter list);
+++++_ [static] DELEGATE SIGNED_INTEGER_FUNCTION identifier(parameter list);
++++ class events
+++++_ EVENTHANDLER identifier(CLASS identifier, EVENTARGS identifier);
++++ class properties
+++++_ DELEGATEPROPERTY delegate_identifier identifier;
+++++_ STRING identifier[];
+++++_ SIMPLSHARPSTRING identifier[];
+++++_ SIGNED_LONG_INTEGER identifier;
+++++_ LONG_INTEGER identifier;
+++++_ SIGNED_INTEGER identifier;
+++++_ INTEGER identifier;
+++++_ structure_identifier identifier;
+++++_ class_identifier identifier;
+@endmindmap

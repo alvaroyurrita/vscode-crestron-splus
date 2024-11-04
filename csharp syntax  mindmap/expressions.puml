@@ -1,0 +1,64 @@
+@startmindmap
+*: Expression
+<code>
+a and b are operands
+</code>
+;
+++ literal
++++_ 123
++++_ "abc \\n %d"
++++_ 'a'
++++_ \\n
++++_ 0x23AB
+++ integer 
++++_ integer literal expression
++++_ integer_function identifier(argument list)
++++_ integer arithmetic expression
++++_ signed_integer_function identifier(argument list)
++++_ long_integer_function identifier(argument list)
++++_ signed_long_integer_function identifier(argument list)
+++ string
++++_ string_function identifier(expression)
+++ member access
++++_ a[integer expression]
++++_ a[integer expression][integer expression]
+++ unary
++++_ not(binary expression)
++++_ !binary expression
++++_ -arithmetic expression
+++ bitwise
++++_ a & b
++++_ a | b
++++_ a ^ b
++++_ Not(a)
++++_ a << b
++++_ a >> b
++++_ a }} b
++++_ a {{ b
+-- relational
+---_ a < b
+---_ a > b
+---_ a <= b
+---_ a >= b
+---_ a S< b
+---_ a S> b
+---_ a S<= b
+---_ a S>= b
+---_ a = b
+---_ a <> b
+---_ a && b
+---_ a || b
+-- parenthesized
+---_ (expression)
+-- assignment
+---_ a=b
+-- arithmetic
+---_ a - b
+---_ a - b
+---_ a * b
+---_ a / b
+---_ a % b
+---_ a mod b
+---_ a umod b
+@endmindmap
+

@@ -1,0 +1,27 @@
+@startmindmap
++ statements
+++ Looping
++++_ while(expression){ statements; [continue|break] }
++++_ do{ statements; [continue|break] } until(expression);
++++_ for(<variable> = <start_expression> TO <end_expression> \n[STEP <step_expression>])){ statements; [continue|break] }
+++ wait
++++_ WAIT(<integer|long integer expression>, string identifier){ statements; }
++++_ RetimeWait(<integer|long integer expression>, string identifier);
++++_ CANCELWAIT(identifier);
++++_ CancelAllWait();
++++_ PauseWait(identifier);
++++_ ResumeWait(identifier);
++++_ ResumeAllWait();
+++ branching and decissoin
++++_ IF(expression){ statements; }ELSE { statements; }
++++_ IF(expression){ statements; }ELSE IF { statements; }
++++_ IF(expression){ statements; }ELSE IF { statements; } ELSE { statements; }
++++_ SWITCH(integer expression ){ (case expression: {statements};)* default: {statements} }
++++_ CSWITCH(integer expression ){ (case constant: {statements} break;)* default: {statements} }
+++ exception handling
++++_ TRY{ statements; } CATCH{ statements; }
+++ variable assignments
+++ local variable declarations
+
+
+@endmindmap

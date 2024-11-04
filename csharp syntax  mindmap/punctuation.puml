@@ -1,0 +1,63 @@
+@startmindmap
++ punctuation
+++ { }
++++_ compound statement
+++ [ ]
++++_ array index
++++_ array initialization
+++ ( )
++++_ function call
++++_ expression grouping
++++_ function declarator
++++_ if, switch, while, do-while, for: delimit controlling clause
+++ ;
++++_ statement terminator
++++_ structure terminator
+++ .
++++_ member access
+++ ,
++++_ comma operator
++++_ array separator
++++_ argument list separator
++++_ parameter list separator 
+++ +
++++_ binary plus
+++ -
++++_ binary minus
+++ *
++++_ binary multiply
+++ /
++++_ binary divide
+++ MOD
++++_ binary modulus
+++ %
++++_ binary modulus
+++ UMOD
++++_ unsigned binary modulus
+-- ^
+---_ binary xor
+-- &
+---_ binary and
+-- |
+---_ binary or
+-- =
+---_ assignment
+---_ binary comparison
+-- !
+---_ unary not
+-- <>
+---_ binary not equal
+-- <
+---_ binary less than
+-- >
+---_ binary greater than
+-- <=
+---_ binary less than or equal
+-- >=
+---_ binary greater than or equal
+-- &&
+---_ binary logical and
+-- <U+007C> <U+007C>
+---_ binary logical or
+
+@endmindmap

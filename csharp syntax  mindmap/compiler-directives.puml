@@ -1,0 +1,46 @@
+@startmindmap
++ compiler directives
+**: \#ANALOG_SERIAL_EXPAND <value>
+<code>
+value: Separately | OutputsWithParams | 
+InputsWithOutputs | AllWithAny | PWithIxorO
+</code>
+;
+++ \#BEGIN_PARAMETER_PROPERTIES \n{prop directives} \n#END_PARAMETER_PROPERTIES 
+++ \#CATEGORY "category number"
+++ \#CRESTRON_LIBRARY "library name"
+++ \#CRESTRON_SIMPLSHARP_LIBRARY "library name"
+++ \#DEFAULT_NONVOLATILE 
+++ \#DEFAULT_VOLATILE 
+++ \#DEFINE_CONSTANT <identifier> <value>
+**: \#DIGITAL_EXPAND 
+<value>
+<code>
+value: Separately | OutputsWithParams | 
+InputsWithOutputs | InputsWithParams |
+AllWithAny | PWithIxorO
+</code>
+;
+++ \#ENABLE_STACK_CHECKING 
+++ \#ENABLE_TRACE 
+++ \#ENCODING_ASCII 
+++ \#ENCODING_UTF16 
+++ \#ENCODING_INHERIT_FROM_PARENT 
+++ \#ENCODING_INHERIT_FROM_PROGRAM 
+-- \#HELP "help text"
+-- \#HELP_BEGIN help lines #HELP_END 
+-- \#HINT "hint text"
+-- \#IF_DEFINED <statements> #ENDIF 
+-- \#IF_NOT_DEFINED <statements> #ENDIF 
+-- \#IF_SERIES2 <statements> #ENDIF 
+-- \#IF_SERIES3 <statements> #ENDIF 
+-- \#IF_SERIES4 <statements> #ENDIF 
+-- \#INCLUDEPATH "absolute path"
+-- \#LARGE_STACK 
+-- \#MAX_INTERNAL_BUFFER_SIZE <size>
+-- \#OUTPUT_SHIFT <size>
+-- \#PRINT_TO_TRACE 
+-- \#SYMBOL_NAME "symbol name"
+-- \#USER_LIBRARY "library name"
+-- \#USER_SIMPLSHARP_LIBRARY "library name"
+@endmindmap
