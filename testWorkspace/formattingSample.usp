@@ -20,6 +20,14 @@ jkj 0xABCcfjkj //malformed
 1234e-4 //exponential
 1234E5 //exponential
 
+//Character Literal
+'d'
+
+//Illegal Charcter Literal
+'dd'
+'d
+'x034df3'
+
 
 //preprocessor-define-constant
 #DEFINE_CONSTANT HELLO 534343

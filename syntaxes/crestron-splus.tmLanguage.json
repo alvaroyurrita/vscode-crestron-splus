@@ -854,6 +854,9 @@
           "include": "#numeric-literal"
         },
         {
+          "include": "#char-literal"
+        },
+        {
           "include": "#string-literal"
         },
         {
@@ -898,6 +901,30 @@
           ]
         }
       }
+    },
+    "char-literal": {
+      "name": "string.quoted.single.cs",
+      "begin": "\\'",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.definition.char.begin.cs"
+        }
+      },
+      "end": "(\\')|((?:[^\\n])$)",
+      "endCaptures": {
+        "1": {
+          "name": "punctuation.definition.char.end.cs"
+        },
+        "2": {
+          "name": "invalid.illegal.newline.cs"
+        }
+      },
+      "patterns": [
+        {
+          "match": "([0-9a-zA-Z]{2,})",
+          "name": "invalid.illegal.char.cs"
+        }
+      ]
     },
     "punctuation-comma": {
       "match": "\\,",

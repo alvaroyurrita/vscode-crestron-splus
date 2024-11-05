@@ -8,6 +8,8 @@ a and b are operands
 +++_ 123
 +++_ "abc \\n %d"
 +++_ 'a'
++++_ '\x1234'
++++_ '\n'
 +++_ \\n
 +++_ 0x23AB
 ++ integer 

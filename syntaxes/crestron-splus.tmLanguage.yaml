@@ -999,7 +999,7 @@ repository:
       # - include: "#boolean-literal"
       # - include: "#null-literal"
       - include: "#numeric-literal"
-      # - include: "#char-literal"
+      - include: "#char-literal"
       - include: "#string-literal"
       # - include: "#raw-string-literal"
       # - include: "#verbatim-string-literal"
@@ -1041,6 +1041,21 @@ repository:
                 name: constant.numeric.decimal.cs
           - match: (?:(?:[0-9a-zA-Z_]|_)|(?<=[eE])[+-]|\.\d)+ # invalidate anything that did not match hex of decimal
             name: invalid.illegal.constant.numeric.cs
+  char-literal:
+    name: string.quoted.single.cs
+    begin: \'
+    beginCaptures:
+      '0':
+        name: punctuation.definition.char.begin.cs
+    end: (\')|((?:[^\n])$) #end with a single quote or anything but newline
+    endCaptures:
+      '1':
+        name: punctuation.definition.char.end.cs
+      '2':
+        name: invalid.illegal.newline.cs
+    patterns:
+    - match: ([0-9a-zA-Z]{2,})
+      name: invalid.illegal.char.cs
 
 
 #Punctuation
