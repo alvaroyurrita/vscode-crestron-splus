@@ -3,8 +3,6 @@ scopeName: source.splus
 fileTypes:
   - usp
   - usl
-  - csp
-  - csl
 name: Crestron
 patterns:
   - include: "#preprocessor"
@@ -15,7 +13,6 @@ patterns:
 
 # - include: "#crestron_keywords"
 # - include: "#comments"
-# - include: "#numbers"
 # - include: "#string"
 # - include: "#expression"
 
@@ -141,7 +138,6 @@ repository:
       #     #   - include: "#conditional-operator"
       - include: "#assignment-expression"
       - include: "#expression-operators"
-      # - include: "#string-literal"
       #     #   - include: "#await-expression"
       #     #   - include: "#query-expression"
       #     #   - include: "#as-expression"
@@ -272,7 +268,7 @@ repository:
   #       name: support.constant.media.usp
 
   #     - comment: Crestron Conditionals
-  #       match: "(?ix)\\b(break|continue|switch|cswitch|if|else|do|until|for|while)\\b"
+  #       match: "(?ix)\\b(break|continue|switch.uspwitch|if|else|do|until|for|while)\\b"
   #       name: keyword.control.usp
 
   #     - comment: Crestron Array Functions
@@ -907,20 +903,6 @@ repository:
         name: punctuation.parenthesis.close.usp
     patterns:
     - include: "#expression"
-  string-literal:
-    name: string.quoted.double.usp
-    begin: \"
-    beginCaptures:
-      '0':
-        name: punctuation.definition.string.begin.usp
-    end: (")|((?:[^\\\n])$)
-    endCaptures:
-      '1':
-        name: punctuation.definition.string.end.usp
-      '2':
-        name: invalid.illegal.newline.usp
-    patterns:
-    - include: "#string-character-escape"
   expression-operator-expression:
     begin: (\()
     beginCaptures:
@@ -959,40 +941,6 @@ repository:
         match: "(?i)\\+|-(?!>)|\\*|\\/|S\\/|%|mod|umod"
 
 
-
-# operands
-  string-character-escape:
-    name: constant.character.escape.usp
-    match: >
-      (?x)
-        (\\ #escape initializer character
-          (?:
-            [abfnrt\'\"\\]| #Static Specification String #AudibleAlert, Backspace, Formfeed, CRLF, CR, Tab, SingleQuote, DoubleQuote, Backslash
-            x[0-9A-Fa-f]{2}| #Hexadecimal Constant
-          )|
-          %(?:[0-9]?[0-9])? #[[pad]width]
-            (?:
-              d| #Signed Analog_Input, Analog_Output or Integer as decimal
-              s| #Buffer_Input, String_Input or String
-              u| #Unsigned Analog_Input, Analog_Output or integer
-              ld| #Long_Integer as decimal
-              lu| #Long_Unsigned_Integer as decimal
-              %   #Prints % 
-            )| #Print Formatters %[[pad]width]specifier
-          %(?:
-              x| #Analog_Input, Analog_Output or Integer as lowercase hexadecimal
-              X| #Analog_Input, Analog_Output or Integer as uppercase hexadecimal
-          )
-        )
-
-
-  numbers:
-      match: \b((0x[a-fA-F0-9]{1,8})|([0-9]+))\b
-      name: constant.numeric.usp
-
-
-
-
 #Literals
   literal:
       patterns:
@@ -1011,7 +959,7 @@ repository:
   numeric-literal:
     match: >
       (?x)
-        (?<!\w)\.?\d
+        (?<!\w)\.?\d #ensure it starts with a digit or period and not a word character
         (?:
           (?:[0-9a-zA-Z_]|_)| #capture any digit or letter or underscore (anything that resembles a number)
           (?<=[eE])[+-]| # even if it looks scientific
@@ -1029,33 +977,106 @@ repository:
                 ([0-9a-fA-F](?:[0-9a-fA-F])*)$ #capture rest of hex digits
             captures:
               '1':
-                name: constant.numeric.other.preffix.hex.cs
+                name: constant.numeric.other.prefix.hex.usp
               '2':
-                name: constant.numeric.hex.cs          
+                name: constant.numeric.hex.usp
           - match: >   # grab a decimal integer
               (?x)
                 (?=[0-9])(?!0[xX]) #ensure it starts with a digit, but not wit a 0x or 0X 
                 ([0-9](?:[0-9])*)$ #capture rest of decimal digits
             captures:
               '1':
-                name: constant.numeric.decimal.cs
+                name: constant.numeric.decimal.usp
           - match: (?:(?:[0-9a-zA-Z_]|_)|(?<=[eE])[+-]|\.\d)+ # invalidate anything that did not match hex of decimal
-            name: invalid.illegal.constant.numeric.cs
+            name: invalid.illegal.constant.numeric.usp
   char-literal:
-    name: string.quoted.single.cs
+    name: string.quoted.single.usp
     begin: \'
     beginCaptures:
       '0':
-        name: punctuation.definition.char.begin.cs
+        name: punctuation.definition.char.begin.usp
     end: (\')|((?:[^\n])$) #end with a single quote or anything but newline
     endCaptures:
       '1':
-        name: punctuation.definition.char.end.cs
+        name: punctuation.definition.char.end.usp
       '2':
-        name: invalid.illegal.newline.cs
+        name: invalid.illegal.newline.usp
     patterns:
     - match: ([0-9a-zA-Z]{2,})
-      name: invalid.illegal.char.cs
+      name: invalid.illegal.char.usp
+  string-literal:
+    name: string.quoted.double.usp
+    begin: \"
+    beginCaptures:
+      '0':
+        name: punctuation.definition.string.begin.usp
+    end: (")|((?:[^\n])$)
+    endCaptures:
+      '1':
+        name: punctuation.definition.string.end.usp
+      '2':
+        name: invalid.illegal.newline.usp
+    patterns:
+    - include: "#string-character-escape"
+  string-character-escape:
+    match: >
+      (?x)
+        (\%   #escape initializer character either % or \
+          (?:
+            (?:[0-9a-zA-Z]|\%)? #grab any digit or letter or % character for next character zero or 1 times
+            (?:[0-9a-zA-Z])*    #grab the rest of the digits or letters
+          )
+        ) |  #or
+        (\\(?:[a-zA-Z\\])(?:(?:[0-9a-fA-F]){2})?) #grab any one letter or dual hex number after a backslash
+    captures:
+      "0":
+        patterns:  #with the match above:
+        - begin: "(?=.)"
+          end: "$"
+          patterns:
+          - match: > #percent character escape
+              (?x)
+                (%%) |  # Prints % or
+                (%
+                  (?:
+                    (?:[0-9]?[0-9])? #[[pad]width]
+                    (?:
+                      d|  #Signed Analog_Input, Analog_Output or Integer as decimal
+                      s|  #Buffer_Input, String_Input or String
+                      u|  #Unsigned Analog_Input, Analog_Output or integer
+                      ld| #Long_Integer as decimal
+                      lu| #Long_Unsigned_Integer as decimal
+                      x|  #Analog_Input, Analog_Output or Integer as lowercase hexadecimal
+                      X|  #Analog_Input, Analog_Output or Integer as uppercase hexadecimal
+                      c|  #Printable ASCII character
+                    ){1}
+                  ) #Print Formatters %[[pad]width]specifier
+                )
+            name: constant.character.escape.usp
+          - match: > #backslash character escape
+              (?x)
+                 (\\
+                   (?:
+                     a|  #Alert (Beep)
+                     b|  #Backspace
+                     f|  #Form Feed
+                     n|  #Newline
+                     r|  #Carriage Return
+                     t|  #Horizontal Tab
+                     v|  #Vertical Tab
+                     \\| slash
+                   )
+                 ) |
+                 (\\
+                   (?:
+                     [xX](?:[0-9a-fA-F]){2} |  #Hexadecimal character code
+                   )
+                 )
+            name: constant.character.escape.usp
+          - match: .* #invalidate anything that did not match the above
+            name: invalid.illegal.character.escape.usp
+
+
 
 
 #Punctuation
