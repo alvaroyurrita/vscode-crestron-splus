@@ -30,6 +30,9 @@
       "patterns": [
         {
           "include": "#expression"
+        },
+        {
+          "include": "#local-declarations"
         }
       ]
     },
@@ -51,10 +54,10 @@
           "include": "#expression-operators"
         },
         {
-          "include": "#string-literal"
+          "include": "#invocation-function"
         },
         {
-          "include": "#invocation-function"
+          "include": "#literal"
         },
         {
           "include": "#parenthesized-expression"
@@ -427,32 +430,47 @@
         }
       }
     },
-    "expression-operator-expression": {
-      "begin": "(\\()",
-      "beginCaptures": {
-        "1": {
-          "name": "punctuation.parenthesis.open.usp"
-        }
-      },
-      "end": "\\)",
-      "endCaptures": {
-        "0": {
-          "name": "punctuation.parenthesis.close.usp"
-        }
-      },
+    "local-declarations": {
       "patterns": [
         {
-          "include": "#expression"
+          "include": "#local-variable-declaration"
         }
       ]
     },
-    "constant-pattern": {
+    "local-variable-declaration": {
+      "begin": "(?ix) (?:  (?:(dynamic|volatile|nonvolatile|ascii|utf16|inherit)?\\s+)? # declaration modifier\n  (?<type_name>\n    (?:\n      (?:\n        (?<identifier>[_[:alpha:]][\\#\\$\\_[:alnum:]]*)\n        (?:\\s*\\.\\s*\\g<identifier>)* | # Are there any more names being dotted into?\n      )\n    )\n  )\n)\\s+ (  (\\g<identifier>)\\s*\n  (?:\\s*                 # array suffix?\n      (?:(\\[)\\d*(\\])\\s*)\n      (?:(\\[)\\d*(\\])\\s*)?\n  )?\n) (?=,|;|=|\\))\n",
+      "beginCaptures": {
+        "1": {
+          "name": "storage.modifier.$1.usp"
+        },
+        "2": {
+          "patterns": [
+            {
+              "include": "#type"
+            }
+          ]
+        },
+        "4": {
+          "patterns": [
+            {
+              "include": "#simple-designation-pattern"
+            }
+          ]
+        }
+      },
+      "end": "(?=[;)}])",
       "patterns": [
         {
-          "include": "#string-literal"
+          "include": "#simple-designation-pattern"
         },
         {
-          "include": "#expression-operators"
+          "include": "#punctuation-comma"
+        },
+        {
+          "include": "#comment"
+        },
+        {
+          "include": "#variable-initializer"
         }
       ]
     },
@@ -502,7 +520,7 @@
       ]
     },
     "parameter": {
-      "match": "(?ix)\n(?:(?:\\b(ByRef|ByVal|ReadOnlyByRef)\\b)\\s+)?\n(?<type_name>\n (?:\n    (?:\n      (?<identifier>[_[:alpha:]][\\#\\$\\_[:alnum:]]*)\n      (?:\\s*\\.\\s*\\g<identifier>)* | # Are there any more names being dotted into?\n    )\n    (?:\\s* # array suffix?\n      \\[\n        (?:\\s*,\\s*)* # commata for multi-dimensional arrays\n      \\]\n      \\s*\n    )*\n  )\n)\\s+\n(\\g<identifier>)/ixg",
+      "match": "(?ix)\n(?:(?:\\b(ByRef|ByVal|ReadOnlyByRef)\\b)\\s+)?\n(?<type_name>\n (?:\n    (?:\n      (?<identifier>[_[:alpha:]][\\#\\$\\_[:alnum:]]*)\n      (?:\\s*\\.\\s*\\g<identifier>)* | # Are there any more names being dotted into?\n    )\n    (?:\\s* # array suffix?\n      \\[\n        (?:\\s*,\\s*)* # commata for multi-dimensional arrays\n      \\]\n      \\s*\n    )*\n  )\n)\\s+\n(\\g<identifier>)",
       "captures": {
         "1": {
           "name": "storage.modifier.$1.usp"
@@ -591,7 +609,7 @@
       ]
     },
     "type-builtin": {
-      "match": "(?ix)\\b(integer|long_integer|signed_integer|signed_long_integer|string|structure|cmutex|cevent|file_info)\\b",
+      "match": "(?ix)\\b(integer|long_integer|signed_integer|signed_long_integer|string|structure)\\b",
       "comment": "Crestron Built In Types",
       "name": "keyword.type.$1.usp"
     },
@@ -625,6 +643,62 @@
         }
       ]
     },
+    "designation-pattern": {
+      "patterns": [
+        {
+          "include": "#intrusive"
+        },
+        {
+          "begin": "\\(",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.parenthesis.open.usp"
+            }
+          },
+          "end": "\\)",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.parenthesis.close.usp"
+            }
+          },
+          "patterns": [
+            {
+              "include": "#punctuation-comma"
+            },
+            {
+              "include": "#designation-pattern"
+            }
+          ]
+        },
+        {
+          "include": "#simple-designation-pattern"
+        }
+      ]
+    },
+    "simple-designation-pattern": {
+      "patterns": [
+        {
+          "match": "(?x) (?:  ([_[:alpha:]][\\#\\$\\_[:alnum:]]*) #Name\n  (?:\\s*                   # array suffix?\n    (?:(\\[)\\d*(\\])\\s*)\n    (?:(\\[)\\d*(\\])\\s*)?\n  )?\n)\n",
+          "captures": {
+            "1": {
+              "name": "entity.name.variable.local.usp"
+            },
+            "2": {
+              "name": "punctuation.squarebracket.open.usp"
+            },
+            "3": {
+              "name": "punctuation.squarebracket.close.usp"
+            },
+            "4": {
+              "name": "punctuation.squarebracket.open.usp"
+            },
+            "5": {
+              "name": "punctuation.squarebracket.close.usp"
+            }
+          }
+        }
+      ]
+    },
     "type-array-suffix": {
       "begin": "\\[",
       "beginCaptures": {
@@ -646,10 +720,6 @@
           "include": "#punctuation-comma"
         }
       ]
-    },
-    "identifier": {
-      "match": "([\\_[:alpha:]][\\_\\#\\_\\$[:alnum:]]*)",
-      "name": "variable.other.readwrite.usp"
     },
     "assignment-expression": {
       "begin": "\\=(?!=|>)\"",
@@ -673,6 +743,48 @@
       "begin": "\\(",
       "beginCaptures": {
         "0": {
+          "name": "punctuation.parenthesis.open.usp"
+        }
+      },
+      "end": "\\)",
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.parenthesis.close.usp"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#expression"
+        }
+      ]
+    },
+    "string-literal": {
+      "name": "string.quoted.double.usp",
+      "begin": "\\\"",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.definition.string.begin.usp"
+        }
+      },
+      "end": "(\")|((?:[^\\\\\\n])$)",
+      "endCaptures": {
+        "1": {
+          "name": "punctuation.definition.string.end.usp"
+        },
+        "2": {
+          "name": "invalid.illegal.newline.usp"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#string-character-escape"
+        }
+      ]
+    },
+    "expression-operator-expression": {
+      "begin": "(\\()",
+      "beginCaptures": {
+        "1": {
           "name": "punctuation.parenthesis.open.usp"
         }
       },
@@ -728,32 +840,64 @@
         }
       ]
     },
-    "string-literal": {
-      "name": "string.quoted.double.cs",
-      "begin": "\\\"",
-      "beginCaptures": {
-        "0": {
-          "name": "punctuation.definition.string.begin.cs"
-        }
-      },
-      "end": "(\")|((?:[^\\\\\\n])$)",
-      "endCaptures": {
-        "1": {
-          "name": "punctuation.definition.string.end.cs"
-        },
-        "2": {
-          "name": "invalid.illegal.newline.cs"
-        }
-      },
+    "string-character-escape": {
+      "name": "constant.character.escape.usp",
+      "match": "(?x)  (\\\\ #escape initializer character\n    (?:\n      [abfnrt\\'\\\"\\\\]| #Static Specification String #AudibleAlert, Backspace, Formfeed, CRLF, CR, Tab, SingleQuote, DoubleQuote, Backslash\n      x[0-9A-Fa-f]{2}| #Hexadecimal Constant\n    )|\n    %(?:[0-9]?[0-9])? #[[pad]width]\n      (?:\n        d| #Signed Analog_Input, Analog_Output or Integer as decimal\n        s| #Buffer_Input, String_Input or String\n        u| #Unsigned Analog_Input, Analog_Output or integer\n        ld| #Long_Integer as decimal\n        lu| #Long_Unsigned_Integer as decimal\n        %   #Prints % \n      )| #Print Formatters %[[pad]width]specifier\n    %(?:\n        x| #Analog_Input, Analog_Output or Integer as lowercase hexadecimal\n        X| #Analog_Input, Analog_Output or Integer as uppercase hexadecimal\n    )\n  )\n"
+    },
+    "numbers": {
+      "match": "\\b((0x[a-fA-F0-9]{1,8})|([0-9]+))\\b",
+      "name": "constant.numeric.usp"
+    },
+    "literal": {
       "patterns": [
         {
-          "include": "#string-character-escape"
+          "include": "#numeric-literal"
+        },
+        {
+          "include": "#string-literal"
+        },
+        {
+          "include": "#expression-operators"
         }
       ]
     },
-    "string-character-escape": {
-      "name": "constant.character.escape.usp",
-      "match": "(?x)  (\\\\ #escape initializer character\n    (?:\n      [abefnrtv\\'\\\"\\\\]| #Static Specification String\n      x[0-9A-Fa-f]{2}| #Hexadecimal Constant\n    )|\n    %(?:[0-9]?[0-9])? #[[pad]width]\n      (?:\n        d| #Signed Analog_Input, Analog_Output or Integer as decimal\n        s| #Buffer_Input, String_Input or String\n        u| #Unsigned Analog_Input, Analog_Output or integer\n        ld| #Long_Integer as decimal\n        lu| #Long_Unsigned_Integer as decimal\n        %   #Prints % \n      )| #Print Formatters %[[pad]width]specifier\n    %(?:\n        x| #Analog_Input, Analog_Output or Integer as lowercase hexadecimal\n        X| #Analog_Input, Analog_Output or Integer as uppercase hexadecimal\n    )\n  )\n"
+    "numeric-literal": {
+      "match": "(?x)  (?<!\\w)\\.?\\d\n  (?:\n    (?:[0-9a-zA-Z_]|_)| #capture any digit or letter or underscore (anything that resembles a number)\n    (?<=[eE])[+-]| # even if it looks scientific\n    \\.\\d #or floating point\n  )*\n",
+      "captures": {
+        "0": {
+          "patterns": [
+            {
+              "begin": "(?=.)",
+              "end": "$",
+              "patterns": [
+                {
+                  "match": "(?x)  (0[xX]) #ensure it starts with a 0x or 0X\n  ([0-9a-fA-F](?:[0-9a-fA-F])*)$ #capture rest of hex digits\n",
+                  "captures": {
+                    "1": {
+                      "name": "constant.numeric.other.preffix.hex.cs"
+                    },
+                    "2": {
+                      "name": "constant.numeric.hex.cs"
+                    }
+                  }
+                },
+                {
+                  "match": "(?x)  (?=[0-9])(?!0[xX]) #ensure it starts with a digit, but not wit a 0x or 0X \n  ([0-9](?:[0-9])*)$ #capture rest of decimal digits\n",
+                  "captures": {
+                    "1": {
+                      "name": "constant.numeric.decimal.cs"
+                    }
+                  }
+                },
+                {
+                  "match": "(?:(?:[0-9a-zA-Z_]|_)|(?<=[eE])[+-]|\\.\\d)+",
+                  "name": "invalid.illegal.constant.numeric.cs"
+                }
+              ]
+            }
+          ]
+        }
+      }
     },
     "punctuation-comma": {
       "match": "\\,",

@@ -10,7 +10,6 @@ patterns:
   - include: "#preprocessor"
   - include: "#script-top-level"
   - include: "#comment"
-# - include: "#directives"
 # - include: "#declarations"
 # - include: "#script-top-level"
 
@@ -122,6 +121,7 @@ repository:
   statement:
     patterns:
       - include: "#expression"
+      - include: "#local-declarations"
 
   expression:
     patterns:
@@ -141,7 +141,7 @@ repository:
       #     #   - include: "#conditional-operator"
       - include: "#assignment-expression"
       - include: "#expression-operators"
-      - include: "#string-literal"
+      # - include: "#string-literal"
       #     #   - include: "#await-expression"
       #     #   - include: "#query-expression"
       #     #   - include: "#as-expression"
@@ -154,7 +154,7 @@ repository:
       #     #   - include: "#member-access-expression"
       #     #   - include: "#element-access-expression"
       #     #   - include: "#cast-expression"
-      #     #   - include: "#literal"
+      - include: "#literal"
       - include: "#parenthesized-expression"
       #     #   - include: "#tuple-deconstruction-assignment"
       #     #   - include: "#initializer-expression"
@@ -367,9 +367,6 @@ repository:
   #     patterns:
   #     - include: "$base"
 
-  #   numbers:
-  #     match: "\\b((0x[a-fA-F0-9]{1,8})|([0-9]+))\\b"
-  #     name: constant.numeric.usp
 
 
 
@@ -663,34 +660,53 @@ repository:
         name: keyword.preprocessor.endparameterproperties.usp                        
 
 
-  expression-operator-expression:
-    begin: (\()
+
+
+
+
+  local-declarations:
+    patterns:
+    - include: "#local-variable-declaration"
+
+
+  local-variable-declaration:
+    begin: >
+      (?ix)
+      (?:
+        (?:(dynamic|volatile|nonvolatile|ascii|utf16|inherit)?\s+)? # declaration modifier
+        (?<type_name>
+          (?:
+            (?:
+              (?<identifier>[_[:alpha:]][\#\$\_[:alnum:]]*)
+              (?:\s*\.\s*\g<identifier>)* | # Are there any more names being dotted into?
+            )
+          )
+        )
+      )\s+
+      (
+        (\g<identifier>)\s*
+        (?:\s*                 # array suffix?
+            (?:(\[)\d*(\])\s*)
+            (?:(\[)\d*(\])\s*)?
+        )?
+      )
+      (?=,|;|=|\))
     beginCaptures:
-      "1":
-        name: punctuation.parenthesis.open.usp
-    end: \)
-    endCaptures:
-      "0":
-        name: punctuation.parenthesis.close.usp
+      '1':
+        name: storage.modifier.$1.usp
+      '2':
+        patterns:
+        - include: "#type"
+      '4':
+        patterns:
+          - include: "#simple-designation-pattern"
+
+    end: "(?=[;)}])"
     patterns:
-      - include: "#expression"
-
-  
-
-  constant-pattern:
-    patterns:
-    # - include: "#boolean-literal"
-    # - include: "#null-literal"
-    # - include: "#numeric-literal"
-    # - include: "#char-literal"
-    - include: "#string-literal"
-    # - include: "#raw-string-literal"
-    # - include: "#verbatim-string-literal"
-    # - include: "#type-operator-expression"
-    # - include: "#expression-operator-expression"
-    - include: "#expression-operators"
-    # - include: "#casted-constant-pattern"
-
+    - include: "#simple-designation-pattern"
+    - include: "#punctuation-comma"
+    - include: "#comment"
+    - include: "#variable-initializer"
 
 
 #Functions
@@ -742,7 +758,7 @@ repository:
           )*
         )
       )\s+
-      (\g<identifier>)/ixg
+      (\g<identifier>)
     captures:
       '1':
         name: storage.modifier.$1.usp
@@ -792,7 +808,7 @@ repository:
     - include: "#type-name"
 
   type-builtin:
-    match: (?ix)\b(integer|long_integer|signed_integer|signed_long_integer|string|structure|cmutex|cevent|file_info)\b
+    match: (?ix)\b(integer|long_integer|signed_integer|signed_long_integer|string|structure)\b
     comment: Crestron Built In Types
     name: keyword.type.$1.usp
   type-name:
@@ -812,6 +828,44 @@ repository:
     - name: entity.name.type.usp
       match: (@?[_[:alpha:]][\_\#\_\$_[:alnum:]]*)
 
+  designation-pattern:
+    patterns:
+    - include: "#intrusive"
+    - begin: "\\("
+      beginCaptures:
+        '0':
+          name: punctuation.parenthesis.open.usp
+      end: "\\)"
+      endCaptures:
+        '0':
+          name: punctuation.parenthesis.close.usp
+      patterns:
+      - include: "#punctuation-comma"
+      - include: "#designation-pattern"
+    - include: "#simple-designation-pattern"
+  simple-designation-pattern:
+    patterns:
+    - match: >
+        (?x)
+        (?:
+          ([_[:alpha:]][\#\$\_[:alnum:]]*) #Name
+          (?:\s*                   # array suffix?
+            (?:(\[)\d*(\])\s*)
+            (?:(\[)\d*(\])\s*)?
+          )?
+        )
+      captures:
+        "1":
+          name: entity.name.variable.local.usp
+        "2":
+          name: punctuation.squarebracket.open.usp
+        "3":
+          name: punctuation.squarebracket.close.usp
+        "4":
+          name: punctuation.squarebracket.open.usp
+        "5":
+          name: punctuation.squarebracket.close.usp
+
 #Constructs
   type-array-suffix:
     begin: \[
@@ -827,9 +881,9 @@ repository:
     - include: "#punctuation-comma"
 
 #Variables
-  identifier:
-    match: ([\_[:alpha:]][\_\#\_\$[:alnum:]]*)
-    name: "variable.other.readwrite.usp"
+  # identifier:
+  #   match: ([\_[:alpha:]][\_\#\_\$[:alnum:]]*)
+  #   name: "variable.other.readwrite.usp"
 
 
 #Expressions
@@ -853,6 +907,31 @@ repository:
         name: punctuation.parenthesis.close.usp
     patterns:
     - include: "#expression"
+  string-literal:
+    name: string.quoted.double.usp
+    begin: \"
+    beginCaptures:
+      '0':
+        name: punctuation.definition.string.begin.usp
+    end: (")|((?:[^\\\n])$)
+    endCaptures:
+      '1':
+        name: punctuation.definition.string.end.usp
+      '2':
+        name: invalid.illegal.newline.usp
+    patterns:
+    - include: "#string-character-escape"
+  expression-operator-expression:
+    begin: (\()
+    beginCaptures:
+      "1":
+        name: punctuation.parenthesis.open.usp
+    end: \)
+    endCaptures:
+      "0":
+        name: punctuation.parenthesis.close.usp
+    patterns:
+      - include: "#expression"
 
 #Math Assignment Operators
   assignment-operators:
@@ -880,29 +959,15 @@ repository:
         match: "(?i)\\+|-(?!>)|\\*|\\/|S\\/|%|mod|umod"
 
 
-#Punctuation
 
-  string-literal:
-    name: string.quoted.double.cs
-    begin: \"
-    beginCaptures:
-      '0':
-        name: punctuation.definition.string.begin.cs
-    end: (")|((?:[^\\\n])$)
-    endCaptures:
-      '1':
-        name: punctuation.definition.string.end.cs
-      '2':
-        name: invalid.illegal.newline.cs
-    patterns:
-    - include: "#string-character-escape"
+# operands
   string-character-escape:
     name: constant.character.escape.usp
     match: >
       (?x)
         (\\ #escape initializer character
           (?:
-            [abefnrtv\'\"\\]| #Static Specification String
+            [abfnrt\'\"\\]| #Static Specification String #AudibleAlert, Backspace, Formfeed, CRLF, CR, Tab, SingleQuote, DoubleQuote, Backslash
             x[0-9A-Fa-f]{2}| #Hexadecimal Constant
           )|
           %(?:[0-9]?[0-9])? #[[pad]width]
@@ -919,6 +984,66 @@ repository:
               X| #Analog_Input, Analog_Output or Integer as uppercase hexadecimal
           )
         )
+
+
+  numbers:
+      match: \b((0x[a-fA-F0-9]{1,8})|([0-9]+))\b
+      name: constant.numeric.usp
+
+
+
+
+#Literals
+  literal:
+      patterns:
+      # - include: "#boolean-literal"
+      # - include: "#null-literal"
+      - include: "#numeric-literal"
+      # - include: "#char-literal"
+      - include: "#string-literal"
+      # - include: "#raw-string-literal"
+      # - include: "#verbatim-string-literal"
+      # - include: "#type-operator-expression"
+      # - include: "#expression-operator-expression"
+      - include: "#expression-operators"
+      # - include: "#casted-constant-pattern"
+
+  numeric-literal:
+    match: >
+      (?x)
+        (?<!\w)\.?\d
+        (?:
+          (?:[0-9a-zA-Z_]|_)| #capture any digit or letter or underscore (anything that resembles a number)
+          (?<=[eE])[+-]| # even if it looks scientific
+          \.\d #or floating point
+        )*
+    captures:
+      '0':
+        patterns:  #with the match above:
+        - begin: "(?=.)"
+          end: "$"
+          patterns:
+          - match: > # grab a hex integer
+              (?x)
+                (0[xX]) #ensure it starts with a 0x or 0X
+                ([0-9a-fA-F](?:[0-9a-fA-F])*)$ #capture rest of hex digits
+            captures:
+              '1':
+                name: constant.numeric.other.preffix.hex.cs
+              '2':
+                name: constant.numeric.hex.cs          
+          - match: >   # grab a decimal integer
+              (?x)
+                (?=[0-9])(?!0[xX]) #ensure it starts with a digit, but not wit a 0x or 0X 
+                ([0-9](?:[0-9])*)$ #capture rest of decimal digits
+            captures:
+              '1':
+                name: constant.numeric.decimal.cs
+          - match: (?:(?:[0-9a-zA-Z_]|_)|(?<=[eE])[+-]|\.\d)+ # invalidate anything that did not match hex of decimal
+            name: invalid.illegal.constant.numeric.cs
+
+
+#Punctuation
   punctuation-comma:
     match: \,
     name: punctuation.separator.comma.usp

@@ -4,6 +4,23 @@
 
 // Single Line Comment
 
+//Numeric literals
+0x12AC
+0X123
+0x123
+1234
+jkjk 123 jkjk
+jkj 0xabc fjkj
+
+//Illegal Numeric literals
+1234f  //c# floating point cast
+123.459  //floating point
+jkjk 123jkj  //malformed
+jkj 0xABCcfjkj //malformed
+1234e-4 //exponential
+1234E5 //exponential
+
+
 //preprocessor-define-constant
 #DEFINE_CONSTANT HELLO 534343
 #DEFINE_CONSTANT HELLO2 "Something"
@@ -149,18 +166,31 @@ STRUCTURE StructureExample
 
 StructureExample struct;
 
-//Declarations
+//Local Variable Declarations
+INTEGER IntegerVariable1[1], IntegerVariable2[4], IntegerVariable3[4][2];
+INTEGER IntegerVariable1[2][1], IntegerVariable2[4], IntegerVariable3[4][2];
 INTEGER IntegerVariable1, IntegerVariable2[4], IntegerVariable3[4][2];
+INTEGER IntegerVariable3[4][2];
+INTEGER IntegerVariable3[4];
+INTEGER IntegerVariable3;
 LONG_INTEGER LongIntgerVariable1, LongIntgerVariable2[4], LongIntgerVariable3[4][2];
+
+LONG_INTEGER LongIntgerVariable3 [4] [2];
+
+LONG_INTEGER LongIntgerVariable3[4];
 SIGNED_INTEGER SignedIntegerVariable1, SignedIntegerVariable2[4], SignedIntegerVariable3[4][2];
 SIGNED_LONG_INTEGER SignedLongIntegerVariable1, SignedLongIntegerVariable2[4], SignedLongIntegerVariable3[4][2];
 STRING StringVariable1[50], StringVariable2[4][50];
 DYNAMIC STRING DynamicString[10];
 VOLATILE STRING VolatileString[10];
-NONVOLATILE STRING NonVolatileString[10];
+NONVOLATILE STRING NonVolatileString [10];
 ASCII STRING AsiiString[10];
 UTF16 string Utf16String[10];
 INHERIT STRING InheritString[10];
+STRING InheritString[10][20];
+test.STRING InheritString[10];
+volatile test.STRING InheritString;
+volatile test.STRING InheritString[10][20];
 
 //Functions
 

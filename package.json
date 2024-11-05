@@ -104,6 +104,21 @@
           "light": "./icons/splusIcon.png"
         },
         "configuration": "./language-configuration.json"
+      },
+      {
+        "aliases": [
+          "Crestron C# API",
+          "SIMPL# Library API"
+        ],
+        "id": "splus-sharp_api",
+        "extensions": [
+          ".cstest"
+        ],
+        "icon": {
+          "dark": "./icons/splusIcon.png",
+          "light": "./icons/splusIcon.png"
+        },
+        "configuration": "./language-configuration.json"
       }
     ],
     "grammars": [
@@ -111,6 +126,11 @@
         "language": "splus-source",
         "scopeName": "source.splus",
         "path": "./syntaxes/crestron-splus.tmLanguage.json"
+      },
+      {
+        "language": "splus-sharp_api",
+        "scopeName": "source.cs",
+        "path": "./syntaxes/csharp.tmLanguage.json"
       }
     ],
     "snippets": [
