@@ -80,6 +80,63 @@ print("%12lX", li);
 print("%12m", li);
 print("%m", li);
 
+//punctuation
+
+//Arithmetic
+-
+*
+/
+S/
+MOD
+UMOD
+%
++
+-
+
+//bitwise
+<<
+>>
+{{
+}}
+NOT
+&
+|
+^
+!
+&&
+||
+ 
+//comaprison
+=
+<>
+
+//relational
+<
+>
+<=
+>=
+S<
+S>
+S<=
+S>=
+
+
+//assignment
+=
+
+//grouping
+{ }
+[ ]
+( )
+
+//structure
+,
+;
+.
+
+
+
+
 
 
 //preprocessor-define-constant
@@ -142,24 +199,35 @@ line_n
 #ENCODING_INHERIT_FROM_PROGRAM 
 #ENCODING_UTF16 
 
-
 //Parameter Properties
 #BEGIN_PARAMETER_PROPERTIES StringParameter1, StringParameter2
-propValidUnits =  unitString;
-propDefaultUnit =  unitString;
-propDefaultValue =  "";
-propList = { "hello" , "helloLabel" } , { "goodby" , "goodbylabel" };
-propShortDescription = "status_bar_hint_text for StringParameter1";
-#BEGIN_PROP_FULL_DESCRIPTION  
-line_1...  
-line_2...  
-line_n  
-#END_PROP_FULL_DESCRIPTION
-#BEGIN_PROP_NOTES 
-line_1...  
-line_2...  
-line_n  
-#END_PROP_NOTES
+	#propValidUnits =  unitString; 
+	#propValidUnits =  unitDecimal|unitHex|unitPercent|unitCharacter|unitTime|unitTicks; 
+	#propDefaultUnits =  unitString;
+	#propDefaultUnits =  unitHex;
+	#propDefaultUnits =  unitPercent;
+	#propDefaultUnits =  unitCharacter;
+	#propDefaultUnits =  unitTime;
+	#propDefaultUnits =  unitTicks;
+	#propDefaultValue =  "string";
+	#propDefaultValue =  25d;
+	#propDefaultValue =  25h;
+	#propDefaultValue =  25%;
+	#propDefaultValue =  'a';
+	#propDefaultValue =  25s;
+	#propDefaultValue =  25t;
+	#propList = { 25d , "label" } , { 25h, "label" } , { 25%, "label" } , { 'a' , "label" } , { 25s, "label" } , { 25t , "label" } , { "helloLabel", "label" };
+	#propShortDescription = "status_bar_hint_text for StringParameter1";
+	#BEGIN_PROP_FULL_DESCRIPTION  
+		line_1...  
+		line_2...  
+		line_n  
+	#END_PROP_FULL_DESCRIPTION
+	#BEGIN_PROP_NOTES 
+		line_1...  
+		line_2...  
+		line_n  
+	#END_PROP_NOTES
 #END_PARAMETER_PROPERTIES
 
 

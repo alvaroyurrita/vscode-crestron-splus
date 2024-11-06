@@ -1,0 +1,85 @@
+@startwbs
++ Patterns
+	+ statement
+		+ looping -statement
+		+ wait-statement
+		+ branching-and-decision-statement
+		+ exception-handling-statement
+		+ variable-assignments-statement
+		+ local-variable-declarations-statement
+		+ built-in-function-calls-statement
+		+ user-defined-function-calls-statement
+		+ SimplSharp-method-calls-statement
+	+ expression
+		+ relational-expression
+		+ parenthesized-expression
+		+ assignment-expression
+		+ arithmetic-expression
+		+ literal-expression
+		+ integer-expression
+		+ string-expression
+		+ member-access-expression
+		+ unary-expression
+		+ bitwise-expression
+	+ operands
+		+ user define functions
+		+ built in functions
+		+ built in constants
+		+ user constants
+		+ variables
+		+ built in variables
+		+ literal
+			+ numeric-literal
+			+ char-literal
+			+ string-literal
+	+ declarations
+		+ input-declaration
+		+ output-declaration
+		+ parameter-declaration
+		+ variable-declaration
+		+ function-declaration
+		+ constant-declaration
+		+ SimplSharp-declaration
+			+ types-ss-declaration
+			+ delegates-ss-declaration
+			+ events-ss-declaration
+			+ properties-ss-declaration
+		+ parameter-list-declaration
+		+ identifier
+	+ "preprocessor" as prpr
+		+ "comment" as prprcom
+		+ preprocessor-define-constant
+		+ preprocessor-if-ifnot-defined
+		+ preprocessor-endif
+		+ preprocessor-category
+		+ preprocessor-library
+		+ preprocessor-include-path
+		+ preprocessor-symbol-name
+		+ preprocessor-hint
+		+ preprocessor-help
+		+ preprocessor-default-nonvolatile-volatile
+		+ preprocessor-analog-digital-expand
+		+ preprocessor-output-shift
+		+ preprocessor-max-internal-buffer-size
+		+ preprocessor-single
+		+ preprocessor-begin-parameter-properties
+		+ preprocessor-end-parameter-properties	
+	+ "punctuation" as punc
+		+ punctuation-arithmetic
+		+ punctuation-bitwise
+		+ punctuation-comparison
+		+ punctuation-relational
+		+ punctuation-assignment
+		+ punctuation-grouping
+			+ punctuation-square-brackets
+			+ punctuation-parentheses
+		+ punctuation-structure
+			+ punctuation-comma
+			+ punctuation-semicolon
+			+ punctuation-dot
+	+ "comments" as com
+		+ comment-line
+		+ comment-block
+		+ comment-block-preprocessor			
+prprcom --> com
+@endwbs

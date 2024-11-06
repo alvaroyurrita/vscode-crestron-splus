@@ -22,8 +22,16 @@
 +++_ STURCTURE socket_struct
 +++_ STRUCTURE ramp_info
 +++_ STRUCTURE file_info
-++ numbers
-++ strings
+++ literals
++++ numbers
+++++_ 123
+++++_ '\x1234'
+++++_ 0x23AB
++++ strings
+++++_ "abc \\n %d"
++++ character
+++++_ 'a'
+++++_ \\n
 -- expression
 -- user define functions
 ---_ function(argument list)

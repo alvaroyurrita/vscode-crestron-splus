@@ -7,75 +7,426 @@
   "name": "Crestron",
   "patterns": [
     {
+      "include": "#comments"
+    },
+    {
       "include": "#preprocessor"
     },
     {
-      "include": "#script-top-level"
+      "include": "#statements"
     },
     {
-      "include": "#comment"
+      "include": "#expressions"
+    },
+    {
+      "include": "#operands"
+    },
+    {
+      "include": "#declaration"
+    },
+    {
+      "include": "#punctuation"
     }
   ],
   "repository": {
-    "script-top-level": {
+    "statements": {
       "patterns": [
         {
-          "include": "#statement"
+          "include": "#looping-statement"
+        },
+        {
+          "include": "#wait-statement"
+        },
+        {
+          "include": "#branching-and-decision-statement"
+        },
+        {
+          "include": "#exception-handling-statement"
+        },
+        {
+          "include": "#variable-assignments-statement"
+        },
+        {
+          "include": "#local-variable-declarations-statement"
+        },
+        {
+          "include": "#built-in-function-calls-statement"
+        },
+        {
+          "include": "#user-defined-function-calls-statement"
+        },
+        {
+          "include": "#SimplSharp-method-calls-statement"
         }
       ]
     },
-    "statement": {
-      "patterns": [
-        {
-          "include": "#expression"
-        },
-        {
-          "include": "#local-declarations"
-        }
-      ]
+    "looping-statement": {
+      "patterns": []
     },
-    "expression": {
+    "wait-statement": {
+      "patterns": []
+    },
+    "branching-and-decision-statement": {
+      "patterns": []
+    },
+    "exception-handling-statement": {
+      "patterns": []
+    },
+    "variable-assignments-statement": {
+      "patterns": []
+    },
+    "local-variable-declarations-statement": {
+      "patterns": []
+    },
+    "built-in-function-calls-statement": {
+      "patterns": []
+    },
+    "user-defined-function-calls-statement": {
+      "patterns": []
+    },
+    "SimplSharp-method-calls-statement": {
+      "patterns": []
+    },
+    "expressions": {
       "patterns": [
         {
-          "include": "#preprocessor"
-        },
-        {
-          "include": "#comment"
-        },
-        {
-          "include": "#expression-operator-expression"
-        },
-        {
-          "include": "#assignment-expression"
-        },
-        {
-          "include": "#expression-operators"
-        },
-        {
-          "include": "#invocation-function"
-        },
-        {
-          "include": "#literal"
+          "include": "#relational-expression"
         },
         {
           "include": "#parenthesized-expression"
         },
         {
-          "include": "#identifier"
-        }
-      ]
-    },
-    "intrusive": {
-      "patterns": [
-        {
-          "include": "#preprocessor"
+          "include": "#assignment-expression"
         },
         {
-          "include": "#comment"
+          "include": "#arithmetic-expression"
+        },
+        {
+          "include": "#literal-expression"
+        },
+        {
+          "include": "#integer-expression"
+        },
+        {
+          "include": "#string-expression"
+        },
+        {
+          "include": "#member-access-expression"
+        },
+        {
+          "include": "#unary-expression"
+        },
+        {
+          "include": "#bitwise-expression"
         }
       ]
     },
+    "relational-expression": {
+      "patterns": []
+    },
+    "parenthesized-expression": {
+      "patterns": []
+    },
+    "assignment-expression": {
+      "patterns": []
+    },
+    "arithmetic-expression": {
+      "patterns": []
+    },
+    "literal-expression": {
+      "patterns": []
+    },
+    "integer-expression": {
+      "patterns": []
+    },
+    "string-expression": {
+      "patterns": []
+    },
+    "member-access-expression": {
+      "patterns": []
+    },
+    "unary-expression": {
+      "patterns": []
+    },
+    "bitwise-expression": {
+      "patterns": []
+    },
+    "operands": {
+      "patterns": [
+        {
+          "include": "#user-defined-functions"
+        },
+        {
+          "include": "#built-in-functions"
+        },
+        {
+          "include": "#built-in-constants"
+        },
+        {
+          "include": "#user-constants"
+        },
+        {
+          "include": "#variables"
+        },
+        {
+          "include": "#built-in-variables"
+        },
+        {
+          "include": "#literals"
+        }
+      ]
+    },
+    "user-defined-functions": {
+      "patterns": []
+    },
+    "built-in-functions": {
+      "patterns": []
+    },
+    "built-in-constants": {
+      "patterns": []
+    },
+    "user-constants": {
+      "patterns": []
+    },
+    "variables": {
+      "patterns": []
+    },
+    "built-in-variables": {
+      "patterns": []
+    },
+    "literals": {
+      "patterns": [
+        {
+          "include": "#numeric-literal"
+        },
+        {
+          "include": "#char-literal"
+        },
+        {
+          "include": "#string-literal"
+        }
+      ]
+    },
+    "numeric-literal": {
+      "match": "(?x)  (?<!\\w)\\.?\\d #ensure it starts with a digit or period and not a word character\n  (?:\n    (?:[0-9a-zA-Z_%]|_)| #capture any digit or letter or underscore (anything that resembles a number)\n    (?<=[eE])[+-]| # even if it looks scientific\n    \\.\\d #or floating point\n  )*\n",
+      "captures": {
+        "0": {
+          "patterns": [
+            {
+              "begin": "(?=.)",
+              "end": "$",
+              "patterns": [
+                {
+                  "match": "(?x)  (0[xX]) #ensure it starts with a 0x or 0X\n  ([0-9a-fA-F](?:[0-9a-fA-F])*)$ #capture rest of hex digits\n",
+                  "captures": {
+                    "1": {
+                      "name": "constant.numeric.other.prefix.hex.usp"
+                    },
+                    "2": {
+                      "name": "constant.numeric.hex.usp"
+                    }
+                  }
+                },
+                {
+                  "match": "(?x)  (?=[0-9])(?!0[xX]) #ensure it starts with a digit, but not wit a 0x or 0X \n  ([0-9d](?:[0-9d])*)$ #capture rest of decimal digits and d (for parameter properties decimal value)\n",
+                  "captures": {
+                    "1": {
+                      "name": "constant.numeric.decimal.usp"
+                    }
+                  }
+                },
+                {
+                  "match": "(?ix)  (?=[0-9a-f])(?!0[xX]) #ensure it starts with a hex digit, but not wit a 0x or 0X \n  ([0-9a-fh](?:[0-9a-fh])*)$ #capture rest of hex digits and h (for parameter properties decimal value)hex value)\n",
+                  "captures": {
+                    "1": {
+                      "name": "constant.numeric.hex.usp"
+                    }
+                  }
+                },
+                {
+                  "match": "(?x)  (?=[0-9])(?!0[xX]) #ensure it starts with a digit, but not wit a 0x or 0X \n  ([0-9%](?:[0-9%])*)$ #capture rest of decimal digits and % (for parameter properties percentage value)\n",
+                  "captures": {
+                    "1": {
+                      "name": "constant.numeric.percentage.usp"
+                    }
+                  }
+                },
+                {
+                  "match": "(?x)  (?=[0-9])(?!0[xX]) #ensure it starts with a digit, but not wit a 0x or 0X \n  ([0-9s](?:[0-9s])*)$ #capture rest of decimal digits and s (for parameter properties seconds value)\n",
+                  "captures": {
+                    "1": {
+                      "name": "constant.numeric.seconds.usp"
+                    }
+                  }
+                },
+                {
+                  "match": "(?x)  (?=[0-9])(?!0[xX]) #ensure it starts with a digit, but not wit a 0x or 0X \n  ([0-9t](?:[0-9t])*)$ #capture rest of decimal digits and t (for parameter properties ticks value)\n",
+                  "captures": {
+                    "1": {
+                      "name": "constant.numeric.ticks.usp"
+                    }
+                  }
+                },
+                {
+                  "match": "(?:(?:[0-9a-zA-Z_]|_)|(?<=[eE])[+-]|\\.\\d)+",
+                  "name": "invalid.illegal.constant.numeric.usp"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "char-literal": {
+      "name": "string.quoted.single.usp",
+      "begin": "\\'",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.definition.char.begin.usp"
+        }
+      },
+      "end": "(\\')|((?:[^\\n])$)",
+      "endCaptures": {
+        "1": {
+          "name": "punctuation.definition.char.end.usp"
+        },
+        "2": {
+          "name": "invalid.illegal.newline.usp"
+        }
+      },
+      "patterns": [
+        {
+          "match": "([0-9a-zA-Z]{2,})",
+          "name": "invalid.illegal.char.usp"
+        }
+      ]
+    },
+    "string-literal": {
+      "name": "string.quoted.double.usp",
+      "begin": "\\\"",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.definition.string.begin.usp"
+        }
+      },
+      "end": "(\")|((?:[^\\n])$)",
+      "endCaptures": {
+        "1": {
+          "name": "punctuation.definition.string.end.usp"
+        },
+        "2": {
+          "name": "invalid.illegal.newline.usp"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#string-character-escape"
+        }
+      ]
+    },
+    "string-character-escape": {
+      "match": "(?x)  (\\%   #escape initializer character either % or \\\n    (?:\n      (?:[0-9a-zA-Z]|\\%)? #grab any digit or letter or % character for next character zero or 1 times\n      (?:[0-9a-zA-Z])*    #grab the rest of the digits or letters\n    )\n  ) |  #or\n  (\\\\(?:[a-zA-Z\\\\])(?:(?:[0-9a-fA-F]){2})?) #grab any one letter or dual hex number after a backslash\n",
+      "captures": {
+        "0": {
+          "patterns": [
+            {
+              "begin": "(?=.)",
+              "end": "$",
+              "patterns": [
+                {
+                  "match": "(?x)  (%%) |  # Prints % or\n  (%\n    (?:\n      (?:[0-9]?[0-9])? #[[pad]width]\n      (?:\n        d|  #Signed Analog_Input, Analog_Output or Integer as decimal\n        s|  #Buffer_Input, String_Input or String\n        u|  #Unsigned Analog_Input, Analog_Output or integer\n        ld| #Long_Integer as decimal\n        lu| #Long_Unsigned_Integer as decimal\n        x|  #Analog_Input, Analog_Output or Integer as lowercase hexadecimal\n        X|  #Analog_Input, Analog_Output or Integer as uppercase hexadecimal\n        c|  #Printable ASCII character\n      ){1}\n    ) #Print Formatters %[[pad]width]specifier\n  )\n",
+                  "name": "constant.character.escape.usp"
+                },
+                {
+                  "match": "(?x)   (\\\\\n     (?:\n       a|  #Alert (Beep)\n       b|  #Backspace\n       f|  #Form Feed\n       n|  #Newline\n       r|  #Carriage Return\n       t|  #Horizontal Tab\n       v|  #Vertical Tab\n       \\\\| slash\n     )\n   ) |\n   (\\\\\n     (?:\n       [xX](?:[0-9a-fA-F]){2} |  #Hexadecimal character code\n     )\n   )\n",
+                  "name": "constant.character.escape.usp"
+                },
+                {
+                  "match": ".*",
+                  "name": "invalid.illegal.character.escape.usp"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "declarations": {
+      "patterns": [
+        {
+          "includes": "input-declaration"
+        },
+        {
+          "includes": "output-declaration"
+        },
+        {
+          "includes": "parameter-declaration"
+        },
+        {
+          "includes": "variable-declaration"
+        },
+        {
+          "includes": "function-declaration"
+        },
+        {
+          "includes": "constant-declaration"
+        },
+        {
+          "includes": "SimplSharp-declaration"
+        },
+        {
+          "includes": "parameter-list-declaration"
+        },
+        {
+          "includes": "identifier-declaration"
+        }
+      ]
+    },
+    "input-declaration": {
+      "patterns": []
+    },
+    "output-declaration": {
+      "patterns": []
+    },
+    "parameter-declaration": {
+      "patterns": []
+    },
+    "variable-declaration": {
+      "patterns": []
+    },
+    "function-declaration": {
+      "patterns": []
+    },
+    "constant-declaration": {
+      "patterns": []
+    },
+    "SimplSharp-declaration": {
+      "patterns": []
+    },
+    "parameter-list-declaration": {
+      "patterns": []
+    },
+    "identifier-declaration": {
+      "patterns": []
+    },
+    "identifier": {
+      "match": "([\\_[:alpha:]][\\_\\#\\_\\$[:alnum:]]*)",
+      "name": "variable.other.readwrite.usp"
+    },
     "preprocessor": {
+      "patterns": [
+        {
+          "include": "#preprocessor-parameter-properties"
+        },
+        {
+          "include": "#preprocessor-block-help"
+        },
+        {
+          "include": "#preprocessor-single-line"
+        }
+      ]
+    },
+    "preprocessor-single-line": {
       "name": "meta.preprocessor.usp",
       "begin": "^\\s*(\\#)",
       "beginCaptures": {
@@ -86,7 +437,7 @@
       "end": "(?<=$)",
       "patterns": [
         {
-          "include": "#comment"
+          "include": "#comments"
         },
         {
           "include": "#preprocessor-define-constant"
@@ -129,12 +480,6 @@
         },
         {
           "include": "#preprocessor-single"
-        },
-        {
-          "include": "#preprocessor-begin-parameter-properties"
-        },
-        {
-          "include": "#preprocessor-end-parameter-properties"
         }
       ]
     },
@@ -188,7 +533,7 @@
       "end": "(?=$)",
       "patterns": [
         {
-          "include": "#comment"
+          "include": "#comments"
         },
         {
           "match": "\\b([_[:alpha:]][\\#\\$\\_[:alnum:]]*)\\b",
@@ -403,28 +748,609 @@
         }
       }
     },
-    "preprocessor-begin-parameter-properties": {
-      "begin": "(?ix)\\G  \\b(begin_parameter_properties)\\b #Directive\n",
+    "preprocessor-parameter-properties": {
+      "begin": "(?ix)  (\\#)(begin_parameter_properties)\n  (\n    [\\_\\#\\_\\$\\,[:alnum:]\\s]*\n  )? #Parameter Properties Directive\n",
       "beginCaptures": {
+        "0": {
+          "name": "meta.preprocessor.usp"
+        },
         "1": {
+          "name": "punctuation.separator.hash.usp"
+        },
+        "2": {
           "name": "keyword.preprocessor.beginparameterproperties.usp"
+        },
+        "3": {
+          "patterns": [
+            {
+              "include": "#identifier"
+            },
+            {
+              "include": "#punctuation-comma"
+            }
+          ]
         }
       },
-      "end": "(?=$)",
+      "end": "(?ix)  (\\#)(END_PARAMETER_PROPERTIES)\n",
+      "endCaptures": {
+        "0": {
+          "name": "meta.preprocessor.usp"
+        },
+        "1": {
+          "name": "punctuation.separator.hash.usp"
+        },
+        "2": {
+          "name": "keyword.preprocessor.endparameterproperties.usp"
+        }
+      },
       "patterns": [
         {
-          "include": "#identifier"
+          "include": "#preprocessor-parameter-properties-valid-unit"
+        },
+        {
+          "include": "#preprocessor-parameter-properties-default-unit"
+        },
+        {
+          "include": "#preprocessor-parameter-properties-default-value"
+        },
+        {
+          "include": "#preprocessor-parameter-properties-list"
+        },
+        {
+          "include": "#preprocessor-parameter-properties-bounds"
+        },
+        {
+          "include": "#preprocessor-parameter-properties-short-description"
+        },
+        {
+          "include": "#preprocessor-properties-block-description-notes"
+        },
+        {
+          "include": "#comments"
+        }
+      ]
+    },
+    "preprocessor-parameter-properties-valid-unit": {
+      "begin": "(?ix)  (\\#)\\b(propValidUnits)\\b #directive\n",
+      "beginCaptures": {
+        "0": {
+          "name": "meta.preprocessor.usp"
+        },
+        "1": {
+          "name": "punctuation.separator.hash.usp"
+        },
+        "2": {
+          "name": "keyword.preprocessor.propvalidunits.usp"
+        }
+      },
+      "end": "(;)",
+      "endCaptures": {
+        "1": {
+          "name": "punctuation.terminator.statementtest.usp"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#punctuation-assignment"
+        },
+        {
+          "include": "#punctuation-pipe"
+        },
+        {
+          "include": "#preprocessor-parameter-units"
+        }
+      ]
+    },
+    "preprocessor-parameter-properties-default-unit": {
+      "begin": "(?ix)  (\\#)\\b(propDefaultUnits)\\b #directive\n",
+      "beginCaptures": {
+        "0": {
+          "name": "meta.preprocessor.usp"
+        },
+        "1": {
+          "name": "punctuation.separator.hash.usp"
+        },
+        "2": {
+          "name": "keyword.preprocessor.propdefaultunits.usp"
+        }
+      },
+      "end": "(;)",
+      "endCaptures": {
+        "1": {
+          "name": "punctuation.terminator.statementtest.usp"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#punctuation-assignment"
+        },
+        {
+          "include": "#preprocessor-parameter-units"
+        }
+      ]
+    },
+    "preprocessor-parameter-properties-default-value": {
+      "begin": "(?ix)  (\\#)\\b(propDefaultValue)\\b #directive\n",
+      "beginCaptures": {
+        "0": {
+          "name": "meta.preprocessor.usp"
+        },
+        "1": {
+          "name": "punctuation.separator.hash.usp"
+        },
+        "2": {
+          "name": "keyword.preprocessor.propdefaultunits.usp"
+        }
+      },
+      "end": "(;)",
+      "endCaptures": {
+        "1": {
+          "name": "punctuation.terminator.statementtest.usp"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#literals"
+        }
+      ]
+    },
+    "preprocessor-parameter-properties-list": {
+      "begin": "(?ix)  (\\#)\\b(propList)\\b #directive\n",
+      "beginCaptures": {
+        "0": {
+          "name": "meta.preprocessor.usp"
+        },
+        "1": {
+          "name": "punctuation.separator.hash.usp"
+        },
+        "2": {
+          "name": "keyword.preprocessor.proplist.usp"
+        }
+      },
+      "end": "(;)",
+      "endCaptures": {
+        "1": {
+          "name": "punctuation.terminator.statementtest.usp"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#preprocessor-property-list-pair"
         },
         {
           "include": "#punctuation-comma"
         }
       ]
     },
-    "preprocessor-end-parameter-properties": {
-      "match": "(?ix)\\G  \\b(end_parameter_properties)\\b #directive\n",
+    "preprocessor-parameter-properties-bounds": {
+      "begin": "(?ix)  (\\#)\\b(propBounds)\\b #directive\n",
+      "beginCaptures": {
+        "0": {
+          "name": "meta.preprocessor.usp"
+        },
+        "1": {
+          "name": "punctuation.separator.hash.usp"
+        },
+        "2": {
+          "name": "keyword.preprocessor.propBounds.usp"
+        }
+      },
+      "end": "(;)",
+      "endCaptures": {
+        "1": {
+          "name": "punctuation.terminator.statementtest.usp"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#numeric-literal"
+        },
+        {
+          "include": "#punctuation-comma"
+        }
+      ]
+    },
+    "preprocessor-parameter-properties-short-description": {
+      "begin": "(?ix)  (\\#)\\b(propShortDescription)\\b #directive\n",
+      "beginCaptures": {
+        "0": {
+          "name": "meta.preprocessor.usp"
+        },
+        "1": {
+          "name": "punctuation.separator.hash.usp"
+        },
+        "2": {
+          "name": "keyword.preprocessor.propShortDescription.usp"
+        }
+      },
+      "end": "(;)",
+      "endCaptures": {
+        "1": {
+          "name": "punctuation.terminator.propShortDescription.usp"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#string-literal"
+        }
+      ]
+    },
+    "preprocessor-block-help": {
+      "contentName": "comment.block.documentation.usp",
+      "begin": "(?i)(\\#)(help_begin)",
+      "beginCaptures": {
+        "0": {
+          "name": "meta.preprocessor.usp"
+        },
+        "1": {
+          "name": "punctuation.separator.hash.usp"
+        },
+        "2": {
+          "name": "keyword.preprocessor.helpbegin.usp"
+        }
+      },
+      "end": "(?i)(\\#)(help_end)",
+      "endCaptures": {
+        "0": {
+          "name": "meta.preprocessor.usp"
+        },
+        "1": {
+          "name": "punctuation.separator.hash.usp"
+        },
+        "2": {
+          "name": "keyword.preprocessor.helpend.usp"
+        }
+      }
+    },
+    "preprocessor-properties-block-description-notes": {
+      "contentName": "comment.block.documentation.usp",
+      "begin": "(?i)(\\#)(?:(begin_prop_full_description)|(begin_prop_notes))",
+      "beginCaptures": {
+        "0": {
+          "name": "meta.preprocessor.usp"
+        },
+        "1": {
+          "name": "punctuation.separator.hash.usp"
+        },
+        "2": {
+          "name": "keyword.preprocessor.beginpropfulldescription.usp"
+        },
+        "3": {
+          "name": "keyword.preprocessor.beginpropnotes.usp"
+        }
+      },
+      "end": "(?i)(\\#)(?:(end_prop_full_description)|(end_prop_notes))$",
+      "endCaptures": {
+        "0": {
+          "name": "meta.preprocessor.usp"
+        },
+        "1": {
+          "name": "punctuation.separator.hash.usp"
+        },
+        "2": {
+          "name": "keyword.preprocessor.endpropfulldescription.usp"
+        },
+        "3": {
+          "name": "keyword.preprocessor.endpropnotes.usp"
+        }
+      }
+    },
+    "preprocessor-parameter-units": {
+      "patterns": [
+        {
+          "match": "(?ix)  \\b(unitString|unitDecimal|unitHex|unitPercent|unitCharacter|unitTime|unitTicks)\\b #directive\n",
+          "name": "keyword.preprocessor.$1."
+        }
+      ]
+    },
+    "preprocessor-property-list-pair": {
+      "patterns": [
+        {
+          "match": "(\\{)([^}]*)(\\})",
+          "captures": {
+            "1": {
+              "name": "punctuation.curlybracket.open.usp"
+            },
+            "2": {
+              "patterns": [
+                {
+                  "match": "(.*)\\s?(,)\\s?(.*)",
+                  "captures": {
+                    "1": {
+                      "patterns": [
+                        {
+                          "include": "#literals"
+                        }
+                      ]
+                    },
+                    "2": {
+                      "name": "punctuation.comma.usp"
+                    },
+                    "3": {
+                      "patterns": [
+                        {
+                          "include": "#string-literal"
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
+            },
+            "3": {
+              "name": "punctuation.curlybracket.close.usp"
+            }
+          }
+        }
+      ]
+    },
+    "punctuation": {
+      "patterns": [
+        {
+          "include": "#punctuation-arithmetic"
+        },
+        {
+          "include": "#punctuation-bitwise"
+        },
+        {
+          "include": "#punctuation-comparison-unequal"
+        },
+        {
+          "include": "#punctuation-relational"
+        },
+        {
+          "include": "#punctuation-equal"
+        },
+        {
+          "include": "#punctuation-grouping"
+        },
+        {
+          "include": "#punctuation-structure"
+        }
+      ]
+    },
+    "punctuation-arithmetic": {
+      "match": "(?i)\\+|-(?!>)|\\*|\\/|S\\/|%|mod|umod",
+      "name": "keyword.operator.arithmetic.usp"
+    },
+    "punctuation-bitwise": {
+      "patterns": [
+        {
+          "name": "keyword.operator.bitwise.shift.usp",
+          "match": "(?i)<<|>>"
+        },
+        {
+          "name": "keyword.operator.bitwise.rotate.usp",
+          "match": "{{|}}"
+        },
+        {
+          "name": "keyword.operator.bitwise.usp",
+          "match": "(?i)\\&|not|\\^|\\|"
+        },
+        {
+          "name": "keyword.operator.bitwise.usp",
+          "match": "\\!|&&|\\|\\|"
+        }
+      ]
+    },
+    "punctuation-comparison-unequal": {
+      "patterns": [
+        {
+          "name": "keyword.operator.comparison.usp",
+          "match": "(<>)"
+        }
+      ]
+    },
+    "punctuation-relational": {
+      "patterns": [
+        {
+          "name": "keyword.operator.relational.usp",
+          "match": "<=|>=|<|>|S<=|S>=|S<|S>"
+        }
+      ]
+    },
+    "punctuation-equal": {
+      "begin": "[^=]+(=)",
+      "beginCaptures": {
+        "1": {
+          "name": "keyword.operator.assignment.usp"
+        }
+      },
+      "end": "(;)",
+      "endCaptures": {
+        "1": {
+          "name": "punctuation.terminator.statement.usp"
+        }
+      },
+      "patterns": [
+        {
+          "match": "(=)",
+          "name": "keyword.operator.comparison.usp"
+        }
+      ]
+    },
+    "punctuation-assignment": {
+      "patterns": [
+        {
+          "match": "=",
+          "name": "keyword.operator.assignment.usp"
+        }
+      ]
+    },
+    "punctuation-grouping": {
+      "patterns": [
+        {
+          "include": "#punctuation-square-bracket"
+        },
+        {
+          "include": "punctuation-parenthesis"
+        },
+        {
+          "include": "punctuation-curly-bracket"
+        }
+      ]
+    },
+    "punctuation-structure": {
+      "patterns": [
+        {
+          "include": "#punctuation-comma"
+        },
+        {
+          "include": "#punctuation-semicolon"
+        },
+        {
+          "include": "#punctuation-parenthesis"
+        },
+        {
+          "include": "#punctuation-accessor"
+        },
+        {
+          "include": "#punctuation-dot"
+        },
+        {
+          "include": "#punctuation-pipe"
+        }
+      ]
+    },
+    "punctuation-square-bracket": {
+      "begin": "\\[",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.squarebracket.open.usp"
+        }
+      },
+      "end": "\\]",
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.squarebracket.close.usp"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#intrusive"
+        },
+        {
+          "include": "#punctuation-comma"
+        }
+      ]
+    },
+    "punctuation-curly-bracket": {
+      "begin": "\\{",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.curlybracket.open.usp"
+        }
+      },
+      "end": "\\}",
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.curlybracket.close.usp"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#intrusive"
+        },
+        {
+          "include": "#punctuation-comma"
+        }
+      ]
+    },
+    "punctuation-parenthesis": {
+      "begin": "(\\()",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.parenthesis.open.usp"
+        }
+      },
+      "end": "(\\))",
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.parenthesis.close.usp"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#expression"
+        }
+      ]
+    },
+    "punctuation-comma": {
+      "match": "\\,",
+      "name": "punctuation.comma.usp"
+    },
+    "punctuation-semicolon": {
+      "match": "\\;",
+      "name": "punctuation.structure.semicolon.usp"
+    },
+    "punctuation-dot": {
+      "match": "(\\.)",
+      "name": "punctuation.structure.dot.usp"
+    },
+    "punctuation-pipe": {
+      "match": "(\\|)",
+      "name": "punctuation.structure.pipe.usp"
+    },
+    "comments": {
+      "patterns": [
+        {
+          "include": "#comment-single-line"
+        },
+        {
+          "include": "#comment-block"
+        }
+      ]
+    },
+    "comment-single-line": {
+      "name": "comment.line.double-slash.usp",
+      "begin": "(^\\s+)?(\\/\\/).*$",
+      "while": "^(\\s*)(\\/\\/).*$",
       "captures": {
         "1": {
-          "name": "keyword.preprocessor.endparameterproperties.usp"
+          "name": "punctuation.whitespace.comment.leading.usp"
+        },
+        "2": {
+          "name": "punctuation.definition.comment.usp"
+        }
+      }
+    },
+    "comment-block": {
+      "name": "comment.block.usp",
+      "begin": "\\/\\*",
+      "end": "\\*\\/",
+      "captures": {
+        "0": {
+          "name": "punctuation.definition.comment.usp"
+        }
+      }
+    },
+    "comment-block-preprocessor": {
+      "contentName": "comment.block.documentation.usp",
+      "begin": "(?i)(?:(help_begin)|(begin_prop_full_description)|(begin_prop_notes))",
+      "beginCaptures": {
+        "1": {
+          "name": "keyword.preprocessor.helpbegin.usp"
+        },
+        "2": {
+          "name": "keyword.preprocessor.beginpropfulldescription.usp"
+        },
+        "3": {
+          "name": "keyword.preprocessor.beginpropnotes.usp"
+        }
+      },
+      "end": "(?i)(\\#)(?:(help_end)|(end_prop_full_description)|(end_prop_notes))$",
+      "endCaptures": {
+        "1": {
+          "name": "punctuation.separator.hash.usp"
+        },
+        "2": {
+          "name": "keyword.preprocessor.helpend.usp"
+        },
+        "3": {
+          "name": "keyword.preprocessor.endpropfulldescription.usp"
+        },
+        "4": {
+          "name": "keyword.preprocessor.endpropnotes.usp"
         }
       }
     },
@@ -465,7 +1391,7 @@
           "include": "#punctuation-comma"
         },
         {
-          "include": "#comment"
+          "include": "#comments"
         },
         {
           "include": "#variable-initializer"
@@ -504,7 +1430,7 @@
       },
       "patterns": [
         {
-          "include": "#comment"
+          "include": "#comments"
         },
         {
           "include": "#attribute-section"
@@ -593,7 +1519,7 @@
     "type": {
       "patterns": [
         {
-          "include": "#comment"
+          "include": "#comments"
         },
         {
           "include": "#ref-modifier"
@@ -692,321 +1618,6 @@
             },
             "5": {
               "name": "punctuation.squarebracket.close.usp"
-            }
-          }
-        }
-      ]
-    },
-    "type-array-suffix": {
-      "begin": "\\[",
-      "beginCaptures": {
-        "0": {
-          "name": "punctuation.squarebracket.open.usp"
-        }
-      },
-      "end": "\\]",
-      "endCaptures": {
-        "0": {
-          "name": "punctuation.squarebracket.close.usp"
-        }
-      },
-      "patterns": [
-        {
-          "include": "#intrusive"
-        },
-        {
-          "include": "#punctuation-comma"
-        }
-      ]
-    },
-    "assignment-expression": {
-      "begin": "\\=(?!=|>)\"",
-      "beginCaptures": {
-        "0": {
-          "patterns": [
-            {
-              "include": "#assignment-operators"
-            }
-          ]
-        }
-      },
-      "end": "(?=[,\\)\\];}])",
-      "patterns": [
-        {
-          "include": "#expression"
-        }
-      ]
-    },
-    "parenthesized-expression": {
-      "begin": "\\(",
-      "beginCaptures": {
-        "0": {
-          "name": "punctuation.parenthesis.open.usp"
-        }
-      },
-      "end": "\\)",
-      "endCaptures": {
-        "0": {
-          "name": "punctuation.parenthesis.close.usp"
-        }
-      },
-      "patterns": [
-        {
-          "include": "#expression"
-        }
-      ]
-    },
-    "expression-operator-expression": {
-      "begin": "(\\()",
-      "beginCaptures": {
-        "1": {
-          "name": "punctuation.parenthesis.open.usp"
-        }
-      },
-      "end": "\\)",
-      "endCaptures": {
-        "0": {
-          "name": "punctuation.parenthesis.close.usp"
-        }
-      },
-      "patterns": [
-        {
-          "include": "#expression"
-        }
-      ]
-    },
-    "assignment-operators": {
-      "patterns": [
-        {
-          "name": "keyword.operator.assignment.usp",
-          "match": "\\="
-        }
-      ]
-    },
-    "expression-operators": {
-      "patterns": [
-        {
-          "name": "keyword.operator.bitwise.shift.usp",
-          "match": "(?i)<<|>>"
-        },
-        {
-          "name": "keyword.operator.bitwise.rotate.usp",
-          "match": "{{|}}"
-        },
-        {
-          "name": "keyword.operator.comparison.usp",
-          "match": "=|<>"
-        },
-        {
-          "name": "keyword.operator.relational.usp",
-          "match": "<=|>=|<|>|S<=|S>=|S<|S>"
-        },
-        {
-          "name": "keyword.operator.logical.usp",
-          "match": "\\!|&&|\\|\\|"
-        },
-        {
-          "name": "keyword.operator.bitwise.usp",
-          "match": "(?i)\\&|not|\\^|\\|"
-        },
-        {
-          "name": "keyword.operator.arithmetic.usp",
-          "match": "(?i)\\+|-(?!>)|\\*|\\/|S\\/|%|mod|umod"
-        }
-      ]
-    },
-    "literal": {
-      "patterns": [
-        {
-          "include": "#numeric-literal"
-        },
-        {
-          "include": "#char-literal"
-        },
-        {
-          "include": "#string-literal"
-        },
-        {
-          "include": "#expression-operators"
-        }
-      ]
-    },
-    "numeric-literal": {
-      "match": "(?x)  (?<!\\w)\\.?\\d #ensure it starts with a digit or period and not a word character\n  (?:\n    (?:[0-9a-zA-Z_]|_)| #capture any digit or letter or underscore (anything that resembles a number)\n    (?<=[eE])[+-]| # even if it looks scientific\n    \\.\\d #or floating point\n  )*\n",
-      "captures": {
-        "0": {
-          "patterns": [
-            {
-              "begin": "(?=.)",
-              "end": "$",
-              "patterns": [
-                {
-                  "match": "(?x)  (0[xX]) #ensure it starts with a 0x or 0X\n  ([0-9a-fA-F](?:[0-9a-fA-F])*)$ #capture rest of hex digits\n",
-                  "captures": {
-                    "1": {
-                      "name": "constant.numeric.other.prefix.hex.usp"
-                    },
-                    "2": {
-                      "name": "constant.numeric.hex.usp"
-                    }
-                  }
-                },
-                {
-                  "match": "(?x)  (?=[0-9])(?!0[xX]) #ensure it starts with a digit, but not wit a 0x or 0X \n  ([0-9](?:[0-9])*)$ #capture rest of decimal digits\n",
-                  "captures": {
-                    "1": {
-                      "name": "constant.numeric.decimal.usp"
-                    }
-                  }
-                },
-                {
-                  "match": "(?:(?:[0-9a-zA-Z_]|_)|(?<=[eE])[+-]|\\.\\d)+",
-                  "name": "invalid.illegal.constant.numeric.usp"
-                }
-              ]
-            }
-          ]
-        }
-      }
-    },
-    "char-literal": {
-      "name": "string.quoted.single.usp",
-      "begin": "\\'",
-      "beginCaptures": {
-        "0": {
-          "name": "punctuation.definition.char.begin.usp"
-        }
-      },
-      "end": "(\\')|((?:[^\\n])$)",
-      "endCaptures": {
-        "1": {
-          "name": "punctuation.definition.char.end.usp"
-        },
-        "2": {
-          "name": "invalid.illegal.newline.usp"
-        }
-      },
-      "patterns": [
-        {
-          "match": "([0-9a-zA-Z]{2,})",
-          "name": "invalid.illegal.char.usp"
-        }
-      ]
-    },
-    "string-literal": {
-      "name": "string.quoted.double.usp",
-      "begin": "\\\"",
-      "beginCaptures": {
-        "0": {
-          "name": "punctuation.definition.string.begin.usp"
-        }
-      },
-      "end": "(\")|((?:[^\\n])$)",
-      "endCaptures": {
-        "1": {
-          "name": "punctuation.definition.string.end.usp"
-        },
-        "2": {
-          "name": "invalid.illegal.newline.usp"
-        }
-      },
-      "patterns": [
-        {
-          "include": "#string-character-escape"
-        }
-      ]
-    },
-    "string-character-escape": {
-      "match": "(?x)  (\\%   #escape initializer character either % or \\\n    (?:\n      (?:[0-9a-zA-Z]|\\%)? #grab any digit or letter or % character for next character zero or 1 times\n      (?:[0-9a-zA-Z])*    #grab the rest of the digits or letters\n    )\n  ) |  #or\n  (\\\\(?:[a-zA-Z\\\\])(?:(?:[0-9a-fA-F]){2})?) #grab any one letter or dual hex number after a backslash\n",
-      "captures": {
-        "0": {
-          "patterns": [
-            {
-              "begin": "(?=.)",
-              "end": "$",
-              "patterns": [
-                {
-                  "match": "(?x)  (%%) |  # Prints % or\n  (%\n    (?:\n      (?:[0-9]?[0-9])? #[[pad]width]\n      (?:\n        d|  #Signed Analog_Input, Analog_Output or Integer as decimal\n        s|  #Buffer_Input, String_Input or String\n        u|  #Unsigned Analog_Input, Analog_Output or integer\n        ld| #Long_Integer as decimal\n        lu| #Long_Unsigned_Integer as decimal\n        x|  #Analog_Input, Analog_Output or Integer as lowercase hexadecimal\n        X|  #Analog_Input, Analog_Output or Integer as uppercase hexadecimal\n        c|  #Printable ASCII character\n      ){1}\n    ) #Print Formatters %[[pad]width]specifier\n  )\n",
-                  "name": "constant.character.escape.usp"
-                },
-                {
-                  "match": "(?x)   (\\\\\n     (?:\n       a|  #Alert (Beep)\n       b|  #Backspace\n       f|  #Form Feed\n       n|  #Newline\n       r|  #Carriage Return\n       t|  #Horizontal Tab\n       v|  #Vertical Tab\n       \\\\| slash\n     )\n   ) |\n   (\\\\\n     (?:\n       [xX](?:[0-9a-fA-F]){2} |  #Hexadecimal character code\n     )\n   )\n",
-                  "name": "constant.character.escape.usp"
-                },
-                {
-                  "match": ".*",
-                  "name": "invalid.illegal.character.escape.usp"
-                }
-              ]
-            }
-          ]
-        }
-      }
-    },
-    "punctuation-comma": {
-      "match": "\\,",
-      "name": "punctuation.separator.comma.usp"
-    },
-    "punctuation-semicolon": {
-      "match": "\\;",
-      "name": "punctuation.terminator.statement.usp"
-    },
-    "punctuation-accessor": {
-      "match": "\\.",
-      "name": "punctuation.accessor.usp"
-    },
-    "comment": {
-      "patterns": [
-        {
-          "name": "comment.line.double-slash.usp",
-          "begin": "(^\\s+)?(\\/\\/).*$",
-          "while": "^(\\s*)(\\/\\/).*$",
-          "captures": {
-            "1": {
-              "name": "punctuation.whitespace.comment.leading.usp"
-            },
-            "2": {
-              "name": "punctuation.definition.comment.usp"
-            }
-          }
-        },
-        {
-          "name": "comment.block.usp",
-          "begin": "\\/\\*",
-          "end": "\\*\\/",
-          "captures": {
-            "0": {
-              "name": "punctuation.definition.comment.usp"
-            }
-          }
-        },
-        {
-          "contentName": "comment.block.documentation.usp",
-          "begin": "(?i)(?:(help_begin)|(begin_prop_full_description)|(begin_prop_notes))",
-          "beginCaptures": {
-            "1": {
-              "name": "keyword.preprocessor.helpbegin.usp"
-            },
-            "2": {
-              "name": "keyword.preprocessor.beginpropfulldescription.usp"
-            },
-            "3": {
-              "name": "keyword.preprocessor.beginpropnotes.usp"
-            }
-          },
-          "end": "(?i)(\\#)(?:(help_end)|(end_prop_full_description)|(end_prop_notes))$",
-          "endCaptures": {
-            "1": {
-              "name": "punctuation.separator.hash.usp"
-            },
-            "2": {
-              "name": "keyword.preprocessor.helpend.usp"
-            },
-            "3": {
-              "name": "keyword.preprocessor.endpropfulldescription.usp"
-            },
-            "4": {
-              "name": "keyword.preprocessor.endpropnotes.usp"
             }
           }
         }
