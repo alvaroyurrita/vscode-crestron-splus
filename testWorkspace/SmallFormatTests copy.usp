@@ -1,3 +1,2 @@
-#BEGIN_PARAMETER_PROPERTIES Parameter
-    #propList = { 25d , "label" } , { 25h, "label" } , { 25%, "label" } , { 'a' , "label" } , { 25s, "label" } , { 25t , "label" } , { "helloLabel", "label" };
-#END_PARAMETER_PROPERTIES
+mySruct internalStruct, internalStuct[10];
+INTEGER Variable#1, _Variable2 [4] , __Variable3 [4] [2] ;

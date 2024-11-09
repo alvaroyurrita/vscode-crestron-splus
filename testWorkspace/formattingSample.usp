@@ -231,20 +231,99 @@ line_n
 #END_PARAMETER_PROPERTIES
 
 
-
-
-
-//DIGITAL, ANALOG and SERIAL INPUTS and OUTPUTS
+//Declarations
+//Input Declarations
 STRING_INPUT StringInput1[20];//, StringInput2[4][20], _SKIP_, StringInput3[4,2][20];
 BUFFER_INPUT BufferInput1[20];
 DIGITAL_INPUT DigitalInput1, DigitalInput2[4], _SKIP_, DigitalInput3[4,2];
 ANALOG_INPUT AnalogInput1, AnalogInput2[4], _SKIP_, AnalogInput3[4,2];
 STRING_INPUT StringInput2[4][20], _SKIP_, StringInput3[4,2][20];
 BUFFER_INPUT BufferInput2[4][20], _SKIP_, BufferInput3[4,2][20];
+
+//Output Declarations
 STRING_OUTPUT StringOutput1;
 DIGITAL_OUTPUT DigitalOutput1, DigitalOutput2[4], _SKIP_, DigitalOutput3[4,2];
 ANALOG_OUTPUT AnalogOutput1, AnalogOutput2[4], _SKIP_, AnalogOutput3[4,2];
 STRING_OUTPUT StringOutput2[4], _SKIP_, StringOutput3[4,2];
+
+// Parameter Declaration
+INTEGER_PARAMETER IntegerParameter1, IntegerParameter2[4];
+SIGNED_INTEGER_PARAMETER SignedIntegerParameter1, SignedIntegerParameter2[4];
+LONG_INTEGER_PARAMETER LongIntgerParameter1, LongIntgerParameter2[4];
+SIGNED_LONG_INTEGER_PARAMETER SignedLongIntegerParameter1, SignedLongIntegerParameter2[4];
+STRING_PARAMETER StringParameter1[50], StringParameter2[4][50];
+
+//Variable Definition
+mySruct internalStruct, internalStuct[10];
+INTEGER Variable#1, _Variable2 [4] , __Variable3 [4] [2] ;
+LONG_INTEGER Variable4, Variable5[4], Variable6[4][2];
+SIGNED_INTEGER Variable7, Variable8[4], Variable9[4][2];
+SIGNED_LONG_INTEGER Variable10[4][2];
+STRING Variable11$[6], Variable11[4][6];
+DYNAMIC STRING DynamicString[10];
+VOLATILE STRING VolatileString[10];
+NONVOLATILE STRING NonVolatileString [10];
+ASCII STRING AsiiString[10];
+UTF16 string Utf16String[10];
+INHERIT STRING InheritString[10];
+STRING InheritString[10][20]; //tes
+
+//structure definition
+STRUCTURE mySruct //test
+{
+	INTEGER Variable#1, _Variable2[4], __Variable3[4][2];
+	INTEGER Variable#1, _Variable2[4], __Variable3[4][2];
+	LONG_INTEGER Variable4, Variable5[4], Variable6[4][2];
+	SIGNED_INTEGER Variable7, Variable8[4], Variable9[4][2];
+	SIGNED_LONG_INTEGER Variable10[4][2];
+	STRING Variable11$[6], Variable11[4][6];
+};
+
+CEVENT myEvent1;
+CMUTEX myMutex;
+
+
+//Function Deinition
+
+FUNCTION MyFunction1(ByRef INTEGER myvar1,  LONG_INTEGER myvar2, SIGNED_INTEGER myVar3, SIGNED_LONG_INTEGER myvar4, ByVal mySruct myvar5)
+{
+	//Internal Function Definitions
+	INTEGER Variable#1, _Variable2[4], __Variable3[4][2];
+	LONG_INTEGER Variable4, Variable5[4], Variable6[4][2];
+	SIGNED_INTEGER Variable7, Variable8[4], Variable9[4][2];
+	SIGNED_LONG_INTEGER Variable10, Variable11[4], Variable12[4][2];
+	STRING Variable13$[6], Variable14[4][6];
+	mySruct internalStruct1, internalStuct2[10];
+
+	//Local Function Call
+	MyFunction1(Variable#1, Variable4, Variable7, variable10, internalStruct);
+}
+INTEGER_FUNCTION MyFunction2(ReadOnlyByRef INTEGER myvar1[], LONG_INTEGER myvar2[], SIGNED_INTEGER myVar3[],  SIGNED_LONG_INTEGER myvar4[], ReadOnlyByRef mySruct myvar5[])
+{
+	//statements
+}
+LONG_INTEGER_FUNCTION MyFunction3(INTEGER myvar1[][], LONG_INTEGER myvar2[][], SIGNED_INTEGER myVar3[][],  SIGNED_LONG_INTEGER myvar4[][], mySruct myvar5[])
+{
+	//statements
+}
+SIGNED_INTEGER_FUNCTION MyFunction4(string myvar1, string myvar2[])
+{
+	STRING Variable13$[6], Variable14[4][6];
+	MyFunction4(Variable13$, Variable14);
+}
+SIGNED_LONG_INTEGER_FUNCTION MyFunction5()
+{
+	//statements
+
+}
+STRING_FUNCTION MyFunction6()
+{
+	//statements
+
+}
+
+
+
 
 // Class Definitions
 SampleClass CustomClass;
@@ -257,32 +336,6 @@ TCP_CLIENT TcpClient[100];
 TCP_SERVER TcpServer[100];
 UDP_SOCKET UdpSocket[100];
 
-// Parameters
-INTEGER_PARAMETER IntegerParameter1, IntegerParameter2[4];
-SIGNED_INTEGER_PARAMETER SignedIntegerParameter1, SignedIntegerParameter2[4];
-LONG_INTEGER_PARAMETER LongIntgerParameter1, LongIntgerParameter2[4];
-SIGNED_LONG_INTEGER_PARAMETER SignedLongIntegerParameter1, SignedLongIntegerParameter2[4];
-STRING_PARAMETER StringParameter1[50], StringParameter2[4][50];
-
-
-
-#BEGIN_PARAMETER_PROPERTIES IntegerParameter1
-propValidUnits = unitDecimal|unitHex|unitPercent|unitCharacter|unitTime|unitTicks;
-propDefaultUnit =  unitDecimal;
-propBounds = 5d , 10d;
-propDefaultValue = 5d;  
-propShortDescription = "status_bar_hint_text for IntegerParameter1";
-#BEGIN_PROP_FULL_DESCRIPTION  
-line_1...  
-line_2...  
-line_n  
-#END_PROP_FULL_DESCRIPTION
-#BEGIN_PROP_NOTES 
-line_1...  
-line_2...  
-line_n  
-#END_PROP_NOTES
-#END_PARAMETER_PROPERTIES
 
 
 

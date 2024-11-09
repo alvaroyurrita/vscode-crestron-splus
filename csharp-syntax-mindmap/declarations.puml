@@ -6,67 +6,145 @@ and identifier syntax is
 a-z, A-Z, 0-9, #, _, and $ but may not begin with 0-9
 </code>
 ;
-++ input
-+++_ DIGITAL_INPUT identifier[size[,min]], ... ;
-+++_ ANALOG_INPUT identifier[size[,min]], ... ;
-+++_ STRING_INPUT identifier[size[,min]][max_chars], ... ;
-+++_ BUFFER_INPUT identifier[size[,min]][max_chars], ... ;
-++ output
-+++_ DIGITAL_OUTPUT identifier[size[,min]], ... ;
-+++_ ANALOG_OUTPUT identifier[size[,min]], ... ;
-+++_ STRING_OUTPUT identifier[size[,min]][max_chars], ... ;
-++ parameter
-+++_ INTEGER_PARAMETER identifier[size], ... ;
-+++_ SIGNED_INTEGER_PARAMETER identifier[size], ... ;
-+++_ LONG_INTEGER_PARAMETER identifier[size], ... ;
-+++_ SIGNED_LONG_INTEGER_PARAMETER identifier[size], ... ;
-+++_ STRING_PARAMETER identifier[size][max_chars], ... ;
-**: variables
+**: input-declaration
 <code>
-modifiers are VOLATILE, NONVOLATILE,
-DYNAMIC (for arrays only)
-ASCII, UTF16, INHERIT (for string only)
+keyword.declaration.input
+entity.name.variable.input.usp
+</code>;
+***_ DIGITAL_INPUT identifier[size[,min]], ... ;
+***_ ANALOG_INPUT identifier[size[,min]], ... ;
+***_ STRING_INPUT identifier[size[,min]][max_chars], ... ;
+***_ BUFFER_INPUT identifier[size[,min]][max_chars], ... ;
+**: output-declaration
+<code>
+keyword.declaration.output.usp
+entity.name.variable.output.usp
+</code>;
+***_ DIGITAL_OUTPUT identifier[size[,min]], ... ;
+***_ ANALOG_OUTPUT identifier[size[,min]], ... ;
+***_ STRING_OUTPUT identifier[size[,min]][max_chars], ... ;
+**: parameter-declaration
+<code>
+keyword.declaration.parameter.usp
+entity.name.variable.parameter.usp
+</code>;
+***_ INTEGER_PARAMETER identifier[size], ... ;
+***_ SIGNED_INTEGER_PARAMETER identifier[size], ... ;
+***_ LONG_INTEGER_PARAMETER identifier[size], ... ;
+***_ SIGNED_LONG_INTEGER_PARAMETER identifier[size], ... ;
+***_ STRING_PARAMETER identifier[size][max_chars], ... ;
+**: variable-declaration
+<code>
+keyword.modifier.variable.usp
+keyword.declaration.variable.usp
+entity.name.variable.usp
+entity.name.type.usp
 </code>
-;
-+++_ [modifier] INTEGER identifier[size], ... ;
-+++_ [modifier] SIGNED_INTEGER identifier[size], ... ;
-+++_ [modifier] LONG_INTEGER identifier[size], ... ;
-+++_ [modifier] SIGNED_LONG_INTEGER identifier[size], ... ;
-+++_ [modifier] STRING identifier[size][max_chars], ... ;
-+++_ [modifier] STRUCTURE identifier[size]{declaration;...};
-++ object instance
-+++_ user_class_object identifier, ... ;
-+++_ CEVENT identifier, ... ;
-+++_ CMUTEX identifier, ... ;
-++ function
-+++_ FUNCTION identifier(parameter list){ statements;  };
-+++_ INTEGER_FUNCTION identifier(parameter list){ statements; RETURN expression; };
-+++_ SIGNED_INTEGER_FUNCTION identifier(parameter list){ statements; RETURN expression; };
-+++_ LONG_INTEGER_FUNCTION identifier(parameter list){ statements; RETURN expression; };
-+++_ SIGNED_LONG_INTEGER_FUNCTION identifier(parameter list){ statements; RETURN expression; };
-+++_ STRING_FUNCTION identifier(parameter list){ statements; RETURN expression; };
-+++_ SIMPLSHARPSTRING_FUNCTION identifier(parameter list){ statements; RETURN expression; };
-++ SIMPL#
-+++_ [static] CLASS identifier{declaration;...};
-+++_ NAMESPACE identifier{declaration;...};
-+++ class delegate
-++++_ [static] DELEGATE FUNCTION  identifier(parameter list);
-++++_ [static] DELEGATE SIGNED_LONG_INTEGER_FUNCTION identifier(parameter list);
-++++_ [static] DELEGATE STRING_FUNCTION identifier(parameter list);
-++++_ [static] DELEGATE SIMPLSHARPSTRING_FUNCTION identifier(parameter list);
-++++_ [static] DELEGATE LONG_INTEGER_FUNCTION identifier(parameter list);
-++++_ [static] DELEGATE INTEGER_FUNCTION identifier(parameter list);
-++++_ [static] DELEGATE SIGNED_INTEGER_FUNCTION identifier(parameter list);
-+++ class events
-++++_ EVENTHANDLER identifier(CLASS identifier, EVENTARGS identifier);
-+++ class properties
-++++_ DELEGATEPROPERTY delegate_identifier identifier;
-++++_ STRING identifier[];
-++++_ SIMPLSHARPSTRING identifier[];
-++++_ SIGNED_LONG_INTEGER identifier;
-++++_ LONG_INTEGER identifier;
-++++_ SIGNED_INTEGER identifier;
-++++_ INTEGER identifier;
-++++_ structure_identifier identifier;
-++++_ class_identifier identifier;
+modifiers
+<code>
+- VOLATILE
+- NONVOLATILE
+- DYNAMIC (for arrays only)
+- ASCII, UTF16, INHERIT (for string only)
+</code>;
+***_ [modifier] INTEGER identifier[size], ... ;
+***_ [modifier] SIGNED_INTEGER identifier[size], ... ;
+***_ [modifier] LONG_INTEGER identifier[size], ... ;
+***_ [modifier] SIGNED_LONG_INTEGER identifier[size], ... ;
+***_ [modifier] STRING identifier[size][max_chars], ... ;
+***_ [modifier] user_structure identifier[size]{declaration;...};
+**: structure-declaration
+<code>
+keyword.declaration.structure.usp
+entity.name.type.structure.usp
+</code>;
+***_ STRUCTURE identifier{declaration;...};
+**: class instance
+<code>
+support.class.usp
+entity.name.type.class.usp
+entity.name.type.usp
+entity.name.variable.usp
+</code>;
+***_ CEVENT identifier, ... ;
+***_ CMUTEX identifier, ... ;
+***_ user_class_object identifier, ... ;
+**: function-declaration
+<code>
+keyword.declaration.function.usp
+entity.name.variable.function.usp
+</code>;
+***_ FUNCTION identifier(parameter list){ statements;  };
+***_ INTEGER_FUNCTION identifier(parameter list){ statements; RETURN expression; };
+***_ SIGNED_INTEGER_FUNCTION identifier(parameter list){ statements; RETURN expression; };
+***_ LONG_INTEGER_FUNCTION identifier(parameter list){ statements; RETURN expression; };
+***_ SIGNED_LONG_INTEGER_FUNCTION identifier(parameter list){ statements; RETURN expression; };
+***_ STRING_FUNCTION identifier(parameter list){ statements; RETURN expression; };
+***_ SIMPLSHARPSTRING_FUNCTION identifier(parameter list){ statements; RETURN expression; };
+** SIMPL#
+***: namespace-declaration
+<code>
+keyword.declaration.namespace.usp
+entity.name.type.namespace.usp
+</code>;
+****_ NAMESPACE identifier{declaration;...};
+***: class-declaration
+<code>
+keyword.modifier.class.usp
+keyword.declaration.class.usp
+entity.name.type.class.usp
+</code>;
+****_ [static] CLASS identifier{declaration;...};
+***: class-delegate-declaration
+<code>
+keyword.modifier.class.delegate.usp
+keyword.declaration.class.delegate.usp
+entity.name.type.class.delegate.usp
+</code>;
+****_ [static] DELEGATE FUNCTION  identifier(parameter list);
+****_ [static] DELEGATE SIGNED_LONG_INTEGER_FUNCTION identifier(parameter list);
+****_ [static] DELEGATE STRING_FUNCTION identifier(parameter list);
+****_ [static] DELEGATE SIMPLSHARPSTRING_FUNCTION identifier(parameter list);
+****_ [static] DELEGATE LONG_INTEGER_FUNCTION identifier(parameter list);
+****_ [static] DELEGATE INTEGER_FUNCTION identifier(parameter list);
+****_ [static] DELEGATE SIGNED_INTEGER_FUNCTION identifier(parameter list);
+***: class-event-declaration
+<code>
+keyword.declaration.class.event.usp
+entity.name.type.class.event.usp
+</code>;
+****_ EVENTHANDLER identifier(CLASS identifier, EVENTARGS identifier);
+***: class-property-declaration
+<code>
+keyword.declaration.class.property.usp
+entity.name.type.class.property.usp
+entity.name.type.usp
+entity.name.variable.usp
+</code>;
+****_ DELEGATEPROPERTY delegate_identifier identifier;
+****_ STRING identifier[];
+****_ SIMPLSHARPSTRING identifier[];
+****_ SIGNED_LONG_INTEGER identifier;
+****_ LONG_INTEGER identifier;
+****_ SIGNED_INTEGER identifier;
+****_ INTEGER identifier;
+****_ structure_identifier identifier;
+****_ class_identifier identifier;
+**: parameter list
+<code>
+keyword.modifier.parameter.usp
+keyword.declaration.parameter.usp
+entity.name.variable.parameter.usp
+</code>
+modifiers
+<code>
+ByVal, ByRef, ReadOnlyByRef
+</code>;
+***_ [modifier] INTEGER identifier[size], ... ;
+***_ [modifier] SIGNED_INTEGER identifier[size], ... ;
+***_ [modifier] LONG_INTEGER identifier[size], ... ;
+***_ [modifier] SIGNED_LONG_INTEGER identifier[size], ... ;
+***_ [modifier] STRING identifier[size][max_chars], ... ;
+***_ [modifier] user_structure identifier[size]{declaration;...};
+
 @endmindmap
