@@ -112,7 +112,7 @@
         ],
         "id": "splus-sharp_api",
         "extensions": [
-          ".cstest"
+          ".api"
         ],
         "icon": {
           "dark": "./icons/splusIcon.png",
@@ -128,9 +128,9 @@
         "path": "./syntaxes/crestron-splus.tmLanguage.json"
       },
       {
-        "language": "splus-sharp_api",
-        "scopeName": "source.cs",
-        "path": "./syntaxes/csharp.tmLanguage.json"
+        "language": "splus-source",
+        "scopeName": "source.splus",
+        "path": "./syntaxes/crestron-splus.tmLanguage.json"
       }
     ],
     "snippets": [
@@ -188,6 +188,7 @@
     "lint": "eslint src",
     "test": "vscode-test",
     "yaml2json-watch": "yaml2json syntaxes --save --pretty --recursive --watch",
+    "puml-to-svg": "java -jar \"C:\\ProgramData\\chocolatey\\lib\\plantuml\\tools\\plantuml.jar\"  \".\\csharp-syntax-mindmap\\*.puml\" -svg",
     "test-with-coverage": "vscode-test --coverage"
   },
   "devDependencies": {

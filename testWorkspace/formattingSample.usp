@@ -230,7 +230,6 @@ line_n
 	#END_PROP_NOTES
 #END_PARAMETER_PROPERTIES
 
-
 //Declarations
 //Input Declarations
 STRING_INPUT StringInput1[20];//, StringInput2[4][20], _SKIP_, StringInput3[4,2][20];
@@ -298,6 +297,7 @@ FUNCTION MyFunction1(ByRef INTEGER myvar1,  LONG_INTEGER myvar2, SIGNED_INTEGER 
 	//Local Function Call
 	MyFunction1(Variable#1, Variable4, Variable7, variable10, internalStruct);
 }
+
 INTEGER_FUNCTION MyFunction2(ReadOnlyByRef INTEGER myvar1[], LONG_INTEGER myvar2[], SIGNED_INTEGER myVar3[],  SIGNED_LONG_INTEGER myvar4[], ReadOnlyByRef mySruct myvar5[])
 {
 	//statements

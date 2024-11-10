@@ -1,2 +1,17 @@
-mySruct internalStruct, internalStuct[10];
-INTEGER Variable#1, _Variable2 [4] , __Variable3 [4] [2] ;
+class test {
+        
+};
+
+namespace SampleSimplSharpLibrary;
+{
+    class test {
+        SIGNED_LONG_INTEGER intSampleField;
+        
+    };
+
+}
+
+namespace test
+{
+
+}
