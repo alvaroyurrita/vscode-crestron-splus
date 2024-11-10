@@ -934,7 +934,13 @@ repository:
             (encoding_ascii)|
             (encoding_inherit_from_parent)|
             (encoding_inherit_from_program)|
-            (encoding_utf16)
+            (encoding_utf16)|
+            (default_nonvolatile)|
+            (default_volatile)|
+            (endif)|
+            (if_series2)|
+            (if_series3)|
+            (if_series4)
           )\b)
           \s* #Directive
     end: (?=$)
@@ -957,6 +963,18 @@ repository:
         name: keyword.preprocessor.encodinginheritfromprogram.usp
       '9':
         name: keyword.preprocessor.encodingutf16.usp
+      '10':
+        name: keyword.preprocessor.defaultnonvolatile.usp
+      '11':
+        name: keyword.preprocessor.defaultvolatile.usp
+      '12':
+        name: keyword.preprocessor.endif.usp
+      '13':
+        name: keyword.preprocessor.ifseries2.usp
+      '14':
+        name: keyword.preprocessor.ifseries3.usp
+      '15':
+        name: keyword.preprocessor.ifseries4.usp
   preprocessor-parameter-properties:
     name: meta.preprocessor.properties.usp
     begin: |-
@@ -974,7 +992,8 @@ repository:
         name: keyword.preprocessor.beginparameterproperties.usp
       "3":
         patterns:
-          - include: "#identifier"
+          - match: ([\_[:alpha:]][\_\#\_\$[:alnum:]]*)
+            name: entity.name.type
           - include: "#punctuation-comma"
     end: |-
       (?ix)
@@ -1009,7 +1028,7 @@ repository:
     end: (;)
     endCaptures:
       "1":
-        name: punctuation.terminator.statementtest.usp
+        name: punctuation.terminator.parameteryproperty.usp
     patterns:
       - include: "#punctuation-assignment"
       - include: "#punctuation-pipe"
@@ -1028,7 +1047,7 @@ repository:
     end: (;)
     endCaptures:
       "1":
-        name: punctuation.terminator.statementtest.usp
+        name: punctuation.terminator.parameteryproperty.usp
     patterns:
       - include: "#punctuation-assignment"
       - include: "#preprocessor-parameter-units"
@@ -1046,7 +1065,7 @@ repository:
     end: (;)
     endCaptures:
       "1":
-        name: punctuation.terminator.statementtest.usp
+        name: punctuation.terminator.parameteryproperty.usp
     patterns:
       - include: "#literals"
   preprocessor-parameter-properties-list:
@@ -1063,7 +1082,7 @@ repository:
     end: (;)
     endCaptures:
       "1":
-        name: punctuation.terminator.statementtest.usp
+        name: punctuation.terminator.parameteryproperty.usp
     patterns:
       - include: "#preprocessor-property-list-pair"
       - include: "#punctuation-comma"
@@ -1081,7 +1100,7 @@ repository:
     end: (;)
     endCaptures:
       "1":
-        name: punctuation.terminator.statementtest.usp
+        name: punctuation.terminator.parameteryproperty.usp
     patterns:
       - include: "#numeric-literal"
       - include: "#punctuation-comma"
@@ -1099,7 +1118,7 @@ repository:
     end: (;)
     endCaptures:
       "1":
-        name: punctuation.terminator.propShortDescription.usp
+        name: punctuation.terminator.parameteryproperty.usp
     patterns:
       - include: "#string-literal"
   preprocessor-block-help:

@@ -1251,7 +1251,7 @@
       ]
     },
     "preprocessor-single": {
-      "begin": "(?ix)\\G\n  (?:\\b\n    (?:\n      (print_to_trace)|\n      (enable_dynamic)|\n      (enable_stack_checking)|\n      (large_stack)|\n      (enable_trace)|\n      (encoding_ascii)|\n      (encoding_inherit_from_parent)|\n      (encoding_inherit_from_program)|\n      (encoding_utf16)\n    )\\b)\n    \\s* #Directive",
+      "begin": "(?ix)\\G\n  (?:\\b\n    (?:\n      (print_to_trace)|\n      (enable_dynamic)|\n      (enable_stack_checking)|\n      (large_stack)|\n      (enable_trace)|\n      (encoding_ascii)|\n      (encoding_inherit_from_parent)|\n      (encoding_inherit_from_program)|\n      (encoding_utf16)|\n      (default_nonvolatile)|\n      (default_volatile)|\n      (endif)|\n      (if_series2)|\n      (if_series3)|\n      (if_series4)\n    )\\b)\n    \\s* #Directive",
       "end": "(?=$)",
       "beginCaptures": {
         "1": {
@@ -1280,6 +1280,24 @@
         },
         "9": {
           "name": "keyword.preprocessor.encodingutf16.usp"
+        },
+        "10": {
+          "name": "keyword.preprocessor.defaultnonvolatile.usp"
+        },
+        "11": {
+          "name": "keyword.preprocessor.defaultvolatile.usp"
+        },
+        "12": {
+          "name": "keyword.preprocessor.endif.usp"
+        },
+        "13": {
+          "name": "keyword.preprocessor.ifseries2.usp"
+        },
+        "14": {
+          "name": "keyword.preprocessor.ifseries3.usp"
+        },
+        "15": {
+          "name": "keyword.preprocessor.ifseries4.usp"
         }
       }
     },
@@ -1299,7 +1317,8 @@
         "3": {
           "patterns": [
             {
-              "include": "#identifier"
+              "match": "([\\_[:alpha:]][\\_\\#\\_\\$[:alnum:]]*)",
+              "name": "entity.name.type"
             },
             {
               "include": "#punctuation-comma"
@@ -1362,7 +1381,7 @@
       "end": "(;)",
       "endCaptures": {
         "1": {
-          "name": "punctuation.terminator.statementtest.usp"
+          "name": "punctuation.terminator.parameteryproperty.usp"
         }
       },
       "patterns": [
@@ -1393,7 +1412,7 @@
       "end": "(;)",
       "endCaptures": {
         "1": {
-          "name": "punctuation.terminator.statementtest.usp"
+          "name": "punctuation.terminator.parameteryproperty.usp"
         }
       },
       "patterns": [
@@ -1421,7 +1440,7 @@
       "end": "(;)",
       "endCaptures": {
         "1": {
-          "name": "punctuation.terminator.statementtest.usp"
+          "name": "punctuation.terminator.parameteryproperty.usp"
         }
       },
       "patterns": [
@@ -1446,7 +1465,7 @@
       "end": "(;)",
       "endCaptures": {
         "1": {
-          "name": "punctuation.terminator.statementtest.usp"
+          "name": "punctuation.terminator.parameteryproperty.usp"
         }
       },
       "patterns": [
@@ -1474,7 +1493,7 @@
       "end": "(;)",
       "endCaptures": {
         "1": {
-          "name": "punctuation.terminator.statementtest.usp"
+          "name": "punctuation.terminator.parameteryproperty.usp"
         }
       },
       "patterns": [
@@ -1502,7 +1521,7 @@
       "end": "(;)",
       "endCaptures": {
         "1": {
-          "name": "punctuation.terminator.propShortDescription.usp"
+          "name": "punctuation.terminator.parameteryproperty.usp"
         }
       },
       "patterns": [
