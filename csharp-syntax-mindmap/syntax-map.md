@@ -5,3 +5,4 @@
 * ![Operands](../csharp-syntax-mindmap/operands.svg)
 * ![Declarations](../csharp-syntax-mindmap/declarations.svg)
 * ![Punctuation](../csharp-syntax-mindmap/punctuation.svg)
+![events](events.svg)

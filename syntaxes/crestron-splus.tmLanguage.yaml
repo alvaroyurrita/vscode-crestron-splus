@@ -311,7 +311,8 @@ repository:
       - include: "#parameter-declaration"
       - include: "#structure-declaration"
       - include: "#function-declaration"
-      - include: "#constant-declaration"
+      - include: "#event-declaration"
+      - include: "#callback-declaration"
       - include: "#namespace-declaration"
       - include: "#variable-declaration"
   input-declaration:
@@ -495,6 +496,101 @@ repository:
       - include: "statement"
       - include: "#preprocessor"
       - include: "#comment"
+  event-declaration:
+    begin: |-
+        (?ix)
+          (?=
+            (\bthreadsafe\b\s+)? #Possibly grab threadsafe
+            (?:push|event|change|release|socketconnect|socketdisconnect|socketreceive|socketstatus|eventhandler)
+          ) #start pattern at the beginning of the function keyword without grabbing any characters
+    end: |-
+        (?ix)
+          (?<=})   #stop pattern after the closing curly brace without grabbing any characters
+    patterns:
+    - begin: |-
+          (?ix)
+            (\bthreadsafe\b\s+)?
+            (push|event|change|release|socketconnect|socketdisconnect|socketreceive|socketstatus|eventhandler)\b\s+
+      beginCaptures:
+        '1':
+          name: keyword.modifier.event.usp
+        '2':
+          name: keyword.declaration.event.usp
+        '3':
+          name: entity.name.variable.event.usp
+      end: |-
+          (?ix)
+            (?=\{) #stop pattern after the opening curly brace without grabbing any characters
+      name: meta.declaration.event.usp
+      patterns:
+      - match: ([\_[:alpha:]][\_\#\_\$[:alnum:]]*)
+        name: entity.name.variable.event.usp
+      - include: "#punctuation-comma"
+      - include: "#comment"
+      - include: "#parenthesized-parameter-list"
+    - begin: (\{)
+      beginCaptures:
+        '1':
+          name: punctuation.curlybrace.open.usp
+      end: (\})
+      endCaptures:
+        '1':
+          name: punctuation.curlybrace.close.usp
+      name: meta.event.contents
+      patterns:
+      - include: "#statements"
+      - include: "#variable-declaration"
+      - include: "statement"
+      - include: "#preprocessor"
+      - include: "#comment"
+
+  callback-declaration:
+    begin: |-
+        (?ix)
+          (?=
+            (\bcallback\b\s+)? #test for callback
+            (?:function|integer_function|string_function|long_integer_function|signed_integer_function|signed_long_integer_function|simplsharpstring)
+          ) #start pattern at the beginning of the callback function keyword without grabbing any characters
+    end: |-
+        (?ix)
+          (?<=})   #stop pattern after the closing curly brace without grabbing any characters
+    patterns:
+    - begin: |-
+          (?ix)
+            (\bcallback\b\s+)? #grab the callback keyword
+            (function|integer_function|string_function|long_integer_function|signed_integer_function|signed_long_integer_function|simplsharpstring)\b\s+
+            ([_[:alpha:]][\#\$\_[:alnum:]]*)
+      beginCaptures:
+        '1':
+          name: keyword.declaration.callback.usp
+        '2':
+          name: keyword.declaration.function.usp
+        '3':
+          name: entity.name.variable.function.usp
+      end: |-
+          (?ix)
+            (?=\{) #stop pattern after the opening curly brace without grabbing any characters
+      name: meta.declaration.function.usp
+      patterns:
+      - include: "#comment"
+      - include: "#parenthesized-parameter-list"
+    - begin: (\{)
+      beginCaptures:
+        '1':
+          name: punctuation.curlybrace.open.usp
+      end: (\})
+      endCaptures:
+        '1':
+          name: punctuation.curlybrace.close.usp
+      name: meta.callback.contents
+      patterns:
+      - include: "#statements"
+      - include: "#variable-declaration"
+      - include: "statement"
+      - include: "#preprocessor"
+      - include: "#comment"
+
+
   namespace-declaration:
     begin: |-
         (?ix)
@@ -718,15 +814,7 @@ repository:
     - include: "#numeric-literal"
     - include: "#punctuation-comma"
 
-  constant-declaration:
-    patterns:
-      []
-  SimplSharp-declaration:
-    patterns:
-      []
-
-
-
+ 
 #preprocessor
   preprocessor:
     patterns:
