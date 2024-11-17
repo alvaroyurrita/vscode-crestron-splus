@@ -3,6 +3,7 @@ Formatting
 * Statements
 * Properties Literals
 * Remove properties Literals from global literals
+* Add Wait as a local function declaration
 
 Add Insert category
 Formatting (comprehensive)

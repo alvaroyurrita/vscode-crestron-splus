@@ -573,14 +573,17 @@ repository:
     begin: |-
       (?x)
         (?=
-          ^        #start pattern at the beginning of a line
-          [^\(]*   #grab everything that doesn't have ann opening parenthesis
-          \s*      #across multiple lines
-          (?<!});  #and end on a semicolon that doesn't have a curly bracket behind it
+          ^   #start pattern at the beginning of a line
+          \s* #ignore leading spaces
+          (?:
+            (?:[\_[:alpha:]][\_\#\_\$[:alnum:]]*)\s   #grab identifier
+          )
+          (?=[\_[:alpha:]])  #only when followed by the beginning of another identifier
         )          #without grabbing any characters
     end: |-
       (?x)
-        (?<=;) #stop pattern after the semicolon without grabbing any characters
+        (?<=;)|    #stop pattern after the semicolon or
+        (?=[{\(]) #before curly bracket or parenthesis without grabbing any characters
     patterns:
       - begin: |-
           (?ix)
@@ -684,10 +687,10 @@ repository:
           name: punctuation.curlybrace.close.usp
       name: meta.function.contents
       patterns:
-      # - include: "#preprocessor"
+      - include: "#variable-declaration"
+      - include: "#preprocessor"
       - include: "#statements"
-      # - include: "#variable-declaration"
-      # - include: "#comment"
+      - include: "#comment"
   event-declaration:
     begin: |-
         (?ix)
@@ -730,11 +733,14 @@ repository:
           name: punctuation.curlybrace.close.usp
       name: meta.event.contents
       patterns:
+      # - include: "#variable-declaration"
+      - match: (?i)\bTerminateEvent\b
+        name: keyword.control.event.terminate.usp
       - include: "#statements"
-      - include: "#variable-declaration"
       - include: "statement"
       - include: "#preprocessor"
       - include: "#comment"
+
   callback-declaration:
     begin: |-
         (?ix)
@@ -1082,7 +1088,6 @@ repository:
         name: punctuation.accessor.usp
       "2":
         patterns:
-          - include: "#functions-data-conversion"
           - include: "#builtin-functions"
           - include: "#built-in-void-functions"
           - match: (?xi)[\_[:alpha:]][\_\#\_\$[:alnum:]]*
@@ -1094,21 +1099,20 @@ repository:
       - include: "#argument-list"
   builtin-functions:
     patterns:
+      - include: "#functions-data-conversion"
       - include: "#functions-random-number"
       - include: "#functions-string-parsing"
       - include: "#functions-mathematical"
       - include: "#functions-bit-and-byte"
       - include: "#functions-file"
-      # - include: "#functions-time-and-date"
-      # - include: "#functions-direct-socket-access"
-      # - include: "#functions-email"
-      # - include: "#functions-ramping"
-      # - include: "#functions-encoding"
-      # - include: "#functions-system-interfacing"
-      # - include: "#functions-system-control"
-      # - include: "#functions-wait"
-      # - include: "#functions-array-operations"
-      # - include: "#functions-exception-handling"
+      - include: "#functions-time-and-date"
+      - include: "#functions-system-interfacing"
+      - include: "#functions-direct-socket-access"
+      - include: "#functions-email"
+      - include: "#functions-ramping"
+      - include: "#functions-encoding"
+      - include: "#functions-array-operations"
+      - include: "#functions-exception-handling"
   functions-data-conversion:
     match: (?i)\b(Atoi|Atosi|Atol|Atosl|Chr|HexToI|HexToL|HexToSI|HexToSL|Itoa|Itohex|Ltoa|Ltohex)\b
     name: keyword.support.function.usp
@@ -1118,7 +1122,7 @@ repository:
   functions-string-parsing:
     match: |-
       (?ix)
-        \b(Makestring|Print|Trace|CompareStrings|CompareStringsNoCase|Find|
+        \b(CompareStrings|CompareStringsNoCase|Find|
         FindNoCase|Gather|GatherByLength|GatherAsync|GatherAsyncByLength|GatherByLengthWithDest|ReArmGatherAsync|RemoveGatherAsync|
         GetC|Left|Len|Lower|Upper|Mid|Remove|RemoveByLength|ResizeString|ReverseFind|ReverseFindNoCase|Right|SetString)\b
     name: keyword.support.function.usp
@@ -1171,7 +1175,7 @@ repository:
     match: |-
       (?ix)
         \b(GetSlot|GetCresnet|GetCIP|GetSymbolInstanceName|GetSymbolReferenceName|MakeProgramFilename|GetModelNumber|GetSeries|
-        IsSignalDefined|)\b
+        IsSignalDefined)\b
     name: keyword.support.function.usp
   functions-array-operations:
     match: |-
@@ -1188,25 +1192,25 @@ repository:
       - include: "#void-functions-random-number"
       - include: "#void-functions-string-parsing"
       - include: "#void-functions-file"
-      # - include: "#void-functions-system-control"
-      # - include: "#void-functions-system-interfacing"
-      # - include: "#void-functions-wait"
-      # - include: "#void-functions-string-formatting-and-printing"
-      # - include: "#void-functions-time-and-date"
-      # - include: "#void-functions-ramping"
-      # - include: "#void-functions-encoding"
-      # - include: "#void-functions-delegate-handling"
-      # - include: "#void-functions-event-handling"
-      # - include: "#void-functions-array-operations"
+      - include: "#void-functions-system-control"
+      - include: "#void-functions-time-and-date"
+      - include: "#void-functions-system-interfacing"
+      - include: "#void-functions-wait"
+      - include: "#void-functions-string-formatting-and-printing"
+      - include: "#void-functions-ramping"
+      - include: "#void-functions-encoding"
+      - include: "#void-functions-array-operations"
+      - include: "#void-functions-delegate-handling"
+      - include: "#void-functions-event-handling"
   void-functions-random-number:
     match: (?i)\b(Seed)\b
     name: keyword.support.function.usp
   void-functions-string-parsing:
-    match: (?ix)\b(ClearBuffer|)\b
+    match: (?ix)\b(ClearBuffer)\b
     name: keyword.support.function.usp
   void-functions-system-control:
-    match: (?i)\b(delay|ProcessLogic|pulse|TerminateEvent|WaitForInitializationComplete)\b
-    name: keyword.support.function.
+    match: (?ix)\b(delay|ProcessLogic|pulse|WaitForInitializationComplete)\b
+    name: keyword.support.function.usp
   void-functions-system-interfacing:
     match: (?ix)\b(GenerateUserNotice|GenerateUserWarning|GenerateUserError|SendPacketToCPU|SendCresnetPacket|SetCresnet|SetSlot|SetCIP)\b
     name: keyword.support.function.usp
@@ -1214,19 +1218,19 @@ repository:
     match: (?i)\b(CancelAllWait|CancelWait|PauseAllWait|PauseWait|ResumeAllWait|ResumeWait|RetimeWait)\b
     name: keyword.support.function.usp
   void-functions-string-formatting-and-printing:
-    match: (?i)\b(Makestring|Print|Trace|)\b
+    match: (?i)\b(Makestring|Print|Trace)\b
     name: keyword.support.function.usp
   void-functions-file:
     match: (?ix)\b(ReadStructure|WriteStructure)\b
     name: keyword.support.function.usp
   void-functions-time-and-date:
-    match: (?ix)\b(SetDate|SetClock|)\b
+    match: (?ix)\b(SetDate|SetClock)\b
     name: keyword.support.function.usp
   void-functions-ramping:
     match: (?ix)\b(InitializeRampInfoArray|InitializeRampInfo)\b
     name: keyword.support.function.usp
   void-functions-encoding:
-    match: (?i)\b(SetEncoding|)\b
+    match: (?i)\b(SetEncoding)\b
     name: keyword.support.function.usp
   void-functions-delegate-handling:
     match: (?i)\b(RegisterDelegate)\b
@@ -1235,8 +1239,7 @@ repository:
     match: (?i)\b(RegisterEvent)\b
     name: keyword.support.function.usp
   void-functions-array-operations:
-    match: (?ix)
-      \b(SetArray|)\b
+    match: (?ix)\b(SetArray)\b
     name: keyword.support.function.usp
 
 

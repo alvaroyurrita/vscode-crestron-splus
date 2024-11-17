@@ -655,6 +655,7 @@ FUNCTION SystemControl()
 	Pulse(5,DigitalOutput1);
 	PROCESSLOGIC();
 	DELAY(6);
+	WaitForInitializationComplete();
 }
 
 FUNCTION SystemInterfaceing()
@@ -674,10 +675,7 @@ FUNCTION SystemInterfaceing()
 
 FUNCTION WaitEvents()
 {
-	WAIT(10,MyWait)
-	{
-		PRINT("");
-	}
+
 	CANCELWAIT(MyWait);
 	CANCELALLWAIT();
 	PAUSEWAIT(MyWait);
@@ -685,6 +683,10 @@ FUNCTION WaitEvents()
 	PAUSEALLWAIT();
 	RETIMEWAIT(5,MyWait);
 	RESUMEWAIT(MyWait);
+	WAIT(10,MyWait)
+	{
+		PRINT("");
+	}
 }
 
 FUNCTION MathematicalFunctions()
@@ -1103,6 +1105,8 @@ FUNCTION RampingFunctions()
 FUNCTION TryAndCatchHandling()
 {
 	INTEGER intArr[10];
+	GetExceptionCode();
+	GetExceptionMessage();
 	TRY
 	{
 		intArr[1] = 1;
@@ -1112,6 +1116,7 @@ FUNCTION TryAndCatchHandling()
 	{
 		Print( "Exception thrown: %s", GetExceptionMessage() );
 	}
+
 }
 
 SIGNED_INTEGER_FUNCTION SignedIntegerFunction1()
@@ -1135,13 +1140,13 @@ STRING_FUNCTION StringFunction1()
 
 THREADSAFE PUSH DigitalInput1, DigitalInpu2
 {
-	TERMINATEEVENT;
 }
 
 
 
 RELEASE DigitalInput1
 {
+	TERMINATEEVENT;
 	// TODO:  Add code here
 }
 
@@ -1223,7 +1228,18 @@ SOCKETSTATUS TcpClient
 
 Function Main()
 {
+	RegisterDelegate(objectName, delegateName, callbackName);
+	RegisterEvent(objectInstName, eventName, callbackFuncName);
 	
+	eventhandler callbackFuncName(senderClassType sender,argsType args)
+	{
+		//code here;
+	}
+	
+	callback function callbackName(argsType args)
+	{
+		//todo: code;
+	}
 	WaitForInitializationComplete();
 }
 

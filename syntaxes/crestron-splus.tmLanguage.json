@@ -864,8 +864,8 @@
       ]
     },
     "variable-declaration": {
-      "begin": "(?x)\n  (?=\n    ^        #start pattern at the beginning of a line\n    [^\\(]*   #grab everything that doesn't have ann opening parenthesis\n    \\s*      #across multiple lines\n    (?<!});  #and end on a semicolon that doesn't have a curly bracket behind it\n  )          #without grabbing any characters",
-      "end": "(?x)\n  (?<=;) #stop pattern after the semicolon without grabbing any characters",
+      "begin": "(?x)\n  (?=\n    ^   #start pattern at the beginning of a line\n    \\s* #ignore leading spaces\n    (?:\n      (?:[\\_[:alpha:]][\\_\\#\\_\\$[:alnum:]]*)\\s   #grab identifier\n    )\n    (?=[\\_[:alpha:]])  #only when followed by the beginning of another identifier\n  )          #without grabbing any characters",
+      "end": "(?x)\n  (?<=;)|    #stop pattern after the semicolon or\n  (?=[{\\(]) #before curly bracket or parenthesis without grabbing any characters",
       "patterns": [
         {
           "begin": "(?ix)\n  (?:\\s*)\n  (dynamic|volatile|nonvolatile|ascii|utf16|inherit)?\\s*  #Possibly grab modifier\n  (?:\n    (integer|string|long_integer|signed_integer|signed_long_integer|simplsharpstring|delegateproperty)| #grab the variable type or\n    (cevent|cmutex)| #or built in class\n    ([_[:alpha:]][\\#\\$\\_[:alnum:]]*)\\s* #grab the variable name\n  )",
@@ -999,7 +999,16 @@
           "name": "meta.function.contents",
           "patterns": [
             {
+              "include": "#variable-declaration"
+            },
+            {
+              "include": "#preprocessor"
+            },
+            {
               "include": "#statements"
+            },
+            {
+              "include": "#comment"
             }
           ]
         }
@@ -1056,10 +1065,11 @@
           "name": "meta.event.contents",
           "patterns": [
             {
-              "include": "#statements"
+              "match": "(?i)\\bTerminateEvent\\b",
+              "name": "keyword.control.event.terminate.usp"
             },
             {
-              "include": "#variable-declaration"
+              "include": "#statements"
             },
             {
               "include": "statement"
@@ -1504,9 +1514,6 @@
         "2": {
           "patterns": [
             {
-              "include": "#functions-data-conversion"
-            },
-            {
               "include": "#builtin-functions"
             },
             {
@@ -1529,6 +1536,9 @@
     "builtin-functions": {
       "patterns": [
         {
+          "include": "#functions-data-conversion"
+        },
+        {
           "include": "#functions-random-number"
         },
         {
@@ -1542,6 +1552,30 @@
         },
         {
           "include": "#functions-file"
+        },
+        {
+          "include": "#functions-time-and-date"
+        },
+        {
+          "include": "#functions-system-interfacing"
+        },
+        {
+          "include": "#functions-direct-socket-access"
+        },
+        {
+          "include": "#functions-email"
+        },
+        {
+          "include": "#functions-ramping"
+        },
+        {
+          "include": "#functions-encoding"
+        },
+        {
+          "include": "#functions-array-operations"
+        },
+        {
+          "include": "#functions-exception-handling"
         }
       ]
     },
@@ -1554,7 +1588,7 @@
       "name": "keyword.support.function.usp"
     },
     "functions-string-parsing": {
-      "match": "(?ix)\n  \\b(Makestring|Print|Trace|CompareStrings|CompareStringsNoCase|Find|\n  FindNoCase|Gather|GatherByLength|GatherAsync|GatherAsyncByLength|GatherByLengthWithDest|ReArmGatherAsync|RemoveGatherAsync|\n  GetC|Left|Len|Lower|Upper|Mid|Remove|RemoveByLength|ResizeString|ReverseFind|ReverseFindNoCase|Right|SetString)\\b",
+      "match": "(?ix)\n  \\b(CompareStrings|CompareStringsNoCase|Find|\n  FindNoCase|Gather|GatherByLength|GatherAsync|GatherAsyncByLength|GatherByLengthWithDest|ReArmGatherAsync|RemoveGatherAsync|\n  GetC|Left|Len|Lower|Upper|Mid|Remove|RemoveByLength|ResizeString|ReverseFind|ReverseFindNoCase|Right|SetString)\\b",
       "name": "keyword.support.function.usp"
     },
     "functions-mathematical": {
@@ -1590,7 +1624,7 @@
       "name": "keyword.support.function.usp"
     },
     "functions-system-interfacing": {
-      "match": "(?ix)\n  \\b(GetSlot|GetCresnet|GetCIP|GetSymbolInstanceName|GetSymbolReferenceName|MakeProgramFilename|GetModelNumber|GetSeries|\n  IsSignalDefined|)\\b",
+      "match": "(?ix)\n  \\b(GetSlot|GetCresnet|GetCIP|GetSymbolInstanceName|GetSymbolReferenceName|MakeProgramFilename|GetModelNumber|GetSeries|\n  IsSignalDefined)\\b",
       "name": "keyword.support.function.usp"
     },
     "functions-array-operations": {
@@ -1611,6 +1645,36 @@
         },
         {
           "include": "#void-functions-file"
+        },
+        {
+          "include": "#void-functions-system-control"
+        },
+        {
+          "include": "#void-functions-time-and-date"
+        },
+        {
+          "include": "#void-functions-system-interfacing"
+        },
+        {
+          "include": "#void-functions-wait"
+        },
+        {
+          "include": "#void-functions-string-formatting-and-printing"
+        },
+        {
+          "include": "#void-functions-ramping"
+        },
+        {
+          "include": "#void-functions-encoding"
+        },
+        {
+          "include": "#void-functions-array-operations"
+        },
+        {
+          "include": "#void-functions-delegate-handling"
+        },
+        {
+          "include": "#void-functions-event-handling"
         }
       ]
     },
@@ -1619,12 +1683,12 @@
       "name": "keyword.support.function.usp"
     },
     "void-functions-string-parsing": {
-      "match": "(?ix)\\b(ClearBuffer|)\\b",
+      "match": "(?ix)\\b(ClearBuffer)\\b",
       "name": "keyword.support.function.usp"
     },
     "void-functions-system-control": {
-      "match": "(?i)\\b(delay|ProcessLogic|pulse|TerminateEvent|WaitForInitializationComplete)\\b",
-      "name": "keyword.support.function."
+      "match": "(?ix)\\b(delay|ProcessLogic|pulse|WaitForInitializationComplete)\\b",
+      "name": "keyword.support.function.usp"
     },
     "void-functions-system-interfacing": {
       "match": "(?ix)\\b(GenerateUserNotice|GenerateUserWarning|GenerateUserError|SendPacketToCPU|SendCresnetPacket|SetCresnet|SetSlot|SetCIP)\\b",
@@ -1635,7 +1699,7 @@
       "name": "keyword.support.function.usp"
     },
     "void-functions-string-formatting-and-printing": {
-      "match": "(?i)\\b(Makestring|Print|Trace|)\\b",
+      "match": "(?i)\\b(Makestring|Print|Trace)\\b",
       "name": "keyword.support.function.usp"
     },
     "void-functions-file": {
@@ -1643,7 +1707,7 @@
       "name": "keyword.support.function.usp"
     },
     "void-functions-time-and-date": {
-      "match": "(?ix)\\b(SetDate|SetClock|)\\b",
+      "match": "(?ix)\\b(SetDate|SetClock)\\b",
       "name": "keyword.support.function.usp"
     },
     "void-functions-ramping": {
@@ -1651,7 +1715,7 @@
       "name": "keyword.support.function.usp"
     },
     "void-functions-encoding": {
-      "match": "(?i)\\b(SetEncoding|)\\b",
+      "match": "(?i)\\b(SetEncoding)\\b",
       "name": "keyword.support.function.usp"
     },
     "void-functions-delegate-handling": {
@@ -1663,7 +1727,7 @@
       "name": "keyword.support.function.usp"
     },
     "void-functions-array-operations": {
-      "match": "(?ix)\n\\b(SetArray|)\\b",
+      "match": "(?ix)\\b(SetArray)\\b",
       "name": "keyword.support.function.usp"
     },
     "built-in-variables": {
