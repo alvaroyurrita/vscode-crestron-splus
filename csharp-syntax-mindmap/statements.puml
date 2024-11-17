@@ -40,15 +40,15 @@ built-in
 |= keyword.support.function |= meta.function.parameters |= punctuation.curlybracket.open | statements |= punctuation.curlybracket.close |
 | WAIT |  argument-list | {  | statements |  }  |;
 
-**:= void function call
+**:= void invocation
 built-in-void-functions
-|= keyword.support.function |= meta.function.parameters  |= punctuation.terminator.statement |
+|= keyword.support.function |= meta.function.parameters  |= punctuation.terminator.invocation |
 | random-number\n sring-parsing\n system-control\n system-interfacing\n wait\n string formatting and printing\n file\n time-and-date\n ramping\n encoding\n delegate handling\n event handling\n array opperations |  argument-list |  ;  |
 user-void-function-call
-|= entity.name.function |= meta.function.parameters  |= punctuation.terminator.statement |
+|= entity.name.function |= meta.function.parameters  |= punctuation.terminator.invocation |
 | name |  argument-list |  ;  |
 user-sharp-function-call
-|= entity.name.type |= punctuation.accessor |= entity.name.function |= meta.function.parameters  |= punctuation.terminator.statement |
+|= entity.name.type |= punctuation.accessor |= entity.name.function |= meta.function.parameters  |= punctuation.terminator.invocation |
 | type name | . | name |  argument-list |  ;  |
 ----
 argument-list

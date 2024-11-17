@@ -67,30 +67,30 @@ FUNCTION MyFunction(){
 	print("liu decimal %lu %9lu %09lu \n", li, li, li);
 	print("%% \n");
 	print("%c %2c %02c \n", i, i, i);
-	
-	//Illegal string literals
 	print("\c");
-	print("\xF");
 	print("\d");
 	print("\e");
 	print("\g");
-	print("\h");
 	print("\i");
-	print("\j");
 	print("\k");
 	print("\l");
 	print("\m");
 	print("\o");
 	print("\p");
-	print("\q");
 	print("\s");
 	print("\u");
 	print("\w");
-	print("\y");
 	print("\z");
 	print("%12lx", li);
 	print("%12lx", li);
 	print("%12lX", li);
+
+	//Illegal string literals
+	print("\xF");
+	print("\h");
+	print("\j");
+	print("\q");
+	print("\y");
 	print("%12m", li);
 	print("%m", li);
 	
@@ -439,13 +439,14 @@ FUNCTION MyFunction1()
 	INTEGER int1, int2, int3;
 	//Operators
 	//Arithmetic Operators
+	int3 [int3,int3] [int3];
 	int3 = -int1; //negation
-	int3 = int1 * int2; //multiplications
+	int3 = int1[5][6] * int2[int3]; //multiplications
 	int3 = int1 / int2; //division
 	int3 = int1 S/ int2; //Signed Divition
 	int3 = int1 MOD int2; //Signed Modulo
 	int3 = int1 UMOD int2; //Unsigned Modulo
-	int3 = int1 % int2; // Singed Module
+	int3 = int1 % int2 + (int3 * Int4); // Singed Module
 	int3 = int1 + int2; // Addition
 	int3 = int1 - int2; // Substraction
 	int3 = int1 + int2; // Addition
@@ -459,7 +460,7 @@ FUNCTION MyFunction1()
 	int3 = int1 << 1; // Shift Left
 	int3 = int1 >> 1; // Shift Right
 	int3 = int1 {{ 1; // Rotate LEft
-			int3 = int1 }} 1; // Rotate Right
+	int3 = int1 }} 1; // Rotate Right
 	int3 = Not(int1); // 1's Complement
 	int3 = int1 & int2; // Bitwise AND
 	int3 = int1 | int2; // Bitwise OR

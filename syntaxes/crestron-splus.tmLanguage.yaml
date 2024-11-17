@@ -6,10 +6,10 @@ fileTypes:
 name: Crestron
 patterns:
   - include: "#comment"
-  # - include: "#preprocessor"
-  - include: "#declarations"
-  # - include: "#statements"
-  # - include: "#expressions"
+  - include: "#preprocessor"
+  - include: "#declaration"
+  # - include: "#statement"
+  # - include: "#expression"
   # - include: "#punctuation"
 
 repository:
@@ -497,8 +497,8 @@ repository:
             name: punctuation.curlybrace.close.usp
 
 
-#declarations
-  declarations:
+#declaration
+  declaration:
     patterns:
       - include: "#input-declaration"
       - include: "#output-declaration"
@@ -588,9 +588,9 @@ repository:
       - begin: |-
           (?ix)
             (?:\s*)
-            (dynamic|volatile|nonvolatile|ascii|utf16|inherit)?\s*  #Possibly grab modifier
+            (dynamic|volatile|nonvolatile|ascii|utf16|inherit|delegateproperty)?\s*  #Possibly grab modifier
             (?:
-              (integer|string|long_integer|signed_integer|signed_long_integer|simplsharpstring|delegateproperty)| #grab the variable type or
+              (integer|string|long_integer|signed_integer|signed_long_integer|simplsharpstring)| #grab the built-in variable type or
               (cevent|cmutex)| #or built in class
               ([_[:alpha:]][\#\$\_[:alnum:]]*)\s* #grab the variable name
             )
@@ -602,7 +602,10 @@ repository:
           '3':
             name: keyword.support.class.usp
           '4':
-            name: entity.name.type.usp
+            patterns:
+              - include: "#built-in-types"
+              - match: ([\_[:alpha:]][\_\#\_\$[:alnum:]]*)
+                name: entity.name.variable.usp
         end: |-
           (?ix)
             (\;)  #stop pattern before the closing curly brace or before semicolon without grabbing any characters
@@ -660,7 +663,7 @@ repository:
           (?=(?:function|integer_function|string_function|long_integer_function|signed_integer_function|signed_long_integer_function|simplsharpstring)) #start pattern at the beginning of the function keyword without grabbing any characters
     end: |-
         (?ix)
-          (?<=})   #stop pattern after the closing curly brace without grabbing any characters
+          (?<!\})\}(?!\})   #stop pattern after the closing curly brace without grabbing any characters only when there are no adjacent curly braces to avoid stopping at bitwise rotate right
     patterns:
     - begin: |-
           (?ix)
@@ -681,16 +684,16 @@ repository:
       beginCaptures:
         '1':
           name: punctuation.curlybrace.open.usp
-      end: (})
+      end: (?<!\})(\})(?!\})
       endCaptures:
         '1':
           name: punctuation.curlybrace.close.usp
       name: meta.function.contents
       patterns:
-      - include: "#variable-declaration"
       - include: "#preprocessor"
-      - include: "#statements"
+      - include: "#statement"
       - include: "#comment"
+      - include: "#variable-declaration"
   event-declaration:
     begin: |-
         (?ix)
@@ -736,7 +739,7 @@ repository:
       # - include: "#variable-declaration"
       - match: (?i)\bTerminateEvent\b
         name: keyword.control.event.terminate.usp
-      - include: "#statements"
+      - include: "#statement"
       - include: "statement"
       - include: "#preprocessor"
       - include: "#comment"
@@ -781,7 +784,7 @@ repository:
           name: punctuation.curlybrace.close.usp
       name: meta.callback.contents
       patterns:
-      - include: "#statements"
+      - include: "#statement"
       - include: "#variable-declaration"
       - include: "statement"
       - include: "#preprocessor"
@@ -1014,13 +1017,13 @@ repository:
 
 
 
-# statements
-  statements:
+# statement
+  statement:
     patterns:
       - include: "#preprocessor"
       - include: "#comment"
       # - include: "#branching-and-decision"
-      - include: "#expressions"
+      - include: "#expression"
       # - include: "#looping"
       # - include: "#local-function-declaration"
       # - include: "#void-invocation"
@@ -1030,10 +1033,10 @@ repository:
 
   branching-and-decision:
     patterns:
-      - include: "#while-statements"
-      # - include: "#do-statements"
-      # - include: "#for-statements"
-  while-statements:
+      - include: "#while-statement"
+      # - include: "#do-statement"
+      # - include: "#for-statement"
+  while-statement:
     begin: |-
         (?ix)
           \b(while)\b\s*(?=\() #Keyword
@@ -1052,29 +1055,28 @@ repository:
             name: punctuation.definition.parameters.end.usp
         patterns:
           - include: "#expression"
-      - include: "#statements"
+      - include: "#statement"
 
 
 
 
 
-#Expressions
-  expressions:
+#expression
+  expression:
+    patterns:
+      - include: "#assignment-expression"
+      - include: "#expression-no-assignment"
+  expression-no-assignment:
     patterns:
       - include: "#preprocessor"
-      # - include: "#comment"
-      # - include: "#type-builtin"
-      # - include: "#switch-statement-or-expression"
-      # - include: "#assignment-expression"
-      # - include: "#expression-operators"
-      # - include: "#variable-declaration"
+      - include: "#comment"
       - include: "#invocation-expression"
-      # - include: "#element-access-expression"
+      # - include: "#switch-statement-or-expression"
+      - include: "#element-access-expression"
+      - include: "#built-in-constants"
       - include: "#literals"
-      # - include: "#parenthesized-expression"
-      # - include: "#identifier"
-      # - include: "#built-in-variables"
-      # - include: "#built-in-constants"
+      - include: "#type-name"
+      - include: "#parenthesized-expression"
 
 
   invocation-expression:
@@ -1094,7 +1096,10 @@ repository:
             name: entity.name.function.usp
     end: |-
       (?xi)
-        (?<=\)) #stop pattern after the closing parenthesis without grabbing any characters
+        (;) #stop pattern after the closing parenthesis without grabbing any characters
+    endCaptures:
+      "1":
+        name: punctuation.terminator.invocation.usp
     patterns:
       - include: "#argument-list"
   builtin-functions:
@@ -1113,6 +1118,7 @@ repository:
       - include: "#functions-encoding"
       - include: "#functions-array-operations"
       - include: "#functions-exception-handling"
+      - include: "#functions-bitwise"
   functions-data-conversion:
     match: (?i)\b(Atoi|Atosi|Atol|Atosl|Chr|HexToI|HexToL|HexToSI|HexToSL|Itoa|Itohex|Ltoa|Ltohex)\b
     name: keyword.support.function.usp
@@ -1186,6 +1192,9 @@ repository:
   functions-exception-handling:
     match: (?i)\b(GetExceptionCode|GetExceptionMessage)\b
     name: keyword.support.function.usp
+  functions-bitwise:
+    match: (?i)\b(not)\b
+    name: keyword.support.function.usp    
 
   built-in-void-functions:
     patterns:
@@ -1246,16 +1255,37 @@ repository:
 
 
   built-in-variables:
-    match: (?ix)
-      \b(_oem_break|_oem_cd|_oem_cts|_oem_dtr|_oem_long_break|_oem_max_string|_oem_pacing|
-      _oem_rts|_oem_str_in|_oem_str_out|FILE_INFO)\b
+    match: |-
+      (?ix)
+        \b(_oem_break|_oem_cd|_oem_cts|_oem_dtr|_oem_long_break|_oem_max_string|_oem_pacing|
+        _oem_rts|_oem_str_in|_oem_str_out|FILE_INFO)\b
     name: keyword.support.variable.usp
-
+  built-in-types:
+    match: |-
+      (?ix)
+        \b(FILE_INFO|ramp_info)\b
+    name: keyword.support.variable.usp    
   built-in-constants:
-    match: (?ix)
-      \b(_O_APPEND|_O_CREAT|_O_EXCL|_O_TRUNC|_O_TEXT|_O_BINARY|_O_RDONLY|_O_RDWR|_O_WRONLY|ARDONLY|AHIDDEN|ASYSTEM|AVOLUME|ADIRENT|ARCHIVE|ON|OFF)\b
+    match: |-
+      (?ix)
+        \b(_O_APPEND|_O_CREAT|_O_EXCL|_O_TRUNC|_O_TEXT|_O_BINARY|_O_RDONLY|_O_RDWR|_O_WRONLY|ARDONLY|AHIDDEN|ASYSTEM|AVOLUME|ADIRENT|ARCHIVE|ON|OFF)\b
     name: keyword.support.constant.usp
-
+  type-name:
+    patterns:
+    - match: ([_[:alpha:]][\_\#\_\$[:alnum:]]*)\s*(\.)
+      captures:
+        '1':
+          name: entity.name.type.usp
+        '2':
+          name: punctuation.accessor.usp
+    - match: (\.)\s*([_[:alpha:]][\_\#\_\$_[:alnum:]]*)(?![<>])
+      captures:
+        '1':
+          name: punctuation.accessor.usp
+        '2':
+          name: entity.name.type.usp
+    - name: entity.name.type.usp
+      match: ([_[:alpha:]][\_\#\_\$_[:alnum:]]*)(?![<>])
   bracketed-argument-list:
     begin: \[
     beginCaptures:
@@ -1266,7 +1296,7 @@ repository:
       '0':
         name: punctuation.squarebracket.close.usp
     patterns:
-    - include: "#argument"
+    - include: "#expression"
     - include: "#punctuation-comma"
   argument-list:
     begin: \(
@@ -1279,12 +1309,67 @@ repository:
         name: punctuation.parenthesis.close.usp
     patterns:
     - include: "#named-argument"
-    - include: "#expressions"
+    - include: "#expression"
     - include: "#punctuation-comma"
   named-argument:
     match: (@?[_[:alpha:]][_[:alnum:]]*)
     name: entity.name.variable.parameter.cs
 
+  assignment-expression:
+    begin: |-
+        (?:([\_[:alpha:]][\_\#\_\$[:alnum:]]*)\s*)(=)
+    beginCaptures:
+      "1":
+        name: entity.name.type.usp
+      "2":
+        name: keyword.operator.assignment.usp
+    end: (?<=;)
+    patterns:
+      - include: "#expression-operator"
+      - include: "#expression-no-assignment"
+
+  expression-operator:
+    patterns:
+      - name: keyword.operator.relational.usp
+        match: <=|>=|<|>|S<=|S>=|S<|S>
+      - name: keyword.operator.arithmetic.usp
+        match: (?i)\+|\-|\*|\/|S\/|%|mod|umod
+      - name: keyword.operator.bitwise.shift.usp
+        match: <<|>>
+      - name: keyword.operator.bitwise.rotate.usp
+        match: \{\{|\}\}
+      - name: keyword.operator.bitwise.usp
+        match: (?i)\&|\^|\|
+      - name: keyword.operator.bitwise.usp
+        match: \!|&&|\|\|
+      - match: (=)
+        name: keyword.operator.comparison.usp        
+      - match: <>
+        name: keyword.operator.relational.usp
+
+  element-access-expression:
+    begin: |-
+      (?x)
+        (?:([\_[:alpha:]][\_\#\_\$[:alnum:]]*)\s*) # property name
+        (?=\[)                              # open bracket of argument list
+    beginCaptures:
+      '1':
+        name: entity.name.type.usp
+    end: (?<=\])(?!\s*\[)
+    patterns:
+    - include: "#bracketed-argument-list"
+
+  parenthesized-expression:
+    begin: \(
+    beginCaptures:
+      '0':
+        name: punctuation.parenthesis.open.cs
+    end: \)
+    endCaptures:
+      '0':
+        name: punctuation.parenthesis.close.cs
+    patterns:
+    - include: "#expression"
 
 #literals
   literals:
@@ -1412,6 +1497,8 @@ repository:
                       lu| #Long_Unsigned_Integer as decimal
                       x|  #Analog_Input, Analog_Output or Integer as lowercase hexadecimal
                       X|  #Analog_Input, Analog_Output or Integer as uppercase hexadecimal
+                      lx| #long Integer as lowercase hexadecimal
+                      lX| #long Integer as uppercase hexadecimal
                       c|  #Printable ASCII character
                     ){1}
                   ) #Print Formatters %[[pad]width]specifier
@@ -1420,76 +1507,35 @@ repository:
           - match: |- #backslash character escape
               (?x)
                  (\\
-                   (?:
-                     a|  #Alert (Beep)
-                     b|  #Backspace
-                     f|  #Form Feed
-                     n|  #Newline
-                     r|  #Carriage Return
-                     t|  #Horizontal Tab
-                     v|  #Vertical Tab
-                   )
+                   [
+                     a  #Alert (Beep)
+                     b  #Backspace
+                     f  #Form Feed
+                     n  #Newline
+                     r  #Carriage Return
+                     t  #Horizontal Tab
+                     v
+                   ] #Vertical Tab
                  ) |
                  (\\
                    (?:
-                     [xX](?:[0-9a-fA-F]){2} |  #Hexadecimal character code
+                     [xX](?:[0-9a-fA-F]){2}  #Hexadecimal character code
                    )
                  ) |
-                 (\\\\) | escaped backslash
+                 (\\\\) #double backslash
             name: constant.character.escape.usp
           - match: .* #invalidate anything that did not match the above
             name: invalid.illegal.character.escape.usp
 
 
-
-
 #punctuation
   punctuation:
     patterns:
-      - include: "#punctuation-arithmetic"
-      - include: "#punctuation-bitwise"
-      - include: "#punctuation-comparison-unequal"
-      - include: "#punctuation-relational"
-      - include: "#punctuation-equal"
       - include: "#punctuation-grouping"
       - include: "#punctuation-structure"
-  punctuation-arithmetic:
-    match: "(?i)\\+|-(?!>)|\\*|\\/|S\\/|%|mod|umod"
-    name: keyword.operator.arithmetic.usp
-  punctuation-bitwise:
-    patterns:
-      - name: keyword.operator.bitwise.shift.usp
-        match: (?i)<<|>>
-      - name: keyword.operator.bitwise.rotate.usp
-        match: "{{|}}"
-      - name: keyword.operator.bitwise.usp
-        match: (?i)\&|not|\^|\|
-      - name: keyword.operator.bitwise.usp
-        match: \!|&&|\|\|
-  punctuation-comparison-unequal:
-    patterns:
-      - name: keyword.operator.comparison.usp
-        match: (<>)
-  punctuation-relational:
-    patterns:
-      - name: keyword.operator.relational.usp
-        match: <=|>=|<|>|S<=|S>=|S<|S>
-  punctuation-equal:
-      begin: "[^=]+(=)"
-      beginCaptures:
-            "1":
-              name: keyword.operator.assignment.usp
-      end: (;)
-      endCaptures:
-            "1":
-              name: punctuation.terminator.statement.usp
-      patterns:
-        - match: (=)
-          name: keyword.operator.comparison.usp
-  punctuation-assignment:
-    patterns:
-    - match: =
-      name: keyword.operator.assignment.usp
+
+
+
   punctuation-grouping:
     patterns:
     - include: "#punctuation-square-bracket"
@@ -1563,29 +1609,9 @@ repository:
     patterns:
     - include: "#comment"
     - include: "#ref-modifier"
-    - include: "#type-builtin"
     - include: "#type-name"
 
-  type-builtin:
-    match: (?ix)\b(integer|long_integer|signed_integer|signed_long_integer|string|structure)\b
-    comment: Crestron Built In Types
-    name: keyword.type.$1.usp
-  type-name:
-    patterns:
-    - match: (?(@?[_[:alpha:]][\_\#\_\$[:alnum:]]*)\s*(\.))
-      captures:
-        '1':
-          name: entity.name.type.usp
-        '2':
-          name: punctuation.accessor.usp
-    - match: (?:(\.)\s*(@?[_[:alpha:]][\_\#\_\$_[:alnum:]]*))
-      captures:
-        '1':
-          name: punctuation.accessor.usp
-        '2':
-          name: entity.name.type.usp
-    - name: entity.name.type.usp
-      match: (@?[_[:alpha:]][\_\#\_\$_[:alnum:]]*)
+
 
   designation-pattern:
     patterns:

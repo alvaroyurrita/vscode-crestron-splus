@@ -3,7 +3,7 @@
 
 * preprocessor
 * comment
-* type-builtin
+* type
 * switch-statement-or-expression
 * assignment-expression
 * expression-operators
@@ -28,23 +28,15 @@ expression-operators
 |= keyword.operator.logical |
 |    && <U+007c><U+007c> |
 |= keyword.operator.bitwise |
-|    &  <U+007c>  ^  Not() |
+|    &  <U+007c>  ^   |
 |= keyword.operator.atithmetic |
 |    + - * / % mod umod |;
 
 
 **:== type
- type-builtin 
-|= keyword.type.$1 |
-| INTEGER\n SIGNED_INTEGER\n LONG_INTEGER\n SIGNED_LONG_INTEGER\n STRING |
-----
 type-name
-|= entity.name.type |
-| name |
-----
-type-array-suffix
-|= punctuation.squarebracket.open |= expression |= punctuation.squarebracket.close |
-|    [     |  intrusive \n punctuation-coma  |   ]  |;
+|= entity.name.type |=punctuation.accessor |= entity.name.type |
+| name | . | name |;
 
 
 **:== intrusive
@@ -95,7 +87,7 @@ assignment-expression
 
 **:= invocation
 invocation-expression
-|= puctuation.accessor  |= entity.name.function | argument-list | punctuation.terminator.statement |
+|= puctuation.accessor  |= entity.name.function | argument-list | punctuation.terminator.invocation |
 | . (optional) | function  |   argument-list  |  ;  |
 ----
 argument-list
@@ -126,9 +118,9 @@ built-in-constants
 |= keyword.support.constant   |
 | _O_APPEND\n _O_CREAT\n _O_EXCL\n _O_TRUNC\n _O_TEXT\n _O_BINARY\n _O_RDONLY\n _O_RDWR\n _O_WRONLY\n ARDONLY\n AHIDDEN\n ASYSTEM\n AVOLUME\n ADIRENT\n ARCHIVE\non \noff |;
 
-**:= built-in-structures
-built-in-constants
-|= keyword.support.constant   |
+**:= built-in-types
+built-in-types
+|= keyword.support.types   |
 | socket_struct\n ramp_info\n file_info|;
 
 **:= built-in-variables

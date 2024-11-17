@@ -34,7 +34,7 @@ structure-declaration
 variable-declaration
 ----
 |= keyword.modifier.variable.usp |= keyword.declaration.variable |= entity.name.variable | array |= punctuation.comma |= punctuation.terminator.variable |
-| optional:\n VOLATILE\n NONVOLATILE\n ASCII\n UTF16\n INHERIT\n DELEGATEPROPERTY | INTEGER\n SIGNED_INTEGER\n LONG_INTEGER\n SIGNED_LONG_INTEGER\n STRING |  \n  name | \n  [count] [size]  |= \n   ,|=  \n     ; |
+| optional:\n VOLATILE\n NONVOLATILE\n ASCII\n UTF16\n INHERIT\n DELEGATEPROPERTY | INTEGER\n SIGNED_INTEGER\n LONG_INTEGER\n SIGNED_LONG_INTEGER\n STRING\n SIMPLSHARPSTRING|  \n  name | \n  [count] [size]  |= \n   ,|=  \n     ; |
 
 |= keyword.support.class |= entity.name.type | array |= punctuation.terminator.variable |
 | CEVENT\n CMUTEX |  name  | [count]  |=     ; |

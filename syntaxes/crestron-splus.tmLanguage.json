@@ -10,7 +10,10 @@
       "include": "#comment"
     },
     {
-      "include": "#declarations"
+      "include": "#preprocessor"
+    },
+    {
+      "include": "#declaration"
     }
   ],
   "repository": {
@@ -736,7 +739,7 @@
         }
       ]
     },
-    "declarations": {
+    "declaration": {
       "patterns": [
         {
           "include": "#input-declaration"
@@ -868,7 +871,7 @@
       "end": "(?x)\n  (?<=;)|    #stop pattern after the semicolon or\n  (?=[{\\(]) #before curly bracket or parenthesis without grabbing any characters",
       "patterns": [
         {
-          "begin": "(?ix)\n  (?:\\s*)\n  (dynamic|volatile|nonvolatile|ascii|utf16|inherit)?\\s*  #Possibly grab modifier\n  (?:\n    (integer|string|long_integer|signed_integer|signed_long_integer|simplsharpstring|delegateproperty)| #grab the variable type or\n    (cevent|cmutex)| #or built in class\n    ([_[:alpha:]][\\#\\$\\_[:alnum:]]*)\\s* #grab the variable name\n  )",
+          "begin": "(?ix)\n  (?:\\s*)\n  (dynamic|volatile|nonvolatile|ascii|utf16|inherit|delegateproperty)?\\s*  #Possibly grab modifier\n  (?:\n    (integer|string|long_integer|signed_integer|signed_long_integer|simplsharpstring)| #grab the built-in variable type or\n    (cevent|cmutex)| #or built in class\n    ([_[:alpha:]][\\#\\$\\_[:alnum:]]*)\\s* #grab the variable name\n  )",
           "beginCaptures": {
             "1": {
               "name": "keyword.modifier.variable.usp"
@@ -880,7 +883,15 @@
               "name": "keyword.support.class.usp"
             },
             "4": {
-              "name": "entity.name.type.usp"
+              "patterns": [
+                {
+                  "include": "#built-in-types"
+                },
+                {
+                  "match": "([\\_[:alpha:]][\\_\\#\\_\\$[:alnum:]]*)",
+                  "name": "entity.name.variable.usp"
+                }
+              ]
             }
           },
           "end": "(?ix)\n  (\\;)  #stop pattern before the closing curly brace or before semicolon without grabbing any characters",
@@ -963,7 +974,7 @@
     },
     "function-declaration": {
       "begin": "(?ix)\n  (?=(?:function|integer_function|string_function|long_integer_function|signed_integer_function|signed_long_integer_function|simplsharpstring)) #start pattern at the beginning of the function keyword without grabbing any characters",
-      "end": "(?ix)\n  (?<=})   #stop pattern after the closing curly brace without grabbing any characters",
+      "end": "(?ix)\n  (?<!\\})\\}(?!\\})   #stop pattern after the closing curly brace without grabbing any characters only when there are no adjacent curly braces to avoid stopping at bitwise rotate right",
       "patterns": [
         {
           "begin": "(?ix)\n  (function|integer_function|string_function|long_integer_function|signed_integer_function|signed_long_integer_function|simplsharpstring)\\b\\s+\n  ([_[:alpha:]][\\#\\$\\_[:alnum:]]*)",
@@ -990,7 +1001,7 @@
               "name": "punctuation.curlybrace.open.usp"
             }
           },
-          "end": "(})",
+          "end": "(?<!\\})(\\})(?!\\})",
           "endCaptures": {
             "1": {
               "name": "punctuation.curlybrace.close.usp"
@@ -999,16 +1010,16 @@
           "name": "meta.function.contents",
           "patterns": [
             {
-              "include": "#variable-declaration"
-            },
-            {
               "include": "#preprocessor"
             },
             {
-              "include": "#statements"
+              "include": "#statement"
             },
             {
               "include": "#comment"
+            },
+            {
+              "include": "#variable-declaration"
             }
           ]
         }
@@ -1069,7 +1080,7 @@
               "name": "keyword.control.event.terminate.usp"
             },
             {
-              "include": "#statements"
+              "include": "#statement"
             },
             {
               "include": "statement"
@@ -1128,7 +1139,7 @@
           "name": "meta.callback.contents",
           "patterns": [
             {
-              "include": "#statements"
+              "include": "#statement"
             },
             {
               "include": "#variable-declaration"
@@ -1439,7 +1450,7 @@
         }
       ]
     },
-    "statements": {
+    "statement": {
       "patterns": [
         {
           "include": "#preprocessor"
@@ -1448,18 +1459,18 @@
           "include": "#comment"
         },
         {
-          "include": "#expressions"
+          "include": "#expression"
         }
       ]
     },
     "branching-and-decision": {
       "patterns": [
         {
-          "include": "#while-statements"
+          "include": "#while-statement"
         }
       ]
     },
-    "while-statements": {
+    "while-statement": {
       "begin": "(?ix)\n  \\b(while)\\b\\s*(?=\\() #Keyword",
       "beginCaptures": {
         "1": {
@@ -1488,20 +1499,45 @@
           ]
         },
         {
-          "include": "#statements"
+          "include": "#statement"
         }
       ]
     },
-    "expressions": {
+    "expression": {
+      "patterns": [
+        {
+          "include": "#assignment-expression"
+        },
+        {
+          "include": "#expression-no-assignment"
+        }
+      ]
+    },
+    "expression-no-assignment": {
       "patterns": [
         {
           "include": "#preprocessor"
         },
         {
+          "include": "#comment"
+        },
+        {
           "include": "#invocation-expression"
         },
         {
+          "include": "#element-access-expression"
+        },
+        {
+          "include": "#built-in-constants"
+        },
+        {
           "include": "#literals"
+        },
+        {
+          "include": "#type-name"
+        },
+        {
+          "include": "#parenthesized-expression"
         }
       ]
     },
@@ -1526,7 +1562,12 @@
           ]
         }
       },
-      "end": "(?xi)\n  (?<=\\)) #stop pattern after the closing parenthesis without grabbing any characters",
+      "end": "(?xi)\n  (;) #stop pattern after the closing parenthesis without grabbing any characters",
+      "endCaptures": {
+        "1": {
+          "name": "punctuation.terminator.invocation.usp"
+        }
+      },
       "patterns": [
         {
           "include": "#argument-list"
@@ -1576,6 +1617,9 @@
         },
         {
           "include": "#functions-exception-handling"
+        },
+        {
+          "include": "#functions-bitwise"
         }
       ]
     },
@@ -1633,6 +1677,10 @@
     },
     "functions-exception-handling": {
       "match": "(?i)\\b(GetExceptionCode|GetExceptionMessage)\\b",
+      "name": "keyword.support.function.usp"
+    },
+    "functions-bitwise": {
+      "match": "(?i)\\b(not)\\b",
       "name": "keyword.support.function.usp"
     },
     "built-in-void-functions": {
@@ -1731,12 +1779,46 @@
       "name": "keyword.support.function.usp"
     },
     "built-in-variables": {
-      "match": "(?ix)\n\\b(_oem_break|_oem_cd|_oem_cts|_oem_dtr|_oem_long_break|_oem_max_string|_oem_pacing|\n_oem_rts|_oem_str_in|_oem_str_out|FILE_INFO)\\b",
+      "match": "(?ix)\n  \\b(_oem_break|_oem_cd|_oem_cts|_oem_dtr|_oem_long_break|_oem_max_string|_oem_pacing|\n  _oem_rts|_oem_str_in|_oem_str_out|FILE_INFO)\\b",
+      "name": "keyword.support.variable.usp"
+    },
+    "built-in-types": {
+      "match": "(?ix)\n  \\b(FILE_INFO|ramp_info)\\b",
       "name": "keyword.support.variable.usp"
     },
     "built-in-constants": {
-      "match": "(?ix)\n\\b(_O_APPEND|_O_CREAT|_O_EXCL|_O_TRUNC|_O_TEXT|_O_BINARY|_O_RDONLY|_O_RDWR|_O_WRONLY|ARDONLY|AHIDDEN|ASYSTEM|AVOLUME|ADIRENT|ARCHIVE|ON|OFF)\\b",
+      "match": "(?ix)\n  \\b(_O_APPEND|_O_CREAT|_O_EXCL|_O_TRUNC|_O_TEXT|_O_BINARY|_O_RDONLY|_O_RDWR|_O_WRONLY|ARDONLY|AHIDDEN|ASYSTEM|AVOLUME|ADIRENT|ARCHIVE|ON|OFF)\\b",
       "name": "keyword.support.constant.usp"
+    },
+    "type-name": {
+      "patterns": [
+        {
+          "match": "([_[:alpha:]][\\_\\#\\_\\$[:alnum:]]*)\\s*(\\.)",
+          "captures": {
+            "1": {
+              "name": "entity.name.type.usp"
+            },
+            "2": {
+              "name": "punctuation.accessor.usp"
+            }
+          }
+        },
+        {
+          "match": "(\\.)\\s*([_[:alpha:]][\\_\\#\\_\\$_[:alnum:]]*)(?![<>])",
+          "captures": {
+            "1": {
+              "name": "punctuation.accessor.usp"
+            },
+            "2": {
+              "name": "entity.name.type.usp"
+            }
+          }
+        },
+        {
+          "name": "entity.name.type.usp",
+          "match": "([_[:alpha:]][\\_\\#\\_\\$_[:alnum:]]*)(?![<>])"
+        }
+      ]
     },
     "bracketed-argument-list": {
       "begin": "\\[",
@@ -1753,7 +1835,7 @@
       },
       "patterns": [
         {
-          "include": "#argument"
+          "include": "#expression"
         },
         {
           "include": "#punctuation-comma"
@@ -1778,7 +1860,7 @@
           "include": "#named-argument"
         },
         {
-          "include": "#expressions"
+          "include": "#expression"
         },
         {
           "include": "#punctuation-comma"
@@ -1788,6 +1870,95 @@
     "named-argument": {
       "match": "(@?[_[:alpha:]][_[:alnum:]]*)",
       "name": "entity.name.variable.parameter.cs"
+    },
+    "assignment-expression": {
+      "begin": "(?:([\\_[:alpha:]][\\_\\#\\_\\$[:alnum:]]*)\\s*)(=)",
+      "beginCaptures": {
+        "1": {
+          "name": "entity.name.type.usp"
+        },
+        "2": {
+          "name": "keyword.operator.assignment.usp"
+        }
+      },
+      "end": "(?<=;)",
+      "patterns": [
+        {
+          "include": "#expression-operator"
+        },
+        {
+          "include": "#expression-no-assignment"
+        }
+      ]
+    },
+    "expression-operator": {
+      "patterns": [
+        {
+          "name": "keyword.operator.relational.usp",
+          "match": "<=|>=|<|>|S<=|S>=|S<|S>"
+        },
+        {
+          "name": "keyword.operator.arithmetic.usp",
+          "match": "(?i)\\+|\\-|\\*|\\/|S\\/|%|mod|umod"
+        },
+        {
+          "name": "keyword.operator.bitwise.shift.usp",
+          "match": "<<|>>"
+        },
+        {
+          "name": "keyword.operator.bitwise.rotate.usp",
+          "match": "\\{\\{|\\}\\}"
+        },
+        {
+          "name": "keyword.operator.bitwise.usp",
+          "match": "(?i)\\&|\\^|\\|"
+        },
+        {
+          "name": "keyword.operator.bitwise.usp",
+          "match": "\\!|&&|\\|\\|"
+        },
+        {
+          "match": "(=)",
+          "name": "keyword.operator.comparison.usp"
+        },
+        {
+          "match": "<>",
+          "name": "keyword.operator.relational.usp"
+        }
+      ]
+    },
+    "element-access-expression": {
+      "begin": "(?x)\n  (?:([\\_[:alpha:]][\\_\\#\\_\\$[:alnum:]]*)\\s*) # property name\n  (?=\\[)                              # open bracket of argument list",
+      "beginCaptures": {
+        "1": {
+          "name": "entity.name.type.usp"
+        }
+      },
+      "end": "(?<=\\])(?!\\s*\\[)",
+      "patterns": [
+        {
+          "include": "#bracketed-argument-list"
+        }
+      ]
+    },
+    "parenthesized-expression": {
+      "begin": "\\(",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.parenthesis.open.cs"
+        }
+      },
+      "end": "\\)",
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.parenthesis.close.cs"
+        }
+      },
+      "patterns": [
+        {
+          "include": "#expression"
+        }
+      ]
     },
     "literals": {
       "patterns": [
@@ -1929,11 +2100,11 @@
               "end": "$",
               "patterns": [
                 {
-                  "match": "(?x)\n  (%%) |  # Prints % or\n  (%\n    (?:\n      (?:[0-9]?[0-9])? #[[pad]width]\n      (?:\n        d|  #Signed Analog_Input, Analog_Output or Integer as decimal\n        s|  #Buffer_Input, String_Input or String\n        u|  #Unsigned Analog_Input, Analog_Output or integer\n        ld| #Long_Integer as decimal\n        lu| #Long_Unsigned_Integer as decimal\n        x|  #Analog_Input, Analog_Output or Integer as lowercase hexadecimal\n        X|  #Analog_Input, Analog_Output or Integer as uppercase hexadecimal\n        c|  #Printable ASCII character\n      ){1}\n    ) #Print Formatters %[[pad]width]specifier\n  )",
+                  "match": "(?x)\n  (%%) |  # Prints % or\n  (%\n    (?:\n      (?:[0-9]?[0-9])? #[[pad]width]\n      (?:\n        d|  #Signed Analog_Input, Analog_Output or Integer as decimal\n        s|  #Buffer_Input, String_Input or String\n        u|  #Unsigned Analog_Input, Analog_Output or integer\n        ld| #Long_Integer as decimal\n        lu| #Long_Unsigned_Integer as decimal\n        x|  #Analog_Input, Analog_Output or Integer as lowercase hexadecimal\n        X|  #Analog_Input, Analog_Output or Integer as uppercase hexadecimal\n        lx| #long Integer as lowercase hexadecimal\n        lX| #long Integer as uppercase hexadecimal\n        c|  #Printable ASCII character\n      ){1}\n    ) #Print Formatters %[[pad]width]specifier\n  )",
                   "name": "constant.character.escape.usp"
                 },
                 {
-                  "match": "(?x)\n   (\\\\\n     (?:\n       a|  #Alert (Beep)\n       b|  #Backspace\n       f|  #Form Feed\n       n|  #Newline\n       r|  #Carriage Return\n       t|  #Horizontal Tab\n       v|  #Vertical Tab\n     )\n   ) |\n   (\\\\\n     (?:\n       [xX](?:[0-9a-fA-F]){2} |  #Hexadecimal character code\n     )\n   ) |\n   (\\\\\\\\) | escaped backslash",
+                  "match": "(?x)\n   (\\\\\n     [\n       a  #Alert (Beep)\n       b  #Backspace\n       f  #Form Feed\n       n  #Newline\n       r  #Carriage Return\n       t  #Horizontal Tab\n       v\n     ] #Vertical Tab\n   ) |\n   (\\\\\n     (?:\n       [xX](?:[0-9a-fA-F]){2}  #Hexadecimal character code\n     )\n   ) |\n   (\\\\\\\\) #double backslash",
                   "name": "constant.character.escape.usp"
                 },
                 {
@@ -1949,93 +2120,10 @@
     "punctuation": {
       "patterns": [
         {
-          "include": "#punctuation-arithmetic"
-        },
-        {
-          "include": "#punctuation-bitwise"
-        },
-        {
-          "include": "#punctuation-comparison-unequal"
-        },
-        {
-          "include": "#punctuation-relational"
-        },
-        {
-          "include": "#punctuation-equal"
-        },
-        {
           "include": "#punctuation-grouping"
         },
         {
           "include": "#punctuation-structure"
-        }
-      ]
-    },
-    "punctuation-arithmetic": {
-      "match": "(?i)\\+|-(?!>)|\\*|\\/|S\\/|%|mod|umod",
-      "name": "keyword.operator.arithmetic.usp"
-    },
-    "punctuation-bitwise": {
-      "patterns": [
-        {
-          "name": "keyword.operator.bitwise.shift.usp",
-          "match": "(?i)<<|>>"
-        },
-        {
-          "name": "keyword.operator.bitwise.rotate.usp",
-          "match": "{{|}}"
-        },
-        {
-          "name": "keyword.operator.bitwise.usp",
-          "match": "(?i)\\&|not|\\^|\\|"
-        },
-        {
-          "name": "keyword.operator.bitwise.usp",
-          "match": "\\!|&&|\\|\\|"
-        }
-      ]
-    },
-    "punctuation-comparison-unequal": {
-      "patterns": [
-        {
-          "name": "keyword.operator.comparison.usp",
-          "match": "(<>)"
-        }
-      ]
-    },
-    "punctuation-relational": {
-      "patterns": [
-        {
-          "name": "keyword.operator.relational.usp",
-          "match": "<=|>=|<|>|S<=|S>=|S<|S>"
-        }
-      ]
-    },
-    "punctuation-equal": {
-      "begin": "[^=]+(=)",
-      "beginCaptures": {
-        "1": {
-          "name": "keyword.operator.assignment.usp"
-        }
-      },
-      "end": "(;)",
-      "endCaptures": {
-        "1": {
-          "name": "punctuation.terminator.statement.usp"
-        }
-      },
-      "patterns": [
-        {
-          "match": "(=)",
-          "name": "keyword.operator.comparison.usp"
-        }
-      ]
-    },
-    "punctuation-assignment": {
-      "patterns": [
-        {
-          "match": "=",
-          "name": "keyword.operator.assignment.usp"
         }
       ]
     },
@@ -2162,45 +2250,7 @@
           "include": "#ref-modifier"
         },
         {
-          "include": "#type-builtin"
-        },
-        {
           "include": "#type-name"
-        }
-      ]
-    },
-    "type-builtin": {
-      "match": "(?ix)\\b(integer|long_integer|signed_integer|signed_long_integer|string|structure)\\b",
-      "comment": "Crestron Built In Types",
-      "name": "keyword.type.$1.usp"
-    },
-    "type-name": {
-      "patterns": [
-        {
-          "match": "(?(@?[_[:alpha:]][\\_\\#\\_\\$[:alnum:]]*)\\s*(\\.))",
-          "captures": {
-            "1": {
-              "name": "entity.name.type.usp"
-            },
-            "2": {
-              "name": "punctuation.accessor.usp"
-            }
-          }
-        },
-        {
-          "match": "(?:(\\.)\\s*(@?[_[:alpha:]][\\_\\#\\_\\$_[:alnum:]]*))",
-          "captures": {
-            "1": {
-              "name": "punctuation.accessor.usp"
-            },
-            "2": {
-              "name": "entity.name.type.usp"
-            }
-          }
-        },
-        {
-          "name": "entity.name.type.usp",
-          "match": "(@?[_[:alpha:]][\\_\\#\\_\\$_[:alnum:]]*)"
         }
       ]
     },
