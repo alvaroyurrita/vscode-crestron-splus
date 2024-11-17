@@ -4,137 +4,151 @@
 
 // Single Line Comment
 
-//Numeric literals
-0x12AC
-0X123
-0x123
-1234
--2
-jkjk 123 jkjk
-jkj 0xabc fjkj
+#IF_DEFINED dfdfdf
 
-//Illegal Numeric literals
-1234f  //c# floating point cast
-123.459  //floating point
-jkjk 123jkj  //malformed
-jkj 0xABCcfjkj //malformed
-1234e-4 //exponential
-1234E5 //exponential
+#ENDIF
 
-//Character Literal
-'d'
+FUNCTION MyFunction(){
 
-//Illegal Charcter Literal
-'dd'
-'d
-'x034df3'
+	#IF_DEFINED dfdfdf
 
-//string Literal
-print("hello world");
-print("\a \b \f \n \r \t \x34 ");
-print("\a");
-print("\b");
-print("\f");
-print("\n");
-print("\r");
-print("\t");
-print("\v");
-print("\xFA91");
-print("\xFA9");
-print("\xFA");
+	#ENDIF
 
+	#IF_NOT_DEFINED
 
-print("string: %s %4s %04s \n", s, s, s);
-print("signed decimal %d %4d %04d \n", si, si, si);
-print("unsigned %u %4u %04u \n", i, i, i);
-print("hex %x %2x %02x \n", i, i, i);
-print("HEX %X %2X %02X \n", i, i, i);
-print("lis decimal %ld %9ld %09ld \n", sli, sli, sli);
-print("liu decimal %lu %9lu %09lu \n", li, li, li);
-print("%% \n");
-print("%c %2c %02c \n", i, i, i);
+	#ENDIF	
 
-//Illegal string literals
-print("\c");
-print("\xF");
-print("\d");
-print("\e");
-print("\g");
-print("\h");
-print("\i");
-print("\j");
-print("\k");
-print("\l");
-print("\m");
-print("\o");
-print("\p");
-print("\q");
-print("\s");
-print("\u");
-print("\w");
-print("\y");
-print("\z");
-print("%12lx", li);
-print("%12lx", li);
-print("%12lX", li);
-print("%12m", li);
-print("%m", li);
-
-//punctuation
-
-//Arithmetic
--
-*
-/
-S/
-MOD
-UMOD
-%
-+
--
-
-//bitwise
-<<
->>
-{{
-}}
-NOT
-&
-|
-^
-!
-&&
-||
- 
-//comaprison
-=
-<>
-
-//relational
-<
->
-<=
->=
-S<
-S>
-S<=
-S>=
-
-
-//assignment
-=
-
-//grouping
-{ }
-[ ]
-( )
-
-//structure
-,
-;
-.
-
-
+	//Numeric literals
+	0x12AC
+	0X123
+	0x123
+	1234
+	-2
+	jkjk 123 jkjk
+	jkj 0xabc fjkj
+	
+	//Illegal Numeric literals
+	1234f  //c# floating point cast
+	123.459  //floating point
+	jkjk 123jkj  //malformed
+	jkj 0xABCcfjkj //malformed
+	1234e-4 //exponential
+	1234E5 //exponential
+	
+	//Character Literal
+	'd'
+	
+	//Illegal Charcter Literal
+	'dd'
+	'd
+	'x034df3'
+	
+	//string Literal
+	print("hello world");
+	print("\a \b \f \n \r \t \x34 ");
+	print("\a");
+	print("\b");
+	print("\f");
+	print("\n");
+	print("\r");
+	print("\t");
+	print("\v");
+	print("\xFA91");
+	print("\xFA9");
+	print("\xFA");
+	
+	
+	print("string: %s %4s %04s \n", s, s, s);
+	print("signed decimal %d %4d %04d \n", si, si, si);
+	print("unsigned %u %4u %04u \n", i, i, i);
+	print("hex %x %2x %02x \n", i, i, i);
+	print("HEX %X %2X %02X \n", i, i, i);
+	print("lis decimal %ld %9ld %09ld \n", sli, sli, sli);
+	print("liu decimal %lu %9lu %09lu \n", li, li, li);
+	print("%% \n");
+	print("%c %2c %02c \n", i, i, i);
+	
+	//Illegal string literals
+	print("\c");
+	print("\xF");
+	print("\d");
+	print("\e");
+	print("\g");
+	print("\h");
+	print("\i");
+	print("\j");
+	print("\k");
+	print("\l");
+	print("\m");
+	print("\o");
+	print("\p");
+	print("\q");
+	print("\s");
+	print("\u");
+	print("\w");
+	print("\y");
+	print("\z");
+	print("%12lx", li);
+	print("%12lx", li);
+	print("%12lX", li);
+	print("%12m", li);
+	print("%m", li);
+	
+	//punctuation
+	
+	//Arithmetic
+	-
+	*
+	/
+	S/
+	MOD
+	UMOD
+	%
+	+
+	-
+	
+	//bitwise
+	<<
+	>>
+	{{
+	}}
+	NOT
+	&
+	|
+	^
+	!
+	&&
+	||
+	
+	//comaprison
+	=
+	<>
+	
+	//relational
+	<
+	>
+	<=
+	>=
+	S<
+	S>
+	S<=
+	S>=
+	
+	
+	//assignment
+	=
+	
+	//grouping
+	{ }
+	[ ]
+	( )
+	
+	//structure
+	,
+	;
+	.
+	
+}
 
 
 
@@ -201,33 +215,33 @@ line_n
 
 //Parameter Properties
 #BEGIN_PARAMETER_PROPERTIES StringParameter1, StringParameter2
-	#propValidUnits =  unitString; 
-	#propValidUnits =  unitDecimal|unitHex|unitPercent|unitCharacter|unitTime|unitTicks; 
-	#propDefaultUnits =  unitString;
-	#propDefaultUnits =  unitHex;
-	#propDefaultUnits =  unitPercent;
-	#propDefaultUnits =  unitCharacter;
-	#propDefaultUnits =  unitTime;
-	#propDefaultUnits =  unitTicks;
-	#propDefaultValue =  "string";
-	#propDefaultValue =  25d;
-	#propDefaultValue =  25h;
-	#propDefaultValue =  25%;
-	#propDefaultValue =  'a';
-	#propDefaultValue =  25s;
-	#propDefaultValue =  25t;
-	#propList = { 25d , "label" } , { 25h, "label" } , { 25%, "label" } , { 'a' , "label" } , { 25s, "label" } , { 25t , "label" } , { "helloLabel", "label" };
-	#propShortDescription = "status_bar_hint_text for StringParameter1";
-	#BEGIN_PROP_FULL_DESCRIPTION  
-		line_1...  
-		line_2...  
-		line_n  
-	#END_PROP_FULL_DESCRIPTION
-	#BEGIN_PROP_NOTES 
-		line_1...  
-		line_2...  
-		line_n  
-	#END_PROP_NOTES
+#propValidUnits =  unitString; 
+#propValidUnits =  unitDecimal|unitHex|unitPercent|unitCharacter|unitTime|unitTicks; 
+#propDefaultUnits =  unitString;
+#propDefaultUnits =  unitHex;
+#propDefaultUnits =  unitPercent;
+#propDefaultUnits =  unitCharacter;
+#propDefaultUnits =  unitTime;
+#propDefaultUnits =  unitTicks;
+#propDefaultValue =  "string";
+#propDefaultValue =  25d;
+#propDefaultValue =  25h;
+#propDefaultValue =  25%;
+#propDefaultValue =  'a';
+#propDefaultValue =  25s;
+#propDefaultValue =  25t;
+#propList = { 25d , "label" } , { 25h, "label" } , { 25%, "label" } , { 'a' , "label" } , { 25s, "label" } , { 25t , "label" } , { "helloLabel", "label" };
+#propShortDescription = "status_bar_hint_text for StringParameter1";
+#BEGIN_PROP_FULL_DESCRIPTION  
+line_1...  
+line_2...  
+line_n  
+#END_PROP_FULL_DESCRIPTION
+#BEGIN_PROP_NOTES 
+line_1...  
+line_2...  
+line_n  
+#END_PROP_NOTES
 #END_PARAMETER_PROPERTIES
 
 //Declarations
@@ -293,7 +307,7 @@ FUNCTION MyFunction1(ByRef INTEGER myvar1,  LONG_INTEGER myvar2, SIGNED_INTEGER 
 	SIGNED_LONG_INTEGER Variable10, Variable11[4], Variable12[4][2];
 	STRING Variable13$[6], Variable14[4][6];
 	mySruct internalStruct1, internalStuct2[10];
-
+	
 	//Local Function Call
 	MyFunction1(Variable#1, Variable4, Variable7, variable10, internalStruct);
 }
@@ -314,12 +328,16 @@ SIGNED_INTEGER_FUNCTION MyFunction4(string myvar1, string myvar2[])
 SIGNED_LONG_INTEGER_FUNCTION MyFunction5()
 {
 	//statements
-
+	
 }
 STRING_FUNCTION MyFunction6()
 {
 	//statements
-
+	#INCLUDEPATH "Name"
+	
+	
+	STRING Variable13$[6], Variable14[4][6];
+	
 }
 
 //callback declarations
@@ -334,7 +352,7 @@ CALLBACK FUNCTION MyFunction1(ByRef INTEGER myvar1,  LONG_INTEGER myvar2, SIGNED
 	SIGNED_LONG_INTEGER Variable10, Variable11[4], Variable12[4][2];
 	STRING Variable13$[6], Variable14[4][6];
 	mySruct internalStruct1, internalStuct2[10];
-
+	
 	//Local Function Call
 	MyFunction1(Variable#1, Variable4, Variable7, variable10, internalStruct);
 }
@@ -355,12 +373,12 @@ SIGNED_INTEGER_FUNCTION MyFunction4(string myvar1, string myvar2[])
 SIGNED_LONG_INTEGER_FUNCTION MyFunction5()
 {
 	//statements
-
+	
 }
 STRING_FUNCTION MyFunction6()
 {
 	//statements
-
+	
 }
 
 
@@ -493,6 +511,42 @@ LONG_INTEGER_FUNCTION LongIntegerFunction1()
 FUNCTION LoopingConstructs()
 {
 	INTEGER a;
+
+	// encoding functions
+	d = GetEncoding(a);
+	SetEncoding(a,ENCODING_ASCII);
+	b = ToASCII(a);
+	b = ToUTF16(a);
+
+	//string parsing functions
+	ClearBuffer(BufferInput1);
+	c =CompareStrings(a,b);
+	c = CompareStringsNoCase(a,b);
+	d = Find("a",a,1);
+	d = FindNoCase("a",a,1);
+	a = Gather("a",BufferInput1,10);
+	c = GatherAsync("a",BufferInput1,MyGatherCallback,10);
+	c = GatherAsyncByLength(5,BufferInput1,MyGatherCallback,10);
+	b = GatherByLength(5,BufferInput1,10);
+	c = GatherByLengthWithDest(5,BufferInput1,b,10);
+	a = Left(a,3);
+	d = Len(a);
+	b = Lower(a);
+	a = Mid(a,1,2);
+	c = RearmGatherAsync(BufferInput1);
+	b = Remove("a",a,1);
+	b = RemoveByLength(3,a);
+	c = RemoveGatherAsync(BufferInput1);
+	c = ResizeString(a,20);
+	d = ReverseFind(a,"d",0);
+	d = ReverseFindNoCase(a,"d",0); 
+	b = Right(a,5);
+	b = Upper(a);
+	
+	WHILE(a<5)
+	{
+		
+	}
 	
 	FOR (a = 1 TO 5 STEP 1)
 	{
@@ -500,11 +554,7 @@ FUNCTION LoopingConstructs()
 		CONTINUE;
 	}
 	a = 0;
-	WHILE(a<5)
-	{
-		a=a+1;
-		PRINT("");
-	}
+	
 	
 	a=0;
 	do
@@ -585,7 +635,7 @@ callback GatherEventHandler MyGatherCallback(GatherEventArgs Args)
 	Test("test %d %s %u %s %x %X %ld %lu %% %adf");
 	Test("test %1d %12s %3u %32s %x %X %2ld %1lu %%");
 	Test("test %133d %1233s %3333u %32333s %33x %33X %2333ld %3331lu %%");
-    Test("\n \t \b \r \f\ \a \\ \' \" \x23 ");
+	Test("\n \t \b \r \f\ \a \\ \' \" \x23 ");
 }
 
 Function Test1(byRef Param1, byval Param2, ReadOnlyByRef Param3)
@@ -597,33 +647,7 @@ Function StringParsingAndManipulations()
 	INTEGER d;
 	SIGNED_INTEGER c;
 	
-	ClearBuffer(BufferInput1);
-	c =CompareStrings(a,b);
-	c = CompareStringsNoCase(a,b);
-	d = Find("a",a,1);
-	d = FindNoCase("a",a,1);
-	a = Gather("a",BufferInput1,10);
-	c = GatherAsync("a",BufferInput1,MyGatherCallback,10);
-	c = GatherAsyncByLength(5,BufferInput1,MyGatherCallback,10);
-	b = GatherByLength(5,BufferInput1,10);
-	c = GatherByLengthWithDest(5,BufferInput1,b,10);
-	d = GetEncoding(a);
-	a = Left(a,3);
-	d = Len(a);
-	b = Lower(a);
-	a = Mid(a,1,2);
-	c = RearmGatherAsync(BufferInput1);
-	b = Remove("a",a,1);
-	b = RemoveByLength(3,a);
-	c = RemoveGatherAsync(BufferInput1);
-	c = ResizeString(a,20);
-	d = ReverseFind(a,"d",0);
-	d = ReverseFindNoCase(a,"d",0); 
-	b = Right(a,5);
-	SetEncoding(a,ENCODING_ASCII);
-	b = ToASCII(a);
-	b = ToUTF16(a);
-	b = Upper(a);
+	
 }
 
 FUNCTION SystemControl()
@@ -746,6 +770,72 @@ FUNCTION BitAndByteFunctions()
 	a= LowerChar(12);
 	a= UpperChar(12);
 	a= SetByte(c,1,2);
+}
+
+Function FileFunctions()
+{
+	a = IsNull(cMutexClass);
+	
+	a=StartFileOperations();
+	nFileHandle = FileOpen ( "\\CF0\\MyFile", _O_WRONLY | _O_TEXT );
+		nNumWritten=FileWrite( nFileHandle, sBuf, 500 );
+		FileClose( nFileHandle );
+	a=EndFileOperations();
+	a=StartFileOperations();
+	FileEOF ( nFileHandle ) ;
+	a= SEEK_SET | SEEK_CUR | SEEK_END;
+	FileSeek( nFileHandle, 0, SEEK_SET) 
+	FileClose ( nFileHandle ) ;
+	FileDelete ( "\\CF0\\MyFile" ) 
+	nFileHandle = FileOpen ( "\\CF0\\MyFile", _O_RDONLY | _O_TEXT);
+	FileBOF ( nFileHandle ) 
+	FileRead(nFileHandle, sBuf, 4096)
+	iErrorCode = ReadString( nFileHandle, s2);
+	iErrorCode = WriteStringArray( nFileHandle, s);
+	iErrorCode = ReadStringArray( nFileHandle, s);
+	iErrorCode = WriteSignedLongInteger(nFileHandle, sli);
+	iErrorCode = WriteLongInteger(nFileHandle, li);
+	iErrorCode = WriteInteger(nFileHandle, i);
+	iErrorCode = WriteString( nFileHandle, s2);
+	iErrorCode = ReadSignedLongIntegerArray(nFileHandle, sliArray);
+	iErrorCode = ReadIntegerArray(nFileHandle, iArray);
+	iErrorCode = ReadSignedIntegerArray(nFileHandle, isArray);
+	iErrorCode = ReadLongIntegerArray(nFileHandle, ilArray);
+	iErrorCode = ReadIntegerArray(nFileHandle, iArray);
+	iErrorCode = ReadSignedLongInteger(nFileHandle, sli);
+	iErrorCode = ReadSignedInteger(nFileHandle, si);
+	iErrorCode = ReadLongInteger(nFileHandle, li);
+	iErrorCode = ReadInteger(nFileHandle, i);
+	ReadStructure( nFileHandle, struct, nTotalBytesRead );
+		
+	WaitForNewDisk() 
+	FileDeleteShared ( "\\CF0\\MyFile" )
+	a = ARDONLY | AHIDDEN | ASYSTEM | AVOLUME | ADIRENT | ARCHIVE  ;      
+	(FileInfo.iAttributes & ADIRENT)
+	CheckForNVRAMDisk() 
+	MakeDirectoryShared("NewDirect") 
+	RemoveDirectoryShared("\\CF0\\NewDirect") 
+	CheckForDisk () 
+	GetCurrentDirectory()
+	SetCurrentDirectory("\\CF0\\NewDirect")
+	RemoveDirectory("\\CF0\\NewDirect") 
+	MakeDirectory("NewDirect") 
+	FindFirst("*.dat", FileInfo );
+	IsVolume(FileInfo)
+	IsSystem(FileInfo)
+	IsReadOnly(FileInfo)
+	Found = FindNext(FileInfo);
+	IsDirectory(FileInfo)
+	IsHidden(FileInfo)
+	iErrorCode = WriteSignedIntegerArray(nFileHandle, isArray);
+	FindClose() < 0 
+	a = _O_APPEND | _O_CREAT | _O_EXCL | _O_TRUNC | _O_TEXT | _O_BINARY | _O_RDONLY | _O_RDWR | _O_WRONLY;
+	
+	s2 = FileInfo.Name;
+	a = FileInfo.iAttributes;
+	a = FileInfo.iTime;
+	a = FileInfo.iDate;
+	li = FileInfo.lSize;
 }
 
 FUNCTION FileFunctions()

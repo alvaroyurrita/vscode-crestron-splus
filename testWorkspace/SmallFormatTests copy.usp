@@ -1,17 +1,27 @@
-class test {
-        
-};
+#IF_DEFINED dfdfdf
 
-namespace SampleSimplSharpLibrary;
-{
-    class test {
-        SIGNED_LONG_INTEGER intSampleField;
-        
-    };
+#ENDIF
 
-}
+#IF_NOT_DEFINED
 
-namespace test
-{
+#ENDIF
 
+FUNCTION myfunction(){
+	"test"
+	10
+	
+	#IF_DEFINED dfdfdf
+
+	#ENDIF
+	a = ATOI("Hello", test, 45);
+	c = ATOL("Hello");
+	b = Chr(10);
+	a = HexToI("ABCD");
+	c = HexToL("ABCDabcd");
+	d = HexToSI ("ABCD");
+	e = HexToSL ("ABCDabcd");
+	b = ITOA(25);
+	b = ITOHex(14);
+	b = LtoA(10000000);
+	b = LtoHex(10000000); 
 }

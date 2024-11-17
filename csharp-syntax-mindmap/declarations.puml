@@ -46,7 +46,7 @@ variable-declaration
 **:== meta.declaration.function.usp
 function-declaration
 ----
-|= keyword.declaration.function |= entity.name.variable.function |= meta.delegate.parameters |= meta.function.contents |
+|= keyword.declaration.function |= entity.name.variable.function |= meta.function.parameters |= meta.function.contents |
 | FUNCTION\n INTEGER_FUNCTION\n SIGNED_INTEGER_FUNCTION\n LONG_INTEGER_FUNCTION\n SIGNED_LONG_INTEGER_FUNCTION\n STRING_FUNCTION \n SIMPLSHARPSTRING_FUNCTION  |  \n  name | \n  parenthesized-parameter-list | \n  {..statements..}  |;
 
 **:== meta.declaration.event.usp

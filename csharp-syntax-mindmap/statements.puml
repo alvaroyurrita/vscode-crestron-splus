@@ -1,30 +1,97 @@
 @startmindmap
-+ statements
-++ Looping
-+++_ while(expression){ statements; [continue|break] }
-+++_ do{ statements; [continue|break] } until(expression);
-+++_ for(<variable> = <start_expression> TO <end_expression> \n[STEP <step_expression>])){ statements; [continue|break] }
-++ wait
-+++_ WAIT(<integer|long integer expression>, string identifier){ statements; }
-+++_ RetimeWait(<integer|long integer expression>, string identifier);
-+++_ CANCELWAIT(identifier);
-+++_ CancelAllWait();
-+++_ PauseWait(identifier);
-+++_ ResumeWait(identifier);
-+++_ ResumeAllWait();
-++ branching and decissoin
-+++_ IF(expression){ statements; }ELSE { statements; }
-+++_ IF(expression){ statements; }ELSE IF { statements; }
-+++_ IF(expression){ statements; }ELSE IF { statements; } ELSE { statements; }
-+++_ SWITCH(integer expression ){ (case expression: {statements};)* default: {statements} }
-+++_ CSWITCH(integer expression ){ (case constant: {statements} break;)* default: {statements} }
-++ exception handling
-+++_ TRY{ statements; } CATCH{ statements; }
-++ variable assignments
-++ local variable declarations
-++ Built In Function Call
-++ User Defined Function Call
-++ CSharp type.method call
+*:= statements
+* preprocessor
+* comment
+* while-statement
+* do-statement
+* for-statement
+* if-statement
+* else-part
+* switch-statement-or-expression
+* return-statement
+* break-or-continue-statement
+* variable-declaration
+* condtional-compilation
+* block
+* expression
+* punctuation-semicolon
+* void-function-call
+* built-in-void-function-call
+* user-function-call
+* user-sharp-function-call
+
+;
+
+**:== looping
+while-statements
+|= keyword.control.loop.while |= punctuation.parenthesis.open | expression |= punctuation.parenthesis.close |= punctuation.curlybracket.open | statements |= punctuation.curlybracket.close |
+| while |     ( | expression |    )  |     { | statements |   } |
+
+do-statements
+|= keyword.control.loop.do |= punctuation.curlybracket.open | statements |= punctuation.curlybracket.close |= keyword.control.loop.until |=  punctuation.parenthesis.open | expression | punctuation.parenthesis.close |= punctuation.terminator.statement |
+| do |     { | statements |        } | until |   ( | expression |    )  |  ; |
+
+for-statements
+|= keyword.control.loop.for |= punctuation.parenthesis.open | variable |= keyword.control.loop.to | start_expression | keyword.control.loop.step | step_expression | punctuation.parenthesis.close | punctuation.curlybracket.open | statements |= punctuation.curlybracket.open | statement | punctuation.curlybracket.close |
+| for |     ( | variable |     = | expression | TO | expression | STEP | expression |     ) |     { | statements |     } |;
+
+**:= local-function declaration
+built-in
+|= keyword.support.function |= meta.function.parameters |= punctuation.curlybracket.open | statements |= punctuation.curlybracket.close |
+| WAIT |  argument-list | {  | statements |  }  |;
+
+**:= void function call
+built-in-void-functions
+|= keyword.support.function |= meta.function.parameters  |= punctuation.terminator.statement |
+| random-number\n sring-parsing\n system-control\n system-interfacing\n wait\n string formatting and printing\n file\n time-and-date\n ramping\n encoding\n delegate handling\n event handling\n array opperations |  argument-list |  ;  |
+user-void-function-call
+|= entity.name.function |= meta.function.parameters  |= punctuation.terminator.statement |
+| name |  argument-list |  ;  |
+user-sharp-function-call
+|= entity.name.type |= punctuation.accessor |= entity.name.function |= meta.function.parameters  |= punctuation.terminator.statement |
+| type name | . | name |  argument-list |  ;  |
+----
+argument-list
+|= punctuation.parenthesis.open | elements |= punctuation.parenthesis.open  |
+| (  | named-argument \n expression \n punctuation-comma | )  |;
+
+**:= branching and decision
+if-statement
+|= keyword.control.branch.if |= punctuation.parenthesis.open | expression |= punctuation.parenthesis.close |= punctuation.curlybracket.open | statements |= punctuation.curlybracket.close |
+| if |     ( | expression |    )  |     { | statements |   } |
+else-part
+|= keyword.control.branch.else |= punctuation.curlybracket.open | statements |= punctuation.curlybracket.close |
+| else |     { | statements |   } |
+switch-statement-or-expression
+|= keyword.control.branch.switch  | switch-statement |= punctuation.curlybracket.open | switch-extpression  |= punctuation.curlybracket.close |
+| switch \n cswitch | switch-statement |      { | switch-body-statement |    } |
+switch-statement
+|= punctuation.parenthesis.open |  expression |= punctuation.parenthesis.close |
+| ( | expression |      ) |
+switch-body-statement
+|= keyword.control.conditional.$1.case | expression |= punctuation.colon |= punctuation.curlybracket.open | statements |= punctuation.curlybracket.close |
+| case \n default | expression \n constant | : |  { | statements |  }  |  ; |;
+
+**:= flow control
+return-statement
+|= keyword.control.flow.return |= expression |= punctuation.terminator.statement |
+| return | expression |  ; |
+break-or-continue-statement
+|= keyword.control.flow.$1 |= punctuation.terminator.statement |
+| break \n continue |  ; |;
+
+**:= exception handling
+try-statement:
+try-block
+|= keyword.control.exception.try | block |
+| try | try  block |
+catch-block
+|= keyword.control.exception.catch | block |
+| catch | catch block |;
+**:=block
+block
+|= punctuation.curlybracket.open | statements |= punctuation.curlybracket.close |
+| { | statements |  } |;
 
 
 @endmindmap

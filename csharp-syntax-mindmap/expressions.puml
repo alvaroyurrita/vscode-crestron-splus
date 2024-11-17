@@ -1,59 +1,140 @@
 @startmindmap
-*: Expression
-<code>
-a and b are operands
-</code>
-;
-++ literal
-++ integer 
-+++_ integer literal expression
-+++_ integer_function identifier(argument list)
-+++_ integer arithmetic expression
-+++_ signed_integer_function identifier(argument list)
-+++_ long_integer_function identifier(argument list)
-+++_ signed_long_integer_function identifier(argument list)
-++ string
-+++_ string_function identifier(expression)
-++ member access
-+++_ a[integer expression]
-+++_ a[integer expression][integer expression]
-++ unary
-+++_ not(binary expression)
-+++_ !binary expression
-+++_ -arithmetic expression
-++ bitwise
-+++_ a & b
-+++_ a | b
-+++_ a ^ b
-+++_ Not(a)
-+++_ a << b
-+++_ a >> b
-+++_ a }} b
-+++_ a {{ b
--- relational
----_ a < b
----_ a > b
----_ a <= b
----_ a >= b
----_ a S< b
----_ a S> b
----_ a S<= b
----_ a S>= b
----_ a = b
----_ a <> b
----_ a && b
----_ a || b
--- parenthesized
----_ (expression)
--- assignment
----_ a=b
--- arithmetic
----_ a - b
----_ a - b
----_ a * b
----_ a / b
----_ a % b
----_ a mod b
----_ a umod b
+*:= Expressions
+
+* preprocessor
+* comment
+* type-builtin
+* switch-statement-or-expression
+* assignment-expression
+* expression-operators
+* variable-declaration
+* invocation-expression
+* element-access-expression
+* literal
+* parenthesized-expression
+* identifier
+* built-in-function
+* built-in-variables
+* built-in-constants;
+
+**:== operators
+expression-operators
+|= keyword.operator.bitwise.shift |
+|    <<  >> {{  }}|
+|= keyword.operator.comparison |
+|    =  <> |
+|= keyword.operator.relational |
+|    <=  >=  <  >  S< S> S<= S>= |
+|= keyword.operator.logical |
+|    && <U+007c><U+007c> |
+|= keyword.operator.bitwise |
+|    &  <U+007c>  ^  Not() |
+|= keyword.operator.atithmetic |
+|    + - * / % mod umod |;
+
+
+**:== type
+ type-builtin 
+|= keyword.type.$1 |
+| INTEGER\n SIGNED_INTEGER\n LONG_INTEGER\n SIGNED_LONG_INTEGER\n STRING |
+----
+type-name
+|= entity.name.type |
+| name |
+----
+type-array-suffix
+|= punctuation.squarebracket.open |= expression |= punctuation.squarebracket.close |
+|    [     |  intrusive \n punctuation-coma  |   ]  |;
+
+
+**:== intrusive
+preprocessor
+comment;
+
+**:= literal
+numeric-lieteral
+|= constant.numeric.other.prefix  |= constant.numeric.hex |
+| 0x | 1234 |
+
+|= constant.numeric.decimal |
+| 1234 |
+----
+char-literal
+|= punctuation.definition.char.begin |= constant.numeric.char |= punctuation.definition.char.end |
+| ' | A | ' |
+----
+string-literal
+|= punctuation.doublequotes |= string.quoted.double |= punctuation.doublequotes |
+| " | Hello World | " |
+----
+string-character-escape
+|= constant.character.escape |
+| \\a: alert \n \\b: backspace \n \\f: form feed \n \\n: new line \n \\r: carriage return \n \\ t: Horizontal tab \n \\v: vertical Tab \n \:slash  |
+----
+|= constant.specification.string |
+| %[[pad]width]specifier: \n %d: signed analog \n %s: string \n %u unsigned analong \n %ld: long integer \n %lu: long unsigned integer \n %x analog as lowercase hex \n %X analog as upercase hex \n %c printable ascii |;
+
+
+
+left side
+
+**:= comment
+comment-single-line
+|= comment.line.double-slash |
+| \\ comment |
+----
+coment-block
+|= comment.block |
+| /* comment */ |;
+
+
+**:= assignment
+assignment-expression
+| variable |= keword.operator.assignment | expression |= punctuation.terminator.statement |
+| a  |  =  |  b  |  ;  |;
+
+**:= invocation
+invocation-expression
+|= puctuation.accessor  |= entity.name.function | argument-list | punctuation.terminator.statement |
+| . (optional) | function  |   argument-list  |  ;  |
+----
+argument-list
+|= punctuation.parenthesis.open | elements |= punctuation.parenthesis.open  |
+| (  | named-argument \n expression \n punctuation-comma | )  |
+----
+named-argument
+|= entity.name.variable  |
+| variable name |;
+
+**:= element access
+element-access-expression
+|= entinty.name.variable |= punctuation.squarebracket.open  |= expression  |= punctuation.squarebracket.close |
+| variable name | [  |  named-argument \n expression \n punctuation-comma  |  ]  |;
+
+**:= parenthesized-expression
+element-access-expression
+|= punctuation.parenthesis.open  | expression  |= punctuation.parenthesis.close |
+| ( |   expression  |  )  |;
+
+**:= built-in-function
+built-in-function
+|= keyword.support.function  | argument-list | punctuation.terminator.statement |
+| data conversion\n random number\n string parsing\n mathematical\n string formating and printing\n bit and byte\n file\n time & date\n direct socket access\n email\n ramping\n encoding\n system-interfacing\n delegate-handling\n event-handling\n system-control\n wait\n array-operations\n exception-handling  |   argument-list  |  ;  |;
+
+**:= built-in-constants
+built-in-constants
+|= keyword.support.constant   |
+| _O_APPEND\n _O_CREAT\n _O_EXCL\n _O_TRUNC\n _O_TEXT\n _O_BINARY\n _O_RDONLY\n _O_RDWR\n _O_WRONLY\n ARDONLY\n AHIDDEN\n ASYSTEM\n AVOLUME\n ADIRENT\n ARCHIVE\non \noff |;
+
+**:= built-in-structures
+built-in-constants
+|= keyword.support.constant   |
+| socket_struct\n ramp_info\n file_info|;
+
+**:= built-in-variables
+built-in-variables
+|= keyword.support.variable   |
+| _OEM_STR_OUT\n _OEM_CD\n _OEM_STR_IN\n _OEM_CTS\n _OEM_STR_IN\n _OEM_MAX_STRING \n _OEM_LONG_BREAK\n _OEM_CTS\n _OEM_BREAK \n _OEM_DTR |;
+
 @endmindmap
 

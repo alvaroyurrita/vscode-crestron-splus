@@ -8,14 +8,6 @@ preprocesor-define-constant
 |= keyword.preprocessor.defineconstant |= entity.name.variable.preprocessor.symbol  |= constant.numeric.hex \n constant.numeric.decimal \n constant.character \n string.quoted.double |
 | #DEFINE_CONSTANT  |  name | value |
 ----
-preprocessor-if-ifnot-defined
-|= keyword.preprocessor.ifdefined\n keyword.preprocessor.ifnotdefined |= entity.name.variable.preprocessor.symbol  |
-| #IF_DEFINED \n #IF_NOT_DEFINED  | constant |
-----
-preprocessor-endif
-|= keyword.preprocessor.endif  |
-| #ENDIF |
-----
 preprocessor-category
 |= keyword.preprocessor.category |= constant.numeric.category  |
 | #CATEGORY  | constant |
@@ -63,7 +55,7 @@ preprocessor
 ----
 preprocessor-single
 |= keyword.preprocessor.{namebelow}   |
-|  #PRINT_TO_TRACE \n  #ENABLE_DYNAMIC \n  #ENABLE_STACK_CHECKING \n  #LARGE_STACK \n  #ENABLE_TRACE \n  #ENCODING_ASCII \n  #ENCODING_INHERIT_FROM_PARENT \n  #ENCODING_INHERIT_FROM_PROGRAM \n  #ENCODING_UTF16 \n  #DEFAULT_NONVOLATILE \n  #DEFAULT_VOLATILE \n  #ENDIF \n  #IF_SERIES2  \n  #IF_SERIES3  \n  #IF_SERIES4   |;
+|  #PRINT_TO_TRACE \n  #ENABLE_DYNAMIC \n  #ENABLE_STACK_CHECKING \n  #LARGE_STACK \n  #ENABLE_TRACE \n  #ENCODING_ASCII \n  #ENCODING_INHERIT_FROM_PARENT \n  #ENCODING_INHERIT_FROM_PROGRAM \n  #ENCODING_UTF16 \n  #DEFAULT_NONVOLATILE \n  #DEFAULT_VOLATILE  |;
 
 **:= meta.preprocessor
 preprocessor-parameter-properties
@@ -116,5 +108,38 @@ meta.preprocessor.properties.description
 |= keyword.preprocessor.endpropfulldescription \n keyword.preprocessor.endpropnotes |
 | #END_PROP_FULL_DESCRIPTION \n #END_PROP_NOTES |;
 
+***: preprocessors properties Literals
+|= constant.numeric.hex |= constant.numberic.other.suffix.hex |
+| 12AB | h |
+----
+|= constant.numeric.decimal |= constant.numberic.other.suffix.dec |
+| 1234 | d |
+----
+|= constant.numeric.percent |= constant.numberic.other.suffix.percent |
+| 1234 | % |
+----
+|= punctuation.definition.char.begin |= constant.numeric.char |= punctuation.definition.char.end |
+| ' | A | ' |
+---- 
+|= constant.numeric.seconds |= constant.numberic.other.suffix.time |
+| 1234 | s |
+----
+|= constant.numeric.ticks |= constant.numberic.other.suffix.ticks |
+| 1234 | t |
+----
+|= punctuation.doublequotes |= constant.numeric.string |= punctuation.doublequotes |
+| " | Hello World | " |;
 
+
+**:= conditional compilation
+----
+preprocessor-if-ifnot-defined
+|= keyword.preprocessor.ifdefined\n keyword.preprocessor.ifnotdefined |= entity.name.variable.preprocessor.symbol  |
+| #IF_DEFINED \n #IF_NOT_DEFINED  | constant |
+preprocessor-if-series
+|= keyword.preprocessor.ifseries2\n keyword.preprocessor.ifseries3\nkeyword.preprocessor.ifseries4  |
+| #IF_SERIES2 \n #IF_SERIES3 \n #IF_SERIES4  |
+preprocessor-endif
+|= keyword.preprocessor.endif  |
+| #ENDIF  |;
 @endmindmap
