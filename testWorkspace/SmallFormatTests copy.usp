@@ -1,4 +1,4 @@
 FUNCTION ArrayOperators()
 {
-	int3 = int1 = 1; // Shift Right
+	+
 }

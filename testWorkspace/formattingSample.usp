@@ -8,151 +8,6 @@
 
 #ENDIF
 
-FUNCTION MyFunction(){
-
-	#IF_DEFINED dfdfdf
-
-	#ENDIF
-
-	#IF_NOT_DEFINED
-
-	#ENDIF	
-
-	//Numeric literals
-	0x12AC
-	0X123
-	0x123
-	1234
-	-2
-	jkjk 123 jkjk
-	jkj 0xabc fjkj
-	
-	//Illegal Numeric literals
-	1234f  //c# floating point cast
-	123.459  //floating point
-	jkjk 123jkj  //malformed
-	jkj 0xABCcfjkj //malformed
-	1234e-4 //exponential
-	1234E5 //exponential
-	
-	//Character Literal
-	'd'
-	
-	//Illegal Charcter Literal
-	'dd'
-	'd
-	'x034df3'
-	
-	//string Literal
-	print("hello world");
-	print("\a \b \f \n \r \t \x34 ");
-	print("\a");
-	print("\b");
-	print("\f");
-	print("\n");
-	print("\r");
-	print("\t");
-	print("\v");
-	print("\xFA91");
-	print("\xFA9");
-	print("\xFA");
-	
-	
-	print("string: %s %4s %04s \n", s, s, s);
-	print("signed decimal %d %4d %04d \n", si, si, si);
-	print("unsigned %u %4u %04u \n", i, i, i);
-	print("hex %x %2x %02x \n", i, i, i);
-	print("HEX %X %2X %02X \n", i, i, i);
-	print("lis decimal %ld %9ld %09ld \n", sli, sli, sli);
-	print("liu decimal %lu %9lu %09lu \n", li, li, li);
-	print("%% \n");
-	print("%c %2c %02c \n", i, i, i);
-	print("\c");
-	print("\d");
-	print("\e");
-	print("\g");
-	print("\i");
-	print("\k");
-	print("\l");
-	print("\m");
-	print("\o");
-	print("\p");
-	print("\s");
-	print("\u");
-	print("\w");
-	print("\z");
-	print("%12lx", li);
-	print("%12lx", li);
-	print("%12lX", li);
-
-	//Illegal string literals
-	print("\xF");
-	print("\h");
-	print("\j");
-	print("\q");
-	print("\y");
-	print("%12m", li);
-	print("%m", li);
-	
-	//punctuation
-	
-	//Arithmetic
-	-
-	*
-	/
-	S/
-	MOD
-	UMOD
-	%
-	+
-	-
-	
-	//bitwise
-	<<
-	>>
-	{{
-	}}
-	NOT
-	&
-	|
-	^
-	!
-	&&
-	||
-	
-	//comaprison
-	=
-	<>
-	
-	//relational
-	<
-	>
-	<=
-	>=
-	S<
-	S>
-	S<=
-	S>=
-	
-	
-	//assignment
-	=
-	
-	//grouping
-	{ }
-	[ ]
-	( )
-	
-	//structure
-	,
-	;
-	.
-	
-}
-
-
-
-
 //preprocessor-define-constant
 #DEFINE_CONSTANT HELLO 534343
 #DEFINE_CONSTANT HELLO2 "Something"
@@ -280,6 +135,152 @@ ASCII STRING AsiiString[10];
 UTF16 string Utf16String[10];
 INHERIT STRING InheritString[10];
 STRING InheritString[10][20]; //tes
+
+
+FUNCTION MyFunction(){
+
+	#IF_DEFINED dfdfdf
+
+	#ENDIF
+
+	#IF_NOT_DEFINED
+
+	#ENDIF	
+
+	//Arithmetic
+	-
+	*
+	/
+	S/
+	MOD
+	UMOD
+	%
+	+
+	-
+	
+	//bitwise
+	<<
+	>>
+	{{
+	}}
+	NOT()
+	&
+	|
+	^
+	!
+	&&
+	||
+	
+	//comaprison
+	=
+	<>
+	
+	//relational
+	<
+	>
+	<=
+	>=
+	S<
+	S>
+	S<=
+	S>=
+	
+	
+	//assignment
+	=
+	
+	
+	//structure
+	,
+	;
+	.
+
+	//Numeric literals
+	0x12AC
+	0X123
+	0x123
+	1234
+	-2
+	jkjk 123 jkjk
+	jkj 0xabc fjkj
+	
+	//Illegal Numeric literals
+	1234f  //c# floating point cast
+	123.459  //floating point
+	jkjk 123jkj  //malformed
+	jkj 0xABCcfjkj //malformed
+	1234e-4 //exponential
+	1234E5 //exponential
+	
+	//Character Literal
+	'd'
+	
+	//Illegal Charcter Literal
+	'dd'
+	'd
+	'x034df3'
+	
+	//string Literal
+	print("hello world");
+	print("\a \b \f \n \r \t \x34 ");
+	print("\a");
+	print("\b");
+	print("\f");
+	print("\n");
+	print("\r");
+	print("\t");
+	print("\v");
+	print("\xFA91");
+	print("\xFA9");
+	print("\xFA");
+	
+	
+	print("string: %s %4s %04s \n", s, s, s);
+	print("signed decimal %d %4d %04d \n", si, si, si);
+	print("unsigned %u %4u %04u \n", i, i, i);
+	print("hex %x %2x %02x \n", i, i, i);
+	print("HEX %X %2X %02X \n", i, i, i);
+	print("lis decimal %ld %9ld %09ld \n", sli, sli, sli);
+	print("liu decimal %lu %9lu %09lu \n", li, li, li);
+	print("%% \n");
+	print("%c %2c %02c \n", i, i, i);
+	print("\c");
+	print("\d");
+	print("\e");
+	print("\g");
+	print("\i");
+	print("\k");
+	print("\l");
+	print("\m");
+	print("\o");
+	print("\p");
+	print("\s");
+	print("\u");
+	print("\w");
+	print("\z");
+	print("%12lx", li);
+	print("%12lx", li);
+	print("%12lX", li);
+
+	//Illegal string literals
+	print("\xF");
+	print("\h");
+	print("\j");
+	print("\q");
+	print("\y");
+	print("%12m", li);
+	print("%m", li);
+	
+	//punctuation
+	
+	
+	
+}
+
+
+
+
+
 
 //structure definition
 STRUCTURE mySruct //test
@@ -512,6 +513,13 @@ LONG_INTEGER_FUNCTION LongIntegerFunction1()
 FUNCTION LoopingConstructs()
 {
 	INTEGER a;
+	d = GetEncoding(a);
+
+	WHILE( a < 5 )
+	{
+		d = ReverseFind(a,"d",0);
+		d = ReverseFindNoCase(a,"d",0); 		
+	}
 
 	// encoding functions
 	d = GetEncoding(a);
@@ -529,7 +537,8 @@ FUNCTION LoopingConstructs()
 	c = GatherAsync("a",BufferInput1,MyGatherCallback,10);
 	c = GatherAsyncByLength(5,BufferInput1,MyGatherCallback,10);
 	b = GatherByLength(5,BufferInput1,10);
-	c = GatherByLengthWithDest(5,BufferInput1,b,10);
+	b = Right(a,5);
+	b = Upper(a);	c = GatherByLengthWithDest(5,BufferInput1,b,10);
 	a = Left(a,3);
 	d = Len(a);
 	b = Lower(a);
@@ -541,12 +550,12 @@ FUNCTION LoopingConstructs()
 	c = ResizeString(a,20);
 	d = ReverseFind(a,"d",0);
 	d = ReverseFindNoCase(a,"d",0); 
-	b = Right(a,5);
-	b = Upper(a);
+	d = a < 5;
 	
-	WHILE(a<5)
+	WHILE( a < 5 )
 	{
-		
+		d = ReverseFind(a,"d",0);
+		d = ReverseFindNoCase(a,"d",0); 		
 	}
 	
 	FOR (a = 1 TO 5 STEP 1)

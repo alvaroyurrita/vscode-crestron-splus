@@ -1016,6 +1016,9 @@
               "include": "#statement"
             },
             {
+              "include": "#expression"
+            },
+            {
               "include": "#comment"
             },
             {
@@ -1459,7 +1462,7 @@
           "include": "#comment"
         },
         {
-          "include": "#expression"
+          "include": "#branching-and-decision"
         }
       ]
     },
@@ -1477,7 +1480,7 @@
           "name": "keyword.control.loop.while.usp"
         }
       },
-      "end": "(?<=\\})",
+      "end": "(?<=\\})|(?=;)",
       "patterns": [
         {
           "begin": "\\(",
@@ -1500,6 +1503,9 @@
         },
         {
           "include": "#statement"
+        },
+        {
+          "include": "#expression"
         }
       ]
     },
@@ -1538,11 +1544,14 @@
         },
         {
           "include": "#parenthesized-expression"
+        },
+        {
+          "include": "#expression-operator"
         }
       ]
     },
     "invocation-expression": {
-      "begin": "(?xi)\n  (\\.)?\\s*  # possibly grab dot from a SIMPL# type\n  \\b([\\_[:alpha:]][\\_\\#\\_\\$[:alnum:]]*)\\b\\s* #grab the function name  \n  (?=\\() #stop pattern before the opening parenthesis without grabbing any characters",
+      "begin": "(?xi)\n  (\\.)?\\s*  # possibly grab dot from a SIMPL# type\n  (?!while|for|if)\n  \\b([\\_[:alpha:]][\\_\\#\\_\\$[:alnum:]]*)\\b\\s* #grab the function name  \n  (?=\\() #stop pattern before the opening parenthesis without grabbing any characters",
       "beginCaptures": {
         "1": {
           "name": "punctuation.accessor.usp"
@@ -1562,7 +1571,7 @@
           ]
         }
       },
-      "end": "(?xi)\n  (;) #stop pattern after the closing parenthesis without grabbing any characters",
+      "end": "(?xi)\n  (?<=\\)) #stop pattern after the closing parenthesis without grabbing any characters",
       "endCaptures": {
         "1": {
           "name": "punctuation.terminator.invocation.usp"

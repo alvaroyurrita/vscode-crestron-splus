@@ -692,6 +692,7 @@ repository:
       patterns:
       - include: "#preprocessor"
       - include: "#statement"
+      - include: "#expression"
       - include: "#comment"
       - include: "#variable-declaration"
   event-declaration:
@@ -743,7 +744,6 @@ repository:
       - include: "statement"
       - include: "#preprocessor"
       - include: "#comment"
-
   callback-declaration:
     begin: |-
         (?ix)
@@ -789,8 +789,6 @@ repository:
       - include: "statement"
       - include: "#preprocessor"
       - include: "#comment"
-
-
   namespace-declaration:
     begin: |-
         (?ix)
@@ -959,8 +957,6 @@ repository:
       - include: "#preprocessor"
       - include: "#comment"
       - include: "#parenthesized-parameter-list"
-
-
   structure-members:
     patterns:
     - include: "#variable-declaration"
@@ -1000,7 +996,6 @@ repository:
       - match: ([\_[:alpha:]][\_\#\_\$[:alnum:]]*)
         name: entity.name.variable.usp
       - include: "#type-array-suffix"
-
   type-array-suffix:
     begin: "\\["
     beginCaptures:
@@ -1014,23 +1009,18 @@ repository:
     - include: "#numeric-literal"
     - include: "#punctuation-comma"
 
-
-
-
-# statement
+# statements
   statement:
     patterns:
       - include: "#preprocessor"
       - include: "#comment"
-      # - include: "#branching-and-decision"
-      - include: "#expression"
+      # - include: "#expression"
+      - include: "#branching-and-decision"
       # - include: "#looping"
       # - include: "#local-function-declaration"
       # - include: "#void-invocation"
-      # - include: "#branching-and-decision"
       # - include: "#flow-control"
       # - include: "#exception-handling"
-
   branching-and-decision:
     patterns:
       - include: "#while-statement"
@@ -1043,7 +1033,7 @@ repository:
     beginCaptures:
       "1":
         name: keyword.control.loop.while.usp
-    end: (?<=\})
+    end: (?<=\})|(?=;)
     patterns:
       - begin: \(
         beginCaptures:
@@ -1056,12 +1046,10 @@ repository:
         patterns:
           - include: "#expression"
       - include: "#statement"
+      - include: "#expression"
 
 
-
-
-
-#expression
+#expressions
   expression:
     patterns:
       - include: "#assignment-expression"
@@ -1077,12 +1065,12 @@ repository:
       - include: "#literals"
       - include: "#type-name"
       - include: "#parenthesized-expression"
-
-
+      - include: "#expression-operator"
   invocation-expression:
     begin: |-
       (?xi)
         (\.)?\s*  # possibly grab dot from a SIMPL# type
+        (?!while|for|if)
         \b([\_[:alpha:]][\_\#\_\$[:alnum:]]*)\b\s* #grab the function name  
         (?=\() #stop pattern before the opening parenthesis without grabbing any characters
     beginCaptures:
@@ -1096,7 +1084,7 @@ repository:
             name: entity.name.function.usp
     end: |-
       (?xi)
-        (;) #stop pattern after the closing parenthesis without grabbing any characters
+        (?<=\)) #stop pattern after the closing parenthesis without grabbing any characters
     endCaptures:
       "1":
         name: punctuation.terminator.invocation.usp
@@ -1195,7 +1183,6 @@ repository:
   functions-bitwise:
     match: (?i)\b(not)\b
     name: keyword.support.function.usp    
-
   built-in-void-functions:
     patterns:
       - include: "#void-functions-random-number"
@@ -1250,10 +1237,6 @@ repository:
   void-functions-array-operations:
     match: (?ix)\b(SetArray)\b
     name: keyword.support.function.usp
-
-
-
-
   built-in-variables:
     match: |-
       (?ix)
@@ -1314,7 +1297,6 @@ repository:
   named-argument:
     match: (@?[_[:alpha:]][_[:alnum:]]*)
     name: entity.name.variable.parameter.cs
-
   assignment-expression:
     begin: |-
         (?:([\_[:alpha:]][\_\#\_\$[:alnum:]]*)\s*)(=)
@@ -1327,7 +1309,6 @@ repository:
     patterns:
       - include: "#expression-operator"
       - include: "#expression-no-assignment"
-
   expression-operator:
     patterns:
       - name: keyword.operator.relational.usp
@@ -1346,7 +1327,6 @@ repository:
         name: keyword.operator.comparison.usp        
       - match: <>
         name: keyword.operator.relational.usp
-
   element-access-expression:
     begin: |-
       (?x)
@@ -1358,7 +1338,6 @@ repository:
     end: (?<=\])(?!\s*\[)
     patterns:
     - include: "#bracketed-argument-list"
-
   parenthesized-expression:
     begin: \(
     beginCaptures:
@@ -1527,15 +1506,11 @@ repository:
           - match: .* #invalidate anything that did not match the above
             name: invalid.illegal.character.escape.usp
 
-
 #punctuation
   punctuation:
     patterns:
       - include: "#punctuation-grouping"
       - include: "#punctuation-structure"
-
-
-
   punctuation-grouping:
     patterns:
     - include: "#punctuation-square-bracket"
@@ -1600,19 +1575,12 @@ repository:
 
 
 
-
-
-
-
 #Types
   type:
     patterns:
     - include: "#comment"
     - include: "#ref-modifier"
     - include: "#type-name"
-
-
-
   designation-pattern:
     patterns:
     - include: "#intrusive"
@@ -1650,8 +1618,3 @@ repository:
           name: punctuation.squarebracket.open.usp
         "5":
           name: punctuation.squarebracket.close.usp
-
-
-
-
-
