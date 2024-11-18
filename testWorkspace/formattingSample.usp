@@ -513,7 +513,20 @@ LONG_INTEGER_FUNCTION LongIntegerFunction1()
 FUNCTION LoopingConstructs()
 {
 	INTEGER a;
-	d = GetEncoding(a);
+	d = GetEncoding(a,b,3,4,d) + Len(t);
+
+	until(a=5);
+
+	FOR ( a = Len(t) TO Len(t) STEP Len(5) ){
+		PRINT("");
+		CONTINUE;
+	}
+
+	do
+	{
+		a=a+1;
+	}
+	until(a=5);
 
 	WHILE( a < 5 )
 	{
@@ -551,6 +564,13 @@ FUNCTION LoopingConstructs()
 	d = ReverseFind(a,"d",0);
 	d = ReverseFindNoCase(a,"d",0); 
 	d = a < 5;
+	until(a=5);
+
+	do
+	{
+		a=a+1;
+	}
+	until(a=5);
 	
 	WHILE( a < 5 )
 	{
@@ -558,7 +578,7 @@ FUNCTION LoopingConstructs()
 		d = ReverseFindNoCase(a,"d",0); 		
 	}
 	
-	FOR (a = 1 TO 5 STEP 1)
+	FOR ( a = 1 TO 5 STEP 1)
 	{
 		PRINT("");
 		CONTINUE;

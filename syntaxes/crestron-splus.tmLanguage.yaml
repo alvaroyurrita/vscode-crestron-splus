@@ -5,14 +5,47 @@ fileTypes:
   - usl
 name: Crestron
 patterns:
-  - include: "#comment"
-  - include: "#preprocessor"
-  - include: "#declaration"
+  - include: "#for-statement-test"
+  # - include: "#comment"
+  # - include: "#preprocessor"
+  # - include: "#declaration"
   # - include: "#statement"
   # - include: "#expression"
   # - include: "#punctuation"
 
 repository:
+  for-statement-test:
+    begin: "\\b(for)\\b"
+    beginCaptures:
+      '1':
+        name: keyword.control.loop.for.cs
+    end: "(?<=\\))|(?=;|})"
+    name: for.statement.cs
+    patterns:
+    - begin: "\\("
+      beginCaptures:
+        '0':
+          name: punctuation.parenthesis.open.cs
+      end: "\\)"
+      endCaptures:
+        '0':
+          name: punctuation.parenthesis.close.cs
+      name: for.insideparenthesis.cs
+      patterns:
+      - begin: "(?=[^;\\)])"
+        end: "(?=;|\\))"
+        name: for.fistmatchexpression.cs
+        patterns:
+        - include: "#intrusive"
+        - include: "#local-variable-declaration"
+      - begin: "(?=;)"
+        end: "(?=\\))"
+        name: for.secondmatchexpression.cs
+        patterns:
+        - include: "#intrusive"
+        - include: "#expression"
+        - include: "#punctuation-comma"
+        - include: "#punctuation-semicolon"
 
 #Comment
   comment:
@@ -692,7 +725,7 @@ repository:
       patterns:
       - include: "#preprocessor"
       - include: "#statement"
-      - include: "#expression"
+      # - include: "#expression"
       - include: "#comment"
       - include: "#variable-declaration"
   event-declaration:
@@ -1024,8 +1057,9 @@ repository:
   branching-and-decision:
     patterns:
       - include: "#while-statement"
-      # - include: "#do-statement"
-      # - include: "#for-statement"
+      - include: "#do-statement"
+      - include: "#until-statement"
+      - include: "#for-statement"
   while-statement:
     begin: |-
         (?ix)
@@ -1033,21 +1067,94 @@ repository:
     beginCaptures:
       "1":
         name: keyword.control.loop.while.usp
-    end: (?<=\})|(?=;)
+    end: (?<=\})
     patterns:
       - begin: \(
         beginCaptures:
           "0":
-            name: punctuation.definition.parameters.begin.usp
+            name: punctuation.parenthesis.open.cs
         end: \)
         endCaptures:
           "0":
-            name: punctuation.definition.parameters.end.usp
+            name: punctuation.parenthesis.close.cs
         patterns:
-          - include: "#expression"
+          - include: "#expression-no-assignment"
       - include: "#statement"
       - include: "#expression"
+  do-statement:
+    begin: |-
+        (?xi)
+          \b(do)\b
+    beginCaptures:
+      '1':
+        name: keyword.control.loop.do.cs
+    end: (?<=\})
+    patterns:
+      - include: "#statement"
+      - include: "#expression"
+  until-statement:
+    begin: |-
+        (?xi)
+          \b(until)\b\s*(?=\()
+    beginCaptures:
+      '1':
+        name: keyword.control.loop.until.cs
+    end: (?<=\))
+    patterns:
+    - begin: \(
+      beginCaptures:
+        '0':
+          name: punctuation.parenthesis.open.cs
+      end: \)
+      endCaptures:
+        '0':
+          name: punctuation.parenthesis.close.cs
+      patterns:
+      - include: "#expression-no-assignment"
 
+  for-statement:
+    begin: |-
+        (?ix)
+          \b(for)\b\s*(?=\()
+    beginCaptures:
+      '1':
+        name: keyword.control.loop.for.cs
+    end: (?<=\})
+    patterns:
+    - begin: \(
+      beginCaptures:
+        '0':
+          name: punctuation.parenthesis.openn.cs
+      end: (\))\s*(?>{|$)
+      endCaptures:
+        '1':
+          name: punctuation.parenthesis.closee.cs
+      patterns:
+        - match: (?i)(.*)(to)(.*)(step)(.*)|(.*)(to)(.*)
+          captures:
+            '1':
+              patterns:
+                - include: "#assignment-expression"
+            '2':
+              name: keyword.control.loop.to.cs
+            '3':
+              patterns:
+                - include: "#expression"
+            '4':
+              name: keyword.control.loop.step.cs
+            '5':
+              patterns:
+                - include: "#expression"
+            '6':
+              patterns:
+                - include: "#assignment-expression"
+            '7':
+              name: keyword.control.loop.to.cs
+            '8':
+              patterns:
+                - include: "#expression"
+    - include: "#statement"
+    - include: "#expression"
 
 #expressions
   expression:
@@ -1058,6 +1165,7 @@ repository:
     patterns:
       - include: "#preprocessor"
       - include: "#comment"
+      - include: "#expression-operator"
       - include: "#invocation-expression"
       # - include: "#switch-statement-or-expression"
       - include: "#element-access-expression"
@@ -1065,12 +1173,10 @@ repository:
       - include: "#literals"
       - include: "#type-name"
       - include: "#parenthesized-expression"
-      - include: "#expression-operator"
   invocation-expression:
     begin: |-
       (?xi)
         (\.)?\s*  # possibly grab dot from a SIMPL# type
-        (?!while|for|if)
         \b([\_[:alpha:]][\_\#\_\$[:alnum:]]*)\b\s* #grab the function name  
         (?=\() #stop pattern before the opening parenthesis without grabbing any characters
     beginCaptures:
@@ -1081,13 +1187,10 @@ repository:
           - include: "#builtin-functions"
           - include: "#built-in-void-functions"
           - match: (?xi)[\_[:alpha:]][\_\#\_\$[:alnum:]]*
-            name: entity.name.function.usp
+            name: entity.name.invocation.usp
     end: |-
       (?xi)
         (?<=\)) #stop pattern after the closing parenthesis without grabbing any characters
-    endCaptures:
-      "1":
-        name: punctuation.terminator.invocation.usp
     patterns:
       - include: "#argument-list"
   builtin-functions:
@@ -1255,6 +1358,7 @@ repository:
     name: keyword.support.constant.usp
   type-name:
     patterns:
+    - include: "#reserved-words"
     - match: ([_[:alpha:]][\_\#\_\$[:alnum:]]*)\s*(\.)
       captures:
         '1':
@@ -1291,24 +1395,26 @@ repository:
       '0':
         name: punctuation.parenthesis.close.usp
     patterns:
+    - include: "#reserved-words"
     - include: "#named-argument"
     - include: "#expression"
     - include: "#punctuation-comma"
   named-argument:
-    match: (@?[_[:alpha:]][_[:alnum:]]*)
+    match: ([\_[:alpha:]][\_\#\_\$[:alnum:]]*)
     name: entity.name.variable.parameter.cs
   assignment-expression:
-    begin: |-
-        (?:([\_[:alpha:]][\_\#\_\$[:alnum:]]*)\s*)(=)
+    begin: (=)
     beginCaptures:
-      "1":
-        name: entity.name.type.usp
-      "2":
-        name: keyword.operator.assignment.usp
-    end: (?<=;)
+      '0':
+        patterns:
+        - include: "#assignment-operators"
+    end: (?=[,\)\];}])
     patterns:
-      - include: "#expression-operator"
       - include: "#expression-no-assignment"
+  assignment-operators:
+    patterns:
+      - name: keyword.operator.assignment.cs
+        match: \=
   expression-operator:
     patterns:
       - name: keyword.operator.relational.usp
@@ -1356,6 +1462,7 @@ repository:
     - include: "#numeric-literal"
     - include: "#char-literal"
     - include: "#string-literal"
+    - include: "#reserved-words"
   numeric-literal:
     match: |-
       (?x)
@@ -1505,7 +1612,11 @@ repository:
             name: constant.character.escape.usp
           - match: .* #invalidate anything that did not match the above
             name: invalid.illegal.character.escape.usp
-
+  reserved-words:
+    match: |-
+      (?ix)
+        \b(until|do|while|for|to|step|CONTINUE)\b
+    name: keyword.control.usp
 #punctuation
   punctuation:
     patterns:
