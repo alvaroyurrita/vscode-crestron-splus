@@ -5,69 +5,15 @@ fileTypes:
   - usl
 name: Crestron
 patterns:
-  - include: "#for-statement-test"
-  # - include: "#comment"
-  # - include: "#preprocessor"
-  # - include: "#declaration"
+  - include: "#preprocessor"
+  - include: "#comment"
+  - include: "#directives"
   # - include: "#statement"
+  - include: "#declaration"
   # - include: "#expression"
   # - include: "#punctuation"
 
 repository:
-  for-statement-test:
-    begin: "\\b(for)\\b"
-    beginCaptures:
-      '1':
-        name: keyword.control.loop.for.cs
-    end: "(?<=\\))|(?=;|})"
-    name: for.statement.cs
-    patterns:
-    - begin: "\\("
-      beginCaptures:
-        '0':
-          name: punctuation.parenthesis.open.cs
-      end: "\\)"
-      endCaptures:
-        '0':
-          name: punctuation.parenthesis.close.cs
-      name: for.insideparenthesis.cs
-      patterns:
-      - begin: "(?=[^;\\)])"
-        end: "(?=;|\\))"
-        name: for.fistmatchexpression.cs
-        patterns:
-        - include: "#intrusive"
-        - include: "#local-variable-declaration"
-      - begin: "(?=;)"
-        end: "(?=\\))"
-        name: for.secondmatchexpression.cs
-        patterns:
-        - include: "#intrusive"
-        - include: "#expression"
-        - include: "#punctuation-comma"
-        - include: "#punctuation-semicolon"
-
-#Comment
-  comment:
-    patterns:
-      - include: "#comment-single-line"
-      - include: "#comment-block"
-  comment-single-line:
-    name: comment.line.double-slash.usp
-    begin: (^\s+)?(\/\/).*$
-    while: ^(\s*)(\/\/).*$
-    captures:
-      "1":
-        name: punctuation.whitespace.comment.leading.usp
-      "2":
-        name: punctuation.definition.comment.usp
-  comment-block:
-    name: comment.block.usp
-    begin: \/\*
-    end: \*\/
-    captures:
-      "0":
-        name: punctuation.definition.comment.usp  
 
 #preprocessor
   preprocessor:
@@ -529,19 +475,47 @@ repository:
           "3":
             name: punctuation.curlybrace.close.usp
 
+#Comment
+  comment:
+    patterns:
+      - include: "#comment-single-line"
+      - include: "#comment-block"
+  comment-single-line:
+    name: comment.line.double-slash.usp
+    begin: (^\s+)?(\/\/).*$
+    while: ^(\s*)(\/\/).*$
+    captures:
+      "1":
+        name: punctuation.whitespace.comment.leading.usp
+      "2":
+        name: punctuation.definition.comment.usp
+  comment-block:
+    name: comment.block.usp
+    begin: \/\*
+    end: \*\/
+    captures:
+      "0":
+        name: punctuation.definition.comment.usp  
+
+# Directives
+  directives:
+    patterns:
+    - include: "#punctuation-semicolon"
+
 
 #declaration
   declaration:
     patterns:
-      - include: "#input-declaration"
-      - include: "#output-declaration"
-      - include: "#parameter-declaration"
-      - include: "#structure-declaration"
+      # - include: "#input-declaration"
+      # - include: "#output-declaration"
+      # - include: "#parameter-declaration"
+      # - include: "#structure-declaration"
       - include: "#function-declaration"
-      - include: "#event-declaration"
-      - include: "#callback-declaration"
-      - include: "#namespace-declaration"
-      - include: "#variable-declaration"
+      # - include: "#event-declaration"
+      # - include: "#callback-declaration"
+      # - include: "#namespace-declaration"
+      # - include: "#variable-declaration"
+      - include: "#punctuation-semicolon"
   input-declaration:
     name: meta.declaration.input.usp
     begin: |-
@@ -693,41 +667,22 @@ repository:
   function-declaration:
     begin: |-
         (?ix)
-          (?=(?:function|integer_function|string_function|long_integer_function|signed_integer_function|signed_long_integer_function|simplsharpstring)) #start pattern at the beginning of the function keyword without grabbing any characters
+          (function|integer_function|string_function|long_integer_function|signed_integer_function|signed_long_integer_function|simplsharpstring)\s* # grab the built-in function type or
+          ([\_[:alpha:]][\_\#\_\$[:alnum:]]*)\s* # the function name
+          (?=\() #and stop before the opening parenthesis
+    beginCaptures:
+      '1':
+        name: keyword.declaration.function.usp
+      '2':
+        name: entity.name.variable.function.usp
     end: |-
         (?ix)
-          (?<!\})\}(?!\})   #stop pattern after the closing curly brace without grabbing any characters only when there are no adjacent curly braces to avoid stopping at bitwise rotate right
+          (?<=})|(?=;)   #stop pattern after the closing curly bracket or first semicolon without grabbing any characters
     patterns:
-    - begin: |-
-          (?ix)
-            (function|integer_function|string_function|long_integer_function|signed_integer_function|signed_long_integer_function|simplsharpstring)\b\s+
-            ([_[:alpha:]][\#\$\_[:alnum:]]*)
-      beginCaptures:
-        '1':
-          name: keyword.declaration.function.usp
-        '2':
-          name: entity.name.variable.function.usp
-      end: |-
-          (?ix)
-            (?=\{) #stop pattern after the opening curly brace without grabbing any characters
-      name: meta.declaration.function.usp
-      patterns:
-      - include: "#parenthesized-parameter-list"
-    - begin: ({)
-      beginCaptures:
-        '1':
-          name: punctuation.curlybrace.open.usp
-      end: (?<!\})(\})(?!\})
-      endCaptures:
-        '1':
-          name: punctuation.curlybrace.close.usp
-      name: meta.function.contents
-      patterns:
-      - include: "#preprocessor"
-      - include: "#statement"
-      # - include: "#expression"
-      - include: "#comment"
-      - include: "#variable-declaration"
+    # - include: "#comment"
+    - include: "#parenthesized-parameter-list"
+    # - include: "#preprocessor"
+    - include: "#block"
   event-declaration:
     begin: |-
         (?ix)
@@ -1041,19 +996,33 @@ repository:
     patterns:
     - include: "#numeric-literal"
     - include: "#punctuation-comma"
+  block:
+    begin: (?<!\{)\{(?!\{)
+    beginCaptures:
+      '0':
+        name: punctuation.curlybrace.open.cs
+    end: (?<!\})\}(?!\})
+    endCaptures:
+      '0':
+        name: punctuation.curlybrace.close.cs
+    name: meta.code.block.udp
+    patterns:
+    - include: "#statement"
 
 # statements
   statement:
     patterns:
       - include: "#preprocessor"
       - include: "#comment"
-      # - include: "#expression"
       - include: "#branching-and-decision"
       # - include: "#looping"
       # - include: "#local-function-declaration"
       # - include: "#void-invocation"
       # - include: "#flow-control"
       # - include: "#exception-handling"
+      - include: "#block"
+      - include: "#expression"
+      - include: "#punctuation-semicolon"
   branching-and-decision:
     patterns:
       - include: "#while-statement"
@@ -1113,48 +1082,23 @@ repository:
       - include: "#expression-no-assignment"
 
   for-statement:
-    begin: |-
-        (?ix)
-          \b(for)\b\s*(?=\()
+    begin: (?i)\b(for)\b
     beginCaptures:
       '1':
         name: keyword.control.loop.for.cs
-    end: (?<=\})
+    end: (?<=\))|(?=;|})
+    name: meta.control.loop.for.cs
     patterns:
     - begin: \(
       beginCaptures:
         '0':
-          name: punctuation.parenthesis.openn.cs
-      end: (\))\s*(?>{|$)
+          name: punctuation.parenthesis.open-for.cs
+      end: \)
       endCaptures:
-        '1':
-          name: punctuation.parenthesis.closee.cs
+        '0':
+          name: punctuation.parenthesis.close-for.cs
       patterns:
-        - match: (?i)(.*)(to)(.*)(step)(.*)|(.*)(to)(.*)
-          captures:
-            '1':
-              patterns:
-                - include: "#assignment-expression"
-            '2':
-              name: keyword.control.loop.to.cs
-            '3':
-              patterns:
-                - include: "#expression"
-            '4':
-              name: keyword.control.loop.step.cs
-            '5':
-              patterns:
-                - include: "#expression"
-            '6':
-              patterns:
-                - include: "#assignment-expression"
-            '7':
-              name: keyword.control.loop.to.cs
-            '8':
-              patterns:
-                - include: "#expression"
-    - include: "#statement"
-    - include: "#expression"
+      - include: "#expression"
 
 #expressions
   expression:
@@ -1176,18 +1120,15 @@ repository:
   invocation-expression:
     begin: |-
       (?xi)
-        (\.)?\s*  # possibly grab dot from a SIMPL# type
-        \b([\_[:alpha:]][\_\#\_\$[:alnum:]]*)\b\s* #grab the function name  
+        ([\_[:alpha:]][\_\#\_\$[:alnum:]]*)\s* #grab the function name  
         (?=\() #stop pattern before the opening parenthesis without grabbing any characters
     beginCaptures:
       "1":
-        name: punctuation.accessor.usp
-      "2":
         patterns:
           - include: "#builtin-functions"
           - include: "#built-in-void-functions"
           - match: (?xi)[\_[:alpha:]][\_\#\_\$[:alnum:]]*
-            name: entity.name.invocation.usp
+            name: entity.name.function.usp
     end: |-
       (?xi)
         (?<=\)) #stop pattern after the closing parenthesis without grabbing any characters
@@ -1405,16 +1346,12 @@ repository:
   assignment-expression:
     begin: (=)
     beginCaptures:
-      '0':
-        patterns:
-        - include: "#assignment-operators"
+      '1':
+        name: keyword.operator.assignment.cs
     end: (?=[,\)\];}])
     patterns:
       - include: "#expression-no-assignment"
-  assignment-operators:
-    patterns:
-      - name: keyword.operator.assignment.cs
-        match: \=
+
   expression-operator:
     patterns:
       - name: keyword.operator.relational.usp
@@ -1613,10 +1550,19 @@ repository:
           - match: .* #invalidate anything that did not match the above
             name: invalid.illegal.character.escape.usp
   reserved-words:
-    match: |-
-      (?ix)
-        \b(until|do|while|for|to|step|CONTINUE)\b
-    name: keyword.control.usp
+    patterns:
+    - include: "#for-keywords"
+    - match: |-
+        (?ix)
+          \b(until|do|while|CONTINUE)\b
+      name: keyword.control.usp
+  for-keywords:
+    patterns:
+    - match: (?i)\bto\b
+      name: keyword.control.loop.to.cs
+    - match: (?i)\bstep\b
+      name: keyword.control.loop.step.cs
+
 #punctuation
   punctuation:
     patterns:

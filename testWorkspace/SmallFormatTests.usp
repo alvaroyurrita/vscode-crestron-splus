@@ -1,3 +1,4 @@
-#BEGIN_PARAMETER_PROPERTIES StringParameter1, StringParameter2
-  #propList = { 25d , "label" } , { 25h, "label" } , { 25%, "label" } , { 'a' , "label" } , { 25s, "label" } , { 25t , "label" } , { "helloLabel", "label" };
-#END_PARAMETER_PROPERTIES
+FUNCTION MyFunction1()
+{
+    FOR ( a = Len(t) TO Len(t) STEP Len(5) )
+}

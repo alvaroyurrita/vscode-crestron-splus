@@ -507,7 +507,12 @@ INTEGER_FUNCTION  MyIntFunction1()
 
 LONG_INTEGER_FUNCTION LongIntegerFunction1()
 {
-	Return (0);
+	FOR ( a = Len(t) TO Len(t) STEP Len(5) )
+	{
+		PRINT("");
+		CONTINUE;
+	}
+	
 }
 
 FUNCTION LoopingConstructs()

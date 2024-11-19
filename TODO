@@ -4,6 +4,7 @@ Formatting
 * Properties Literals
 * Remove properties Literals from global literals
 * Add Wait as a local function declaration
+* apply block to remaining declarations
 
 Add Insert category
 Formatting (comprehensive)

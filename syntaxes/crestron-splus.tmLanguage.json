@@ -7,104 +7,19 @@
   "name": "Crestron",
   "patterns": [
     {
-      "include": "#for-statement-test"
+      "include": "#preprocessor"
+    },
+    {
+      "include": "#comment"
+    },
+    {
+      "include": "#directives"
+    },
+    {
+      "include": "#declaration"
     }
   ],
   "repository": {
-    "for-statement-test": {
-      "begin": "\\b(for)\\b",
-      "beginCaptures": {
-        "1": {
-          "name": "keyword.control.loop.for.cs"
-        }
-      },
-      "end": "(?<=\\))|(?=;|})",
-      "name": "for.statement.cs",
-      "patterns": [
-        {
-          "begin": "\\(",
-          "beginCaptures": {
-            "0": {
-              "name": "punctuation.parenthesis.open.cs"
-            }
-          },
-          "end": "\\)",
-          "endCaptures": {
-            "0": {
-              "name": "punctuation.parenthesis.close.cs"
-            }
-          },
-          "name": "for.insideparenthesis.cs",
-          "patterns": [
-            {
-              "begin": "(?=[^;\\)])",
-              "end": "(?=;|\\))",
-              "name": "for.fistmatchexpression.cs",
-              "patterns": [
-                {
-                  "include": "#intrusive"
-                },
-                {
-                  "include": "#local-variable-declaration"
-                }
-              ]
-            },
-            {
-              "begin": "(?=;)",
-              "end": "(?=\\))",
-              "name": "for.secondmatchexpression.cs",
-              "patterns": [
-                {
-                  "include": "#intrusive"
-                },
-                {
-                  "include": "#expression"
-                },
-                {
-                  "include": "#punctuation-comma"
-                },
-                {
-                  "include": "#punctuation-semicolon"
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    "comment": {
-      "patterns": [
-        {
-          "include": "#comment-single-line"
-        },
-        {
-          "include": "#comment-block"
-        }
-      ]
-    },
-    "comment-single-line": {
-      "name": "comment.line.double-slash.usp",
-      "begin": "(^\\s+)?(\\/\\/).*$",
-      "while": "^(\\s*)(\\/\\/).*$",
-      "captures": {
-        "1": {
-          "name": "punctuation.whitespace.comment.leading.usp"
-        },
-        "2": {
-          "name": "punctuation.definition.comment.usp"
-        }
-      }
-    },
-    "comment-block": {
-      "name": "comment.block.usp",
-      "begin": "\\/\\*",
-      "end": "\\*\\/",
-      "captures": {
-        "0": {
-          "name": "punctuation.definition.comment.usp"
-        }
-      }
-    },
     "preprocessor": {
       "patterns": [
         {
@@ -794,34 +709,53 @@
         }
       ]
     },
-    "declaration": {
+    "comment": {
       "patterns": [
         {
-          "include": "#input-declaration"
+          "include": "#comment-single-line"
         },
         {
-          "include": "#output-declaration"
+          "include": "#comment-block"
+        }
+      ]
+    },
+    "comment-single-line": {
+      "name": "comment.line.double-slash.usp",
+      "begin": "(^\\s+)?(\\/\\/).*$",
+      "while": "^(\\s*)(\\/\\/).*$",
+      "captures": {
+        "1": {
+          "name": "punctuation.whitespace.comment.leading.usp"
         },
+        "2": {
+          "name": "punctuation.definition.comment.usp"
+        }
+      }
+    },
+    "comment-block": {
+      "name": "comment.block.usp",
+      "begin": "\\/\\*",
+      "end": "\\*\\/",
+      "captures": {
+        "0": {
+          "name": "punctuation.definition.comment.usp"
+        }
+      }
+    },
+    "directives": {
+      "patterns": [
         {
-          "include": "#parameter-declaration"
-        },
-        {
-          "include": "#structure-declaration"
-        },
+          "include": "#punctuation-semicolon"
+        }
+      ]
+    },
+    "declaration": {
+      "patterns": [
         {
           "include": "#function-declaration"
         },
         {
-          "include": "#event-declaration"
-        },
-        {
-          "include": "#callback-declaration"
-        },
-        {
-          "include": "#namespace-declaration"
-        },
-        {
-          "include": "#variable-declaration"
+          "include": "#punctuation-semicolon"
         }
       ]
     },
@@ -1028,55 +962,22 @@
       ]
     },
     "function-declaration": {
-      "begin": "(?ix)\n  (?=(?:function|integer_function|string_function|long_integer_function|signed_integer_function|signed_long_integer_function|simplsharpstring)) #start pattern at the beginning of the function keyword without grabbing any characters",
-      "end": "(?ix)\n  (?<!\\})\\}(?!\\})   #stop pattern after the closing curly brace without grabbing any characters only when there are no adjacent curly braces to avoid stopping at bitwise rotate right",
+      "begin": "(?ix)\n  (function|integer_function|string_function|long_integer_function|signed_integer_function|signed_long_integer_function|simplsharpstring)\\s* # grab the built-in function type or\n  ([\\_[:alpha:]][\\_\\#\\_\\$[:alnum:]]*)\\s* # the function name\n  (?=\\() #and stop before the opening parenthesis",
+      "beginCaptures": {
+        "1": {
+          "name": "keyword.declaration.function.usp"
+        },
+        "2": {
+          "name": "entity.name.variable.function.usp"
+        }
+      },
+      "end": "(?ix)\n  (?<=})|(?=;)   #stop pattern after the closing curly bracket or first semicolon without grabbing any characters",
       "patterns": [
         {
-          "begin": "(?ix)\n  (function|integer_function|string_function|long_integer_function|signed_integer_function|signed_long_integer_function|simplsharpstring)\\b\\s+\n  ([_[:alpha:]][\\#\\$\\_[:alnum:]]*)",
-          "beginCaptures": {
-            "1": {
-              "name": "keyword.declaration.function.usp"
-            },
-            "2": {
-              "name": "entity.name.variable.function.usp"
-            }
-          },
-          "end": "(?ix)\n  (?=\\{) #stop pattern after the opening curly brace without grabbing any characters",
-          "name": "meta.declaration.function.usp",
-          "patterns": [
-            {
-              "include": "#parenthesized-parameter-list"
-            }
-          ]
+          "include": "#parenthesized-parameter-list"
         },
         {
-          "begin": "({)",
-          "beginCaptures": {
-            "1": {
-              "name": "punctuation.curlybrace.open.usp"
-            }
-          },
-          "end": "(?<!\\})(\\})(?!\\})",
-          "endCaptures": {
-            "1": {
-              "name": "punctuation.curlybrace.close.usp"
-            }
-          },
-          "name": "meta.function.contents",
-          "patterns": [
-            {
-              "include": "#preprocessor"
-            },
-            {
-              "include": "#statement"
-            },
-            {
-              "include": "#comment"
-            },
-            {
-              "include": "#variable-declaration"
-            }
-          ]
+          "include": "#block"
         }
       ]
     },
@@ -1505,6 +1406,26 @@
         }
       ]
     },
+    "block": {
+      "begin": "(?<!\\{)\\{(?!\\{)",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.curlybrace.open.cs"
+        }
+      },
+      "end": "(?<!\\})\\}(?!\\})",
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.curlybrace.close.cs"
+        }
+      },
+      "name": "meta.code.block.udp",
+      "patterns": [
+        {
+          "include": "#statement"
+        }
+      ]
+    },
     "statement": {
       "patterns": [
         {
@@ -1515,6 +1436,15 @@
         },
         {
           "include": "#branching-and-decision"
+        },
+        {
+          "include": "#block"
+        },
+        {
+          "include": "#expression"
+        },
+        {
+          "include": "#punctuation-semicolon"
         }
       ]
     },
@@ -1618,84 +1548,33 @@
       ]
     },
     "for-statement": {
-      "begin": "(?ix)\n  \\b(for)\\b\\s*(?=\\()",
+      "begin": "(?i)\\b(for)\\b",
       "beginCaptures": {
         "1": {
           "name": "keyword.control.loop.for.cs"
         }
       },
-      "end": "(?<=\\})",
+      "end": "(?<=\\))|(?=;|})",
+      "name": "meta.control.loop.for.cs",
       "patterns": [
         {
           "begin": "\\(",
           "beginCaptures": {
             "0": {
-              "name": "punctuation.parenthesis.openn.cs"
+              "name": "punctuation.parenthesis.open-for.cs"
             }
           },
-          "end": "(\\))\\s*(?>{|$)",
+          "end": "\\)",
           "endCaptures": {
-            "1": {
-              "name": "punctuation.parenthesis.closee.cs"
+            "0": {
+              "name": "punctuation.parenthesis.close-for.cs"
             }
           },
           "patterns": [
             {
-              "match": "(?i)(.*)(to)(.*)(step)(.*)|(.*)(to)(.*)",
-              "captures": {
-                "1": {
-                  "patterns": [
-                    {
-                      "include": "#assignment-expression"
-                    }
-                  ]
-                },
-                "2": {
-                  "name": "keyword.control.loop.to.cs"
-                },
-                "3": {
-                  "patterns": [
-                    {
-                      "include": "#expression"
-                    }
-                  ]
-                },
-                "4": {
-                  "name": "keyword.control.loop.step.cs"
-                },
-                "5": {
-                  "patterns": [
-                    {
-                      "include": "#expression"
-                    }
-                  ]
-                },
-                "6": {
-                  "patterns": [
-                    {
-                      "include": "#assignment-expression"
-                    }
-                  ]
-                },
-                "7": {
-                  "name": "keyword.control.loop.to.cs"
-                },
-                "8": {
-                  "patterns": [
-                    {
-                      "include": "#expression"
-                    }
-                  ]
-                }
-              }
+              "include": "#expression"
             }
           ]
-        },
-        {
-          "include": "#statement"
-        },
-        {
-          "include": "#expression"
         }
       ]
     },
@@ -1741,12 +1620,9 @@
       ]
     },
     "invocation-expression": {
-      "begin": "(?xi)\n  (\\.)?\\s*  # possibly grab dot from a SIMPL# type\n  \\b([\\_[:alpha:]][\\_\\#\\_\\$[:alnum:]]*)\\b\\s* #grab the function name  \n  (?=\\() #stop pattern before the opening parenthesis without grabbing any characters",
+      "begin": "(?xi)\n  ([\\_[:alpha:]][\\_\\#\\_\\$[:alnum:]]*)\\s* #grab the function name  \n  (?=\\() #stop pattern before the opening parenthesis without grabbing any characters",
       "beginCaptures": {
         "1": {
-          "name": "punctuation.accessor.usp"
-        },
-        "2": {
           "patterns": [
             {
               "include": "#builtin-functions"
@@ -1756,7 +1632,7 @@
             },
             {
               "match": "(?xi)[\\_[:alpha:]][\\_\\#\\_\\$[:alnum:]]*",
-              "name": "entity.name.invocation.usp"
+              "name": "entity.name.function.usp"
             }
           ]
         }
@@ -2074,26 +1950,14 @@
     "assignment-expression": {
       "begin": "(=)",
       "beginCaptures": {
-        "0": {
-          "patterns": [
-            {
-              "include": "#assignment-operators"
-            }
-          ]
+        "1": {
+          "name": "keyword.operator.assignment.cs"
         }
       },
       "end": "(?=[,\\)\\];}])",
       "patterns": [
         {
           "include": "#expression-no-assignment"
-        }
-      ]
-    },
-    "assignment-operators": {
-      "patterns": [
-        {
-          "name": "keyword.operator.assignment.cs",
-          "match": "\\="
         }
       ]
     },
@@ -2327,8 +2191,27 @@
       }
     },
     "reserved-words": {
-      "match": "(?ix)\n  \\b(until|do|while|for|to|step|CONTINUE)\\b",
-      "name": "keyword.control.usp"
+      "patterns": [
+        {
+          "include": "#for-keywords"
+        },
+        {
+          "match": "(?ix)\n  \\b(until|do|while|CONTINUE)\\b",
+          "name": "keyword.control.usp"
+        }
+      ]
+    },
+    "for-keywords": {
+      "patterns": [
+        {
+          "match": "(?i)\\bto\\b",
+          "name": "keyword.control.loop.to.cs"
+        },
+        {
+          "match": "(?i)\\bstep\\b",
+          "name": "keyword.control.loop.step.cs"
+        }
+      ]
     },
     "punctuation": {
       "patterns": [
