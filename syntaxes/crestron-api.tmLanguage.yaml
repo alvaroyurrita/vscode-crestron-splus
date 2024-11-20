@@ -122,14 +122,17 @@ repository:
     begin: |-
         (?x)
           (?:
+            (\bstatic\b\s+)?             #possibly grab static
             \b(EventHandler)\b\s+ #grab function type
             ([_[:alpha:]][_[:alnum:]]*)\s*
           )
           (?=\()  #stop pattern before the opening parenthesis without grabbing any characters
     beginCaptures:
       '1':
-        name: keyword.modifier.eventhandler.api
+        name: keyword.modifier.static.api
       '2':
+        name: keyword.modifier.eventhandler.api
+      '3':
         name: entity.name.variable.function.api
     end: |-
         (?ix)
@@ -141,7 +144,8 @@ repository:
     begin: |-
       (?x)
         (?:
-          (?:(\bDelegateProperty\b)\s+)? #possibly grab delagate property
+          (?:(\bstatic\b)\s+)? #possibly grab static property
+          (?:(\bDelegateProperty\b)\s+)? #possibly grab delegate property
           ([\_[:alpha:]][_[:alnum:]]*)\s   #grab variable type
           (?:([\_[:alpha:]][_[:alnum:]]*)\s*  #grab variable name
             (?: # array suffix?
@@ -154,13 +158,15 @@ repository:
         (?=;)
     beginCaptures:
       "1":
-        name: keyword.modifier.delegateproperty.api
+        name: keyword.modifier.static.api
       "2":
+        name: keyword.modifier.delegateproperty.api
+      "3":
         patterns:
           - include: "#built-in-types"
           - match: ([_[:alpha:]][_[:alnum:]]*)
             name: entity.name.type.api
-      "3":
+      "4":
         name: entity.name.variable.api
     end: |-
       (?ix)

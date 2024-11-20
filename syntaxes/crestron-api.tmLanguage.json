@@ -180,12 +180,15 @@
     },
     "event-handler-declaration": {
       "name": "meta.declaration.class.function.api",
-      "begin": "(?x)\n  (?:\n    \\b(EventHandler)\\b\\s+ #grab function type\n    ([_[:alpha:]][_[:alnum:]]*)\\s*\n  )\n  (?=\\()  #stop pattern before the opening parenthesis without grabbing any characters",
+      "begin": "(?x)\n  (?:\n    (\\bstatic\\b\\s+)?             #possibly grab static\n    \\b(EventHandler)\\b\\s+ #grab function type\n    ([_[:alpha:]][_[:alnum:]]*)\\s*\n  )\n  (?=\\()  #stop pattern before the opening parenthesis without grabbing any characters",
       "beginCaptures": {
         "1": {
-          "name": "keyword.modifier.eventhandler.api"
+          "name": "keyword.modifier.static.api"
         },
         "2": {
+          "name": "keyword.modifier.eventhandler.api"
+        },
+        "3": {
           "name": "entity.name.variable.function.api"
         }
       },
@@ -197,12 +200,15 @@
       ]
     },
     "variable-declaration": {
-      "begin": "(?x)\n  (?:\n    (?:(\\bDelegateProperty\\b)\\s+)? #possibly grab delagate property\n    ([\\_[:alpha:]][_[:alnum:]]*)\\s   #grab variable type\n    (?:([\\_[:alpha:]][_[:alnum:]]*)\\s*  #grab variable name\n      (?: # array suffix?\n        \\[\n          (?:\\s*,\\s*)* # commata for multi-dimensional arrays\n        \\]\\s*\n      )*\n    )\n  )\n  (?=;)",
+      "begin": "(?x)\n  (?:\n    (?:(\\bstatic\\b)\\s+)? #possibly grab static property\n    (?:(\\bDelegateProperty\\b)\\s+)? #possibly grab delegate property\n    ([\\_[:alpha:]][_[:alnum:]]*)\\s   #grab variable type\n    (?:([\\_[:alpha:]][_[:alnum:]]*)\\s*  #grab variable name\n      (?: # array suffix?\n        \\[\n          (?:\\s*,\\s*)* # commata for multi-dimensional arrays\n        \\]\\s*\n      )*\n    )\n  )\n  (?=;)",
       "beginCaptures": {
         "1": {
-          "name": "keyword.modifier.delegateproperty.api"
+          "name": "keyword.modifier.static.api"
         },
         "2": {
+          "name": "keyword.modifier.delegateproperty.api"
+        },
+        "3": {
           "patterns": [
             {
               "include": "#built-in-types"
@@ -213,7 +219,7 @@
             }
           ]
         },
-        "3": {
+        "4": {
           "name": "entity.name.variable.api"
         }
       },
