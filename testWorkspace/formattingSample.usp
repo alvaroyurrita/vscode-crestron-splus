@@ -138,15 +138,15 @@ STRING InheritString[10][20]; //tes
 
 
 FUNCTION MyFunction(){
-
+	
 	#IF_DEFINED dfdfdf
-
+	
 	#ENDIF
-
+	
 	#IF_NOT_DEFINED
-
+	
 	#ENDIF	
-
+	
 	//Arithmetic
 	-
 	*
@@ -194,7 +194,7 @@ FUNCTION MyFunction(){
 	,
 	;
 	.
-
+	
 	//Numeric literals
 	0x12AC
 	0X123
@@ -261,7 +261,7 @@ FUNCTION MyFunction(){
 	print("%12lx", li);
 	print("%12lx", li);
 	print("%12lX", li);
-
+	
 	//Illegal string literals
 	print("\xF");
 	print("\h");
@@ -293,8 +293,8 @@ STRUCTURE mySruct //test
 	STRING Variable11$[6], Variable11[4][6];
 };
 
-CEVENT myEvent1;
-CMUTEX myMutex;
+//CEVENT myEvent1;
+//CMUTEX myMutex;
 
 
 //Function Deinition
@@ -384,12 +384,12 @@ STRING_FUNCTION MyFunction6()
 
 
 // Class Definitions
-SampleClass CustomClass;
+// SampleClass CustomClass;
 CEvent cEventClass;
 CMutex cMutexClass;
 
 
-// Sockets
+// // Sockets
 TCP_CLIENT TcpClient[100];
 TCP_SERVER TcpServer[100];
 UDP_SOCKET UdpSocket[100];
@@ -461,7 +461,7 @@ FUNCTION MyFunction1()
 	int3 = int1 << 1; // Shift Left
 	int3 = int1 >> 1; // Shift Right
 	int3 = int1 {{ 1; // Rotate LEft
-	int3 = int1 }} 1; // Rotate Right
+			int3 = int1 }} 1; // Rotate Right
 	int3 = Not(int1); // 1's Complement
 	int3 = int1 & int2; // Bitwise AND
 	int3 = int1 | int2; // Bitwise OR
@@ -494,9 +494,9 @@ INTEGER_FUNCTION  MyIntFunction1()
 	PRINT("");
 	#ENDIF 
 	
-	// #IF_SERIES3 
-	// PRINT("");
-	// #ENDIF 
+	#IF_SERIES3 
+	PRINT("");
+	#ENDIF 
 	
 	#IF_SERIES4 
 	PRINT("");
@@ -519,32 +519,31 @@ FUNCTION LoopingConstructs()
 {
 	INTEGER a;
 	d = GetEncoding(a,b,3,4,d) + Len(t);
-
-	until(a=5);
-
+	
+	
 	FOR ( a = Len(t) TO Len(t) STEP Len(5) ){
 		PRINT("");
 		CONTINUE;
 	}
-
+	
 	do
 	{
 		a=a+1;
 	}
 	until(a=5);
-
+	
 	WHILE( a < 5 )
 	{
 		d = ReverseFind(a,"d",0);
 		d = ReverseFindNoCase(a,"d",0); 		
 	}
-
+	
 	// encoding functions
 	d = GetEncoding(a);
 	SetEncoding(a,ENCODING_ASCII);
 	b = ToASCII(a);
 	b = ToUTF16(a);
-
+	
 	//string parsing functions
 	ClearBuffer(BufferInput1);
 	c =CompareStrings(a,b);
@@ -570,7 +569,7 @@ FUNCTION LoopingConstructs()
 	d = ReverseFindNoCase(a,"d",0); 
 	d = a < 5;
 	until(a=5);
-
+	
 	do
 	{
 		a=a+1;
@@ -658,20 +657,135 @@ Function RandomFunctions()
 	a = RANDOM(5,10);
 }
 
-callback GatherEventHandler MyGatherCallback(GatherEventArgs Args)
+//Event Handlers
+
+THREADSAFE PUSH DigitalInput1, DigitalInpu2
 {
-	STRING a[20];
-	SIGNED_INTEGER c;
-	
-	a=Args.RxString;
-	c = Args.Results;
-	RearmGatherAsync(Args.Input);
-	Test2.Test1(one, "2", three[1])
-	Test("test %d %s %u %s %x %X %ld %lu %% %adf");
-	Test("test %1d %12s %3u %32s %x %X %2ld %1lu %%");
-	Test("test %133d %1233s %3333u %32333s %33x %33X %2333ld %3331lu %%");
-	Test("\n \t \b \r \f\ \a \\ \' \" \x23 ");
 }
+
+
+
+RELEASE DigitalInput1
+{
+	TERMINATEEVENT;
+	// TODO:  Add code here
+}
+
+
+
+CHANGE DigitalInput1
+{
+	// TODO:  Add code here
+}
+
+THREADSAFE CHANGE DigitalInput2
+{
+	// TODO:  Add code here
+}
+
+
+
+EVENT
+{
+	SIGNED_INTEGER status;
+	SIGNED_LONG_INTEGER a;
+	STRING soUDP_Rx[10];
+	STRING siUDP_Tx[10];
+	STRING S[300];
+	status = SocketConnectClient (TcpClient, "1.1.1.1", 20, 1);
+	status = SocketDisconnectClient (TcpClient);
+	status = SocketServerStartListen(TcpServer, S, 20);
+	status = SocketServerStopListen(TcpServer);
+	status = SocketUDP_Enable(UdpSocket, "1.1.1.1", 20);
+	status = SocketUDP_Disable (UdpSocket);
+	status = SocketSend(TcpClient, siUDP_Tx );
+	a = SocketGetPortNumber(TcpClient);
+	status = SocketGetRemoteIPAddress(TcpClient, S);
+	status = SocketGetAddressAsRequested(TcpClient, S);
+	status = SocketIsBroadcast(UdpSocket);
+	status = SocketIsMulticast(UdpSocket);
+	if (Len(UdpSocket.SocketRxBuf) < 256)
+	Print("Rx: %s", UdpSocket.SocketRxBuf);
+	soUDP_Rx = UdpSocket.SocketRxBuf;
+	ClearBuffer(UdpSocket.SocketRxBuf);
+	status = SocketSend(UdpSocket, siUDP_Tx );
+}
+
+
+
+SOCKETCONNECT TcpClient
+{
+}
+
+
+
+SOCKETDISCONNECT TcpClient
+{
+	// TODO:  Add code here
+}
+
+
+
+SOCKETRECEIVE TcpClient
+{
+	signed_integer iStatus;
+	STRING siClientTx[10];
+	STRING soClientRx[10];
+	STRING S[300];
+	iStatus = SocketGetSenderIPAddress(UdpSocket, S);
+	iStatus = TcpClient.SocketStatus;
+	soClientRx = TcpClient.SocketRxBuf;
+}
+
+
+
+SOCKETSTATUS TcpClient
+{
+	signed_integer iStatus;
+	iStatus = SocketGetStatus();
+}
+
+
+
+Function Main()
+{
+	RegisterDelegate(objectName, delegateName, callbackName);
+	RegisterEvent(objectInstName, eventName, callbackFuncName);
+	
+	eventhandler callbackFuncName(senderClassType sender,argsType args)
+	{
+		//code here;
+	}
+	
+	callback function callbackName(argsType args)
+	{
+		//todo: code;
+	}
+	WaitForInitializationComplete();
+}
+
+eventhandler test (class myclass, EventArgs myargs){
+	test
+}
+
+eventhandler test (class myclass, myargs myargs){
+	test
+}
+
+// callback GatherEventHandler MyGatherCallback(GatherEventArgs Args)
+// {
+// 	STRING a[20];
+// 	SIGNED_INTEGER c;
+
+// 	a=Args.RxString;
+// 	c = Args.Results;
+// 	RearmGatherAsync(Args.Input);
+// 	Test2.Test1(one, "2", three[1])
+// 	Test("test %d %s %u %s %x %X %ld %lu %% %adf");
+// 	Test("test %1d %12s %3u %32s %x %X %2ld %1lu %%");
+// 	Test("test %133d %1233s %3333u %32333s %33x %33X %2333ld %3331lu %%");
+// 	Test("\n \t \b \r \f\ \a \\ \' \" \x23 ");
+// }
 
 Function Test1(byRef Param1, byval Param2, ReadOnlyByRef Param3)
 {}
@@ -710,7 +824,7 @@ FUNCTION SystemInterfaceing()
 
 FUNCTION WaitEvents()
 {
-
+	
 	CANCELWAIT(MyWait);
 	CANCELALLWAIT();
 	PAUSEWAIT(MyWait);
@@ -815,8 +929,8 @@ Function FileFunctions()
 	
 	a=StartFileOperations();
 	nFileHandle = FileOpen ( "\\CF0\\MyFile", _O_WRONLY | _O_TEXT );
-		nNumWritten=FileWrite( nFileHandle, sBuf, 500 );
-		FileClose( nFileHandle );
+	nNumWritten=FileWrite( nFileHandle, sBuf, 500 );
+	FileClose( nFileHandle );
 	a=EndFileOperations();
 	a=StartFileOperations();
 	FileEOF ( nFileHandle ) ;
@@ -844,7 +958,7 @@ Function FileFunctions()
 	iErrorCode = ReadLongInteger(nFileHandle, li);
 	iErrorCode = ReadInteger(nFileHandle, i);
 	ReadStructure( nFileHandle, struct, nTotalBytesRead );
-		
+	
 	WaitForNewDisk() 
 	FileDeleteShared ( "\\CF0\\MyFile" )
 	a = ARDONLY | AHIDDEN | ASYSTEM | AVOLUME | ADIRENT | ARCHIVE  ;      
@@ -946,26 +1060,28 @@ FUNCTION FileFunctions()
 	{
 		PRINT ( "Length of file = %d\n", FileLength ( nFileHandle ) );
 		WHILE (FileRead(nFileHandle, sBuf, 4096) > 0)
-		PRINT ( "Read from file: %s\n", sBuf );
-		IF ( FileClose ( nFileHandle ) <> 0 )
-		PRINT ( "Error closing file\n" );
-		iErrorCode = ReadString( nFileHandle, s2);
-		iErrorCode = WriteStringArray( nFileHandle, s);
-		iErrorCode = ReadStringArray( nFileHandle, s);
-		iErrorCode = WriteSignedLongInteger(nFileHandle, sli);
-		iErrorCode = WriteLongInteger(nFileHandle, li);
-		iErrorCode = WriteInteger(nFileHandle, i);
-		iErrorCode = WriteString( nFileHandle, s2);
-		iErrorCode = ReadSignedLongIntegerArray(nFileHandle, sliArray);
-		iErrorCode = ReadIntegerArray(nFileHandle, iArray);
-		iErrorCode = ReadSignedIntegerArray(nFileHandle, isArray);
-		iErrorCode = ReadLongIntegerArray(nFileHandle, ilArray);
-		iErrorCode = ReadIntegerArray(nFileHandle, iArray);
-		iErrorCode = ReadSignedLongInteger(nFileHandle, sli);
-		iErrorCode = ReadSignedInteger(nFileHandle, si);
-		iErrorCode = ReadLongInteger(nFileHandle, li);
-		iErrorCode = ReadInteger(nFileHandle, i);
-		ReadStructure( nFileHandle, struct, nTotalBytesRead );
+		{
+			PRINT ( "Read from file: %s\n", sBuf );
+			IF ( FileClose ( nFileHandle ) <> 0 )
+			PRINT ( "Error closing file\n" );
+			iErrorCode = ReadString( nFileHandle, s2);
+			iErrorCode = WriteStringArray( nFileHandle, s);
+			iErrorCode = ReadStringArray( nFileHandle, s);
+			iErrorCode = WriteSignedLongInteger(nFileHandle, sli);
+			iErrorCode = WriteLongInteger(nFileHandle, li);
+			iErrorCode = WriteInteger(nFileHandle, i);
+			iErrorCode = WriteString( nFileHandle, s2);
+			iErrorCode = ReadSignedLongIntegerArray(nFileHandle, sliArray);
+			iErrorCode = ReadIntegerArray(nFileHandle, iArray);
+			iErrorCode = ReadSignedIntegerArray(nFileHandle, isArray);
+			iErrorCode = ReadLongIntegerArray(nFileHandle, ilArray);
+			iErrorCode = ReadIntegerArray(nFileHandle, iArray);
+			iErrorCode = ReadSignedLongInteger(nFileHandle, sli);
+			iErrorCode = ReadSignedInteger(nFileHandle, si);
+			iErrorCode = ReadLongInteger(nFileHandle, li);
+			iErrorCode = ReadInteger(nFileHandle, i);
+			ReadStructure( nFileHandle, struct, nTotalBytesRead );
+		}
 		
 		if ( WaitForNewDisk() < 0 )
 		PRINT ( "Wait for new disk\n" );
@@ -1151,7 +1267,7 @@ FUNCTION TryAndCatchHandling()
 	{
 		Print( "Exception thrown: %s", GetExceptionMessage() );
 	}
-
+	
 }
 
 SIGNED_INTEGER_FUNCTION SignedIntegerFunction1()
@@ -1171,119 +1287,6 @@ STRING_FUNCTION StringFunction1()
 }
 
 
-//Event Handlers
 
-THREADSAFE PUSH DigitalInput1, DigitalInpu2
-{
-}
-
-
-
-RELEASE DigitalInput1
-{
-	TERMINATEEVENT;
-	// TODO:  Add code here
-}
-
-
-
-CHANGE DigitalInput1
-{
-	// TODO:  Add code here
-}
-
-THREADSAFE CHANGE DigitalInput2
-{
-	// TODO:  Add code here
-}
-
-
-
-EVENT
-{
-	SIGNED_INTEGER status;
-	SIGNED_LONG_INTEGER a;
-	STRING soUDP_Rx[10];
-	STRING siUDP_Tx[10];
-	STRING S[300];
-	status = SocketConnectClient (TcpClient, "1.1.1.1", 20, 1);
-	status = SocketDisconnectClient (TcpClient);
-	status = SocketServerStartListen(TcpServer, S, 20);
-	status = SocketServerStopListen(TcpServer);
-	status = SocketUDP_Enable(UdpSocket, "1.1.1.1", 20);
-	status = SocketUDP_Disable (UdpSocket);
-	status = SocketSend(TcpClient, siUDP_Tx );
-	a = SocketGetPortNumber(TcpClient);
-	status = SocketGetRemoteIPAddress(TcpClient, S);
-	status = SocketGetAddressAsRequested(TcpClient, S);
-	status = SocketIsBroadcast(UdpSocket);
-	status = SocketIsMulticast(UdpSocket);
-	if (Len(UdpSocket.SocketRxBuf) < 256)
-	Print("Rx: %s", UdpSocket.SocketRxBuf);
-	soUDP_Rx = UdpSocket.SocketRxBuf;
-	ClearBuffer(UdpSocket.SocketRxBuf);
-	status = SocketSend(UdpSocket, siUDP_Tx );
-}
-
-
-
-SOCKETCONNECT TcpClient
-{
-}
-
-
-
-SOCKETDISCONNECT TcpClient
-{
-	// TODO:  Add code here
-}
-
-
-
-SOCKETRECEIVE TcpClient
-{
-	signed_integer iStatus;
-	STRING siClientTx[10];
-	STRING soClientRx[10];
-	STRING S[300];
-	iStatus = SocketGetSenderIPAddress(UdpSocket, S);
-	iStatus = TcpClient.SocketStatus;
-	soClientRx = TcpClient.SocketRxBuf;
-}
-
-
-
-SOCKETSTATUS TcpClient
-{
-	signed_integer iStatus;
-	iStatus = SocketGetStatus();
-}
-
-
-
-Function Main()
-{
-	RegisterDelegate(objectName, delegateName, callbackName);
-	RegisterEvent(objectInstName, eventName, callbackFuncName);
-	
-	eventhandler callbackFuncName(senderClassType sender,argsType args)
-	{
-		//code here;
-	}
-	
-	callback function callbackName(argsType args)
-	{
-		//todo: code;
-	}
-	WaitForInitializationComplete();
-}
-
-eventhandler test (class myclass, EventArgs myargs){
-	test
-}
-
-eventhandler test (class myclass, myargs myargs){
-	test
-}
 
 

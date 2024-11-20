@@ -1,0 +1,237 @@
+---
+scopeName: source.splusapi
+fileTypes:
+  - api
+name: CrestronApi
+patterns:
+  - include: "#directives"
+  - include: "#declaration"
+
+repository:
+
+# Directives
+  directives:
+    patterns:
+    - include: "#punctuation-semicolon"
+
+
+#declaration
+  declaration:
+    patterns:
+      - include: "#namespace-declaration"
+      - include: "#structure-declaration"
+      - include: "#function-declaration"
+      - include: "#event-declaration"
+      - include: "#class-declaration"
+      - include: "#variable-declaration"
+  namespace-declaration:
+    begin: \b(namespace)\b
+    beginCaptures:
+      '1':
+        name: storage.type.namespace.api
+    end: (?<=\})|(?=;)
+    patterns:
+    - include: "#comment"
+    - name: entity.name.type.namespace.api
+      match: |-
+        (?x)
+          [_[:alpha:]][_[:alnum:]]*
+    - include: "#punctuation-accessor"
+    - begin: \{
+      beginCaptures:
+        '0':
+          name: punctuation.curlybrace.open.api
+      end: \}
+      endCaptures:
+        '0':
+          name: punctuation.curlybrace.close.api
+      patterns:
+      - include: "#declarations"
+      - include: "#punctuation-semicolon"
+  class-declaration:
+    begin: \bclass\b
+    end: (?<=\})|(?=;)
+    patterns:
+    - begin: |-
+        (?x)
+          \b(class)\b\s+
+          (@?[_[:alpha:]][_[:alnum:]]*)\s*
+      beginCaptures:
+        '2':
+          name: storage.type.record.api
+        '3':
+          name: storage.type.class.api
+        '4':
+          name: entity.name.type.class.api
+      end: (?=\{)|(?=;)
+      patterns:
+      - include: "#comment"
+      - include: "#type-parameter-list"
+      - include: "#parenthesized-parameter-list"
+      - include: "#base-types"
+      - include: "#generic-constraints"
+    - begin: \{
+      beginCaptures:
+        '0':
+          name: punctuation.curlybrace.open.api
+      end: \}
+      endCaptures:
+        '0':
+          name: punctuation.curlybrace.close.api
+      patterns:
+      - include: "#class-members"
+    - include: "#preprocessor"
+    - include: "#comment"
+
+  class-members:
+    patterns:
+      - include: "#class-delegate-declaration"
+      - include: "#class-eventhandler-declaration"
+      - include: "#class-function-declaration"
+      - include: "#variable-declaration"
+
+  class-delegate-declaration:
+    name: meta.declaration.class.delegate.api
+    begin: |-
+        (?ix)
+          (?=
+            (\bstatic\b\s+)?
+            \bdelegate\bs*
+          ) #start pattern at the beginning of the delegate keyword without grabbing any characters
+    end: |-
+        (?ix)
+          (?<=\;)   #stop pattern before semicolon without grabbing any characters
+    patterns:
+    - begin: |-
+          (?ix)
+            (?:\b(static)\b\s+)?              #possibly grab static
+            \b(delegate)\b\s+                 #grab the word delegate
+            \b(function|integer_function|string_function|long_integer_function|signed_integer_function|signed_long_integer_function|SIMPLSHARPSTRING_FUNCTION)\b\s+ #grab delegate type
+            ([_[:alpha:]][\#\$\_[:alnum:]]*)   #grab the delegate name
+      beginCaptures:
+        '1':
+          name: keyword.modifier.delegate.api
+        '2':
+          name: keyword.declaration.delegate.api
+        '3':
+          name: keyword.declaration.function.api
+        '4':
+          name: entity.name.variable.delegate.api
+      end: (;)
+      endCaptures:
+        '1':
+          name: punctuation.terminator.delegate.api
+      patterns:
+      - include: "#comment"
+      - include: "#parenthesized-parameter-list"
+  class-eventhandler-declaration:
+    name: meta.declaration.class.eventhandler.api
+    begin: |-
+        (?ix)
+          (?=
+            \beventhandler\b
+          ) #start pattern at the beginning of the eventhandler keyword without grabbing any characters
+    end: |-
+        (?ix)
+          (?<=\;)   #stop pattern after semicolon without grabbing any characters
+    patterns:
+    - begin: |-
+          (?ix)
+            \b(eventhandler)\b\s+              #grab the word eventhandler
+            ([_[:alpha:]][\#\$\_[:alnum:]]*)   #grab the delegate name
+      beginCaptures:
+        '1':
+          name: keyword.modifier.eventhandler.api
+        '2':
+          name: entity.name.variable.eventhandler.api
+      end: (;)
+      endCaptures:
+        '1':
+          name: punctuation.terminator.eventhandler.api
+      patterns:
+      - include: "#comment"
+      - include: "#parenthesized-parameter-list"
+  class-function-declaration:
+    name: meta.declaration.class.function.api
+    begin: |-
+        (?ix)
+          (?=(?:function|integer_function|string_function|long_integer_function|signed_integer_function|signed_long_integer_function|SIMPLSHARPSTRING_FUNCTION)) #start pattern at the beginning of the function keyword without grabbing any characters
+    end: |-
+        (?ix)
+          (?<=;)   #stop pattern after the closing curly brace or before semicolon without grabbing any characters
+    patterns:
+    - begin: |-
+          (?ix)
+            (function|integer_function|string_function|long_integer_function|signed_integer_function|signed_long_integer_function|SIMPLSHARPSTRING_FUNCTION)\b\s+
+            ([_[:alpha:]][\#\$\_[:alnum:]]*)
+      beginCaptures:
+        '1':
+          name: keyword.declaration.function.api
+        '2':
+          name: entity.name.variable.function.api
+      end: (;)
+      endCaptures:
+        '1':
+          name: punctuation.terminator.function.api patterns
+      patterns:
+      - include: "#preprocessor"
+      - include: "#comment"
+      - include: "#parenthesized-parameter-list"
+  variable-declaration:
+    begin: |-
+      (?x)
+        (?=
+          ^   #start pattern at the beginning of a line
+          \s* #ignore leading spaces
+          (?:
+            (?:[\_[:alpha:]][\_\#\_\$[:alnum:]]*)\s   #grab identifier
+          )
+          (?=[\_[:alpha:]])  #only when followed by the beginning of another identifier
+        )          #without grabbing any characters
+    end: |-
+      (?x)
+        (?<=;)|    #stop pattern after the semicolon or
+        (?=[{\(]) #before curly bracket or parenthesis without grabbing any characters
+    patterns:
+      - begin: |-
+          (?ix)
+            (?:\s*)
+            (dynamic|volatile|nonvolatile|ascii|utf16|inherit|delegateproperty)?\s*  #Possibly grab modifier
+            (?:
+              (integer|string|long_integer|signed_integer|signed_long_integer|simplsharpstring)| #grab the built-in variable type or
+              (cevent|cmutex)| #or built in class
+              (tcp_client|tcp_server|udp_socket)| #or built in structure
+              ([_[:alpha:]][\#\$\_[:alnum:]]*)\s* #grab the variable name
+            )
+        beginCaptures:
+          "1":
+            name: keyword.modifier.variable.api
+          '2':
+            name: keyword.declaration.variable.api
+          '3':
+            name: keyword.support.class.api
+          '4':
+            name: keyword.support.structure.api
+          '5':
+            patterns:
+              - include: "#built-in-types"
+              - match: ([\_[:alpha:]][\_\#\_\$[:alnum:]]*)
+                name: entity.name.variable.api
+        end: |-
+          (?ix)
+            (\;)  #stop pattern before the closing curly brace or before semicolon without grabbing any characters
+        endCaptures:
+          "1":
+            name: punctuation.terminator.variable.api
+        name: meta.declaration.variable.api
+        patterns:
+          - match: ([\_[:alpha:]][\_\#\_\$[:alnum:]]*)
+            name: entity.name.variable.api
+          - include: "#type-array-suffix"
+          - include: "#comment"
+          - include: "#punctuation-comma"
+
+
+  punctuation-semicolon:
+    match: \;
+    name: punctuation.terminator.usp

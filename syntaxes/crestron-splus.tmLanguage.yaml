@@ -506,27 +506,21 @@ repository:
 #declaration
   declaration:
     patterns:
-      # - include: "#input-declaration"
-      # - include: "#output-declaration"
-      # - include: "#parameter-declaration"
-      # - include: "#structure-declaration"
+      - include: "#input-declaration"
+      - include: "#output-declaration"
+      - include: "#parameter-declaration"
+      - include: "#structure-declaration"
       - include: "#function-declaration"
-      # - include: "#event-declaration"
-      # - include: "#callback-declaration"
-      # - include: "#namespace-declaration"
-      # - include: "#variable-declaration"
+      - include: "#event-declaration"
+      - include: "#variable-declaration"
       - include: "#punctuation-semicolon"
   input-declaration:
-    name: meta.declaration.input.usp
     begin: |-
       (?ix)
         (?=(?:digital_input|analog_input|buffer_input|string_input)) #start pattern at the beginning of the input keyword without grabbing any characters
     end: |-
         (?ix)
-          (;)|(?=\{)   #stop pattern before the closing curly brace or at semicolon
-    endCaptures:
-      "1":
-        name: punctuation.terminator.input.usp
+          (?=;)   #stop pattern before the semicolon
     patterns:
       - match: (?i)\b(digital_input|analog_input|buffer_input|string_input)\b
         name: keyword.declaration.input.usp
@@ -537,13 +531,12 @@ repository:
       - include: "#punctuation-comma"
       - include: "#type-array-suffix"
   output-declaration:
-    name: meta.declaration.output.usp
     begin: |-
       (?ix)
         (?=(?:digital_output|analog_output|buffer_output|string_output)) #start pattern at the beginning of the input keyword without grabbing any characters
     end: |-
         (?ix)
-          (;)|(?=\{)   #stop pattern before the closing curly brace or at semicolon
+          (?=;)   #stop pattern before the semicolon
     endCaptures:
       "1":
         name: punctuation.terminator.output.usp
@@ -557,13 +550,12 @@ repository:
       - include: "#punctuation-comma"
       - include: "#type-array-suffix"
   parameter-declaration:
-    name: meta.declaration.parameter.usp
     begin: |-
       (?ix)
         (?=(?:integer_parameter|string_parameter|long_integer_parameter|signed_integer_parameter|signed_long_integer_parameter)) #start pattern at the beginning of the input keyword without grabbing any characters
     end: |-
         (?ix)
-          (;)|(?=\{)   #stop pattern before the closing curly brace or at semicolon
+          (?=;)   #stop pattern before the semicolon
     endCaptures:
       "1":
         name: punctuation.terminator.parameter.usp
@@ -599,6 +591,7 @@ repository:
             (?:
               (integer|string|long_integer|signed_integer|signed_long_integer|simplsharpstring)| #grab the built-in variable type or
               (cevent|cmutex)| #or built in class
+              (tcp_client|tcp_server|udp_socket)| #or built in structure
               ([_[:alpha:]][\#\$\_[:alnum:]]*)\s* #grab the variable name
             )
         beginCaptures:
@@ -609,6 +602,8 @@ repository:
           '3':
             name: keyword.support.class.usp
           '4':
+            name: keyword.support.structure.usp
+          '5':
             patterns:
               - include: "#built-in-types"
               - match: ([\_[:alpha:]][\_\#\_\$[:alnum:]]*)
@@ -632,7 +627,7 @@ repository:
           (?=\bstructure\b) #start pattern at the beginning of the word structure without grabbing any characters
     end: |-
         (?ix)
-          (?<=};)   #stop pattern after the closing curly brace semicolon pair without grabbing any characters
+          (?<=})|(?=;)   #stop pattern after the closing curly bracket or first semicolon without grabbing any characters
     patterns:
       - begin: |-
             (?ix)
@@ -649,31 +644,20 @@ repository:
         name: meta.declaration.structure.usp
         patterns:
         - include: "#comment"
-      - begin: (\{)
-        beginCaptures:
-          '1':
-            name: punctuation.curlybrace.open.usp
-        end: (\})\s*(;)
-        endCaptures:
-          '1':
-            name: punctuation.curlybrace.close.usp
-          '2':
-            name: punctuation.terminator.structure.usp
-        name: meta.structure.contents
-        patterns:
-        - include: "#structure-members"
-        - include: "#preprocessor"
-        - include: "#comment"
+      - include: "#block"
   function-declaration:
     begin: |-
         (?ix)
+          (\bcallback\b\s*)?  # possible grab callback
           (function|integer_function|string_function|long_integer_function|signed_integer_function|signed_long_integer_function|simplsharpstring)\s* # grab the built-in function type or
           ([\_[:alpha:]][\_\#\_\$[:alnum:]]*)\s* # the function name
           (?=\() #and stop before the opening parenthesis
     beginCaptures:
       '1':
-        name: keyword.declaration.function.usp
+        name: keyword.modifier.callback.usp
       '2':
+        name: keyword.declaration.function.usp
+      '3':
         name: entity.name.variable.function.usp
     end: |-
         (?ix)
@@ -692,7 +676,7 @@ repository:
           ) #start pattern at the beginning of the function keyword without grabbing any characters
     end: |-
         (?ix)
-          (?<=})   #stop pattern after the closing curly brace without grabbing any characters
+          (?<=})|(?=;)   #stop pattern after the closing curly bracket or first semicolon without grabbing any characters
     patterns:
     - begin: |-
           (?ix)
@@ -708,243 +692,14 @@ repository:
       end: |-
           (?ix)
             (?=\{) #stop pattern after the opening curly brace without grabbing any characters
-      name: meta.declaration.event.usp
       patterns:
       - match: ([\_[:alpha:]][\_\#\_\$[:alnum:]]*)
         name: entity.name.variable.event.usp
       - include: "#punctuation-comma"
       - include: "#comment"
       - include: "#parenthesized-parameter-list"
-    - begin: (\{)
-      beginCaptures:
-        '1':
-          name: punctuation.curlybrace.open.usp
-      end: (\})
-      endCaptures:
-        '1':
-          name: punctuation.curlybrace.close.usp
-      name: meta.event.contents
-      patterns:
-      # - include: "#variable-declaration"
-      - match: (?i)\bTerminateEvent\b
-        name: keyword.control.event.terminate.usp
-      - include: "#statement"
-      - include: "statement"
-      - include: "#preprocessor"
-      - include: "#comment"
-  callback-declaration:
-    begin: |-
-        (?ix)
-          (?=
-            (\bcallback\b\s+)? #test for callback
-            (?:function|integer_function|string_function|long_integer_function|signed_integer_function|signed_long_integer_function|simplsharpstring)
-          ) #start pattern at the beginning of the callback function keyword without grabbing any characters
-    end: |-
-        (?ix)
-          (?<=})   #stop pattern after the closing curly brace without grabbing any characters
-    patterns:
-    - begin: |-
-          (?ix)
-            (\bcallback\b\s+)? #grab the callback keyword
-            (function|integer_function|string_function|long_integer_function|signed_integer_function|signed_long_integer_function|simplsharpstring)\b\s+
-            ([_[:alpha:]][\#\$\_[:alnum:]]*)
-      beginCaptures:
-        '1':
-          name: keyword.declaration.callback.usp
-        '2':
-          name: keyword.declaration.function.usp
-        '3':
-          name: entity.name.variable.function.usp
-      end: |-
-          (?ix)
-            (?=\{) #stop pattern after the opening curly brace without grabbing any characters
-      name: meta.declaration.function.usp
-      patterns:
-      - include: "#comment"
-      - include: "#parenthesized-parameter-list"
-    - begin: (\{)
-      beginCaptures:
-        '1':
-          name: punctuation.curlybrace.open.usp
-      end: (\})
-      endCaptures:
-        '1':
-          name: punctuation.curlybrace.close.usp
-      name: meta.callback.contents
-      patterns:
-      - include: "#statement"
-      - include: "#variable-declaration"
-      - include: "statement"
-      - include: "#preprocessor"
-      - include: "#comment"
-  namespace-declaration:
-    begin: |-
-        (?ix)
-          (?=\bnamespace\b) #start pattern at the beginning of the word structure without grabbing any characters
-    end: |-
-        (?ix)
-          (?<=\})   #stop pattern after the closing curly brace without grabbing any characters
-    patterns:
-    - begin: |-
-          (?ix)
-            \b(namespace)\b\s+
-            ([_[:alpha:]][\#\$\_[:alnum:]]*)
-      beginCaptures:
-        '1':
-          name: keyword.declaration.namespace.usp
-        '2':
-          name: entity.name.type.namespace.usp
-      end: |-
-          (?ix)
-            (?=\{) #stop pattern before the opening curly brace without grabbing any characters
-      name: meta.declaration.namespace.usp
-      patterns:
-      - include: "#comment"
-    - begin: (\{)
-      beginCaptures:
-        '1':
-          name: punctuation.curlybrace.open.usp
-      end: (\})(?!;)
-      endCaptures:
-        '1':
-          name: punctuation.curlybrace.close.usp
-      name: meta.namespace.contents
-      patterns:
-      - include: "#class-declaration"
-      - include: "#comment"
-  class-declaration:
-    begin: |-
-        (?ix)
-          (?=
-            (\bstatic\b\s+)?
-            \bclass\b
-          ) #start pattern at the beginning of the word (static)? class  without grabbing any characters
-    end: |-
-        (?ix)
-          (?<=};)   #stop pattern after the closing curly brace semicolon pair without grabbing any characters
-    patterns:
-    - begin: |-
-          (?ix)
-            (?:\b(static)\b\s+)?               #possibly grab static
-            \b(class)\b\s+                    #grab the word structure
-            ([_[:alpha:]][\#\$\_[:alnum:]]*)  #grab the structure name
-      beginCaptures:
-        "1":
-          name: keyword.modifier.class.usp
-        '2':
-          name: keyword.declaration.class.usp
-        '3':
-          name: entity.name.type.class.usp
-      end: |-
-          (?ix)
-            (?=\{) #stop pattern before the opening curly brace or before semicolon without grabbing any characters
-      patterns:
-      - include: "#comment"
-      name: meta.declaration.class.usp
-    - begin: (\{)
-      beginCaptures:
-        '1':
-          name: punctuation.curlybrace.open.usp
-      end: (\})(;)
-      endCaptures:
-        '1':
-          name: punctuation.curlybrace.close.usp
-        '2':
-          name: punctuation.terminator.class.usp
-      name: meta.class.contents
-      patterns:
-      - include: "#class-delegate-declaration"
-      - include: "#class-eventhandler-declaration"
-      - include: "#class-function-declaration"
-      - include: "#variable-declaration"
-      - include: "#comment"
-  class-delegate-declaration:
-    name: meta.declaration.class.delegate.usp
-    begin: |-
-        (?ix)
-          (?=
-            (\bstatic\b\s+)?
-            \bdelegate\bs*
-          ) #start pattern at the beginning of the delegate keyword without grabbing any characters
-    end: |-
-        (?ix)
-          (?<=\;)   #stop pattern before semicolon without grabbing any characters
-    patterns:
-    - begin: |-
-          (?ix)
-            (?:\b(static)\b\s+)?              #possibly grab static
-            \b(delegate)\b\s+                 #grab the word delegate
-            \b(function|integer_function|string_function|long_integer_function|signed_integer_function|signed_long_integer_function|SIMPLSHARPSTRING_FUNCTION)\b\s+ #grab delegate type
-            ([_[:alpha:]][\#\$\_[:alnum:]]*)   #grab the delegate name
-      beginCaptures:
-        '1':
-          name: keyword.modifier.delegate.usp
-        '2':
-          name: keyword.declaration.delegate.usp
-        '3':
-          name: keyword.declaration.function.usp
-        '4':
-          name: entity.name.variable.delegate.usp
-      end: (;)
-      endCaptures:
-        '1':
-          name: punctuation.terminator.delegate.usp
-      patterns:
-      - include: "#comment"
-      - include: "#parenthesized-parameter-list"
-  class-eventhandler-declaration:
-    name: meta.declaration.class.eventhandler.usp
-    begin: |-
-        (?ix)
-          (?=
-            \beventhandler\b
-          ) #start pattern at the beginning of the eventhandler keyword without grabbing any characters
-    end: |-
-        (?ix)
-          (?<=\;)   #stop pattern after semicolon without grabbing any characters
-    patterns:
-    - begin: |-
-          (?ix)
-            \b(eventhandler)\b\s+              #grab the word eventhandler
-            ([_[:alpha:]][\#\$\_[:alnum:]]*)   #grab the delegate name
-      beginCaptures:
-        '1':
-          name: keyword.modifier.eventhandler.usp
-        '2':
-          name: entity.name.variable.eventhandler.usp
-      end: (;)
-      endCaptures:
-        '1':
-          name: punctuation.terminator.eventhandler.usp
-      patterns:
-      - include: "#comment"
-      - include: "#parenthesized-parameter-list"
-  class-function-declaration:
-    name: meta.declaration.class.function.usp
-    begin: |-
-        (?ix)
-          (?=(?:function|integer_function|string_function|long_integer_function|signed_integer_function|signed_long_integer_function|SIMPLSHARPSTRING_FUNCTION)) #start pattern at the beginning of the function keyword without grabbing any characters
-    end: |-
-        (?ix)
-          (?<=;)   #stop pattern after the closing curly brace or before semicolon without grabbing any characters
-    patterns:
-    - begin: |-
-          (?ix)
-            (function|integer_function|string_function|long_integer_function|signed_integer_function|signed_long_integer_function|SIMPLSHARPSTRING_FUNCTION)\b\s+
-            ([_[:alpha:]][\#\$\_[:alnum:]]*)
-      beginCaptures:
-        '1':
-          name: keyword.declaration.function.usp
-        '2':
-          name: entity.name.variable.function.usp
-      end: (;)
-      endCaptures:
-        '1':
-          name: punctuation.terminator.function.usp patterns
-      patterns:
-      - include: "#preprocessor"
-      - include: "#comment"
-      - include: "#parenthesized-parameter-list"
+    - include: "#block"
+  
   structure-members:
     patterns:
     - include: "#variable-declaration"
@@ -1008,6 +763,7 @@ repository:
     name: meta.code.block.udp
     patterns:
     - include: "#statement"
+    - include: "#variable-declaration"
 
 # statements
   statement:
@@ -1036,7 +792,7 @@ repository:
     beginCaptures:
       "1":
         name: keyword.control.loop.while.usp
-    end: (?<=\})
+    end: (?<=\))|(?=;|})
     patterns:
       - begin: \(
         beginCaptures:
@@ -1057,7 +813,7 @@ repository:
     beginCaptures:
       '1':
         name: keyword.control.loop.do.cs
-    end: (?<=\})
+    end: (?<=\))|(?=;|})
     patterns:
       - include: "#statement"
       - include: "#expression"
@@ -1080,7 +836,6 @@ repository:
           name: punctuation.parenthesis.close.cs
       patterns:
       - include: "#expression-no-assignment"
-
   for-statement:
     begin: (?i)\b(for)\b
     beginCaptures:

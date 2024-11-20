@@ -752,7 +752,25 @@
     "declaration": {
       "patterns": [
         {
+          "include": "#input-declaration"
+        },
+        {
+          "include": "#output-declaration"
+        },
+        {
+          "include": "#parameter-declaration"
+        },
+        {
+          "include": "#structure-declaration"
+        },
+        {
           "include": "#function-declaration"
+        },
+        {
+          "include": "#event-declaration"
+        },
+        {
+          "include": "#variable-declaration"
         },
         {
           "include": "#punctuation-semicolon"
@@ -760,14 +778,8 @@
       ]
     },
     "input-declaration": {
-      "name": "meta.declaration.input.usp",
       "begin": "(?ix)\n  (?=(?:digital_input|analog_input|buffer_input|string_input)) #start pattern at the beginning of the input keyword without grabbing any characters",
-      "end": "(?ix)\n  (;)|(?=\\{)   #stop pattern before the closing curly brace or at semicolon",
-      "endCaptures": {
-        "1": {
-          "name": "punctuation.terminator.input.usp"
-        }
-      },
+      "end": "(?ix)\n  (?=;)   #stop pattern before the semicolon",
       "patterns": [
         {
           "match": "(?i)\\b(digital_input|analog_input|buffer_input|string_input)\\b",
@@ -792,9 +804,8 @@
       ]
     },
     "output-declaration": {
-      "name": "meta.declaration.output.usp",
       "begin": "(?ix)\n  (?=(?:digital_output|analog_output|buffer_output|string_output)) #start pattern at the beginning of the input keyword without grabbing any characters",
-      "end": "(?ix)\n  (;)|(?=\\{)   #stop pattern before the closing curly brace or at semicolon",
+      "end": "(?ix)\n  (?=;)   #stop pattern before the semicolon",
       "endCaptures": {
         "1": {
           "name": "punctuation.terminator.output.usp"
@@ -824,9 +835,8 @@
       ]
     },
     "parameter-declaration": {
-      "name": "meta.declaration.parameter.usp",
       "begin": "(?ix)\n  (?=(?:integer_parameter|string_parameter|long_integer_parameter|signed_integer_parameter|signed_long_integer_parameter)) #start pattern at the beginning of the input keyword without grabbing any characters",
-      "end": "(?ix)\n  (;)|(?=\\{)   #stop pattern before the closing curly brace or at semicolon",
+      "end": "(?ix)\n  (?=;)   #stop pattern before the semicolon",
       "endCaptures": {
         "1": {
           "name": "punctuation.terminator.parameter.usp"
@@ -860,7 +870,7 @@
       "end": "(?x)\n  (?<=;)|    #stop pattern after the semicolon or\n  (?=[{\\(]) #before curly bracket or parenthesis without grabbing any characters",
       "patterns": [
         {
-          "begin": "(?ix)\n  (?:\\s*)\n  (dynamic|volatile|nonvolatile|ascii|utf16|inherit|delegateproperty)?\\s*  #Possibly grab modifier\n  (?:\n    (integer|string|long_integer|signed_integer|signed_long_integer|simplsharpstring)| #grab the built-in variable type or\n    (cevent|cmutex)| #or built in class\n    ([_[:alpha:]][\\#\\$\\_[:alnum:]]*)\\s* #grab the variable name\n  )",
+          "begin": "(?ix)\n  (?:\\s*)\n  (dynamic|volatile|nonvolatile|ascii|utf16|inherit|delegateproperty)?\\s*  #Possibly grab modifier\n  (?:\n    (integer|string|long_integer|signed_integer|signed_long_integer|simplsharpstring)| #grab the built-in variable type or\n    (cevent|cmutex)| #or built in class\n    (tcp_client|tcp_server|udp_socket)| #or built in structure\n    ([_[:alpha:]][\\#\\$\\_[:alnum:]]*)\\s* #grab the variable name\n  )",
           "beginCaptures": {
             "1": {
               "name": "keyword.modifier.variable.usp"
@@ -872,6 +882,9 @@
               "name": "keyword.support.class.usp"
             },
             "4": {
+              "name": "keyword.support.structure.usp"
+            },
+            "5": {
               "patterns": [
                 {
                   "include": "#built-in-types"
@@ -910,7 +923,7 @@
     },
     "structure-declaration": {
       "begin": "(?ix)\n  (?=\\bstructure\\b) #start pattern at the beginning of the word structure without grabbing any characters",
-      "end": "(?ix)\n  (?<=};)   #stop pattern after the closing curly brace semicolon pair without grabbing any characters",
+      "end": "(?ix)\n  (?<=})|(?=;)   #stop pattern after the closing curly bracket or first semicolon without grabbing any characters",
       "patterns": [
         {
           "begin": "(?ix)\n  \\b(structure)\\b\\s+\n  ([_[:alpha:]][\\#\\$\\_[:alnum:]]*)",
@@ -931,43 +944,20 @@
           ]
         },
         {
-          "begin": "(\\{)",
-          "beginCaptures": {
-            "1": {
-              "name": "punctuation.curlybrace.open.usp"
-            }
-          },
-          "end": "(\\})\\s*(;)",
-          "endCaptures": {
-            "1": {
-              "name": "punctuation.curlybrace.close.usp"
-            },
-            "2": {
-              "name": "punctuation.terminator.structure.usp"
-            }
-          },
-          "name": "meta.structure.contents",
-          "patterns": [
-            {
-              "include": "#structure-members"
-            },
-            {
-              "include": "#preprocessor"
-            },
-            {
-              "include": "#comment"
-            }
-          ]
+          "include": "#block"
         }
       ]
     },
     "function-declaration": {
-      "begin": "(?ix)\n  (function|integer_function|string_function|long_integer_function|signed_integer_function|signed_long_integer_function|simplsharpstring)\\s* # grab the built-in function type or\n  ([\\_[:alpha:]][\\_\\#\\_\\$[:alnum:]]*)\\s* # the function name\n  (?=\\() #and stop before the opening parenthesis",
+      "begin": "(?ix)\n  (\\bcallback\\b\\s*)?  # possible grab callback\n  (function|integer_function|string_function|long_integer_function|signed_integer_function|signed_long_integer_function|simplsharpstring)\\s* # grab the built-in function type or\n  ([\\_[:alpha:]][\\_\\#\\_\\$[:alnum:]]*)\\s* # the function name\n  (?=\\() #and stop before the opening parenthesis",
       "beginCaptures": {
         "1": {
-          "name": "keyword.declaration.function.usp"
+          "name": "keyword.modifier.callback.usp"
         },
         "2": {
+          "name": "keyword.declaration.function.usp"
+        },
+        "3": {
           "name": "entity.name.variable.function.usp"
         }
       },
@@ -983,7 +973,7 @@
     },
     "event-declaration": {
       "begin": "(?ix)\n  (?=\n    (\\bthreadsafe\\b\\s+)? #Possibly grab threadsafe\n    (?:push|event|change|release|socketconnect|socketdisconnect|socketreceive|socketstatus|eventhandler)\n  ) #start pattern at the beginning of the function keyword without grabbing any characters",
-      "end": "(?ix)\n  (?<=})   #stop pattern after the closing curly brace without grabbing any characters",
+      "end": "(?ix)\n  (?<=})|(?=;)   #stop pattern after the closing curly bracket or first semicolon without grabbing any characters",
       "patterns": [
         {
           "begin": "(?ix)\n  (\\bthreadsafe\\b\\s+)?\n  (push|event|change|release|socketconnect|socketdisconnect|socketreceive|socketstatus|eventhandler)\\b\\s+",
@@ -999,7 +989,6 @@
             }
           },
           "end": "(?ix)\n  (?=\\{) #stop pattern after the opening curly brace without grabbing any characters",
-          "name": "meta.declaration.event.usp",
           "patterns": [
             {
               "match": "([\\_[:alpha:]][\\_\\#\\_\\$[:alnum:]]*)",
@@ -1017,313 +1006,7 @@
           ]
         },
         {
-          "begin": "(\\{)",
-          "beginCaptures": {
-            "1": {
-              "name": "punctuation.curlybrace.open.usp"
-            }
-          },
-          "end": "(\\})",
-          "endCaptures": {
-            "1": {
-              "name": "punctuation.curlybrace.close.usp"
-            }
-          },
-          "name": "meta.event.contents",
-          "patterns": [
-            {
-              "match": "(?i)\\bTerminateEvent\\b",
-              "name": "keyword.control.event.terminate.usp"
-            },
-            {
-              "include": "#statement"
-            },
-            {
-              "include": "statement"
-            },
-            {
-              "include": "#preprocessor"
-            },
-            {
-              "include": "#comment"
-            }
-          ]
-        }
-      ]
-    },
-    "callback-declaration": {
-      "begin": "(?ix)\n  (?=\n    (\\bcallback\\b\\s+)? #test for callback\n    (?:function|integer_function|string_function|long_integer_function|signed_integer_function|signed_long_integer_function|simplsharpstring)\n  ) #start pattern at the beginning of the callback function keyword without grabbing any characters",
-      "end": "(?ix)\n  (?<=})   #stop pattern after the closing curly brace without grabbing any characters",
-      "patterns": [
-        {
-          "begin": "(?ix)\n  (\\bcallback\\b\\s+)? #grab the callback keyword\n  (function|integer_function|string_function|long_integer_function|signed_integer_function|signed_long_integer_function|simplsharpstring)\\b\\s+\n  ([_[:alpha:]][\\#\\$\\_[:alnum:]]*)",
-          "beginCaptures": {
-            "1": {
-              "name": "keyword.declaration.callback.usp"
-            },
-            "2": {
-              "name": "keyword.declaration.function.usp"
-            },
-            "3": {
-              "name": "entity.name.variable.function.usp"
-            }
-          },
-          "end": "(?ix)\n  (?=\\{) #stop pattern after the opening curly brace without grabbing any characters",
-          "name": "meta.declaration.function.usp",
-          "patterns": [
-            {
-              "include": "#comment"
-            },
-            {
-              "include": "#parenthesized-parameter-list"
-            }
-          ]
-        },
-        {
-          "begin": "(\\{)",
-          "beginCaptures": {
-            "1": {
-              "name": "punctuation.curlybrace.open.usp"
-            }
-          },
-          "end": "(\\})",
-          "endCaptures": {
-            "1": {
-              "name": "punctuation.curlybrace.close.usp"
-            }
-          },
-          "name": "meta.callback.contents",
-          "patterns": [
-            {
-              "include": "#statement"
-            },
-            {
-              "include": "#variable-declaration"
-            },
-            {
-              "include": "statement"
-            },
-            {
-              "include": "#preprocessor"
-            },
-            {
-              "include": "#comment"
-            }
-          ]
-        }
-      ]
-    },
-    "namespace-declaration": {
-      "begin": "(?ix)\n  (?=\\bnamespace\\b) #start pattern at the beginning of the word structure without grabbing any characters",
-      "end": "(?ix)\n  (?<=\\})   #stop pattern after the closing curly brace without grabbing any characters",
-      "patterns": [
-        {
-          "begin": "(?ix)\n  \\b(namespace)\\b\\s+\n  ([_[:alpha:]][\\#\\$\\_[:alnum:]]*)",
-          "beginCaptures": {
-            "1": {
-              "name": "keyword.declaration.namespace.usp"
-            },
-            "2": {
-              "name": "entity.name.type.namespace.usp"
-            }
-          },
-          "end": "(?ix)\n  (?=\\{) #stop pattern before the opening curly brace without grabbing any characters",
-          "name": "meta.declaration.namespace.usp",
-          "patterns": [
-            {
-              "include": "#comment"
-            }
-          ]
-        },
-        {
-          "begin": "(\\{)",
-          "beginCaptures": {
-            "1": {
-              "name": "punctuation.curlybrace.open.usp"
-            }
-          },
-          "end": "(\\})(?!;)",
-          "endCaptures": {
-            "1": {
-              "name": "punctuation.curlybrace.close.usp"
-            }
-          },
-          "name": "meta.namespace.contents",
-          "patterns": [
-            {
-              "include": "#class-declaration"
-            },
-            {
-              "include": "#comment"
-            }
-          ]
-        }
-      ]
-    },
-    "class-declaration": {
-      "begin": "(?ix)\n  (?=\n    (\\bstatic\\b\\s+)?\n    \\bclass\\b\n  ) #start pattern at the beginning of the word (static)? class  without grabbing any characters",
-      "end": "(?ix)\n  (?<=};)   #stop pattern after the closing curly brace semicolon pair without grabbing any characters",
-      "patterns": [
-        {
-          "begin": "(?ix)\n  (?:\\b(static)\\b\\s+)?               #possibly grab static\n  \\b(class)\\b\\s+                    #grab the word structure\n  ([_[:alpha:]][\\#\\$\\_[:alnum:]]*)  #grab the structure name",
-          "beginCaptures": {
-            "1": {
-              "name": "keyword.modifier.class.usp"
-            },
-            "2": {
-              "name": "keyword.declaration.class.usp"
-            },
-            "3": {
-              "name": "entity.name.type.class.usp"
-            }
-          },
-          "end": "(?ix)\n  (?=\\{) #stop pattern before the opening curly brace or before semicolon without grabbing any characters",
-          "patterns": [
-            {
-              "include": "#comment"
-            }
-          ],
-          "name": "meta.declaration.class.usp"
-        },
-        {
-          "begin": "(\\{)",
-          "beginCaptures": {
-            "1": {
-              "name": "punctuation.curlybrace.open.usp"
-            }
-          },
-          "end": "(\\})(;)",
-          "endCaptures": {
-            "1": {
-              "name": "punctuation.curlybrace.close.usp"
-            },
-            "2": {
-              "name": "punctuation.terminator.class.usp"
-            }
-          },
-          "name": "meta.class.contents",
-          "patterns": [
-            {
-              "include": "#class-delegate-declaration"
-            },
-            {
-              "include": "#class-eventhandler-declaration"
-            },
-            {
-              "include": "#class-function-declaration"
-            },
-            {
-              "include": "#variable-declaration"
-            },
-            {
-              "include": "#comment"
-            }
-          ]
-        }
-      ]
-    },
-    "class-delegate-declaration": {
-      "name": "meta.declaration.class.delegate.usp",
-      "begin": "(?ix)\n  (?=\n    (\\bstatic\\b\\s+)?\n    \\bdelegate\\bs*\n  ) #start pattern at the beginning of the delegate keyword without grabbing any characters",
-      "end": "(?ix)\n  (?<=\\;)   #stop pattern before semicolon without grabbing any characters",
-      "patterns": [
-        {
-          "begin": "(?ix)\n  (?:\\b(static)\\b\\s+)?              #possibly grab static\n  \\b(delegate)\\b\\s+                 #grab the word delegate\n  \\b(function|integer_function|string_function|long_integer_function|signed_integer_function|signed_long_integer_function|SIMPLSHARPSTRING_FUNCTION)\\b\\s+ #grab delegate type\n  ([_[:alpha:]][\\#\\$\\_[:alnum:]]*)   #grab the delegate name",
-          "beginCaptures": {
-            "1": {
-              "name": "keyword.modifier.delegate.usp"
-            },
-            "2": {
-              "name": "keyword.declaration.delegate.usp"
-            },
-            "3": {
-              "name": "keyword.declaration.function.usp"
-            },
-            "4": {
-              "name": "entity.name.variable.delegate.usp"
-            }
-          },
-          "end": "(;)",
-          "endCaptures": {
-            "1": {
-              "name": "punctuation.terminator.delegate.usp"
-            }
-          },
-          "patterns": [
-            {
-              "include": "#comment"
-            },
-            {
-              "include": "#parenthesized-parameter-list"
-            }
-          ]
-        }
-      ]
-    },
-    "class-eventhandler-declaration": {
-      "name": "meta.declaration.class.eventhandler.usp",
-      "begin": "(?ix)\n  (?=\n    \\beventhandler\\b\n  ) #start pattern at the beginning of the eventhandler keyword without grabbing any characters",
-      "end": "(?ix)\n  (?<=\\;)   #stop pattern after semicolon without grabbing any characters",
-      "patterns": [
-        {
-          "begin": "(?ix)\n  \\b(eventhandler)\\b\\s+              #grab the word eventhandler\n  ([_[:alpha:]][\\#\\$\\_[:alnum:]]*)   #grab the delegate name",
-          "beginCaptures": {
-            "1": {
-              "name": "keyword.modifier.eventhandler.usp"
-            },
-            "2": {
-              "name": "entity.name.variable.eventhandler.usp"
-            }
-          },
-          "end": "(;)",
-          "endCaptures": {
-            "1": {
-              "name": "punctuation.terminator.eventhandler.usp"
-            }
-          },
-          "patterns": [
-            {
-              "include": "#comment"
-            },
-            {
-              "include": "#parenthesized-parameter-list"
-            }
-          ]
-        }
-      ]
-    },
-    "class-function-declaration": {
-      "name": "meta.declaration.class.function.usp",
-      "begin": "(?ix)\n  (?=(?:function|integer_function|string_function|long_integer_function|signed_integer_function|signed_long_integer_function|SIMPLSHARPSTRING_FUNCTION)) #start pattern at the beginning of the function keyword without grabbing any characters",
-      "end": "(?ix)\n  (?<=;)   #stop pattern after the closing curly brace or before semicolon without grabbing any characters",
-      "patterns": [
-        {
-          "begin": "(?ix)\n  (function|integer_function|string_function|long_integer_function|signed_integer_function|signed_long_integer_function|SIMPLSHARPSTRING_FUNCTION)\\b\\s+\n  ([_[:alpha:]][\\#\\$\\_[:alnum:]]*)",
-          "beginCaptures": {
-            "1": {
-              "name": "keyword.declaration.function.usp"
-            },
-            "2": {
-              "name": "entity.name.variable.function.usp"
-            }
-          },
-          "end": "(;)",
-          "endCaptures": {
-            "1": {
-              "name": "punctuation.terminator.function.usp patterns"
-            }
-          },
-          "patterns": [
-            {
-              "include": "#preprocessor"
-            },
-            {
-              "include": "#comment"
-            },
-            {
-              "include": "#parenthesized-parameter-list"
-            }
-          ]
+          "include": "#block"
         }
       ]
     },
@@ -1423,6 +1106,9 @@
       "patterns": [
         {
           "include": "#statement"
+        },
+        {
+          "include": "#variable-declaration"
         }
       ]
     },
@@ -1471,7 +1157,7 @@
           "name": "keyword.control.loop.while.usp"
         }
       },
-      "end": "(?<=\\})",
+      "end": "(?<=\\))|(?=;|})",
       "patterns": [
         {
           "begin": "\\(",
@@ -1507,7 +1193,7 @@
           "name": "keyword.control.loop.do.cs"
         }
       },
-      "end": "(?<=\\})",
+      "end": "(?<=\\))|(?=;|})",
       "patterns": [
         {
           "include": "#statement"
