@@ -13,17 +13,14 @@ repository:
   directives:
     patterns:
     - include: "#punctuation-semicolon"
+    - include: "#comment"
 
 
 #declaration
   declaration:
     patterns:
       - include: "#namespace-declaration"
-      - include: "#structure-declaration"
-      - include: "#function-declaration"
-      - include: "#event-declaration"
       - include: "#class-declaration"
-      - include: "#variable-declaration"
   namespace-declaration:
     begin: \b(namespace)\b
     beginCaptures:
@@ -49,19 +46,25 @@ repository:
       - include: "#declarations"
       - include: "#punctuation-semicolon"
   class-declaration:
-    begin: \bclass\b
+    begin:  |-
+        (?x)
+          (?=
+            (?:\b(static)\b\s+)?
+            \b(class)\b\s+
+          )
     end: (?<=\})|(?=;)
     patterns:
     - begin: |-
         (?x)
+          (?:\b(static)\b\s+)?
           \b(class)\b\s+
-          (@?[_[:alpha:]][_[:alnum:]]*)\s*
+          ([_[:alpha:]][_[:alnum:]]*)\s*
       beginCaptures:
+        '1':
+          name: keyword.modifier.static.api
         '2':
-          name: storage.type.record.api
-        '3':
           name: storage.type.class.api
-        '4':
+        '3':
           name: entity.name.type.class.api
       end: (?=\{)|(?=;)
       patterns:
@@ -80,158 +83,323 @@ repository:
           name: punctuation.curlybrace.close.api
       patterns:
       - include: "#class-members"
-    - include: "#preprocessor"
     - include: "#comment"
 
   class-members:
     patterns:
-      - include: "#class-delegate-declaration"
-      - include: "#class-eventhandler-declaration"
-      - include: "#class-function-declaration"
+      - include: "#function-declaration"
+      - include: "#event-handler-declaration"
+      - include: "#comment"
       - include: "#variable-declaration"
+      - include: "#punctuation-semicolon"
 
-  class-delegate-declaration:
-    name: meta.declaration.class.delegate.api
+  function-declaration:
     begin: |-
-        (?ix)
-          (?=
-            (\bstatic\b\s+)?
-            \bdelegate\bs*
-          ) #start pattern at the beginning of the delegate keyword without grabbing any characters
+        (?x)
+          (?:
+            (\bstatic\b\s+)?             #possibly grab static
+            (\bdelegate\b\s+)?           #possibly grab delegate
+            \b(FUNCTION|INTEGER_FUNCTION|STRING_FUNCTION|LONG_INTEGER_FUNCTION|SIGNED_INTEGER_FUNCTION|SIGNED_LONG_INTEGER_FUNCTION|SIMPLSHARPSTRING_FUNCTION)\b\s+ #grab function type
+            ([_[:alpha:]][_[:alnum:]]*)\s*
+          )
+          (?=\()  #stop pattern before the opening parenthesis without grabbing any characters
+    beginCaptures:
+      '1':
+        name: keyword.modifier.static.api
+      '2':
+        name: keyword.modifier.delegate.api
+      '3':
+        name: keyword.declaration.function.api
+      '4':
+        name: entity.name.variable.function.api
     end: |-
         (?ix)
-          (?<=\;)   #stop pattern before semicolon without grabbing any characters
+          (?<=;)   #stop pattern after the semicolon
     patterns:
-    - begin: |-
-          (?ix)
-            (?:\b(static)\b\s+)?              #possibly grab static
-            \b(delegate)\b\s+                 #grab the word delegate
-            \b(function|integer_function|string_function|long_integer_function|signed_integer_function|signed_long_integer_function|SIMPLSHARPSTRING_FUNCTION)\b\s+ #grab delegate type
-            ([_[:alpha:]][\#\$\_[:alnum:]]*)   #grab the delegate name
-      beginCaptures:
-        '1':
-          name: keyword.modifier.delegate.api
-        '2':
-          name: keyword.declaration.delegate.api
-        '3':
-          name: keyword.declaration.function.api
-        '4':
-          name: entity.name.variable.delegate.api
-      end: (;)
-      endCaptures:
-        '1':
-          name: punctuation.terminator.delegate.api
-      patterns:
-      - include: "#comment"
-      - include: "#parenthesized-parameter-list"
-  class-eventhandler-declaration:
-    name: meta.declaration.class.eventhandler.api
-    begin: |-
-        (?ix)
-          (?=
-            \beventhandler\b
-          ) #start pattern at the beginning of the eventhandler keyword without grabbing any characters
-    end: |-
-        (?ix)
-          (?<=\;)   #stop pattern after semicolon without grabbing any characters
-    patterns:
-    - begin: |-
-          (?ix)
-            \b(eventhandler)\b\s+              #grab the word eventhandler
-            ([_[:alpha:]][\#\$\_[:alnum:]]*)   #grab the delegate name
-      beginCaptures:
-        '1':
-          name: keyword.modifier.eventhandler.api
-        '2':
-          name: entity.name.variable.eventhandler.api
-      end: (;)
-      endCaptures:
-        '1':
-          name: punctuation.terminator.eventhandler.api
-      patterns:
-      - include: "#comment"
-      - include: "#parenthesized-parameter-list"
-  class-function-declaration:
+    - include: "#parenthesized-parameter-list"
+  event-handler-declaration:
     name: meta.declaration.class.function.api
     begin: |-
-        (?ix)
-          (?=(?:function|integer_function|string_function|long_integer_function|signed_integer_function|signed_long_integer_function|SIMPLSHARPSTRING_FUNCTION)) #start pattern at the beginning of the function keyword without grabbing any characters
+        (?x)
+          (?:
+            \b(EventHandler)\b\s+ #grab function type
+            ([_[:alpha:]][_[:alnum:]]*)\s*
+          )
+          (?=\()  #stop pattern before the opening parenthesis without grabbing any characters
+    beginCaptures:
+      '1':
+        name: keyword.modifier.eventhandler.api
+      '2':
+        name: entity.name.variable.function.api
     end: |-
         (?ix)
-          (?<=;)   #stop pattern after the closing curly brace or before semicolon without grabbing any characters
+          (?<=;)   #stop pattern after the semicolon
     patterns:
-    - begin: |-
-          (?ix)
-            (function|integer_function|string_function|long_integer_function|signed_integer_function|signed_long_integer_function|SIMPLSHARPSTRING_FUNCTION)\b\s+
-            ([_[:alpha:]][\#\$\_[:alnum:]]*)
-      beginCaptures:
-        '1':
-          name: keyword.declaration.function.api
-        '2':
-          name: entity.name.variable.function.api
-      end: (;)
-      endCaptures:
-        '1':
-          name: punctuation.terminator.function.api patterns
-      patterns:
-      - include: "#preprocessor"
-      - include: "#comment"
-      - include: "#parenthesized-parameter-list"
+    - include: "#parenthesized-parameter-list"
+
   variable-declaration:
     begin: |-
       (?x)
-        (?=
-          ^   #start pattern at the beginning of a line
-          \s* #ignore leading spaces
-          (?:
-            (?:[\_[:alpha:]][\_\#\_\$[:alnum:]]*)\s   #grab identifier
+        (?:
+          (?:(\bDelegateProperty\b)\s+)? #possibly grab delagate property
+          ([\_[:alpha:]][_[:alnum:]]*)\s   #grab variable type
+          (?:([\_[:alpha:]][_[:alnum:]]*)\s*  #grab variable name
+            (?: # array suffix?
+              \[
+                (?:\s*,\s*)* # commata for multi-dimensional arrays
+              \]\s*
+            )*
           )
-          (?=[\_[:alpha:]])  #only when followed by the beginning of another identifier
-        )          #without grabbing any characters
-    end: |-
-      (?x)
-        (?<=;)|    #stop pattern after the semicolon or
-        (?=[{\(]) #before curly bracket or parenthesis without grabbing any characters
-    patterns:
-      - begin: |-
-          (?ix)
-            (?:\s*)
-            (dynamic|volatile|nonvolatile|ascii|utf16|inherit|delegateproperty)?\s*  #Possibly grab modifier
-            (?:
-              (integer|string|long_integer|signed_integer|signed_long_integer|simplsharpstring)| #grab the built-in variable type or
-              (cevent|cmutex)| #or built in class
-              (tcp_client|tcp_server|udp_socket)| #or built in structure
-              ([_[:alpha:]][\#\$\_[:alnum:]]*)\s* #grab the variable name
-            )
-        beginCaptures:
-          "1":
-            name: keyword.modifier.variable.api
-          '2':
-            name: keyword.declaration.variable.api
-          '3':
-            name: keyword.support.class.api
-          '4':
-            name: keyword.support.structure.api
-          '5':
-            patterns:
-              - include: "#built-in-types"
-              - match: ([\_[:alpha:]][\_\#\_\$[:alnum:]]*)
-                name: entity.name.variable.api
-        end: |-
-          (?ix)
-            (\;)  #stop pattern before the closing curly brace or before semicolon without grabbing any characters
-        endCaptures:
-          "1":
-            name: punctuation.terminator.variable.api
-        name: meta.declaration.variable.api
+        )
+        (?=;)
+    beginCaptures:
+      "1":
+        name: keyword.modifier.delegateproperty.api
+      "2":
         patterns:
-          - match: ([\_[:alpha:]][\_\#\_\$[:alnum:]]*)
-            name: entity.name.variable.api
-          - include: "#type-array-suffix"
-          - include: "#comment"
-          - include: "#punctuation-comma"
+          - include: "#built-in-types"
+          - match: ([_[:alpha:]][_[:alnum:]]*)
+            name: entity.name.type.api
+      "3":
+        name: entity.name.variable.api
+    end: |-
+      (?ix)
+        (?<=;)   #stop pattern after the semicolon 
+    patterns:
+      - include: "#type-array-suffix"
+      - include: "#punctuation-comma"
+      - include: "#punctuation-semicolon"
+  built-in-types:
+    match: |-
+      \b(INTEGER|STRING|LONG_INTEGER|SIGNED_INTEGER|SIGNED_LONG_INTEGER|SIMPLSHARPSTRING)\b
+    name: keyword.declaration.type.api
 
 
+  parenthesized-parameter-list:
+    name: meta.parameters
+    begin: (\()
+    beginCaptures:
+      '0':
+        name: punctuation.parenthesis.open.usp
+    end: (\))
+    endCaptures:
+      '0':
+        name: punctuation.parenthesis.close.usp
+    patterns:
+    - include: "#comment"
+    - include: "#parameter"
+    - include: "#punctuation-comma"
+  parameter:
+    begin: |-
+      (?x)
+          \s*(ByVal|ByRef|ReadOnlyByRef)?\s*  #Possibly grab modifier
+          (?:
+            (INTEGER|STRING|LONG_INTEGER|SIGNED_INTEGER|SIGNED_LONG_INTEGER|SIMPLSHARPSTRING|EventArgs)| #grab the variable type or
+            ([_[:alpha:]][_[:alnum:]]*) #grab the type
+          )
+    beginCaptures:
+      "1":
+        name: keyword.modifier.parameter.usp
+      '2':
+        name: keyword.declaration.parameter.usp
+      '3':
+        name: entity.name.type.usp
+    end: |-
+      (?ix)
+        (?=[\,\)])  #stop pattern before theres a comma or closing parenthesis without grabbing any characters
+    patterns:
+      - match: ([\_[:alpha:]][_[:alnum:]]*)
+        name: entity.name.variable.usp
+      - include: "#type-array-suffix"
+  type-array-suffix:
+    begin: "\\["
+    beginCaptures:
+      '0':
+        name: punctuation.squarebracket.open.usp
+    end: "\\]"
+    endCaptures:
+      '0':
+        name: punctuation.squarebracket.close.usp
+    patterns:
+    - include: "#numeric-literal"
+    - include: "#punctuation-comma"
+
+#literals
+  literals:
+    patterns:
+    - include: "#numeric-literal"
+    - include: "#char-literal"
+    - include: "#string-literal"
+    - include: "#reserved-words"
+  numeric-literal:
+    match: |-
+      (?x)
+        (?<!\w)\.?\d #ensure it starts with a digit or period and not a word character
+        (?:
+          (?:[0-9a-zA-Z_%]|_)| #capture any digit or letter or underscore (anything that resembles a number)
+          (?<=[eE])[+-]| # even if it looks scientific
+          \.\d #or floating point
+        )*
+    captures:
+      '0':
+        patterns:  #with the match above:
+        - begin: "(?=.)"
+          end: "$"
+          patterns:
+          - match: |- # grab a hex integer
+              (?x)
+                (0[xX]) #ensure it starts with a 0x or 0X
+                ([0-9a-fA-F](?:[0-9a-fA-F])*)$ #capture rest of hex digits
+            captures:
+              '1':
+                name: constant.numeric.other.prefix.hex.usp
+              '2':
+                name: constant.numeric.hex.usp
+          - match: |-
+              (?x)
+                (?=[0-9])(?!0[xX]) #ensure it starts with a digit, but not wit a 0x or 0X 
+                ([0-9d](?:[0-9d])*)$ #capture rest of decimal digits and d (for parameter properties decimal value)
+            captures:
+              '1':
+                name: constant.numeric.decimal.usp
+          - match: |-
+              (?ix)
+                (?=[0-9a-f])(?!0[xX]) #ensure it starts with a hex digit, but not wit a 0x or 0X 
+                ([0-9a-fh](?:[0-9a-fh])*)$ #capture rest of hex digits and h (for parameter properties decimal value)hex value)
+            captures:
+              '1':
+                name: constant.numeric.hex.usp
+          - match: |-
+              (?x)
+                (?=[0-9])(?!0[xX]) #ensure it starts with a digit, but not wit a 0x or 0X 
+                ([0-9%](?:[0-9%])*)$ #capture rest of decimal digits and % (for parameter properties percentage value)
+            captures:
+              '1':
+                name: constant.numeric.percentage.usp
+          - match: |-
+              (?x)
+                (?=[0-9])(?!0[xX]) #ensure it starts with a digit, but not wit a 0x or 0X 
+                ([0-9s](?:[0-9s])*)$ #capture rest of decimal digits and s (for parameter properties seconds value)
+            captures:
+              '1':
+                name: constant.numeric.seconds.usp
+          - match: |-
+              (?x)
+                (?=[0-9])(?!0[xX]) #ensure it starts with a digit, but not wit a 0x or 0X 
+                ([0-9t](?:[0-9t])*)$ #capture rest of decimal digits and t (for parameter properties ticks value)
+            captures:
+              '1':
+                name: constant.numeric.ticks.usp
+          - match: (?:(?:[0-9a-zA-Z_]|_)|(?<=[eE])[+-]|\.\d)+ # invalidate anything that did not match hex of decimal
+            name: invalid.illegal.constant.numeric.usp
+  char-literal:
+    name: string.quoted.single.usp
+    begin: \'
+    beginCaptures:
+      '0':
+        name: punctuation.definition.char.begin.usp
+    end: (\')|((?:[^\n])$) #end with a single quote or anything but newline
+    endCaptures:
+      '1':
+        name: punctuation.definition.char.end.usp
+      '2':
+        name: invalid.illegal.newline.usp
+    patterns:
+    - match: ([0-9a-zA-Z]{2,})
+      name: invalid.illegal.char.usp
+  string-literal:
+    name: string.quoted.double.usp
+    begin: \"
+    beginCaptures:
+      '0':
+        name: punctuation.definition.string.begin.usp
+    end: (")|((?:[^\n])$)
+    endCaptures:
+      '1':
+        name: punctuation.definition.string.end.usp
+      '2':
+        name: invalid.illegal.newline.usp
+    patterns:
+    - include: "#string-character-escape"
+  string-character-escape:
+    match: |-
+      (?x)
+        (\%   #escape initializer character either % or \
+          (?:
+            (?:[0-9a-zA-Z]|\%)? #grab any digit or letter or % character for next character zero or 1 times
+            (?:[0-9a-zA-Z])*    #grab the rest of the digits or letters
+          )
+        ) |  #or
+        (?:\\(?:[a-zA-Z])(?:(?:[0-9a-fA-F]){2})?)|(?:\\\\) #grab any one letter or dual hex number after a backslash or double backslash
+    captures:
+      "0":
+        patterns:  #with the match above:
+        - begin: "(?=.)"
+          end: "$"
+          patterns:
+          - match: |- #percent character escape
+              (?x)
+                (%%) |  # Prints % or
+                (%
+                  (?:
+                    (?:[0-9]?[0-9])? #[[pad]width]
+                    (?:
+                      d|  #Signed Analog_Input, Analog_Output or Integer as decimal
+                      s|  #Buffer_Input, String_Input or String
+                      u|  #Unsigned Analog_Input, Analog_Output or integer
+                      ld| #Long_Integer as decimal
+                      lu| #Long_Unsigned_Integer as decimal
+                      x|  #Analog_Input, Analog_Output or Integer as lowercase hexadecimal
+                      X|  #Analog_Input, Analog_Output or Integer as uppercase hexadecimal
+                      lx| #long Integer as lowercase hexadecimal
+                      lX| #long Integer as uppercase hexadecimal
+                      c|  #Printable ASCII character
+                    ){1}
+                  ) #Print Formatters %[[pad]width]specifier
+                )
+            name: constant.character.escape.usp
+          - match: |- #backslash character escape
+              (?x)
+                 (\\
+                   [
+                     a  #Alert (Beep)
+                     b  #Backspace
+                     f  #Form Feed
+                     n  #Newline
+                     r  #Carriage Return
+                     t  #Horizontal Tab
+                     v
+                   ] #Vertical Tab
+                 ) |
+                 (\\
+                   (?:
+                     [xX](?:[0-9a-fA-F]){2}  #Hexadecimal character code
+                   )
+                 ) |
+                 (\\\\) #double backslash
+            name: constant.character.escape.usp
+          - match: .* #invalidate anything that did not match the above
+            name: invalid.illegal.character.escape.usp
+
+
+
+  punctuation-comma:
+    match: \,
+    name: punctuation.comma.usp
   punctuation-semicolon:
     match: \;
     name: punctuation.terminator.usp
+
+#Comment
+  comment:
+    patterns:
+      - include: "#comment-single-line"
+  comment-single-line:
+    name: comment.line.double-slash.usp
+    begin: (^\s+)?(\/\/).*$
+    while: ^(\s*)(\/\/).*$
+    captures:
+      "1":
+        name: punctuation.whitespace.comment.leading.usp
+      "2":
+        name: punctuation.definition.comment.usp
