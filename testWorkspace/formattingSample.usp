@@ -136,6 +136,17 @@ UTF16 string Utf16String[10];
 INHERIT STRING InheritString[10];
 STRING InheritString[10][20]; //tes
 
+// Class Definitions
+// SampleClass CustomClass;
+CEvent cEventClass;
+CMutex cMutexClass;
+
+
+// // Sockets
+TCP_CLIENT TcpClient[100];
+TCP_SERVER TcpServer[100];
+UDP_SOCKET UdpSocket[100];
+
 
 FUNCTION MyFunction(){
 	
@@ -383,16 +394,7 @@ STRING_FUNCTION MyFunction6()
 }
 
 
-// Class Definitions
-// SampleClass CustomClass;
-CEvent cEventClass;
-CMutex cMutexClass;
 
-
-// // Sockets
-TCP_CLIENT TcpClient[100];
-TCP_SERVER TcpServer[100];
-UDP_SOCKET UdpSocket[100];
 
 //Events
 
@@ -429,9 +431,9 @@ ASCII STRING AsiiString[10];
 UTF16 string Utf16String[10];
 INHERIT STRING InheritString[10];
 STRING InheritString[10][20];
-test.STRING InheritString[10];
-volatile test.STRING InheritString;
-volatile test.STRING InheritString[10][20];
+STRING InheritString[10];
+STRING InheritString;
+STRING InheritString[10][20];
 
 //Functions
 

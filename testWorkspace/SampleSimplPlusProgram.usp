@@ -4,4 +4,3 @@ digital_input Name;
 
 SampleClass TestClass;
 
-push Name{}

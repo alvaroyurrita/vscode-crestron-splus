@@ -976,29 +976,38 @@
     "declaration-keywords": {
       "patterns": [
         {
-          "include": "#declaration-input"
+          "include": "#declaration-keyword-input"
         },
         {
-          "include": "#declaration-output"
+          "include": "#declaration-keyword-output"
         },
         {
-          "include": "#declaration-parameter"
+          "include": "#declaration-keyword-structure"
         },
         {
-          "include": "#declaration-structure"
+          "include": "#declaration-keyword-class"
         },
         {
-          "include": "#declaration-function"
+          "include": "#declaration-keyword-socket"
         },
         {
-          "include": "#declaration-variable"
+          "include": "#declaration-keyword-parameter"
         },
         {
-          "include": "#declaration-event"
+          "include": "#declaration-keyword-structure"
+        },
+        {
+          "include": "#declaration-keyword-function"
+        },
+        {
+          "include": "#declaration-keyword-variable"
+        },
+        {
+          "include": "#declaration-keyword-event"
         }
       ]
     },
-    "declaration-input": {
+    "declaration-keyword-input": {
       "patterns": [
         {
           "match": "(?i)\\b(digital_input|analog_input|buffer_input|string_input)\\b",
@@ -1006,7 +1015,7 @@
         }
       ]
     },
-    "declaration-output": {
+    "declaration-keyword-output": {
       "patterns": [
         {
           "match": "(?i)\\b(digital_output|analog_output|buffer_output|string_output)\\b",
@@ -1014,7 +1023,7 @@
         }
       ]
     },
-    "declaration-parameter": {
+    "declaration-keyword-parameter": {
       "patterns": [
         {
           "match": "(?i)\\b(integer_parameter|string_parameter|long_integer_parameter|signed_integer_parameter|signed_long_integer_parameter)\\b",
@@ -1022,7 +1031,7 @@
         }
       ]
     },
-    "declaration-structure": {
+    "declaration-keyword-structure": {
       "patterns": [
         {
           "match": "(?i)\\b(structure)\\b",
@@ -1030,7 +1039,7 @@
         }
       ]
     },
-    "declaration-function": {
+    "declaration-keyword-function": {
       "patterns": [
         {
           "match": "(?i)\\b(function|integer_function|string_function|long_integer_function|signed_integer_function|signed_long_integer_function|simplsharpstring_function)\\b",
@@ -1038,7 +1047,7 @@
         }
       ]
     },
-    "declaration-variable": {
+    "declaration-keyword-variable": {
       "patterns": [
         {
           "match": "(?i)\\b(integer|string|long_integer|signed_integer|signed_long_integer|SIMPLSHARPSTRING)\\b",
@@ -1046,7 +1055,7 @@
         }
       ]
     },
-    "declaration-event": {
+    "declaration-keyword-event": {
       "patterns": [
         {
           "match": "(?i)\\b(push|event|change|release|socketconnect|socketdisconnect|socketreceive|socketstatus|eventhandler)\\b",
@@ -1054,7 +1063,7 @@
         }
       ]
     },
-    "declaration-class": {
+    "declaration-keyword-class": {
       "patterns": [
         {
           "match": "(?i)\\b(cevent|cmutex)\\b",
@@ -1062,11 +1071,11 @@
         }
       ]
     },
-    "declaration-skip": {
+    "declaration-keyword-socket": {
       "patterns": [
         {
-          "match": "(?i)\\b(_skip_)\\b",
-          "name": "support.variable.skip.usp"
+          "match": "(?i)\\b(tcp_client|tcp_server|udp_socket)\\b",
+          "name": "keyword.declaration.$1.usp"
         }
       ]
     },
@@ -1075,6 +1084,25 @@
         {
           "match": "(?i)\\b(volatile|nonvolatile|dynamic|ascii|utf16|inherit|delegateproperty|threadsafe)\\b",
           "name": "storage.modifier.$1.usp"
+        }
+      ]
+    },
+    "variable-name": {
+      "patterns": [
+        {
+          "include": "#variable-keyword-skip"
+        },
+        {
+          "match": "([_[:alpha:]][\\_\\#\\_\\$[:alnum:]]*)",
+          "name": "entity.name.variable.usp"
+        }
+      ]
+    },
+    "variable-keyword-skip": {
+      "patterns": [
+        {
+          "match": "(?i)\\b(_SKIP_)\\b",
+          "name": "keyword.support.skip.usp"
         }
       ]
     },
@@ -1548,10 +1576,6 @@
           "match": "([_[:alpha:]][\\_\\#\\_\\$_[:alnum:]]*)(?![<>])"
         }
       ]
-    },
-    "variable-name": {
-      "match": "([_[:alpha:]][\\_\\#\\_\\$[:alnum:]]*)",
-      "name": "entity.name.variable.usp"
     },
     "bracketed-argument-list": {
       "begin": "\\[",

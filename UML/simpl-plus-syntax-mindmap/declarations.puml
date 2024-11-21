@@ -24,6 +24,20 @@ parameter-declaration
 |= keyword.declaration.{name below} |= entity.name.type.parameter | array |= punctuation.comma |= punctuation.terminator.parameter |
 | INTEGER_PARAMETER\n SIGNED_INTEGER_PARAMETER\n LONG_INTEGER_PARAMETER\n SIGNED_LONG_INTEGER_PARAMETER\n STRING_PARAMETER  |  \n  name | \n  [count] [size]  |= \n   ,|=  \n     ; |;
 
+**:== Variables
+variable-declaration
+----
+|= storage.modifier.{name below} |= keyword.type.{name below} |= entity.name.variable | array |= punctuation.comma |= punctuation.terminator.variable |
+| optional:\n VOLATILE\n NONVOLATILE\n DYNAMIC \n ASCII\n UTF16\n INHERIT\n DELEGATEPROPERTY | INTEGER\n SIGNED_INTEGER\n LONG_INTEGER\n SIGNED_LONG_INTEGER\n STRING\n SIMPLSHARPSTRING|  \n  name | \n  [count] [size]  |= \n   ,|=  \n     ; |
+
+|= keyword.type.{name below} |= entity.name.variable | array |= punctuation.terminator.variable |
+| CEVENT\n CMUTEX |  name  | [count]  |=     ; |
+
+|= storage.modifier.{name below} |= entity.name.type |= entity.name.variable | array |= punctuation.terminator.variable |
+| optional:\n VOLATILE\n NONVOLATILE\n | \n user defined object |  \n  name | \n  [count]  |=  \n     ; |;
+
+
+
 **:== Structures
 structure-declaration
 ----
@@ -37,17 +51,6 @@ function-declaration
 | FUNCTION\n INTEGER_FUNCTION\n SIGNED_INTEGER_FUNCTION\n LONG_INTEGER_FUNCTION\n SIGNED_LONG_INTEGER_FUNCTION\n STRING_FUNCTION \n SIMPLSHARPSTRING_FUNCTION  |  \n  name | \n  parenthesized-parameter-list | \n  {..statements..}  |;
 
 
-**:== Variables
-variable-declaration
-----
-|= storage.modifier.{name below} |= keyword.type.{name below} |= entity.name.variable | array |= punctuation.comma |= punctuation.terminator.variable |
-| optional:\n VOLATILE\n NONVOLATILE\n DYNAMIC \n ASCII\n UTF16\n INHERIT\n DELEGATEPROPERTY | INTEGER\n SIGNED_INTEGER\n LONG_INTEGER\n SIGNED_LONG_INTEGER\n STRING\n SIMPLSHARPSTRING|  \n  name | \n  [count] [size]  |= \n   ,|=  \n     ; |
-
-|= keyword.type.{name below} |= entity.name.variable | array |= punctuation.terminator.variable |
-| CEVENT\n CMUTEX |  name  | [count]  |=     ; |
-
-|= storage.modifier.{name below} |= entity.name.type |= entity.name.variable | array |= punctuation.terminator.variable |
-| optional:\n VOLATILE\n NONVOLATILE\n | \n user defined object |  \n  name | \n  [count]  |=  \n     ; |;
 
 
 **:== Events

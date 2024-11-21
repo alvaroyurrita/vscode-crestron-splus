@@ -30,6 +30,9 @@
         },
         {
           "include": "#class-declaration"
+        },
+        {
+          "include": "#enum-declaration"
         }
       ]
     },
@@ -115,6 +118,62 @@
         },
         {
           "include": "#comment"
+        }
+      ]
+    },
+    "enum-declaration": {
+      "begin": "(?x)\n  (?=\n    \\b(enum)\\b\\s+\n  )",
+      "end": "(?<=\\})|(?=;)",
+      "patterns": [
+        {
+          "begin": "(?x)\n  \\b(enum)\\b\\s+\n  ([_[:alpha:]][_[:alnum:]]*)\\s*",
+          "beginCaptures": {
+            "1": {
+              "name": "keyword.declaration.enum.api"
+            },
+            "2": {
+              "name": "entity.name.type.enum.api"
+            }
+          },
+          "end": "(?=\\{)|(?=;)",
+          "patterns": [
+            {
+              "include": "#comment"
+            }
+          ]
+        },
+        {
+          "begin": "\\{",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.curlybrace.open.api"
+            }
+          },
+          "end": "\\}",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.curlybrace.close.api"
+            }
+          },
+          "patterns": [
+            {
+              "include": "#enum-members"
+            }
+          ]
+        },
+        {
+          "include": "#comment"
+        }
+      ]
+    },
+    "enum-members": {
+      "patterns": [
+        {
+          "include": "#punctuation-comma"
+        },
+        {
+          "match": "@?[_[:alpha:]][_[:alnum:]]*",
+          "name": "entity.name.variable.enum-member.cs"
         }
       ]
     },
@@ -394,7 +453,7 @@
                   }
                 },
                 {
-                  "match": "(?x)\n  (?=[0-9])(?!0[xX]) #ensure it starts with a digit, but not wit a 0x or 0X \n  ([0-9d](?:[0-9d])*)$ #capture rest of decimal digits and d (for parameter properties decimal value)",
+                  "match": "(?x)\n  (?=[0-9])(?!0[xX]) #ensure it starts with a digit, but not wit a 0x or 0X\n  ([0-9d](?:[0-9d])*)$ #capture rest of decimal digits and d (for parameter properties decimal value)",
                   "captures": {
                     "1": {
                       "name": "constant.numeric.decimal.usp"
@@ -402,7 +461,7 @@
                   }
                 },
                 {
-                  "match": "(?ix)\n  (?=[0-9a-f])(?!0[xX]) #ensure it starts with a hex digit, but not wit a 0x or 0X \n  ([0-9a-fh](?:[0-9a-fh])*)$ #capture rest of hex digits and h (for parameter properties decimal value)hex value)",
+                  "match": "(?ix)\n  (?=[0-9a-f])(?!0[xX]) #ensure it starts with a hex digit, but not wit a 0x or 0X\n  ([0-9a-fh](?:[0-9a-fh])*)$ #capture rest of hex digits and h (for parameter properties decimal value)hex value)",
                   "captures": {
                     "1": {
                       "name": "constant.numeric.hex.usp"
@@ -410,7 +469,7 @@
                   }
                 },
                 {
-                  "match": "(?x)\n  (?=[0-9])(?!0[xX]) #ensure it starts with a digit, but not wit a 0x or 0X \n  ([0-9%](?:[0-9%])*)$ #capture rest of decimal digits and % (for parameter properties percentage value)",
+                  "match": "(?x)\n  (?=[0-9])(?!0[xX]) #ensure it starts with a digit, but not wit a 0x or 0X\n  ([0-9%](?:[0-9%])*)$ #capture rest of decimal digits and % (for parameter properties percentage value)",
                   "captures": {
                     "1": {
                       "name": "constant.numeric.percentage.usp"
@@ -418,7 +477,7 @@
                   }
                 },
                 {
-                  "match": "(?x)\n  (?=[0-9])(?!0[xX]) #ensure it starts with a digit, but not wit a 0x or 0X \n  ([0-9s](?:[0-9s])*)$ #capture rest of decimal digits and s (for parameter properties seconds value)",
+                  "match": "(?x)\n  (?=[0-9])(?!0[xX]) #ensure it starts with a digit, but not wit a 0x or 0X\n  ([0-9s](?:[0-9s])*)$ #capture rest of decimal digits and s (for parameter properties seconds value)",
                   "captures": {
                     "1": {
                       "name": "constant.numeric.seconds.usp"
@@ -426,7 +485,7 @@
                   }
                 },
                 {
-                  "match": "(?x)\n  (?=[0-9])(?!0[xX]) #ensure it starts with a digit, but not wit a 0x or 0X \n  ([0-9t](?:[0-9t])*)$ #capture rest of decimal digits and t (for parameter properties ticks value)",
+                  "match": "(?x)\n  (?=[0-9])(?!0[xX]) #ensure it starts with a digit, but not wit a 0x or 0X\n  ([0-9t](?:[0-9t])*)$ #capture rest of decimal digits and t (for parameter properties ticks value)",
                   "captures": {
                     "1": {
                       "name": "constant.numeric.ticks.usp"
