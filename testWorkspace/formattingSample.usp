@@ -304,8 +304,8 @@ STRUCTURE mySruct //test
 	STRING Variable11$[6], Variable11[4][6];
 };
 
-//CEVENT myEvent1;
-//CMUTEX myMutex;
+CEVENT myEvent1;
+CMUTEX myMutex;
 
 
 //Function Deinition
@@ -666,7 +666,10 @@ THREADSAFE PUSH DigitalInput1, DigitalInpu2
 }
 
 
-
+PUSH IN1
+PUSH IN2
+CHANGE IN3, LEVEL, A$, PRESETS
+RELEASE IN3, IN4
 RELEASE DigitalInput1
 {
 	TERMINATEEVENT;
@@ -774,20 +777,20 @@ eventhandler test (class myclass, myargs myargs){
 	test
 }
 
-// callback GatherEventHandler MyGatherCallback(GatherEventArgs Args)
-// {
-// 	STRING a[20];
-// 	SIGNED_INTEGER c;
+callback GatherEventHandler MyGatherCallback(GatherEventArgs Args)
+{
+	STRING a[20];
+	SIGNED_INTEGER c;
 
-// 	a=Args.RxString;
-// 	c = Args.Results;
-// 	RearmGatherAsync(Args.Input);
-// 	Test2.Test1(one, "2", three[1])
-// 	Test("test %d %s %u %s %x %X %ld %lu %% %adf");
-// 	Test("test %1d %12s %3u %32s %x %X %2ld %1lu %%");
-// 	Test("test %133d %1233s %3333u %32333s %33x %33X %2333ld %3331lu %%");
-// 	Test("\n \t \b \r \f\ \a \\ \' \" \x23 ");
-// }
+	a=Args.RxString;
+	c = Args.Results;
+	RearmGatherAsync(Args.Input);
+	Test2.Test1(one, "2", three[1])
+	Test("test %d %s %u %s %x %X %ld %lu %% %adf");
+	Test("test %1d %12s %3u %32s %x %X %2ld %1lu %%");
+	Test("test %133d %1233s %3333u %32333s %33x %33X %2333ld %3331lu %%");
+	Test("\n \t \b \r \f\ \a \\ \' \" \x23 ");
+}
 
 Function Test1(byRef Param1, byval Param2, ReadOnlyByRef Param3)
 {}

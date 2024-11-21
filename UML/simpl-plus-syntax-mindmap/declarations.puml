@@ -48,25 +48,23 @@ structure-declaration
 function-declaration
 ----
 |= keyword.declaration.{name below} |= entity.name.type.function | parameters |= meta.function.contents |
-| FUNCTION\n INTEGER_FUNCTION\n SIGNED_INTEGER_FUNCTION\n LONG_INTEGER_FUNCTION\n SIGNED_LONG_INTEGER_FUNCTION\n STRING_FUNCTION \n SIMPLSHARPSTRING_FUNCTION  |  \n  name | \n  parenthesized-parameter-list | \n  {..statements..}  |;
-
-
-
+| FUNCTION\n INTEGER_FUNCTION\n SIGNED_INTEGER_FUNCTION\n LONG_INTEGER_FUNCTION\n SIGNED_LONG_INTEGER_FUNCTION\n STRING_FUNCTION \n SIMPLSHARPSTRING_FUNCTION  |  \n  name | \n  parenthesized-parameter-list | \n  {..statements..}  |
+----
+eventhandler:
+|= keyword.declaration.{name below} |= entity.name.type.function | parameters |= meta.event.contents |
+| EVENTHANDLER\n   |  name | parenthesized-parameter-list | {..statements..}  |
+----
+callbacks:
+|= keyword.modifier.callback |= keyword.declaration.function |= entity.name.type.function | parameters |= meta.callback.contents |
+| \n CALLBACK  | FUNCTION\n INTEGER_FUNCTION\n SIGNED_INTEGER_FUNCTION\n LONG_INTEGER_FUNCTION\n SIGNED_LONG_INTEGER_FUNCTION\n STRING_FUNCTION \n SIMPLSHARPSTRING_FUNCTION | \n  name | \n  parenthesized-parameter-list  | \n  {..statements..}  |;
 
 **:== Events
 event-declaration
 ----
 |= storage.modifier.threadsafe |= keyword.declaration.{name below} |= entity.name.variable.event |= punctuation.comma |= meta.event.contents |
-| TRHEADSAFE | PUSH\n EVENT\n CHANGE\n RELEASE\n SOCKETCONNECT\n SOCKETDISCONNECT \n SOCKETRECEIVE \n SOCKETSTATUS  |  \n  name |= \n   ,| \n  {..statements..}  |
-----
-|= keyword.declaration.eventhandler |= entity.name.eventhandler | parameters |= meta.event.contents |
-| EVENTHANDLER  |  name | parenthesized-parameter-list | {..statements..}  |;
+| TRHEADSAFE | PUSH\n EVENT\n CHANGE\n RELEASE\n SOCKETCONNECT\n SOCKETDISCONNECT \n SOCKETRECEIVE \n SOCKETSTATUS  |  \n  name |= \n   ,| \n  {..statements..}  |;
 
-**:== Callbacks
-callback-declaration
-----
-|= keyword.modifier.callback |= keyword.declaration.function |= entity.name.variable.callback | parameters |= meta.callback.contents |
-| \n CALLBACK  | FUNCTION\n INTEGER_FUNCTION\n SIGNED_INTEGER_FUNCTION\n LONG_INTEGER_FUNCTION\n SIGNED_LONG_INTEGER_FUNCTION\n STRING_FUNCTION \n SIMPLSHARPSTRING_FUNCTION | \n  name | \n  parenthesized-parameter-list  | \n  {..statements..}  |;
+
 
 **: Parameters
 parenthesized-parameter-list

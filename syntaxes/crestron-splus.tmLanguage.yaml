@@ -506,8 +506,10 @@ repository:
 #declaration
   declaration:
     patterns:
+      - include: "#event-declaration"
       - include: "#basic-declaration"
       - include: "#function-declaration"
+      - include: "#structure-declaration"
       - include: "#punctuation-semicolon"
   basic-declaration:
     begin: |-
@@ -545,60 +547,84 @@ repository:
     begin: |-
         (?ix)
           (\bcallback\b\s*)?  # possible grab callback
-          (function|integer_function|string_function|long_integer_function|signed_integer_function|signed_long_integer_function|simplsharpstring)\s* # grab the built-in function type or
+          ([\_[:alpha:]][\_\#\_\$[:alnum:]]*)\s* # grab the built-in function type or
           ([\_[:alpha:]][\_\#\_\$[:alnum:]]*)\s* # the function name
           (?=\() #and stop before the opening parenthesis
     beginCaptures:
       '1':
         name: keyword.modifier.callback.usp
-      '2':
-        name: keyword.declaration.function.usp
+      "2":
+        patterns:
+          - include: "#declaration-keywords"
       '3':
         name: entity.name.type.function.usp
     end: |-
         (?ix)
           (?<=})|(?=;)   #stop pattern after the closing curly bracket or first semicolon without grabbing any characters
     patterns:
-    # - include: "#comment"
+    - include: "#comment"
     - include: "#parenthesized-parameter-list"
-    # - include: "#preprocessor"
     - include: "#block"
   event-declaration:
     begin: |-
         (?ix)
-          (?=
-            (\bthreadsafe\b\s+)? #Possibly grab threadsafe
-            (?:push|event|change|release|socketconnect|socketdisconnect|socketreceive|socketstatus|eventhandler)
-          ) #start pattern at the beginning of the function keyword without grabbing any characters
+          (\bthreadsafe\b\s+)? #Possibly grab threadsafe
+          \b(push|event|change|release|socketconnect|socketdisconnect|socketreceive|socketstatus)\b\s? # grab event type 
+          ([\_[:alpha:]][\_\#\_\$[:alnum:]]*)?\s*         # posibly grab first event name
+        (?=,|$|{)  #stop before a comma, end of line or opening curly brace without grabbing any characters
     end: |-
         (?ix)
-          (?<=})|(?=;)   #stop pattern after the closing curly bracket or first semicolon without grabbing any characters
-    patterns:
-    - begin: |-
-          (?ix)
-            (\bthreadsafe\b\s+)?
-            (push|event|change|release|socketconnect|socketdisconnect|socketreceive|socketstatus|eventhandler)\b\s+
-      beginCaptures:
+          (?<=})   #stop pattern after the closing curly bracket or first semicolon without grabbing any characters
+    beginCaptures:
         '1':
-          name: keyword.modifier.event.usp
-        '2':
-          name: keyword.declaration.event.usp
+          name: storage.modifier.threadsafe.usp
+        "2":
+          name: keyword.declaration.$2.usp
         '3':
           name: entity.name.variable.event.usp
-      end: |-
-          (?ix)
-            (?=\{) #stop pattern after the opening curly brace without grabbing any characters
-      patterns:
-      - match: ([\_[:alpha:]][\_\#\_\$[:alnum:]]*)
-        name: entity.name.variable.event.usp
-      - include: "#punctuation-comma"
-      - include: "#comment"
-      - include: "#parenthesized-parameter-list"
+    patterns:
+    - match: (?i)\b(push|event|change|release|socketconnect|socketdisconnect|socketreceive|socketstatus)\b
+      name: keyword.declaration.$1.usp
+    - match: ([\_[:alpha:]][\_\#\_\$[:alnum:]]*)
+      name: entity.name.variable.event.usp
+    - include: "#punctuation-comma"
+    - include: "#comment"
     - include: "#block"
-  
+  structure-declaration:
+    begin:  |-
+        (?xi)
+          (?=
+            \b(structure)\b\s+
+          )
+    end: (?<=\})|(?=;)
+    patterns:
+    - begin: |-
+        (?xi)
+          \b(structure)\b\s+
+          ([_[:alpha:]][_[:alnum:]]*)\s*
+      beginCaptures:
+        '1':
+          name: keyword.declaration.structure.api
+        '2':
+          name: entity.name.type.structure.api
+      end: (?=\{)|(?=;)
+      patterns:
+      - include: "#comment"
+    - begin: \{
+      beginCaptures:
+        '0':
+          name: punctuation.curlybrace.open.api
+      end: \}
+      endCaptures:
+        '0':
+          name: punctuation.curlybrace.close.api
+      patterns:
+      - include: "#basic-declaration"
+    - include: "#comment"
   structure-members:
     patterns:
     - include: "#variable-declaration"
+
   parenthesized-parameter-list:
     name: meta.parameters
     begin: (\()
@@ -670,8 +696,8 @@ repository:
     - include: "#declaration-keyword-parameter"
     - include: "#declaration-keyword-structure"
     - include: "#declaration-keyword-function"
+    - include: "#declaration-keyword-eventhandler"
     - include: "#declaration-keyword-variable"
-    - include: "#declaration-keyword-event"
   declaration-keyword-input:
     patterns:
       - match: (?i)\b(digital_input|analog_input|buffer_input|string_input)\b
@@ -690,15 +716,15 @@ repository:
         name: keyword.declaration.$1.usp
   declaration-keyword-function:
     patterns:
-      - match: (?i)\b(function|integer_function|string_function|long_integer_function|signed_integer_function|signed_long_integer_function|simplsharpstring_function)\b
+      - match: (?i)\b(eventhandler|function|integer_function|string_function|long_integer_function|signed_integer_function|signed_long_integer_function|simplsharpstring_function)\b
+        name: keyword.declaration.$1.usp
+  declaration-keyword-eventhandler:
+    patterns:
+      - match: (?i)\b(GatherEventHandler|EventhHandler)\b
         name: keyword.declaration.$1.usp
   declaration-keyword-variable:
     patterns:
       - match: (?i)\b(integer|string|long_integer|signed_integer|signed_long_integer|SIMPLSHARPSTRING)\b
-        name: keyword.declaration.$1.usp
-  declaration-keyword-event:
-    patterns:
-      - match: (?i)\b(push|event|change|release|socketconnect|socketdisconnect|socketreceive|socketstatus|eventhandler)\b
         name: keyword.declaration.$1.usp
   declaration-keyword-class:
     patterns:
