@@ -1,6 +1,6 @@
 ---
 name: C#
-scopeName: source.cs
+scopeName: source.mycs
 fileTypes:
 - cs
 uuid: f7de61e2-bdde-4e2a-a139-8221b179584e
@@ -9,7 +9,7 @@ patterns:
 - include: "#comment"
 - include: "#directives"
 - include: "#declarations"
-# - include: "#script-top-level"
+- include: "#script-top-level"
 repository:
   directives:
     patterns:
@@ -19,9 +19,9 @@ repository:
     - include: "#punctuation-semicolon"
   declarations:
     patterns:
-    # - include: "#namespace-declaration"
+    - include: "#namespace-declaration"
     - include: "#type-declarations"
-    # - include: "#punctuation-semicolon"
+    - include: "#punctuation-semicolon"
   script-top-level:
     patterns:
     - include: "#statement"
@@ -29,35 +29,35 @@ repository:
     - include: "#punctuation-semicolon"
   type-declarations:
     patterns:
-    # - include: "#preprocessor"
-    # - include: "#comment"
+    - include: "#preprocessor"
+    - include: "#comment"
     - include: "#storage-modifier"
     - include: "#class-declaration"
-    # - include: "#delegate-declaration"
-    # - include: "#enum-declaration"
-    # - include: "#interface-declaration"
-    # - include: "#struct-declaration"
-    # - include: "#record-declaration"
-    # - include: "#attribute-section"
-    # - include: "#punctuation-semicolon"
+    - include: "#delegate-declaration"
+    - include: "#enum-declaration"
+    - include: "#interface-declaration"
+    - include: "#struct-declaration"
+    - include: "#record-declaration"
+    - include: "#attribute-section"
+    - include: "#punctuation-semicolon"
   class-or-struct-members:
     patterns:
-    # - include: "#preprocessor"
-    # - include: "#comment"
+    - include: "#preprocessor"
+    - include: "#comment"
     - include: "#storage-modifier"
-    # - include: "#type-declarations"
-    # - include: "#property-declaration"
-    # - include: "#field-declaration"
-    # - include: "#event-declaration"
-    # - include: "#indexer-declaration"
-    # - include: "#variable-initializer"
-    # - include: "#constructor-declaration"
-    # - include: "#destructor-declaration"
-    # - include: "#operator-declaration"
-    # - include: "#conversion-operator-declaration"
+    - include: "#type-declarations"
+    - include: "#property-declaration"
+    - include: "#field-declaration"
+    - include: "#event-declaration"
+    - include: "#indexer-declaration"
+    - include: "#variable-initializer"
+    - include: "#constructor-declaration"
+    - include: "#destructor-declaration"
+    - include: "#operator-declaration"
+    - include: "#conversion-operator-declaration"
     - include: "#method-declaration"
-    # - include: "#attribute-section"
-    # - include: "#punctuation-semicolon"
+    - include: "#attribute-section"
+    - include: "#punctuation-semicolon"
   interface-members:
     patterns:
     - include: "#preprocessor"
@@ -72,32 +72,32 @@ repository:
     - include: "#punctuation-semicolon"
   statement:
     patterns:
-    # - include: "#preprocessor"
-    # - include: "#comment"
-    # - include: "#while-statement"
-    # - include: "#do-statement"
+    - include: "#preprocessor"
+    - include: "#comment"
+    - include: "#while-statement"
+    - include: "#do-statement"
     - include: "#for-statement"
-    # - include: "#foreach-statement"
-    # - include: "#if-statement"
-    # - include: "#else-part"
-    # - include: "#goto-statement"
-    # - include: "#return-statement"
-    # - include: "#break-or-continue-statement"
-    # - include: "#throw-statement"
-    # - include: "#yield-statement"
-    # - include: "#await-statement"
-    # - include: "#try-statement"
-    # - include: "#expression-operator-expression"
-    # - include: "#context-control-statement"
-    # - include: "#context-control-paren-statement"
-    # - include: "#labeled-statement"
-    # - include: "#object-creation-expression"
-    # - include: "#array-creation-expression"
-    # - include: "#anonymous-object-creation-expression"
-    # - include: "#local-declaration"
-    # - include: "#block"
+    - include: "#foreach-statement"
+    - include: "#if-statement"
+    - include: "#else-part"
+    - include: "#goto-statement"
+    - include: "#return-statement"
+    - include: "#break-or-continue-statement"
+    - include: "#throw-statement"
+    - include: "#yield-statement"
+    - include: "#await-statement"
+    - include: "#try-statement"
+    - include: "#expression-operator-expression"
+    - include: "#context-control-statement"
+    - include: "#context-control-paren-statement"
+    - include: "#labeled-statement"
+    - include: "#object-creation-expression"
+    - include: "#array-creation-expression"
+    - include: "#anonymous-object-creation-expression"
+    - include: "#local-declaration"
+    - include: "#block"
     - include: "#expression"
-    # - include: "#punctuation-semicolon"
+    - include: "#punctuation-semicolon"
   expression:
     patterns:
     - include: "#preprocessor"
@@ -883,10 +883,10 @@ repository:
     end: "(?<=\\})|(?=;)"
     name: meta.method.declaration.cs
     patterns:
-    # - include: "#comment"
-    # - include: "#parenthesized-parameter-list"
-    # - include: "#generic-constraints"
-    # - include: "#expression-body"
+    - include: "#comment"
+    - include: "#parenthesized-parameter-list"
+    - include: "#generic-constraints"
+    - include: "#expression-body"
     - include: "#block"
   constructor-declaration:
     begin: "(?=@?[_[:alpha:]][_[:alnum:]]*\\s*\\()"
@@ -1985,7 +1985,7 @@ repository:
         (?=[,)])
       captures:
         '1':
-          name: variable.other.readwrite.cs
+          name: variable.other.readwrite-tuple.cs
   declaration-expression-local:
     match: |-
       (?x) # e.g. int x OR var x
@@ -2544,7 +2544,7 @@ repository:
     - include: "#expression"
     - include: "#punctuation-comma"
   identifier:
-    name: variable.other.readwrite.cs
+    name: variable.other.readwrite-ie.cs
     match: "@?[_[:alpha:]][_[:alnum:]]*"
   cast-expression:
     match: |-

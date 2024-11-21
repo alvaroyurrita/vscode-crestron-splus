@@ -1,6 +1,6 @@
 {
   "name": "C#",
-  "scopeName": "source.cs",
+  "scopeName": "source.mycs",
   "fileTypes": [
     "cs"
   ],
@@ -17,6 +17,9 @@
     },
     {
       "include": "#declarations"
+    },
+    {
+      "include": "#script-top-level"
     }
   ],
   "repository": {
@@ -39,7 +42,13 @@
     "declarations": {
       "patterns": [
         {
+          "include": "#namespace-declaration"
+        },
+        {
           "include": "#type-declarations"
+        },
+        {
+          "include": "#punctuation-semicolon"
         }
       ]
     },
@@ -59,20 +68,89 @@
     "type-declarations": {
       "patterns": [
         {
+          "include": "#preprocessor"
+        },
+        {
+          "include": "#comment"
+        },
+        {
           "include": "#storage-modifier"
         },
         {
           "include": "#class-declaration"
+        },
+        {
+          "include": "#delegate-declaration"
+        },
+        {
+          "include": "#enum-declaration"
+        },
+        {
+          "include": "#interface-declaration"
+        },
+        {
+          "include": "#struct-declaration"
+        },
+        {
+          "include": "#record-declaration"
+        },
+        {
+          "include": "#attribute-section"
+        },
+        {
+          "include": "#punctuation-semicolon"
         }
       ]
     },
     "class-or-struct-members": {
       "patterns": [
         {
+          "include": "#preprocessor"
+        },
+        {
+          "include": "#comment"
+        },
+        {
           "include": "#storage-modifier"
         },
         {
+          "include": "#type-declarations"
+        },
+        {
+          "include": "#property-declaration"
+        },
+        {
+          "include": "#field-declaration"
+        },
+        {
+          "include": "#event-declaration"
+        },
+        {
+          "include": "#indexer-declaration"
+        },
+        {
+          "include": "#variable-initializer"
+        },
+        {
+          "include": "#constructor-declaration"
+        },
+        {
+          "include": "#destructor-declaration"
+        },
+        {
+          "include": "#operator-declaration"
+        },
+        {
+          "include": "#conversion-operator-declaration"
+        },
+        {
           "include": "#method-declaration"
+        },
+        {
+          "include": "#attribute-section"
+        },
+        {
+          "include": "#punctuation-semicolon"
         }
       ]
     },
@@ -113,10 +191,82 @@
     "statement": {
       "patterns": [
         {
+          "include": "#preprocessor"
+        },
+        {
+          "include": "#comment"
+        },
+        {
+          "include": "#while-statement"
+        },
+        {
+          "include": "#do-statement"
+        },
+        {
           "include": "#for-statement"
         },
         {
+          "include": "#foreach-statement"
+        },
+        {
+          "include": "#if-statement"
+        },
+        {
+          "include": "#else-part"
+        },
+        {
+          "include": "#goto-statement"
+        },
+        {
+          "include": "#return-statement"
+        },
+        {
+          "include": "#break-or-continue-statement"
+        },
+        {
+          "include": "#throw-statement"
+        },
+        {
+          "include": "#yield-statement"
+        },
+        {
+          "include": "#await-statement"
+        },
+        {
+          "include": "#try-statement"
+        },
+        {
+          "include": "#expression-operator-expression"
+        },
+        {
+          "include": "#context-control-statement"
+        },
+        {
+          "include": "#context-control-paren-statement"
+        },
+        {
+          "include": "#labeled-statement"
+        },
+        {
+          "include": "#object-creation-expression"
+        },
+        {
+          "include": "#array-creation-expression"
+        },
+        {
+          "include": "#anonymous-object-creation-expression"
+        },
+        {
+          "include": "#local-declaration"
+        },
+        {
+          "include": "#block"
+        },
+        {
           "include": "#expression"
+        },
+        {
+          "include": "#punctuation-semicolon"
         }
       ]
     },
@@ -1342,6 +1492,18 @@
       "end": "(?<=\\})|(?=;)",
       "name": "meta.method.declaration.cs",
       "patterns": [
+        {
+          "include": "#comment"
+        },
+        {
+          "include": "#parenthesized-parameter-list"
+        },
+        {
+          "include": "#generic-constraints"
+        },
+        {
+          "include": "#expression-body"
+        },
         {
           "include": "#block"
         }
@@ -3108,7 +3270,7 @@
           "match": "(?x) # e.g. x\n(@?[_[:alpha:]][_[:alnum:]]*)\\b\\s*\n(?=[,)])",
           "captures": {
             "1": {
-              "name": "variable.other.readwrite.cs"
+              "name": "variable.other.readwrite-tuple.cs"
             }
           }
         }
@@ -3994,7 +4156,7 @@
       ]
     },
     "identifier": {
-      "name": "variable.other.readwrite.cs",
+      "name": "variable.other.readwrite-ie.cs",
       "match": "@?[_[:alpha:]][_[:alnum:]]*"
     },
     "cast-expression": {

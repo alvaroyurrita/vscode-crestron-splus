@@ -1,0 +1,60 @@
+@startmindmap
+*: declarations
+<code>
+introduces an identifier into the language
+and identifier syntax case sensitive  and
+a-z, A-Z, 0-9, _ , and may not begin with 0 - 9
+</code>
+;
+
+
+**:== Namespace
+namespace-declaration
+----
+|= keyword.declaration.namespace |= entity.name.namespace | contents  |
+| NAMESPACE |  name  |  {...} |;
+
+**:== Class
+class-declaration
+----
+|= storage.modifier.static |= keyword.declaration.class |= entity.name.type.class | contents  |= punctuation.terminator |
+| Optional: static | class |  name  |  {...} | ; |;
+
+
+**:== Delegate
+class-delegate-declaration
+----
+|= storage.type.delegate |= keyword.type.{name below} |= entity.name.type.delegate | parameters  |= punctuation.terminator |
+| delegate | FUNCTION\n INTEGER_FUNCTION\n SIGNED_INTEGER_FUNCTION\n LONG_INTEGER_FUNCTION\n SIGNED_LONG_INTEGER_FUNCTION\n STRING_FUNCTION \n SIMPLSHARPSTRING_FUNCTION |  name  |  parenthesized-parameter-list |=     ; |;
+
+
+**:== Eventhandler
+class-eventhandler-declaration
+----
+|= storage.modifier.static |= keyword.type.eventhandler |= entity.name.type.eventhandler | parameters  |= punctuation.terminator |
+| Optional: static | EVENTHANDLER |  name  |  parenthesized-parameter-list |=     ; |;
+
+**:== Function
+function-declaration
+----
+|= storage.modifier.static |= keyword.type.{name below} |= entity.name.type.function | parameters |= punctuation.terminator |
+| Optional: static | FUNCTION\n INTEGER_FUNCTION\n SIGNED_INTEGER_FUNCTION\n LONG_INTEGER_FUNCTION\n SIGNED_LONG_INTEGER_FUNCTION\n STRING_FUNCTION \n SIMPLSHARPSTRING_FUNCTION  |  \n  name | \n  parenthesized-parameter-list |= \n    ;  |;
+
+**:== Properties and Variables
+properties-and-variables
+----
+|= storage.modifier.{name below} |= keyword.type.{name below} |= entity.name.variable | array |
+| optional:\n static\n DelegateProperty| INTEGER\n SIGNED_INTEGER\n LONG_INTEGER\n SIGNED_LONG_INTEGER\n STRING\n SIMPLSHARPSTING |  \n  name | \n  [ ]  |
+
+|= entity.name.type |= entity.name.variable | array |
+|used defined object | name |  [ ]  |;
+
+**:== Parameters
+parenthesized-parameter-list
+----
+|= storage.modifier.{name below} |= keyword.type.{name below} |= entity.name.variable.parameter | array |
+| optional:\n BYREF| INTEGER\n SIGNED_INTEGER\n LONG_INTEGER\n SIGNED_LONG_INTEGER\n STRING\n SIMPLSHARPSTING\n EventArgs |  \n  name | \n  [ ]  |
+
+|= storage.modifier.{name below} |= entity.name.type |= entity.name.variable.parameter | array |
+| optional:BYREF |used defined object | name |  [ ]  |;
+@endmindmap

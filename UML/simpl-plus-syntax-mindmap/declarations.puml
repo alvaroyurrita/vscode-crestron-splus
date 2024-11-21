@@ -1,0 +1,77 @@
+@startmindmap
+*: declarations
+<code>
+introduces an identifier into the language
+and identifier syntax is
+a-z, A-Z, 0-9, #, _, and $ but may not begin with 0-9
+</code>
+;
+
+**:== Inputs
+input-declaration
+----
+|= keyword.declaration.{name below} |= entity.name.type.input | array |= punctuation.comma |= punctuation.terminator.input |
+| DIGITAL_INPUT\n ANALOG_INPUT\n STRING_INPUT\n BUFFER_INPUT |  \n  name  | \n  [count , [min]] [size]  |= \n   , |=  \n     ; |;
+**:== Outputs
+output-declaration
+----
+|= keyword.declaration.{name below} |= entity.name.type.output | array |= punctuation.comma |= punctuation.terminator.output |
+| DIGITAL_OUTPUT\n ANALOG_OUTPUT\n STRING_OUTPUT\n BUFFER_OUTPUT |  \n  name | \n  [count , [min]] [size]  |= \n   , |=  \n     ; |;
+
+**:== Parameters
+parameter-declaration
+----
+|= keyword.declaration.{name below} |= entity.name.type.parameter | array |= punctuation.comma |= punctuation.terminator.parameter |
+| INTEGER_PARAMETER\n SIGNED_INTEGER_PARAMETER\n LONG_INTEGER_PARAMETER\n SIGNED_LONG_INTEGER_PARAMETER\n STRING_PARAMETER  |  \n  name | \n  [count] [size]  |= \n   ,|=  \n     ; |;
+
+**:== Structures
+structure-declaration
+----
+|= keyword.declaration.structure |= entity.name.type.structure | contents |= punctuation.terminator.structure |
+| STRUCTURE |  name  |  {...} |=     ; |;
+
+**:== Functions
+function-declaration
+----
+|= keyword.declaration.{name below} |= entity.name.type.function | parameters |= meta.function.contents |
+| FUNCTION\n INTEGER_FUNCTION\n SIGNED_INTEGER_FUNCTION\n LONG_INTEGER_FUNCTION\n SIGNED_LONG_INTEGER_FUNCTION\n STRING_FUNCTION \n SIMPLSHARPSTRING_FUNCTION  |  \n  name | \n  parenthesized-parameter-list | \n  {..statements..}  |;
+
+
+**:== Variables
+variable-declaration
+----
+|= storage.modifier.{name below} |= keyword.type.{name below} |= entity.name.variable | array |= punctuation.comma |= punctuation.terminator.variable |
+| optional:\n VOLATILE\n NONVOLATILE\n DYNAMIC \n ASCII\n UTF16\n INHERIT\n DELEGATEPROPERTY | INTEGER\n SIGNED_INTEGER\n LONG_INTEGER\n SIGNED_LONG_INTEGER\n STRING\n SIMPLSHARPSTRING|  \n  name | \n  [count] [size]  |= \n   ,|=  \n     ; |
+
+|= keyword.type.{name below} |= entity.name.variable | array |= punctuation.terminator.variable |
+| CEVENT\n CMUTEX |  name  | [count]  |=     ; |
+
+|= storage.modifier.{name below} |= entity.name.type |= entity.name.variable | array |= punctuation.terminator.variable |
+| optional:\n VOLATILE\n NONVOLATILE\n | \n user defined object |  \n  name | \n  [count]  |=  \n     ; |;
+
+
+**:== Events
+event-declaration
+----
+|= storage.modifier.threadsafe |= keyword.declaration.{name below} |= entity.name.variable.event |= punctuation.comma |= meta.event.contents |
+| TRHEADSAFE | PUSH\n EVENT\n CHANGE\n RELEASE\n SOCKETCONNECT\n SOCKETDISCONNECT \n SOCKETRECEIVE \n SOCKETSTATUS  |  \n  name |= \n   ,| \n  {..statements..}  |
+----
+|= keyword.declaration.eventhandler |= entity.name.eventhandler | parameters |= meta.event.contents |
+| EVENTHANDLER  |  name | parenthesized-parameter-list | {..statements..}  |;
+
+**:== Callbacks
+callback-declaration
+----
+|= keyword.modifier.callback |= keyword.declaration.function |= entity.name.variable.callback | parameters |= meta.callback.contents |
+| \n CALLBACK  | FUNCTION\n INTEGER_FUNCTION\n SIGNED_INTEGER_FUNCTION\n LONG_INTEGER_FUNCTION\n SIGNED_LONG_INTEGER_FUNCTION\n STRING_FUNCTION \n SIMPLSHARPSTRING_FUNCTION | \n  name | \n  parenthesized-parameter-list  | \n  {..statements..}  |;
+
+**: Parameters
+parenthesized-parameter-list
+----
+|= keyword.modifier.parameter |= keyword.declaration.variable |= entity.name.variable | array |
+| optional:\n ByVal\n ByRef\n ReadOnlyRef | INTEGER\n SIGNED_INTEGER\n LONG_INTEGER\n SIGNED_LONG_INTEGER\n EVENTARGS |  \n  name | \n  [] []  |
+
+|= keyword.modifier.parameter |= entity.name.type |= entity.name.variable | array |
+| optional:\n ByVal\n ByRef\n ReadOnlyRef | \n used defined object |  \n  name | \n  []  |;
+
+@endmindmap

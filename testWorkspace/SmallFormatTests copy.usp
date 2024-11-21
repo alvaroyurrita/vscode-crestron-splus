@@ -1,15 +1,1 @@
-namespace Name
-{
-    class Untitled
-    {
-        private void test(int para1)
-        {
-            test(itsme);
-            int result = test(itsme);
-            for (int i = 0; i < length; i++)
-            {
-                
-            }
-        }
-    }
-}
+int a, b, c, d;

@@ -118,6 +118,20 @@
           "light": "./icons/simplSharpIcon.png"
         },
         "configuration": "./language-configuration.json"
+      },
+      {
+        "aliases": [
+          "My C#"
+        ],
+        "id": "mycs-source",
+        "extensions": [
+          ".cs"
+        ],
+        "icon": {
+          "dark": "./icons/crestron.png",
+          "light": "./icons/crestron.png"
+        },
+        "configuration": "./language-configuration.json"
       }
     ],
     "grammars": [
@@ -130,6 +144,11 @@
         "language": "splusapi-source",
         "scopeName": "source.splusapi",
         "path": "./syntaxes/crestron-api.tmLanguage.json"
+      },
+      {
+        "language": "mycs-source",
+        "scopeName": "source.mycs",
+        "path": "./syntaxes/csharp.tmLanguage.json"
       }
     ],
     "snippets": [
@@ -187,7 +206,7 @@
     "lint": "eslint src",
     "test": "vscode-test",
     "yaml2json-watch": "yaml2json syntaxes --save --pretty --recursive --watch",
-    "puml-to-svg": "java -jar \"C:\\ProgramData\\chocolatey\\lib\\plantuml\\tools\\plantuml.jar\"  \".\\csharp-syntax-mindmap\\*.puml\" -svg",
+    "puml-to-svg": "java -jar \"C:\\ProgramData\\chocolatey\\lib\\plantuml\\tools\\plantuml.jar\"  \".\\UML\\csharp-syntax-mindmap\\*.puml\" \".\\UML\\simpl-plus-syntax-mindmap\\*.puml\" -svg",
     "test-with-coverage": "vscode-test --coverage"
   },
   "devDependencies": {
