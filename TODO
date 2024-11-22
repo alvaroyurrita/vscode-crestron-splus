@@ -1,13 +1,5 @@
-Formatting
-* Expressions
-* Statements
-* Properties Literals
-* Remove properties Literals from global literals
-* Add Wait as a local function declaration
-* apply block to remaining declarations
 
 Add Insert category
-Formatting (comprehensive)
 AutoComplete Crestron BuiltIn Structures
 AutoComplete Based on API
 add units to propvalidunits

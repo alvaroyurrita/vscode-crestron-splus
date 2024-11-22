@@ -351,7 +351,7 @@ repository:
       "1":
         name: punctuation.terminator.parameteryproperty.usp
     patterns:
-      - include: "#literals"
+      - include: "#preprocessor-property-literals"
   preprocessor-parameter-properties-list:
     begin: |-
         (?ix)
@@ -463,7 +463,7 @@ repository:
               captures:
                 "1":
                   patterns:
-                    - include: "#literals"
+                    - include: "#preprocessor-property-literals"
                 "2":
                   name: punctuation.comma.usp
                 "3":
@@ -471,6 +471,57 @@ repository:
                     - include: "#string-literal"
           "3":
             name: punctuation.curlybrace.close.usp
+
+  preprocessor-property-literals:
+    patterns:
+      - include: "#preprocessor-numeric"
+      - include: "#char-literal"
+      - include: "#string-literal"
+  preprocessor-numeric:
+    match: |-
+      (?x)
+        (?:
+          (?:[0-9a-fA-F%])+ #capture any digit  (anything that resembles a number)
+          (?:[dh%st])
+        )  #that has a valid property suffix
+    captures:
+      '0':
+        patterns:  #with the match above:
+        - begin: "(?=.)"
+          end: "$"
+          patterns:
+          - match: |-
+              (?x)
+                ([0-9]+d) #capture decimal digits that terminate with d 
+            captures:
+              '1':
+                name: constant.numeric.decimal.usp
+          - match: |-
+              (?x)
+                ([0-9a-fA-F]+h) #capture hex digits and h 
+            captures:
+              '1':
+                name: constant.numeric.hex.usp
+          - match: |-
+              (?x)
+                ([0-9]+%) #capture decimal digits that terminate in %
+            captures:
+              '1':
+                name: constant.numeric.percentage.usp
+          - match: |-
+              (?x)
+                ([0-9]+s) #capture decimal digits that terminate in s
+            captures:
+              '1':
+                name: constant.numeric.seconds.usp
+          - match: |-
+              (?x)
+                ([0-9]+t) #capture decimal digits that terminate in t 
+            captures:
+              '1':
+                name: constant.numeric.ticks.usp
+          - match: (?:(?:[0-9a-zA-Z_]|_)|(?<=[eE])[+-]|\.\d)+ # invalidate anything that did not match hex of decimal
+            name: invalid.illegal.constant.numeric.usp
 
 #Comment
   comment:
@@ -1331,38 +1382,10 @@ repository:
           - match: |-
               (?x)
                 (?=[0-9])(?!0[xX]) #ensure it starts with a digit, but not wit a 0x or 0X 
-                ([0-9d](?:[0-9d])*)$ #capture rest of decimal digits and d (for parameter properties decimal value)
+                ([0-9](?:[0-9])*)$ #capture rest of decimal digits and d (for parameter properties decimal value)
             captures:
               '1':
                 name: constant.numeric.decimal.usp
-          - match: |-
-              (?ix)
-                (?=[0-9a-f])(?!0[xX]) #ensure it starts with a hex digit, but not wit a 0x or 0X 
-                ([0-9a-fh](?:[0-9a-fh])*)$ #capture rest of hex digits and h (for parameter properties decimal value)hex value)
-            captures:
-              '1':
-                name: constant.numeric.hex.usp
-          - match: |-
-              (?x)
-                (?=[0-9])(?!0[xX]) #ensure it starts with a digit, but not wit a 0x or 0X 
-                ([0-9%](?:[0-9%])*)$ #capture rest of decimal digits and % (for parameter properties percentage value)
-            captures:
-              '1':
-                name: constant.numeric.percentage.usp
-          - match: |-
-              (?x)
-                (?=[0-9])(?!0[xX]) #ensure it starts with a digit, but not wit a 0x or 0X 
-                ([0-9s](?:[0-9s])*)$ #capture rest of decimal digits and s (for parameter properties seconds value)
-            captures:
-              '1':
-                name: constant.numeric.seconds.usp
-          - match: |-
-              (?x)
-                (?=[0-9])(?!0[xX]) #ensure it starts with a digit, but not wit a 0x or 0X 
-                ([0-9t](?:[0-9t])*)$ #capture rest of decimal digits and t (for parameter properties ticks value)
-            captures:
-              '1':
-                name: constant.numeric.ticks.usp
           - match: (?:(?:[0-9a-zA-Z_]|_)|(?<=[eE])[+-]|\.\d)+ # invalidate anything that did not match hex of decimal
             name: invalid.illegal.constant.numeric.usp
   char-literal:

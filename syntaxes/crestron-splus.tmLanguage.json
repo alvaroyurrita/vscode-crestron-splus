@@ -514,7 +514,7 @@
       },
       "patterns": [
         {
-          "include": "#literals"
+          "include": "#preprocessor-property-literals"
         }
       ]
     },
@@ -684,7 +684,7 @@
                     "1": {
                       "patterns": [
                         {
-                          "include": "#literals"
+                          "include": "#preprocessor-property-literals"
                         }
                       ]
                     },
@@ -708,6 +708,78 @@
           }
         }
       ]
+    },
+    "preprocessor-property-literals": {
+      "patterns": [
+        {
+          "include": "#preprocessor-numeric"
+        },
+        {
+          "include": "#char-literal"
+        },
+        {
+          "include": "#string-literal"
+        }
+      ]
+    },
+    "preprocessor-numeric": {
+      "match": "(?x)\n  (?:\n    (?:[0-9a-fA-F%])+ #capture any digit  (anything that resembles a number)\n    (?:[dh%st])\n  )  #that has a valid property suffix",
+      "captures": {
+        "0": {
+          "patterns": [
+            {
+              "begin": "(?=.)",
+              "end": "$",
+              "patterns": [
+                {
+                  "match": "(?x)\n  ([0-9]+d) #capture decimal digits that terminate with d",
+                  "captures": {
+                    "1": {
+                      "name": "constant.numeric.decimal.usp"
+                    }
+                  }
+                },
+                {
+                  "match": "(?x)\n  ([0-9a-fA-F]+h) #capture hex digits and h",
+                  "captures": {
+                    "1": {
+                      "name": "constant.numeric.hex.usp"
+                    }
+                  }
+                },
+                {
+                  "match": "(?x)\n  ([0-9]+%) #capture decimal digits that terminate in %",
+                  "captures": {
+                    "1": {
+                      "name": "constant.numeric.percentage.usp"
+                    }
+                  }
+                },
+                {
+                  "match": "(?x)\n  ([0-9]+s) #capture decimal digits that terminate in s",
+                  "captures": {
+                    "1": {
+                      "name": "constant.numeric.seconds.usp"
+                    }
+                  }
+                },
+                {
+                  "match": "(?x)\n  ([0-9]+t) #capture decimal digits that terminate in t",
+                  "captures": {
+                    "1": {
+                      "name": "constant.numeric.ticks.usp"
+                    }
+                  }
+                },
+                {
+                  "match": "(?:(?:[0-9a-zA-Z_]|_)|(?<=[eE])[+-]|\\.\\d)+",
+                  "name": "invalid.illegal.constant.numeric.usp"
+                }
+              ]
+            }
+          ]
+        }
+      }
     },
     "comment": {
       "patterns": [
@@ -2104,42 +2176,10 @@
                   }
                 },
                 {
-                  "match": "(?x)\n  (?=[0-9])(?!0[xX]) #ensure it starts with a digit, but not wit a 0x or 0X \n  ([0-9d](?:[0-9d])*)$ #capture rest of decimal digits and d (for parameter properties decimal value)",
+                  "match": "(?x)\n  (?=[0-9])(?!0[xX]) #ensure it starts with a digit, but not wit a 0x or 0X \n  ([0-9](?:[0-9])*)$ #capture rest of decimal digits and d (for parameter properties decimal value)",
                   "captures": {
                     "1": {
                       "name": "constant.numeric.decimal.usp"
-                    }
-                  }
-                },
-                {
-                  "match": "(?ix)\n  (?=[0-9a-f])(?!0[xX]) #ensure it starts with a hex digit, but not wit a 0x or 0X \n  ([0-9a-fh](?:[0-9a-fh])*)$ #capture rest of hex digits and h (for parameter properties decimal value)hex value)",
-                  "captures": {
-                    "1": {
-                      "name": "constant.numeric.hex.usp"
-                    }
-                  }
-                },
-                {
-                  "match": "(?x)\n  (?=[0-9])(?!0[xX]) #ensure it starts with a digit, but not wit a 0x or 0X \n  ([0-9%](?:[0-9%])*)$ #capture rest of decimal digits and % (for parameter properties percentage value)",
-                  "captures": {
-                    "1": {
-                      "name": "constant.numeric.percentage.usp"
-                    }
-                  }
-                },
-                {
-                  "match": "(?x)\n  (?=[0-9])(?!0[xX]) #ensure it starts with a digit, but not wit a 0x or 0X \n  ([0-9s](?:[0-9s])*)$ #capture rest of decimal digits and s (for parameter properties seconds value)",
-                  "captures": {
-                    "1": {
-                      "name": "constant.numeric.seconds.usp"
-                    }
-                  }
-                },
-                {
-                  "match": "(?x)\n  (?=[0-9])(?!0[xX]) #ensure it starts with a digit, but not wit a 0x or 0X \n  ([0-9t](?:[0-9t])*)$ #capture rest of decimal digits and t (for parameter properties ticks value)",
-                  "captures": {
-                    "1": {
-                      "name": "constant.numeric.ticks.usp"
                     }
                   }
                 },
