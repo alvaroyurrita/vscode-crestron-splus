@@ -148,6 +148,19 @@ TCP_SERVER TcpServer[100];
 UDP_SOCKET UdpSocket[100];
 
 
+
+//structure definition
+STRUCTURE mySruct //test
+{
+	INTEGER Variable#1, _Variable2[4], __Variable3[4][2];
+	INTEGER Variable#1, _Variable2[4], __Variable3[4][2];
+	LONG_INTEGER Variable4, Variable5[4], Variable6[4][2];
+	SIGNED_INTEGER Variable7, Variable8[4], Variable9[4][2];
+	SIGNED_LONG_INTEGER Variable10[4][2];
+	STRING Variable11$[6], Variable11[4][6];
+};
+
+
 FUNCTION MyFunction(){
 	
 	#IF_DEFINED dfdfdf
@@ -292,17 +305,6 @@ FUNCTION MyFunction(){
 
 
 
-
-//structure definition
-STRUCTURE mySruct //test
-{
-	INTEGER Variable#1, _Variable2[4], __Variable3[4][2];
-	INTEGER Variable#1, _Variable2[4], __Variable3[4][2];
-	LONG_INTEGER Variable4, Variable5[4], Variable6[4][2];
-	SIGNED_INTEGER Variable7, Variable8[4], Variable9[4][2];
-	SIGNED_LONG_INTEGER Variable10[4][2];
-	STRING Variable11$[6], Variable11[4][6];
-};
 
 CEVENT myEvent1;
 CMUTEX myMutex;
@@ -602,6 +604,9 @@ FUNCTION LoopingConstructs()
 		a=a+1;
 	}
 	until(a=5);
+	a = _oem_break|_oem_cd|_oem_cts|_oem_dtr|_oem_long_break|_oem_max_string|_oem_pacing|	_oem_rts|_oem_str_in|_oem_str_out;
+	b = on;
+	c  = off;
 }
 
 FUNCTION ArrayOperators()
@@ -875,6 +880,7 @@ FUNCTION StringFormatting()
 	If(a<b){Print("");};
 	If(a>b){Print("");};
 	Trace("Hello World %s",a); 
+	BranchingFunctions(test,test);
 }
 
 Function BranchingFunctions()
@@ -974,7 +980,6 @@ Function FileFunctions()
 	WaitForNewDisk() 
 	FileDeleteShared ( "\\CF0\\MyFile" )
 	a = ARDONLY | AHIDDEN | ASYSTEM | AVOLUME | ADIRENT | ARCHIVE  ;      
-	(FileInfo.iAttributes & ADIRENT)
 	CheckForNVRAMDisk() 
 	MakeDirectoryShared("NewDirect") 
 	RemoveDirectoryShared("\\CF0\\NewDirect") 

@@ -10,18 +10,18 @@ a-z, A-Z, 0-9, #, _, and $ but may not begin with 0-9
 **:== Inputs
 input-declaration
 ----
-|= keyword.type.{name below} |= entity.name.type.input | array |= punctuation.comma |= punctuation.terminator.input |
+|= keyword.type.{name below} |= entity.name.variable | array |= punctuation.comma |= punctuation.terminator.input |
 | DIGITAL_INPUT\n ANALOG_INPUT\n STRING_INPUT\n BUFFER_INPUT |  \n  name  | \n  [count , [min]] [size]  |= \n   , |=  \n     ; |;
 **:== Outputs
 output-declaration
 ----
-|= keyword.type.{name below} |= entity.name.type.output | array |= punctuation.comma |= punctuation.terminator.output |
+|= keyword.type.{name below} |= entity.name.variable | array |= punctuation.comma |= punctuation.terminator.output |
 | DIGITAL_OUTPUT\n ANALOG_OUTPUT\n STRING_OUTPUT\n BUFFER_OUTPUT |  \n  name | \n  [count , [min]] [size]  |= \n   , |=  \n     ; |;
 
 **:== Parameters
 parameter-declaration
 ----
-|= keyword.type.{name below} |= entity.name.type.parameter | array |= punctuation.comma |= punctuation.terminator.parameter |
+|= keyword.type.{name below} |= entity.name.variable | array |= punctuation.comma |= punctuation.terminator.parameter |
 | INTEGER_PARAMETER\n SIGNED_INTEGER_PARAMETER\n LONG_INTEGER_PARAMETER\n SIGNED_LONG_INTEGER_PARAMETER\n STRING_PARAMETER  |  \n  name | \n  [count] [size]  |= \n   ,|=  \n     ; |;
 
 **:== Global Variables
@@ -29,10 +29,16 @@ variable-declaration
 ----
 |= storage.modifier.{name below} |= keyword.type.{name below} |= entity.name.variable | array |= punctuation.comma |= punctuation.terminator.variable |
 | optional:\n VOLATILE\n NONVOLATILE\n DYNAMIC \n ASCII\n UTF16\n INHERIT\n DELEGATEPROPERTY | INTEGER\n SIGNED_INTEGER\n LONG_INTEGER\n SIGNED_LONG_INTEGER\n STRING\n SIMPLSHARPSTRING|  \n  name | \n  [count] [size]  |= \n   ,|=  \n     ; |
-
+----
+built in classes
 |= keyword.type.{name below} |= entity.name.variable | array |= punctuation.terminator.variable |
 | CEVENT\n CMUTEX |  name  | [count]  |=     ; |
-
+----
+built in structures
+|= keyword.type.{name below} |= entity.name.variable | array |= punctuation.terminator.variable |
+| TCP_CLIENT\n TCP_SERVER\n UDP_SOCKET |  name  | [count]  |=     ; |
+----
+user defined classes
 |= storage.modifier.{name below} |= entity.name.type |= entity.name.variable | array |= punctuation.terminator.variable |
 | optional:\n VOLATILE\n NONVOLATILE\n | \n user defined object |  \n  name | \n  [count]  |=  \n     ; |;
 
@@ -47,21 +53,21 @@ structure-declaration
 **:== Functions
 function-declaration
 ----
-|= keyword.type.{name below} |= entity.name.function | parameters |= meta.function.contents |
+|= keyword.type.{name below} |= entity.name.function | parameters | contents |
 | FUNCTION\n INTEGER_FUNCTION\n SIGNED_INTEGER_FUNCTION\n LONG_INTEGER_FUNCTION\n SIGNED_LONG_INTEGER_FUNCTION\n STRING_FUNCTION \n SIMPLSHARPSTRING_FUNCTION  |  \n  name | \n  parenthesized-parameter-list | \n  {..statements..}  |
 ----
 eventhandler:
-|= keyword.type.{name below} |= entity.name.eventhandler | parameters |= meta.event.contents |
-| EVENTHANDLER\n   |  name | parenthesized-parameter-list | {..statements..}  |
+|= keyword.type.{name below} |= entity.name.function | parameters | contents |
+| EVENTHANDLER\n GatherEventHandler   |  name | parenthesized-parameter-list | {..statements..}  |
 ----
 callbacks:
-|= storage.modifier.callback |= keyword.type.{name below} |= entity.name.type.function | parameters |= meta.callback.contents |
+|= storage.modifier.callback |= keyword.type.{name below} |= entity.name.function | parameters | contents |
 | \n CALLBACK  | FUNCTION\n INTEGER_FUNCTION\n SIGNED_INTEGER_FUNCTION\n LONG_INTEGER_FUNCTION\n SIGNED_LONG_INTEGER_FUNCTION\n STRING_FUNCTION \n SIMPLSHARPSTRING_FUNCTION | \n  name | \n  parenthesized-parameter-list  | \n  {..statements..}  |;
 
 **:== Events
 event-declaration
 ----
-|= storage.modifier.threadsafe |= keyword.type.{name below} |= entity.name.variable.event |= punctuation.comma |= meta.event.contents |
+|= storage.modifier.threadsafe |= keyword.type.{name below} |= entity.name.variable.event |= punctuation.comma | contents |
 | TRHEADSAFE | PUSH\n EVENT\n CHANGE\n RELEASE\n SOCKETCONNECT\n SOCKETDISCONNECT \n SOCKETRECEIVE \n SOCKETSTATUS  |  \n  name |= \n   ,| \n  {..statements..}  |;
 
 

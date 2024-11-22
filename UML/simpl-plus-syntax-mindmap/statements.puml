@@ -25,13 +25,13 @@
 **:== Local Variable Declaration
 local-variable-declaration
 ----
-|= storage.modifier.{name below} |= keyword.type.{name below} |= entity.name.variable | array |= punctuation.comma |= punctuation.terminator.variable |
+|= storage.modifier.{name below} |= keyword.type.{name below} |= entity.name.variable | array |= punctuation.comma |= punctuation.terminator |
 | optional:\n DYNAMIC \n ASCII\n UTF16\n INHERIT | INTEGER\n SIGNED_INTEGER\n LONG_INTEGER\n SIGNED_LONG_INTEGER\n STRING\n SIMPLSHARPSTRING|  \n  name | \n  [count] [size]  |= \n   ,|=  \n     ; |
 
-|= keyword.type.{name below} |= entity.name.variable | array |= punctuation.terminator.variable |
+|= keyword.type.{name below} |= entity.name.variable | array |= punctuation.terminator |
 | CEVENT\n CMUTEX |  name  | [count]  |=     ; |
 
-|= storage.modifier.{name below} |= entity.name.type |= entity.name.variable | array |= punctuation.terminator.variable |
+|= storage.modifier.{name below} |= entity.name.type |= entity.name.variable | array |= punctuation.terminator |
 | optional:\n VOLATILE\n NONVOLATILE\n | \n user defined object |  \n  name | \n  [count]  |=  \n     ; |;
 
 
@@ -39,13 +39,13 @@ local-variable-declaration
 while-statements
 |= keyword.control.loop.while |= punctuation.parenthesis.open | expression |= punctuation.parenthesis.close |= punctuation.curlybracket.open | statements |= punctuation.curlybracket.close |
 | while |     ( | expression |    )  |     { | statements |   } |
-
+----
 do-statements
-|= keyword.control.loop.do |= punctuation.curlybracket.open | statements |= punctuation.curlybracket.close |= keyword.control.loop.until |=  punctuation.parenthesis.open | expression | punctuation.parenthesis.close |= punctuation.terminator.statement |
+|= keyword.control.loop.do |= punctuation.curlybracket.open | statements |= punctuation.curlybracket.close |= keyword.control.loop.until |=  punctuation.parenthesis.open | expression | punctuation.parenthesis.close |= punctuation.terminator |
 | do |     { | statements |        } | until |   ( | expression |    )  |  ; |
-
+----
 for-statements
-|= keyword.control.loop.for |= punctuation.parenthesis.open | variable |= keyword.control.loop.to | start_expression | keyword.control.loop.step | step_expression | punctuation.parenthesis.close | punctuation.curlybracket.open | statements |= punctuation.curlybracket.open | statement | punctuation.curlybracket.close |
+|= keyword.control.loop.for |= punctuation.parenthesis.open | variable |= keyword.control.loop.to | start_expression |= keyword.control.loop.step | step_expression | punctuation.parenthesis.close | punctuation.curlybracket.open | statements |= punctuation.curlybracket.open | statement | punctuation.curlybracket.close |
 | for |     ( | variable |     = | expression | TO | expression | STEP | expression |     ) |     { | statements |     } |;
 
 **:= local-function declaration
@@ -55,13 +55,13 @@ built-in
 
 **:= void invocation
 built-in-void-functions
-|= keyword.support.function |= meta.function.parameters  |= punctuation.terminator.invocation |
+|= keyword.support.function.invocation | arguments  |= punctuation.terminator |
 | random-number\n sring-parsing\n system-control\n system-interfacing\n wait\n string formatting and printing\n file\n time-and-date\n ramping\n encoding\n delegate handling\n event handling\n array opperations |  argument-list |  ;  |
 user-void-function-call
-|= entity.name.function |= meta.function.parameters  |= punctuation.terminator.invocation |
+|= entity.name.function.invocation | arguments  |= punctuation.terminator |
 | name |  argument-list |  ;  |
 user-sharp-function-call
-|= entity.name.type |= punctuation.accessor |= entity.name.function |= meta.function.parameters  |= punctuation.terminator.invocation |
+|= variable.other.object |= punctuation.accessor |= entity.name.function.invocation | arguments  |= punctuation.terminator |
 | type name | . | name |  argument-list |  ;  |
 ----
 argument-list
@@ -70,27 +70,28 @@ argument-list
 
 **:= branching and decision
 if-statement
-|= keyword.control.branch.if |= punctuation.parenthesis.open | expression |= punctuation.parenthesis.close |= punctuation.curlybracket.open | statements |= punctuation.curlybracket.close |
+|= keyword.control.conditional.if |= punctuation.parenthesis.open | expression |= punctuation.parenthesis.close |= punctuation.curlybracket.open | statements |= punctuation.curlybracket.close |
 | if |     ( | expression |    )  |     { | statements |   } |
 else-part
-|= keyword.control.branch.else |= punctuation.curlybracket.open | statements |= punctuation.curlybracket.close |
+|= keyword.control.conditional.else |= punctuation.curlybracket.open | statements |= punctuation.curlybracket.close |
 | else |     { | statements |   } |
+----
 switch-statement-or-expression
-|= keyword.control.branch.switch  | switch-statement |= punctuation.curlybracket.open | switch-extpression  |= punctuation.curlybracket.close |
+|= keyword.control.conditional.{name below}  | switch-statement |= punctuation.curlybracket.open | switch-extpression  |= punctuation.curlybracket.close |
 | switch \n cswitch | switch-statement |      { | switch-body-statement |    } |
 switch-statement
 |= punctuation.parenthesis.open |  expression |= punctuation.parenthesis.close |
 | ( | expression |      ) |
 switch-body-statement
-|= keyword.control.conditional.$1.case | expression |= punctuation.colon |= punctuation.curlybracket.open | statements |= punctuation.curlybracket.close |
+|= keyword.control.conditional.$1 | expression |= punctuation.colon |= punctuation.curlybracket.open | statements |= punctuation.curlybracket.close |
 | case \n default | expression \n constant | : |  { | statements |  }  |  ; |;
 
 **:= flow control
 return-statement
-|= keyword.control.flow.return |= expression |= punctuation.terminator.statement |
+|= keyword.control.flow.return |= expression |= punctuation.terminator |
 | return | expression |  ; |
 break-or-continue-statement
-|= keyword.control.flow.$1 |= punctuation.terminator.statement |
+|= keyword.control.flow.$1 |= punctuation.terminator |
 | break \n continue |  ; |;
 
 **:= exception handling

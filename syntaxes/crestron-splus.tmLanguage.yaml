@@ -525,7 +525,7 @@ repository:
         patterns:
           - include: "#storage-modifier"
       "2":
-        patterns:
+        patterns:   
           - include: "#declaration-keywords"
           - include: "#type-name"
       "3":
@@ -549,12 +549,12 @@ repository:
           (?=\() #and stop before the opening parenthesis
     beginCaptures:
       '1':
-        name: keyword.modifier.callback.usp
+        name: storage.modifier.callback.usp
       "2":
         patterns:
           - include: "#declaration-keywords"
       '3':
-        name: entity.name.type.function.usp
+        name: entity.name.function.usp
     end: |-
         (?ix)
           (?<=})|(?=;)   #stop pattern after the closing curly bracket or first semicolon without grabbing any characters
@@ -576,12 +576,12 @@ repository:
         '1':
           name: storage.modifier.threadsafe.usp
         "2":
-          name: keyword.declaration.$2.usp
+          name: keyword.type.$2.usp
         '3':
           name: entity.name.variable.event.usp
     patterns:
     - match: (?i)\b(push|event|change|release|socketconnect|socketdisconnect|socketreceive|socketstatus)\b
-      name: keyword.declaration.$1.usp
+      name: keyword.type.$1.usp
     - match: ([\_[:alpha:]][\_\#\_\$[:alnum:]]*)
       name: entity.name.variable.event.usp
     - include: "#punctuation-comma"
@@ -601,7 +601,7 @@ repository:
           ([_[:alpha:]][_[:alnum:]]*)\s*
       beginCaptures:
         '1':
-          name: keyword.declaration.structure.api
+          name: keyword.type.structure.api
         '2':
           name: entity.name.type.structure.api
       end: (?=\{)|(?=;)
@@ -623,7 +623,6 @@ repository:
     - include: "#variable-declaration"
 
   parenthesized-parameter-list:
-    name: meta.parameters
     begin: (\()
     beginCaptures:
       '0':
@@ -641,14 +640,14 @@ repository:
       (?ix)
           \s*(ByVal|ByRef|ReadOnlyByRef)?\s*  #Possibly grab modifier
           (?:
-            (integer|string|long_integer|signed_integer|signed_long_integer|SIMPLSHARPSTRING|eventargs)| #grab the variable type or
+            (integer|string|long_integer|signed_integer|signed_long_integer|SIMPLSHARPSTRING|eventargs)| #grab the built in type or
             ([_[:alpha:]][\#\$\_[:alnum:]]*) #grab the type
           )
     beginCaptures:
       "1":
-        name: keyword.modifier.parameter.usp
+        name: keyword.modifier.$1.usp
       '2':
-        name: keyword.declaration.parameter.usp
+        name: keyword.type.$2.usp
       '3':
         name: entity.name.type.usp
     end: |-
@@ -679,7 +678,6 @@ repository:
     endCaptures:
       '0':
         name: punctuation.curlybrace.close.cs
-    name: meta.code.block.udp
     patterns:
     - include: "#statement"
     - include: "#variable-declaration"
@@ -697,27 +695,27 @@ repository:
   declaration-keyword-input:
     patterns:
       - match: (?i)\b(digital_input|analog_input|buffer_input|string_input)\b
-        name: keyword.declaration.$1.usp
+        name: keyword.type.$1.usp
   declaration-keyword-output:
     patterns:
       - match: (?i)\b(digital_output|analog_output|buffer_output|string_output)\b
-        name: keyword.declaration.$1.usp
+        name: keyword.type.$1.usp
   declaration-keyword-parameter:
     patterns:
       - match: (?i)\b(integer_parameter|string_parameter|long_integer_parameter|signed_integer_parameter|signed_long_integer_parameter)\b
-        name: keyword.declaration.$1.usp
+        name: keyword.type.$1.usp
   declaration-keyword-structure:
     patterns:
       - match: (?i)\b(structure)\b
-        name: keyword.declaration.$1.usp
+        name: storage.type.$1.usp
   declaration-keyword-function:
     patterns:
       - match: (?i)\b(eventhandler|function|integer_function|string_function|long_integer_function|signed_integer_function|signed_long_integer_function|simplsharpstring_function)\b
-        name: keyword.declaration.$1.usp
+        name: keyword.type.$1.usp
   declaration-keyword-eventhandler:
     patterns:
       - match: (?i)\b(GatherEventHandler|EventhHandler)\b
-        name: keyword.declaration.$1.usp
+        name: keyword.type.$1.usp
   declaration-keyword-variable:
     patterns:
       - match: (?i)\b(integer|string|long_integer|signed_integer|signed_long_integer|SIMPLSHARPSTRING)\b
@@ -826,7 +824,6 @@ repository:
       '1':
         name: keyword.control.loop.for.cs
     end: (?<=\))|(?=;|})
-    name: meta.control.loop.for.cs
     patterns:
     - begin: \(
       beginCaptures:
@@ -921,7 +918,7 @@ repository:
     begin: (?i)(?<!\.)\b(switch|cswitch)\b
     beginCaptures:
       '1':
-        name: keyword.control.conditional.switch.cs
+        name: keyword.control.conditional.$1.cs
     end: (?<=})|(?=})
     patterns:
     - include: "#intrusive"
@@ -1011,6 +1008,7 @@ repository:
       - include: "#invocation-expression"
       - include: "#element-access-expression"
       - include: "#built-in-constants"
+      - include: "#built-in-variables"
       - include: "#literals"
       - include: "#type-name"
       - include: "#parenthesized-expression"
@@ -1025,7 +1023,7 @@ repository:
           - include: "#builtin-functions"
           - include: "#built-in-void-functions"
           - match: (?xi)[\_[:alpha:]][\_\#\_\$[:alnum:]]*
-            name: entity.name.function.usp
+            name: entity.name.function.invocation.usp
     end: |-
       (?xi)
         (?<=\)) #stop pattern after the closing parenthesis without grabbing any characters
@@ -1050,23 +1048,23 @@ repository:
       - include: "#functions-bitwise"
   functions-data-conversion:
     match: (?i)\b(Atoi|Atosi|Atol|Atosl|Chr|HexToI|HexToL|HexToSI|HexToSL|Itoa|Itohex|Ltoa|Ltohex)\b
-    name: support.function.usp
+    name: keyword.support.function.invocation.usp
   functions-random-number:
     match: (?i)\b(Random|Rnd)\b
-    name: support.function.usp
+    name: keyword.support.function.invocation.usp
   functions-string-parsing:
     match: |-
       (?ix)
         \b(CompareStrings|CompareStringsNoCase|Find|
         FindNoCase|Gather|GatherByLength|GatherAsync|GatherAsyncByLength|GatherByLengthWithDest|ReArmGatherAsync|RemoveGatherAsync|
         GetC|Left|Len|Lower|Upper|Mid|Remove|RemoveByLength|ResizeString|ReverseFind|ReverseFindNoCase|Right|SetString)\b
-    name: support.function.usp
+    name: keyword.support.function.invocation.usp
   functions-mathematical:
     match: (?i)\b(abs|max|min|muldiv|smax|smin)\b
-    name: support.function.usp
+    name: keyword.support.function.invocation.usp
   functions-bit-and-byte:
     match: (?i)\b(Bit|Byte|High|HighWord|Low|LowWord|LowerChar|RotateLeft|RotateLeftLong|RotateRight|RotateRightLong|SetByte|UpperChar)\b
-    name: support.function.usp
+    name: keyword.support.function.invocation.usp
   functions-file:
     match: |-
       (?ix)
@@ -1078,7 +1076,7 @@ repository:
         RemoveDirectory|RemoveDirectoryShared|SetCurrentDirectory|StartFileOperations|EndFileOperations|WaitForNewDisk|
         WriteInteger|WriteIntegerArray|WriteLongInteger|WriteLongIntegerArray|WriteSignedInteger|
         WriteSignedIntegerArray|WriteSignedLongInteger|WriteSignedLongIntegerArray|WriteString|WriteStringArray)\b
-    name: support.function.usp
+    name: keyword.support.function.invocation.usp
   functions-time-and-date:
     match: |-
       (?ix)
@@ -1086,44 +1084,44 @@ repository:
         FileGetMinutesNum|FileGetMonthNum|FileGetSecondsNum|FileGetYearNum|FileMonth|FileTime|GetDateNum|
         GetDayOfWeekNum|GetDST|GetGMTOffset|GetHourNum|GetHSeconds|GetMinutesNum|GetMonthNum|GetSecondsNum|
         GetTicks|GetYearNum|month|SetGMTOffset|Time)\b
-    name: support.function.usp
+    name: keyword.support.function.invocation.usp
   functions-direct-socket-access:
     match: (?ix)
       \b(SocketConnectClient|SocketDisconnectClient|
       SocketGetAddressAsRequested|SocketGetPortNumber|SocketGetRemoteIPAddress|SocketGetSenderIPAddress|
       SocketGetStatus|SocketIsBroadcast|SocketIsMulticast|SocketSend|SocketServerStartListen|
       SocketServerStopListen|SocketUDP_Disable|SocketUDP_Enable)\b
-    name: support.function.usp
+    name: keyword.support.function.invocation.usp
   functions-email:
     match: (?i)\b(SendMail|SendMailAdvance|SendMailWithAttachments)\b
-    name: support.function.usp
+    name: keyword.support.function.invocation.usp
   functions-ramping:
     match: |-
       (?ix)
         \b(CompareRampsByAttribute|CompareRampsByID|CreateRamp|GetRampInfo|
         IsRamping|RAMP_INFO|StopRamp)\b
-    name: support.function.usp
+    name: keyword.support.function.invocation.usp
   functions-encoding:
     match: (?i)\b(GetEncoding|SetEncoding|ToAscii|ToUtf16)\b
-    name: support.function.usp
+    name: keyword.support.function.invocation.usp
   functions-system-interfacing:
     match: |-
       (?ix)
         \b(GetSlot|GetCresnet|GetCIP|GetSymbolInstanceName|GetSymbolReferenceName|MakeProgramFilename|GetModelNumber|GetSeries|
         IsSignalDefined)\b
-    name: support.function.usp
+    name: keyword.support.function.invocation.usp
   functions-array-operations:
     match: |-
       (?ix)
         \b(GetLastModifiedArrayIndex|GetNumArrayCols|GetNumArrayRows|GetNumStructureArrayCols|
         ResizeArray|ResizeStructureArray)\b
-    name: support.function.usp
+    name: keyword.support.function.invocation.usp
   functions-exception-handling:
     match: (?i)\b(GetExceptionCode|GetExceptionMessage)\b
-    name: support.function.usp
+    name: keyword.support.function.invocation.usp
   functions-bitwise:
     match: (?i)\b(not)\b
-    name: support.function.usp    
+    name: keyword.support.function.invocation.usp    
   built-in-void-functions:
     patterns:
       - include: "#void-functions-random-number"
@@ -1141,43 +1139,43 @@ repository:
       - include: "#void-functions-event-handling"
   void-functions-random-number:
     match: (?i)\b(Seed)\b
-    name: support.function.usp
+    name: keyword.support.function.invocation.usp
   void-functions-string-parsing:
     match: (?ix)\b(ClearBuffer)\b
-    name: support.function.usp
+    name: keyword.support.function.invocation.usp
   void-functions-system-control:
     match: (?ix)\b(delay|ProcessLogic|pulse|WaitForInitializationComplete)\b
-    name: support.function.usp
+    name: keyword.support.function.invocation.usp
   void-functions-system-interfacing:
     match: (?ix)\b(GenerateUserNotice|GenerateUserWarning|GenerateUserError|SendPacketToCPU|SendCresnetPacket|SetCresnet|SetSlot|SetCIP)\b
-    name: support.function.usp
+    name: keyword.support.function.invocation.usp
   void-functions-wait:
     match: (?i)\b(CancelAllWait|CancelWait|PauseAllWait|PauseWait|ResumeAllWait|ResumeWait|RetimeWait)\b
-    name: support.function.usp
+    name: keyword.support.function.invocation.usp
   void-functions-string-formatting-and-printing:
     match: (?i)\b(Makestring|Print|Trace)\b
-    name: support.function.usp
+    name: keyword.support.function.invocation.usp
   void-functions-file:
     match: (?ix)\b(ReadStructure|WriteStructure)\b
-    name: support.function.usp
+    name: keyword.support.function.invocation.usp
   void-functions-time-and-date:
     match: (?ix)\b(SetDate|SetClock)\b
-    name: support.function.usp
+    name: keyword.support.function.invocation.usp
   void-functions-ramping:
     match: (?ix)\b(InitializeRampInfoArray|InitializeRampInfo)\b
-    name: support.function.usp
+    name: keyword.support.function.invocation.usp
   void-functions-encoding:
     match: (?i)\b(SetEncoding)\b
-    name: support.function.usp
+    name: keyword.support.function.invocation.usp
   void-functions-delegate-handling:
     match: (?i)\b(RegisterDelegate)\b
-    name: support.function.usp
+    name: keyword.support.function.invocation.usp
   void-functions-event-handling:
     match: (?i)\b(RegisterEvent)\b
-    name: support.function.usp
+    name: keyword.support.function.invocation.usp
   void-functions-array-operations:
     match: (?ix)\b(SetArray)\b
-    name: support.function.usp
+    name: keyword.support.function.invocation.usp
   built-in-variable-declaration:
     match: |-
       (?ix)
@@ -1188,18 +1186,33 @@ repository:
       (?ix)
         \b(_oem_break|_oem_cd|_oem_cts|_oem_dtr|_oem_long_break|_oem_max_string|_oem_pacing|
         _oem_rts|_oem_str_in|_oem_str_out)\b
-    name: support.variable.usp
+    name: variable.language.communication.$1.usp
   built-in-constants:
+    patterns:
+      - include: "#built-in-constants-io"
+      - include: "#built-in-constants-file-info"
+      - include: "#built-in-constants-boolean"
+  built-in-constants-io:
     match: |-
       (?ix)
-        \b(_O_APPEND|_O_CREAT|_O_EXCL|_O_TRUNC|_O_TEXT|_O_BINARY|_O_RDONLY|_O_RDWR|_O_WRONLY|ARDONLY|AHIDDEN|ASYSTEM|AVOLUME|ADIRENT|ARCHIVE|ON|OFF)\b
-    name: support.variable.usp
+        \b(_O_APPEND|_O_CREAT|_O_EXCL|_O_TRUNC|_O_TEXT|_O_BINARY|_O_RDONLY|_O_RDWR|_O_WRONLY)\b
+    name: constant.language.io.$1.usp
+  built-in-constants-file-info:
+    match: |-
+      (?ix)
+        \b(ARDONLY|AHIDDEN|ASYSTEM|AVOLUME|ADIRENT|ARCHIVE)\b
+    name: constant.language.file-info.$1.usp
+  built-in-constants-boolean:
+    match: |-
+      (?ix)
+        \b(ON|OFF)\b
+    name: constant.language.boolean.$1.usp
   type-name:
     patterns:
     - match: ([_[:alpha:]][\_\#\_\$[:alnum:]]*)\s*(\.)
       captures:
         '1':
-          name: entity.name.type.usp
+          name: variable.other.object.usp
         '2':
           name: punctuation.accessor.usp
     - match: (\.)\s*([_[:alpha:]][\_\#\_\$_[:alnum:]]*)(?![<>])
@@ -1207,8 +1220,8 @@ repository:
         '1':
           name: punctuation.accessor.usp
         '2':
-          name: entity.name.type.usp
-    - name: entity.name.type.usp
+          name: variable.other.object.property.usp
+    - name: variable.other.readwrite-ie.usp
       match: ([_[:alpha:]][\_\#\_\$_[:alnum:]]*)(?![<>])
 
   bracketed-argument-list:

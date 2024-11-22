@@ -819,7 +819,7 @@
       "begin": "(?ix)\n  (\\bcallback\\b\\s*)?  # possible grab callback\n  ([\\_[:alpha:]][\\_\\#\\_\\$[:alnum:]]*)\\s* # grab the built-in function type or\n  ([\\_[:alpha:]][\\_\\#\\_\\$[:alnum:]]*)\\s* # the function name\n  (?=\\() #and stop before the opening parenthesis",
       "beginCaptures": {
         "1": {
-          "name": "keyword.modifier.callback.usp"
+          "name": "storage.modifier.callback.usp"
         },
         "2": {
           "patterns": [
@@ -829,7 +829,7 @@
           ]
         },
         "3": {
-          "name": "entity.name.type.function.usp"
+          "name": "entity.name.function.usp"
         }
       },
       "end": "(?ix)\n  (?<=})|(?=;)   #stop pattern after the closing curly bracket or first semicolon without grabbing any characters",
@@ -853,7 +853,7 @@
           "name": "storage.modifier.threadsafe.usp"
         },
         "2": {
-          "name": "keyword.declaration.$2.usp"
+          "name": "keyword.type.$2.usp"
         },
         "3": {
           "name": "entity.name.variable.event.usp"
@@ -862,7 +862,7 @@
       "patterns": [
         {
           "match": "(?i)\\b(push|event|change|release|socketconnect|socketdisconnect|socketreceive|socketstatus)\\b",
-          "name": "keyword.declaration.$1.usp"
+          "name": "keyword.type.$1.usp"
         },
         {
           "match": "([\\_[:alpha:]][\\_\\#\\_\\$[:alnum:]]*)",
@@ -887,7 +887,7 @@
           "begin": "(?xi)\n  \\b(structure)\\b\\s+\n  ([_[:alpha:]][_[:alnum:]]*)\\s*",
           "beginCaptures": {
             "1": {
-              "name": "keyword.declaration.structure.api"
+              "name": "keyword.type.structure.api"
             },
             "2": {
               "name": "entity.name.type.structure.api"
@@ -932,7 +932,6 @@
       ]
     },
     "parenthesized-parameter-list": {
-      "name": "meta.parameters",
       "begin": "(\\()",
       "beginCaptures": {
         "0": {
@@ -958,13 +957,13 @@
       ]
     },
     "parameter": {
-      "begin": "(?ix)\n    \\s*(ByVal|ByRef|ReadOnlyByRef)?\\s*  #Possibly grab modifier\n    (?:\n      (integer|string|long_integer|signed_integer|signed_long_integer|SIMPLSHARPSTRING|eventargs)| #grab the variable type or\n      ([_[:alpha:]][\\#\\$\\_[:alnum:]]*) #grab the type\n    )",
+      "begin": "(?ix)\n    \\s*(ByVal|ByRef|ReadOnlyByRef)?\\s*  #Possibly grab modifier\n    (?:\n      (integer|string|long_integer|signed_integer|signed_long_integer|SIMPLSHARPSTRING|eventargs)| #grab the built in type or\n      ([_[:alpha:]][\\#\\$\\_[:alnum:]]*) #grab the type\n    )",
       "beginCaptures": {
         "1": {
-          "name": "keyword.modifier.parameter.usp"
+          "name": "keyword.modifier.$1.usp"
         },
         "2": {
-          "name": "keyword.declaration.parameter.usp"
+          "name": "keyword.type.$2.usp"
         },
         "3": {
           "name": "entity.name.type.usp"
@@ -1016,7 +1015,6 @@
           "name": "punctuation.curlybrace.close.cs"
         }
       },
-      "name": "meta.code.block.udp",
       "patterns": [
         {
           "include": "#statement"
@@ -1061,7 +1059,7 @@
       "patterns": [
         {
           "match": "(?i)\\b(digital_input|analog_input|buffer_input|string_input)\\b",
-          "name": "keyword.declaration.$1.usp"
+          "name": "keyword.type.$1.usp"
         }
       ]
     },
@@ -1069,7 +1067,7 @@
       "patterns": [
         {
           "match": "(?i)\\b(digital_output|analog_output|buffer_output|string_output)\\b",
-          "name": "keyword.declaration.$1.usp"
+          "name": "keyword.type.$1.usp"
         }
       ]
     },
@@ -1077,7 +1075,7 @@
       "patterns": [
         {
           "match": "(?i)\\b(integer_parameter|string_parameter|long_integer_parameter|signed_integer_parameter|signed_long_integer_parameter)\\b",
-          "name": "keyword.declaration.$1.usp"
+          "name": "keyword.type.$1.usp"
         }
       ]
     },
@@ -1085,7 +1083,7 @@
       "patterns": [
         {
           "match": "(?i)\\b(structure)\\b",
-          "name": "keyword.declaration.$1.usp"
+          "name": "storage.type.$1.usp"
         }
       ]
     },
@@ -1093,7 +1091,7 @@
       "patterns": [
         {
           "match": "(?i)\\b(eventhandler|function|integer_function|string_function|long_integer_function|signed_integer_function|signed_long_integer_function|simplsharpstring_function)\\b",
-          "name": "keyword.declaration.$1.usp"
+          "name": "keyword.type.$1.usp"
         }
       ]
     },
@@ -1101,7 +1099,7 @@
       "patterns": [
         {
           "match": "(?i)\\b(GatherEventHandler|EventhHandler)\\b",
-          "name": "keyword.declaration.$1.usp"
+          "name": "keyword.type.$1.usp"
         }
       ]
     },
@@ -1312,7 +1310,6 @@
         }
       },
       "end": "(?<=\\))|(?=;|})",
-      "name": "meta.control.loop.for.cs",
       "patterns": [
         {
           "begin": "\\(",
@@ -1463,7 +1460,7 @@
       "begin": "(?i)(?<!\\.)\\b(switch|cswitch)\\b",
       "beginCaptures": {
         "1": {
-          "name": "keyword.control.conditional.switch.cs"
+          "name": "keyword.control.conditional.$1.cs"
         }
       },
       "end": "(?<=})|(?=})",
@@ -1641,6 +1638,9 @@
           "include": "#built-in-constants"
         },
         {
+          "include": "#built-in-variables"
+        },
+        {
           "include": "#literals"
         },
         {
@@ -1664,7 +1664,7 @@
             },
             {
               "match": "(?xi)[\\_[:alpha:]][\\_\\#\\_\\$[:alnum:]]*",
-              "name": "entity.name.function.usp"
+              "name": "entity.name.function.invocation.usp"
             }
           ]
         }
@@ -1727,63 +1727,63 @@
     },
     "functions-data-conversion": {
       "match": "(?i)\\b(Atoi|Atosi|Atol|Atosl|Chr|HexToI|HexToL|HexToSI|HexToSL|Itoa|Itohex|Ltoa|Ltohex)\\b",
-      "name": "support.function.usp"
+      "name": "keyword.support.function.invocation.usp"
     },
     "functions-random-number": {
       "match": "(?i)\\b(Random|Rnd)\\b",
-      "name": "support.function.usp"
+      "name": "keyword.support.function.invocation.usp"
     },
     "functions-string-parsing": {
       "match": "(?ix)\n  \\b(CompareStrings|CompareStringsNoCase|Find|\n  FindNoCase|Gather|GatherByLength|GatherAsync|GatherAsyncByLength|GatherByLengthWithDest|ReArmGatherAsync|RemoveGatherAsync|\n  GetC|Left|Len|Lower|Upper|Mid|Remove|RemoveByLength|ResizeString|ReverseFind|ReverseFindNoCase|Right|SetString)\\b",
-      "name": "support.function.usp"
+      "name": "keyword.support.function.invocation.usp"
     },
     "functions-mathematical": {
       "match": "(?i)\\b(abs|max|min|muldiv|smax|smin)\\b",
-      "name": "support.function.usp"
+      "name": "keyword.support.function.invocation.usp"
     },
     "functions-bit-and-byte": {
       "match": "(?i)\\b(Bit|Byte|High|HighWord|Low|LowWord|LowerChar|RotateLeft|RotateLeftLong|RotateRight|RotateRightLong|SetByte|UpperChar)\\b",
-      "name": "support.function.usp"
+      "name": "keyword.support.function.invocation.usp"
     },
     "functions-file": {
       "match": "(?ix)\n  \\b(FileBOF|FileClose|FileDelete|FileDeleteShared|FileEOF|FileLength|CheckForDisk|GetCurrentDirectory|\n  FileOpen|FileOpenShared|FileRead|FileSeek|FileWrite|FindClose|FindFirst|FindFirstShared|FindNext|\n  IsDirectory|IsHidden|IsReadOnly|IsSystem|IsVolume|MakeDirectory|MakeDirectoryShared|ReadInteger|\n  ReadIntegerArray|ReadLongInteger|ReadLongIntegerArray|ReadSignedInteger|ReadSignedIntegerArray|\n  ReadSignedLongInteger|ReadSignedLongIntegerArray|ReadString|ReadStringArray|CheckForNVRAMDisk|\n  RemoveDirectory|RemoveDirectoryShared|SetCurrentDirectory|StartFileOperations|EndFileOperations|WaitForNewDisk|\n  WriteInteger|WriteIntegerArray|WriteLongInteger|WriteLongIntegerArray|WriteSignedInteger|\n  WriteSignedIntegerArray|WriteSignedLongInteger|WriteSignedLongIntegerArray|WriteString|WriteStringArray)\\b",
-      "name": "support.function.usp"
+      "name": "keyword.support.function.invocation.usp"
     },
     "functions-time-and-date": {
       "match": "(?ix)\n  \\b(Date|Day|FileDate|FileDay|FileGetDateNum|FileGetDayOfWeekNum|FileGetHourNum|\n  FileGetMinutesNum|FileGetMonthNum|FileGetSecondsNum|FileGetYearNum|FileMonth|FileTime|GetDateNum|\n  GetDayOfWeekNum|GetDST|GetGMTOffset|GetHourNum|GetHSeconds|GetMinutesNum|GetMonthNum|GetSecondsNum|\n  GetTicks|GetYearNum|month|SetGMTOffset|Time)\\b",
-      "name": "support.function.usp"
+      "name": "keyword.support.function.invocation.usp"
     },
     "functions-direct-socket-access": {
       "match": "(?ix)\n\\b(SocketConnectClient|SocketDisconnectClient|\nSocketGetAddressAsRequested|SocketGetPortNumber|SocketGetRemoteIPAddress|SocketGetSenderIPAddress|\nSocketGetStatus|SocketIsBroadcast|SocketIsMulticast|SocketSend|SocketServerStartListen|\nSocketServerStopListen|SocketUDP_Disable|SocketUDP_Enable)\\b",
-      "name": "support.function.usp"
+      "name": "keyword.support.function.invocation.usp"
     },
     "functions-email": {
       "match": "(?i)\\b(SendMail|SendMailAdvance|SendMailWithAttachments)\\b",
-      "name": "support.function.usp"
+      "name": "keyword.support.function.invocation.usp"
     },
     "functions-ramping": {
       "match": "(?ix)\n  \\b(CompareRampsByAttribute|CompareRampsByID|CreateRamp|GetRampInfo|\n  IsRamping|RAMP_INFO|StopRamp)\\b",
-      "name": "support.function.usp"
+      "name": "keyword.support.function.invocation.usp"
     },
     "functions-encoding": {
       "match": "(?i)\\b(GetEncoding|SetEncoding|ToAscii|ToUtf16)\\b",
-      "name": "support.function.usp"
+      "name": "keyword.support.function.invocation.usp"
     },
     "functions-system-interfacing": {
       "match": "(?ix)\n  \\b(GetSlot|GetCresnet|GetCIP|GetSymbolInstanceName|GetSymbolReferenceName|MakeProgramFilename|GetModelNumber|GetSeries|\n  IsSignalDefined)\\b",
-      "name": "support.function.usp"
+      "name": "keyword.support.function.invocation.usp"
     },
     "functions-array-operations": {
       "match": "(?ix)\n  \\b(GetLastModifiedArrayIndex|GetNumArrayCols|GetNumArrayRows|GetNumStructureArrayCols|\n  ResizeArray|ResizeStructureArray)\\b",
-      "name": "support.function.usp"
+      "name": "keyword.support.function.invocation.usp"
     },
     "functions-exception-handling": {
       "match": "(?i)\\b(GetExceptionCode|GetExceptionMessage)\\b",
-      "name": "support.function.usp"
+      "name": "keyword.support.function.invocation.usp"
     },
     "functions-bitwise": {
       "match": "(?i)\\b(not)\\b",
-      "name": "support.function.usp"
+      "name": "keyword.support.function.invocation.usp"
     },
     "built-in-void-functions": {
       "patterns": [
@@ -1830,55 +1830,55 @@
     },
     "void-functions-random-number": {
       "match": "(?i)\\b(Seed)\\b",
-      "name": "support.function.usp"
+      "name": "keyword.support.function.invocation.usp"
     },
     "void-functions-string-parsing": {
       "match": "(?ix)\\b(ClearBuffer)\\b",
-      "name": "support.function.usp"
+      "name": "keyword.support.function.invocation.usp"
     },
     "void-functions-system-control": {
       "match": "(?ix)\\b(delay|ProcessLogic|pulse|WaitForInitializationComplete)\\b",
-      "name": "support.function.usp"
+      "name": "keyword.support.function.invocation.usp"
     },
     "void-functions-system-interfacing": {
       "match": "(?ix)\\b(GenerateUserNotice|GenerateUserWarning|GenerateUserError|SendPacketToCPU|SendCresnetPacket|SetCresnet|SetSlot|SetCIP)\\b",
-      "name": "support.function.usp"
+      "name": "keyword.support.function.invocation.usp"
     },
     "void-functions-wait": {
       "match": "(?i)\\b(CancelAllWait|CancelWait|PauseAllWait|PauseWait|ResumeAllWait|ResumeWait|RetimeWait)\\b",
-      "name": "support.function.usp"
+      "name": "keyword.support.function.invocation.usp"
     },
     "void-functions-string-formatting-and-printing": {
       "match": "(?i)\\b(Makestring|Print|Trace)\\b",
-      "name": "support.function.usp"
+      "name": "keyword.support.function.invocation.usp"
     },
     "void-functions-file": {
       "match": "(?ix)\\b(ReadStructure|WriteStructure)\\b",
-      "name": "support.function.usp"
+      "name": "keyword.support.function.invocation.usp"
     },
     "void-functions-time-and-date": {
       "match": "(?ix)\\b(SetDate|SetClock)\\b",
-      "name": "support.function.usp"
+      "name": "keyword.support.function.invocation.usp"
     },
     "void-functions-ramping": {
       "match": "(?ix)\\b(InitializeRampInfoArray|InitializeRampInfo)\\b",
-      "name": "support.function.usp"
+      "name": "keyword.support.function.invocation.usp"
     },
     "void-functions-encoding": {
       "match": "(?i)\\b(SetEncoding)\\b",
-      "name": "support.function.usp"
+      "name": "keyword.support.function.invocation.usp"
     },
     "void-functions-delegate-handling": {
       "match": "(?i)\\b(RegisterDelegate)\\b",
-      "name": "support.function.usp"
+      "name": "keyword.support.function.invocation.usp"
     },
     "void-functions-event-handling": {
       "match": "(?i)\\b(RegisterEvent)\\b",
-      "name": "support.function.usp"
+      "name": "keyword.support.function.invocation.usp"
     },
     "void-functions-array-operations": {
       "match": "(?ix)\\b(SetArray)\\b",
-      "name": "support.function.usp"
+      "name": "keyword.support.function.invocation.usp"
     },
     "built-in-variable-declaration": {
       "match": "(?ix)\n  \\b(function|integer_function|string_function|long_integer_function|signed_integer_function|signed_long_integer_function|simplsharpstring)\\b",
@@ -1886,11 +1886,32 @@
     },
     "built-in-variables": {
       "match": "(?ix)\n  \\b(_oem_break|_oem_cd|_oem_cts|_oem_dtr|_oem_long_break|_oem_max_string|_oem_pacing|\n  _oem_rts|_oem_str_in|_oem_str_out)\\b",
-      "name": "support.variable.usp"
+      "name": "variable.language.communication.$1.usp"
     },
     "built-in-constants": {
-      "match": "(?ix)\n  \\b(_O_APPEND|_O_CREAT|_O_EXCL|_O_TRUNC|_O_TEXT|_O_BINARY|_O_RDONLY|_O_RDWR|_O_WRONLY|ARDONLY|AHIDDEN|ASYSTEM|AVOLUME|ADIRENT|ARCHIVE|ON|OFF)\\b",
-      "name": "support.variable.usp"
+      "patterns": [
+        {
+          "include": "#built-in-constants-io"
+        },
+        {
+          "include": "#built-in-constants-file-info"
+        },
+        {
+          "include": "#built-in-constants-boolean"
+        }
+      ]
+    },
+    "built-in-constants-io": {
+      "match": "(?ix)\n  \\b(_O_APPEND|_O_CREAT|_O_EXCL|_O_TRUNC|_O_TEXT|_O_BINARY|_O_RDONLY|_O_RDWR|_O_WRONLY)\\b",
+      "name": "constant.language.io.$1.usp"
+    },
+    "built-in-constants-file-info": {
+      "match": "(?ix)\n  \\b(ARDONLY|AHIDDEN|ASYSTEM|AVOLUME|ADIRENT|ARCHIVE)\\b",
+      "name": "constant.language.file-info.$1.usp"
+    },
+    "built-in-constants-boolean": {
+      "match": "(?ix)\n  \\b(ON|OFF)\\b",
+      "name": "constant.language.boolean.$1.usp"
     },
     "type-name": {
       "patterns": [
@@ -1898,7 +1919,7 @@
           "match": "([_[:alpha:]][\\_\\#\\_\\$[:alnum:]]*)\\s*(\\.)",
           "captures": {
             "1": {
-              "name": "entity.name.type.usp"
+              "name": "variable.other.object.usp"
             },
             "2": {
               "name": "punctuation.accessor.usp"
@@ -1912,12 +1933,12 @@
               "name": "punctuation.accessor.usp"
             },
             "2": {
-              "name": "entity.name.type.usp"
+              "name": "variable.other.object.property.usp"
             }
           }
         },
         {
-          "name": "entity.name.type.usp",
+          "name": "variable.other.readwrite-ie.usp",
           "match": "([_[:alpha:]][\\_\\#\\_\\$_[:alnum:]]*)(?![<>])"
         }
       ]

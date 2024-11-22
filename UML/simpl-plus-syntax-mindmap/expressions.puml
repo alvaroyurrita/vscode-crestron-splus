@@ -34,10 +34,12 @@ expression-operators
 
 
 **:== type
-type-name
-|= entity.name.type |=punctuation.accessor |= entity.name.type |
-| name | . | name |;
-
+function
+|= variable.other.object |=punctuation.accessor |= entity.name.function.invocation |
+| name | . | function() |
+variable
+|= variable.other.object |=punctuation.accessor |= variable.other.object.property |
+| name | . | function() |;
 
 **:== intrusive
 preprocessor
@@ -82,7 +84,7 @@ coment-block
 
 **:= assignment
 assignment-expression
-| variable |= keword.operator.assignment | expression |= punctuation.terminator.statement |
+|= variable.other.readwrite-ie |= keword.operator.assignment | expression |= punctuation.terminator.statement |
 | a  |  =  |  b  |  ;  |;
 
 **:= invocation
@@ -95,12 +97,12 @@ argument-list
 | (  | named-argument \n expression \n punctuation-comma | )  |
 ----
 named-argument
-|= entity.name.variable  |
+|= variable.other.readwrite-ie  |
 | variable name |;
 
 **:= element access
 element-access-expression
-|= entinty.name.variable |= punctuation.squarebracket.open  |= expression  |= punctuation.squarebracket.close |
+|= variable.other.object.property |= punctuation.squarebracket.open  |= expression  |= punctuation.squarebracket.close |
 | variable name | [  |  named-argument \n expression \n punctuation-comma  |  ]  |;
 
 **:= parenthesized-expression
@@ -110,22 +112,32 @@ element-access-expression
 
 **:= built-in-function
 built-in-function
-|= keyword.support.function  | argument-list | punctuation.terminator.statement |
+|= keyword.support.function.invocation  | argument-list | punctuation.terminator.statement |
 | data conversion\n random number\n string parsing\n mathematical\n string formating and printing\n bit and byte\n file\n time & date\n direct socket access\n email\n ramping\n encoding\n system-interfacing\n delegate-handling\n event-handling\n system-control\n wait\n array-operations\n exception-handling  |   argument-list  |  ;  |;
 
 **:= built-in-constants
 built-in-constants
-|= keyword.support.constant   |
-| _O_APPEND\n _O_CREAT\n _O_EXCL\n _O_TRUNC\n _O_TEXT\n _O_BINARY\n _O_RDONLY\n _O_RDWR\n _O_WRONLY\n ARDONLY\n AHIDDEN\n ASYSTEM\n AVOLUME\n ADIRENT\n ARCHIVE\non \noff |;
+|= constant.language.io.{name below}   |
+| _O_APPEND\n _O_CREAT\n _O_EXCL\n _O_TRUNC\n _O_TEXT\n _O_BINARY\n _O_RDONLY\n _O_RDWR\n _O_WRONLY |
+----
+File Info Bit Flags
+|= constant.language.file-info.{name below}   |
+|ARDONLY\n AHIDDEN\n ASYSTEM\n AVOLUME\n ADIRENT\n ARCHIVE|
+----
+boolean
+|= constant.language.boolean.{name below}   |
+| on \noff |;
+
+
 
 **:= built-in-types
 built-in-types
-|= keyword.support.types   |
+|= keyword.support.type   |
 | socket_struct\n ramp_info\n file_info|;
 
 **:= built-in-variables
 built-in-variables
-|= keyword.support.variable   |
+|= variable.language.communication.{name below}   |
 | _OEM_STR_OUT\n _OEM_CD\n _OEM_STR_IN\n _OEM_CTS\n _OEM_STR_IN\n _OEM_MAX_STRING \n _OEM_LONG_BREAK\n _OEM_CTS\n _OEM_BREAK \n _OEM_DTR |;
 
 @endmindmap

@@ -12,11 +12,95 @@ namespace test
         public int test;
         public myClass()
         {
+            int a;
+            a = 25;
             if(test){}
-            myMethod();
+            myMethod(test, test, test[24]);
+            test[24] =24 << 1
+            test[24] =24 >> 2
+            test[24] =24 == 5
+            test[24] =24 != 5
+            test[24] =24 <= 5
+            test[24] =24 >= 5
+            test[24] =24 < 5
+            test[24] =24 > 5
+            test[24] =24 && 5
+            test[24] =24 || 5
+            test[24] =24 & 5
+            test[24] = ^24
+            test[24] =24 + 5
+            test[24] = 0x24 - 5
+            test[24] =24 * 5
+            test[24] =24 / 5
+            test[24] =24 % 6
+            test[24] = 'a'
+            test[24] = "test \a \b  \f \n \r \t \v \\"
+            class.method();
+            class.variable = 5;
+
         }
         myClass test;
         public int myMethod(ref int adsafd, int asdfb){}
+        test = true;
+        void test()
+        {
+            do
+            {
+                Console.WriteLine("\nPress the Enter key to Stat the Timer...\n");
+                Console.ReadLine();
+                Console.WriteLine("The Timer started at {0:HH:mm:ss.fff}", DateTime.Now);
+                aTimer.Stop();
+                aTimer.Start();
+
+                // Console.WriteLine("\nPress the Enter key to Stop the Timer...\n");
+                // Console.ReadLine();
+                // Console.WriteLine("The Timer stopped at {0:HH:mm:ss.fff}", DateTime.Now);
+                // aTimer.Stop();
+                // aTimer.Stop();
+                continue;
+            } while (true);
+            return;
+
+            for (int i = 0; i < UPPER; i++)
+            {
+                
+            }
+
+            a = test();
+            a = test.test();
+            test();
+            test.test();
+
+            if (a=b)
+            {}
+            else if(b=c)
+            {}
+            else
+            {}
+
+
+            switch (test)
+            {
+                case "a":
+                    Console.WriteLine("a");
+                    break;
+                case "b":
+                    Console.WriteLine("b");
+                    break;  
+                default:
+                    Console.WriteLine("default");
+                    break;  
+    
+            }
+            try { }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+            
+
+        }
     }
     public ref struct SampleRefStructure   //Note this will  make it into SIMPL+ but without a ref modifier
     {
