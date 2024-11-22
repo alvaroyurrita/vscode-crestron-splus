@@ -11,14 +11,14 @@ a-z, A-Z, 0-9, _ , and may not begin with 0 - 9
 **:== Namespace
 namespace-declaration
 ----
-|= keyword.declaration.namespace |= entity.name.namespace | contents  |
+|= storage.type.namespace |= entity.name.type.namespace | contents  |
 | NAMESPACE |  name  |  {...} |;
 
 
 ***:== Enum
 Enum-declaration
 ----
-|= keyword.declaration.enum |= entity.name.type.enum | contents  |= punctuation.terminator |
+|= storage.type.enum |= entity.name.type.enum | contents  |= punctuation.terminator |
 | enum |  name  |  {enum members} | ; |
 ----
 enum members:
@@ -30,26 +30,26 @@ enum members:
 ***:== Class
 class-declaration
 ----
-|= storage.modifier.static |= keyword.declaration.class |= entity.name.type.class | contents  |= punctuation.terminator |
+|= storage.modifier.static |= storage.type.class |= entity.name.type.class | contents  |= punctuation.terminator |
 | Optional: static | class |  name  |  { class members } | ; |;
 
 ****:== Delegate
 class-delegate-declaration
 ----
-|= storage.type.delegate |= keyword.type.{name below} |= entity.name.type.delegate | parameters  |= punctuation.terminator |
+|= storage.type.delegate |= storage.type.{name below} |= entity.name.type.delegate | parameters  |= punctuation.terminator |
 | delegate | FUNCTION\n INTEGER_FUNCTION\n SIGNED_INTEGER_FUNCTION\n LONG_INTEGER_FUNCTION\n SIGNED_LONG_INTEGER_FUNCTION\n STRING_FUNCTION \n SIMPLSHARPSTRING_FUNCTION |  name  |  parenthesized-parameter-list |=     ; |;
 
 
 ****:== Eventhandler
 class-eventhandler-declaration
 ----
-|= storage.modifier.static |= keyword.type.eventhandler |= entity.name.type.eventhandler | parameters  |= punctuation.terminator |
+|= storage.modifier.static |= keyword.type.eventhandler |= entity.name.eventhandler | parameters  |= punctuation.terminator |
 | Optional: static | EVENTHANDLER |  name  |  parenthesized-parameter-list |=     ; |;
 
 ****:== Function
 function-declaration
 ----
-|= storage.modifier.static |= keyword.type.{name below} |= entity.name.type.function | parameters |= punctuation.terminator |
+|= storage.modifier.static |= keyword.type.{name below} |= entity.name.function | parameters |= punctuation.terminator |
 | Optional: static | FUNCTION\n INTEGER_FUNCTION\n SIGNED_INTEGER_FUNCTION\n LONG_INTEGER_FUNCTION\n SIGNED_LONG_INTEGER_FUNCTION\n STRING_FUNCTION \n SIMPLSHARPSTRING_FUNCTION  |  \n  name | \n  parenthesized-parameter-list |= \n    ;  |;
 
 ****:== Properties and Variables

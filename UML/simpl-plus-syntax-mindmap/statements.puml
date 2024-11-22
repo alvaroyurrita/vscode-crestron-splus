@@ -19,8 +19,21 @@
 * built-in-void-function-call
 * user-function-call
 * user-sharp-function-call
-
+* loval-variable-declaration
 ;
+
+**:== Local Variable Declaration
+local-variable-declaration
+----
+|= storage.modifier.{name below} |= keyword.type.{name below} |= entity.name.variable | array |= punctuation.comma |= punctuation.terminator.variable |
+| optional:\n DYNAMIC \n ASCII\n UTF16\n INHERIT | INTEGER\n SIGNED_INTEGER\n LONG_INTEGER\n SIGNED_LONG_INTEGER\n STRING\n SIMPLSHARPSTRING|  \n  name | \n  [count] [size]  |= \n   ,|=  \n     ; |
+
+|= keyword.type.{name below} |= entity.name.variable | array |= punctuation.terminator.variable |
+| CEVENT\n CMUTEX |  name  | [count]  |=     ; |
+
+|= storage.modifier.{name below} |= entity.name.type |= entity.name.variable | array |= punctuation.terminator.variable |
+| optional:\n VOLATILE\n NONVOLATILE\n | \n user defined object |  \n  name | \n  [count]  |=  \n     ; |;
+
 
 **:== looping
 while-statements
@@ -37,8 +50,8 @@ for-statements
 
 **:= local-function declaration
 built-in
-|= keyword.support.function |= meta.function.parameters |= punctuation.curlybracket.open | statements |= punctuation.curlybracket.close |
-| WAIT |  argument-list | {  | statements |  }  |;
+|= keyword.function.wait |= parameters |= punctuation.curlybracket.open | statements |= punctuation.curlybracket.close |
+| WAIT |  parenthesized-parameter-list | {  | statements |  }  |;
 
 **:= void invocation
 built-in-void-functions

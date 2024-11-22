@@ -319,6 +319,10 @@ FUNCTION MyFunction1(ByRef INTEGER myvar1,  LONG_INTEGER myvar2, SIGNED_INTEGER 
 	SIGNED_LONG_INTEGER Variable10, Variable11[4], Variable12[4][2];
 	STRING Variable13$[6], Variable14[4][6];
 	mySruct internalStruct1, internalStuct2[10];
+	DYNAMIC INTEGER Variable#1, _Variable2[4], __Variable3[4][2];
+	ASCII LONG_INTEGER Variable4, Variable5[4], Variable6[4][2];
+	UTF16 SIGNED_INTEGER Variable7, Variable8[4], Variable9[4][2];
+	INHERIT SIGNED_LONG_INTEGER Variable10, Variable11[4], Variable12[4][2];
 	
 	//Local Function Call
 	MyFunction1(Variable#1, Variable4, Variable7, variable10, internalStruct);
@@ -463,7 +467,7 @@ FUNCTION MyFunction1()
 	int3 = int1 << 1; // Shift Left
 	int3 = int1 >> 1; // Shift Right
 	int3 = int1 {{ 1; // Rotate LEft
-			int3 = int1 }} 1; // Rotate Right
+	int3 = int1 }} 1; // Rotate Right
 	int3 = Not(int1); // 1's Complement
 	int3 = int1 & int2; // Bitwise AND
 	int3 = int1 | int2; // Bitwise OR
@@ -514,7 +518,7 @@ LONG_INTEGER_FUNCTION LongIntegerFunction1()
 		PRINT("");
 		CONTINUE;
 	}
-	
+	test()
 }
 
 FUNCTION LoopingConstructs()
@@ -769,6 +773,9 @@ Function Main()
 	WaitForInitializationComplete();
 }
 
+Function Test1(byRef integer Param1, byval integer Param2, ReadOnlyByRef integer Param3)
+{}
+
 eventhandler test (class myclass, EventArgs myargs){
 	test
 }
@@ -781,7 +788,7 @@ callback GatherEventHandler MyGatherCallback(GatherEventArgs Args)
 {
 	STRING a[20];
 	SIGNED_INTEGER c;
-
+	
 	a=Args.RxString;
 	c = Args.Results;
 	RearmGatherAsync(Args.Input);
@@ -789,11 +796,10 @@ callback GatherEventHandler MyGatherCallback(GatherEventArgs Args)
 	Test("test %d %s %u %s %x %X %ld %lu %% %adf");
 	Test("test %1d %12s %3u %32s %x %X %2ld %1lu %%");
 	Test("test %133d %1233s %3333u %32333s %33x %33X %2333ld %3331lu %%");
-	Test("\n \t \b \r \f\ \a \\ \' \" \x23 ");
+	// Test("\n \t \b \r \f\ \a \\ \' \" \x23 ");
 }
 
-Function Test1(byRef Param1, byval Param2, ReadOnlyByRef Param3)
-{}
+
 
 Function StringParsingAndManipulations()
 {
@@ -801,7 +807,8 @@ Function StringParsingAndManipulations()
 	INTEGER d;
 	SIGNED_INTEGER c;
 	
-	
+	return (a+5);
+	return a*5;
 }
 
 FUNCTION SystemControl()

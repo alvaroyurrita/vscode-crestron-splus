@@ -26,11 +26,11 @@ repository:
     begin: \b(namespace)\b
     beginCaptures:
       '1':
-        name: keyword.declaration.namespace.api
+        name: storage.type.namespace.api
     end: (?<=\})|(?=;)
     patterns:
     - include: "#comment"
-    - name: entity.name.namespace.api
+    - name: entity.name.type.namespace.api
       match: |-
         (?x)
           [_[:alpha:]][_[:alnum:]]*
@@ -62,9 +62,9 @@ repository:
         '1':
           name: storage.modifier.static.api
         '2':
-          name: keyword.declaration.class.api
+          name: storage.type.class.api
         '3':
-          name: entity.name.class.api
+          name: entity.name.type.class.api
       end: (?=\{)|(?=;)
       patterns:
       - include: "#comment"
@@ -93,7 +93,7 @@ repository:
           ([_[:alpha:]][_[:alnum:]]*)\s*
       beginCaptures:
         '1':
-          name: keyword.declaration.enum.api
+          name: storage.type.enum.api
         '2':
           name: entity.name.type.enum.api
       end: (?=\{)|(?=;)
@@ -165,7 +165,7 @@ repository:
       '3':
         patterns:
           - match: ([_[:alpha:]][_[:alnum:]]*)
-            name: entity.name.type.function.api
+            name: entity.name.function.api
     end: |-
         (?ix)
           (?<=;)   #stop pattern after the semicolon
@@ -173,7 +173,6 @@ repository:
     - include: "#parenthesized-parameter-list"
     - include: "#punctuation-semicolon"
   event-handler-declaration:
-    name: meta.declaration.class.function.api
     begin: |-
         (?x)
           (?:
@@ -186,9 +185,9 @@ repository:
       '1':
         name: keyword.modifier.static.api
       '2':
-        name: keyword.modifier.eventhandler.api
+        name: keyword.type.eventhandler.api
       '3':
-        name: entity.name.type.eventhandler.api
+        name: entity.name.variable.eventhandler.api
     end: |-
         (?ix)
           (?<=;)   #stop pattern after the semicolon
@@ -228,7 +227,6 @@ repository:
       - include: "#punctuation-semicolon"
 
   parenthesized-parameter-list:
-    name: meta.parameters
     begin: (\()
     beginCaptures:
       '0':
@@ -262,7 +260,7 @@ repository:
         (?=[\,\)])  #stop pattern before theres a comma or closing parenthesis without grabbing any characters
     patterns:
       - match: ([\_[:alpha:]][_[:alnum:]]*)
-        name: entity.name.variable.usp
+        name: entity.name.variable.parameter.usp
       - include: "#type-array-suffix"
   type-array-suffix:
     begin: "\\["
@@ -289,7 +287,7 @@ repository:
   type-builtin-function-return:
     match: |-
       \b(FUNCTION|INTEGER_FUNCTION|STRING_FUNCTION|LONG_INTEGER_FUNCTION|SIGNED_INTEGER_FUNCTION|SIGNED_LONG_INTEGER_FUNCTION|SIMPLSHARPSTRING_FUNCTION)\b
-    name: keyword.declaration.$1.api
+    name: keyword.type.$1.api
   type-name:
     match: |-
       [_[:alpha:]][_[:alnum:]]*

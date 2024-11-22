@@ -1,1 +1,25 @@
-int a, b, c, d;
+namespace test
+{
+    public enum test
+    {
+        option1,
+        optoin2
+    }
+    public class myClass
+    {
+        delegate int test (int param1);
+        event EventHandler test;
+        public int test;
+        public myClass()
+        {
+            if(test){}
+            myMethod();
+        }
+        myClass test;
+        public int myMethod(ref int adsafd, int asdfb){}
+    }
+    public ref struct SampleRefStructure   //Note this will  make it into SIMPL+ but without a ref modifier
+    {
+        public string SampleStructureString;
+    }
+}

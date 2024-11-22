@@ -8,10 +8,7 @@ patterns:
   - include: "#preprocessor"
   - include: "#comment"
   - include: "#directives"
-  # - include: "#statement"
   - include: "#declaration"
-  # - include: "#expression"
-  # - include: "#punctuation"
 
 repository:
 
@@ -659,7 +656,7 @@ repository:
         (?=[\,\)])  #stop pattern before theres a comma or closing parenthesis without grabbing any characters
     patterns:
       - match: ([\_[:alpha:]][\_\#\_\$[:alnum:]]*)
-        name: entity.name.variable.usp
+        name: entity.name.variable.parameter.usp
       - include: "#type-array-suffix"
   type-array-suffix:
     begin: "\\["
@@ -690,7 +687,6 @@ repository:
     patterns:
     - include: "#declaration-keyword-input"
     - include: "#declaration-keyword-output"
-    - include: "#declaration-keyword-structure"
     - include: "#declaration-keyword-class"
     - include: "#declaration-keyword-socket"
     - include: "#declaration-keyword-parameter"
@@ -725,15 +721,15 @@ repository:
   declaration-keyword-variable:
     patterns:
       - match: (?i)\b(integer|string|long_integer|signed_integer|signed_long_integer|SIMPLSHARPSTRING)\b
-        name: keyword.declaration.$1.usp
+        name: keyword.type.$1.usp
   declaration-keyword-class:
     patterns:
-      - match: (?i)\b(cevent|cmutex)\b
-        name: keyword.declaration.$1.usp
+      - match: (?i)\b(cevent|cmutex|file_info|ramp_info)\b
+        name: keyword.type.$1.usp
   declaration-keyword-socket:
     patterns:
       - match: (?i)\b(tcp_client|tcp_server|udp_socket)\b
-        name: keyword.declaration.$1.usp
+        name: keyword.type.$1.usp
   storage-modifier:
     patterns:
       - match: (?i)\b(volatile|nonvolatile|dynamic|ascii|utf16|inherit|delegateproperty|threadsafe)\b
@@ -755,13 +751,8 @@ repository:
       - include: "#preprocessor"
       - include: "#comment"
       - include: "#branching-and-decision"
-      # - include: "#looping"
-      # - include: "#local-function-declaration"
-      # - include: "#void-invocation"
-      # - include: "#flow-control"
-      # - include: "#exception-handling"
-      - include: "#block"
       - include: "#expression"
+      - include: "#block"
       - include: "#punctuation-semicolon"
   branching-and-decision:
     patterns:
@@ -769,6 +760,15 @@ repository:
       - include: "#do-statement"
       - include: "#until-statement"
       - include: "#for-statement"
+      - include: "#try-statement"
+      - include: "#local-variable-declaration"
+      - include: "#local-builtin-function-declaration"
+      - include: "#if-statement"
+      - include: "#else-part"
+      - include: "#switch-statement-or-expression"
+      - include: "#break-or-continue-statement"
+      - include: "#return-statement"
+      - include: "#expression"
   while-statement:
     begin: |-
         (?ix)
@@ -838,6 +838,165 @@ repository:
           name: punctuation.parenthesis.close-for.cs
       patterns:
       - include: "#expression"
+  local-variable-declaration:
+    begin: |-
+      (?ix)
+        (?:
+          (?:\b([[:alnum:]]*)\b\s+)?           #possibly grab modifier
+          ([_[:alpha:]][\_\$\#[:alnum:]]*)\s   #grab variable type
+          (
+            (?:[_[:alpha:]][\_\$\#[:alnum:]]*)\s* #grab variable name
+            (?:(?<array>\[.*?\])?)(?:\g<array>)?  #that possible has an array punctuation series
+          )
+      )
+      (?=,|;|=|\))  #stop before a comma, semicolon, assignment operator, or closing parenthesis without grabbing any 
+    beginCaptures:
+      "1":
+        patterns:
+          - include: "#storage-modifier"
+      "2":
+        patterns:
+          - include: "#local-declaration-keywords"
+          - include: "#type-name"
+      "3":
+        patterns:
+          - include: "#variable-name"
+          - include: "#type-array-suffix"
+    end: |-
+      (?ix)
+        (\;)  #stop pattern before the closing curly brace or before semicolon without grabbing any characters
+    patterns:
+      - include: "#variable-name"
+      - include: "#type-array-suffix"
+      - include: "#comment"
+      - include: "#punctuation-comma"
+  local-builtin-function-declaration:
+    begin: |-
+        (?ix)
+          (\bwait\b\s*)?  # possible grab callback
+          (?=\() #and stop before the opening parenthesis
+    beginCaptures:
+      '1':
+        name: keyword.function.wait.usp
+    end: |-
+        (?ix)
+          (?<=})|(?=;)   #stop pattern after the closing curly bracket or first semicolon without grabbing any characters
+    patterns:
+    - include: "#comment"
+    - include: "#parenthesized-parameter-list"
+    - include: "#block"
+  local-declaration-keywords:
+    patterns:
+    - include: "#declaration-keyword-class"
+    - include: "#declaration-keyword-variable"
+
+
+  if-statement:
+    begin: (?i)(?<!\.)\b(if)\b\s*(?=\()
+    beginCaptures:
+      '1':
+        name: keyword.control.conditional.if.cs
+    end: (?<=})|(?=;)
+    patterns:
+    - begin: \(
+      beginCaptures:
+        '0':
+          name: punctuation.parenthesis.open.cs
+      end: \)
+      endCaptures:
+        '0':
+          name: punctuation.parenthesis.close.cs
+      patterns:
+      - include: "#expression-no-assignment"
+    - include: "#statement"
+  else-part:
+    begin: (?i)(?<!\.)\b(else)\b
+    beginCaptures:
+      '1':
+        name: keyword.control.conditional.else.cs
+    end: (?<=})|(?=;)
+    patterns:
+    - include: "#statement"
+  switch-statement-or-expression:
+    begin: (?i)(?<!\.)\b(switch|cswitch)\b
+    beginCaptures:
+      '1':
+        name: keyword.control.conditional.switch.cs
+    end: (?<=})|(?=})
+    patterns:
+    - include: "#intrusive"
+    - begin: (?=\()
+      end: (?<=\})|(?=\})
+      patterns:
+      - include: "#switch-statement"
+    - begin: (?=\{)
+      end: (?<=\})|(?=\})
+  switch-statement:
+    patterns:
+    - include: "#intrusive"
+    - begin: \(
+      beginCaptures:
+        '0':
+          name: punctuation.parenthesis.open.cs
+      end: \)
+      endCaptures:
+        '0':
+          name: punctuation.parenthesis.close.cs
+      patterns:
+      - include: "#expression"
+    - begin: \{
+      beginCaptures:
+        '0':
+          name: punctuation.curlybrace.open.cs
+      end: \}
+      endCaptures:
+        '0':
+          name: punctuation.curlybrace.close.cs
+      patterns:
+      - include: "#switch-label"
+      - include: "#statement"
+  switch-label:
+    begin: (?i)\b(case|default)\b
+    beginCaptures:
+      '1':
+        name: keyword.control.conditional.$1.cs
+    end: (:)|(?=})
+    endCaptures:
+      '1':
+        name: punctuation.separator.colon.cs
+  break-or-continue-statement:
+    match: (?i)(?<!\.)\b(break|continue)\b
+    name: keyword.control.flow.$1.cs
+  return-statement:
+    begin: (?i)(?<!\.)\b(return)\b
+    beginCaptures:
+      '1':
+        name: keyword.control.flow.return.cs
+    end: (?=[;}])
+    patterns:
+    - include: "#expression"
+  try-statement:
+    patterns:
+    - include: "#try-block"
+    - include: "#catch-clause"
+  try-block:
+    begin: (?i)(?<!\.)\b(try)\b
+    beginCaptures:
+      '1':
+        name: keyword.control.exception.try.cs
+    end: (?<=\})
+    patterns:
+    - include: "#comment"
+    - include: "#block"
+  catch-clause:
+    begin: (?i)(?<!\.)\b(catch)\b
+    beginCaptures:
+      '1':
+        name: keyword.control.exception.catch.cs
+    end: (?<=\})
+    patterns:
+    - include: "#comment"
+    - include: "#block"
 
 #expressions
   expression:
@@ -850,7 +1009,6 @@ repository:
       - include: "#comment"
       - include: "#expression-operator"
       - include: "#invocation-expression"
-      # - include: "#switch-statement-or-expression"
       - include: "#element-access-expression"
       - include: "#built-in-constants"
       - include: "#literals"
@@ -1029,12 +1187,7 @@ repository:
     match: |-
       (?ix)
         \b(_oem_break|_oem_cd|_oem_cts|_oem_dtr|_oem_long_break|_oem_max_string|_oem_pacing|
-        _oem_rts|_oem_str_in|_oem_str_out|FILE_INFO)\b
-    name: support.variable.usp
-  built-in-types:
-    match: |-
-      (?ix)
-        \b(FILE_INFO|ramp_info)\b
+        _oem_rts|_oem_str_in|_oem_str_out)\b
     name: support.variable.usp
   built-in-constants:
     match: |-
@@ -1043,7 +1196,6 @@ repository:
     name: support.variable.usp
   type-name:
     patterns:
-    - include: "#reserved-words"
     - match: ([_[:alpha:]][\_\#\_\$[:alnum:]]*)\s*(\.)
       captures:
         '1':
@@ -1081,13 +1233,8 @@ repository:
       '0':
         name: punctuation.parenthesis.close.usp
     patterns:
-    - include: "#reserved-words"
-    - include: "#named-argument"
     - include: "#expression"
     - include: "#punctuation-comma"
-  named-argument:
-    match: ([\_[:alpha:]][\_\#\_\$[:alnum:]]*)
-    name: entity.name.variable.parameter.cs
   assignment-expression:
     begin: (=)
     beginCaptures:
@@ -1144,7 +1291,6 @@ repository:
     - include: "#numeric-literal"
     - include: "#char-literal"
     - include: "#string-literal"
-    - include: "#reserved-words"
   numeric-literal:
     match: |-
       (?x)
@@ -1295,23 +1441,6 @@ repository:
           - match: .* #invalidate anything that did not match the above
             name: invalid.illegal.character.escape.usp
 
-  reserved-words:
-    patterns:
-    - include: "#for-keywords"
-    - include: "#while-keywords"
-  for-keywords:
-    patterns:
-    - match: (?i)\bto\b
-      name: keyword.control.loop.to.cs
-    - match: (?i)\bstep\b
-      name: keyword.control.loop.step.cs
-  while-keywords:
-    patterns:
-    - match: |-
-        (?ix)
-          \b(until|do|while|CONTINUE)\b
-      name: keyword.control.usp
-
 #punctuation
   punctuation:
     patterns:
@@ -1377,50 +1506,3 @@ repository:
   punctuation-pipe:
     match: (\|)
     name: punctuation.structure.pipe.usp
-
-
-
-
-#Types
-  type:
-    patterns:
-    - include: "#comment"
-    - include: "#ref-modifier"
-    - include: "#type-name"
-  designation-pattern:
-    patterns:
-    - include: "#intrusive"
-    - begin: "\\("
-      beginCaptures:
-        '0':
-          name: punctuation.parenthesis.open.usp
-      end: "\\)"
-      endCaptures:
-        '0':
-          name: punctuation.parenthesis.close.usp
-      patterns:
-      - include: "#punctuation-comma"
-      - include: "#designation-pattern"
-    - include: "#simple-designation-pattern"
-  simple-designation-pattern:
-    patterns:
-    - match: |-
-        (?x)
-        (?:
-          ([_[:alpha:]][\#\$\_[:alnum:]]*) #Name
-          (?:\s*                   # array suffix?
-            (?:(\[)\d*(\])\s*)
-            (?:(\[)\d*(\])\s*)?
-          )?
-        )
-      captures:
-        "1":
-          name: entity.name.variable.local.usp
-        "2":
-          name: punctuation.squarebracket.open.usp
-        "3":
-          name: punctuation.squarebracket.close.usp
-        "4":
-          name: punctuation.squarebracket.open.usp
-        "5":
-          name: punctuation.squarebracket.close.usp
