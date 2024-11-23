@@ -20,9 +20,9 @@ export function buildExtensionTasks(): void {
         extensionTasks.dispose();
         extensionTasks = undefined;
     }
-    if (!extensionTasks && window?.activeTextEditor?.document.languageId === "splus-source") {
+    if (!extensionTasks && window?.activeTextEditor?.document.languageId === "simpl-plus-source") {
         let splusPromise: Thenable<Task[]> | undefined = undefined;
-        extensionTasks = tasks.registerTaskProvider('splus', {
+        extensionTasks = tasks.registerTaskProvider('simpl-plus', {
             provideTasks: () => {
                 if (!splusPromise) {
                     splusPromise = getSimplPlusComputedTasks();

@@ -1,5 +1,5 @@
 import { HoverProvider, Hover, TextDocument, CancellationToken, Position } from 'vscode';
-import { SimplPlusKeywordHelp } from './SimplPlusKeywordHelp';
+import { SimplPlusKeywordHelp } from './simplPlusKeywordHelp';
 
 export class SimplPlusHoverProvider implements HoverProvider {
     private helpDefinitions = new SimplPlusKeywordHelp();

@@ -1,7 +1,6 @@
-#USER_SIMPLSHARP_LIBRARY  "SampleSimplSharpLibrary"
+#USER_SIMPLSHARP_LIBRARY  "SampleSimplSharpLibrary";
 
 digital_input Name;
 
 SampleClass TestClass;
 
-push Name{}

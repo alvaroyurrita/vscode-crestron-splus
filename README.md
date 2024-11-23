@@ -49,18 +49,18 @@ This extension currently requires that VSCode has opened the containing folder t
 
 This extension contributes the following commands:
 
-* `splus.localHelp`: Opens the local SIMPL+ help reference file
-* `splus.webHelp`: Opens the online SIMPL+ help reference page
+* `simpl-plus.localHelp`: Opens the local SIMPL+ help reference file
+* `simpl-plus.webHelp`: Opens the online SIMPL+ help reference page
 
 ## Extension Settings
 
 This extension contributes the following settings:
 
-* `splus.compilerLocation`: sets the path of the SIMPL+ compiler
-* `splus.helpLocation`: sets the path of the SIMPL+ help file
-* `splus.enable2series`: enables 2 series platform for build targets
-* `splus.enable3series`: enables 3 series platform for build targets
-* `splus.enable4series`: enables 4 series platform for build targets
+* `simpl-plus.compilerLocation`: sets the path of the SIMPL+ compiler
+* `simpl-plus.helpLocation`: sets the path of the SIMPL+ help file
+* `simpl-plus.enable2series`: enables 2 series platform for build targets
+* `simpl-plus.enable3series`: enables 3 series platform for build targets
+* `simpl-plus.enable4series`: enables 4 series platform for build targets
 
 ## Keybindings and Menus
 

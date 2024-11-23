@@ -17,7 +17,7 @@ export async function removeWorkspaceCustomSettings() {
 
 export async function OpenAndShowSPlusDocument(documentContent: string) {
     const document = await vscode.workspace.openTextDocument({
-        language: "splus-source",
+        language: "simpl-plus-source",
         content: documentContent,
     });
     await vscode.window.showTextDocument(document);

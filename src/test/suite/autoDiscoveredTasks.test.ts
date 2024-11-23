@@ -162,7 +162,7 @@ suite("With Faked Saved File", function () {
                 let label: string[] = [];
                 let parameter: string[] = [];
 
-                const configurationSplus = vscode.workspace.getConfiguration('splus');
+                const configurationSplus = vscode.workspace.getConfiguration('simpl-plus');
                 await configurationSplus.update('enable2series', setting.enable2series);
                 await configurationSplus.update('enable3series', setting.enable3series);
                 await configurationSplus.update('enable4series', setting.enable4series);

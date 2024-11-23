@@ -18,15 +18,15 @@ export function simplPlusCompileTasks(): Task[] {
     let activeDocument = activeEditor?.document;
     fileName = activeDocument?.fileName ?? "";
     let emptyTasks: Task[] = [];
-    compilerPath = `\"${workspace.getConfiguration("splus").simplDirectory}\\SPlusCC.exe\"`;
+    compilerPath = `\"${workspace.getConfiguration("simpl-plus").simplDirectory}\\SPlusCC.exe\"`;
 
 
     if (activeDocument === undefined) { return emptyTasks; }
 
     let buildTypes: BuildType = BuildType.None;;
-    buildTypes |= workspace.getConfiguration("splus").enable2series === true ? BuildType.Series2 : BuildType.None;
-    buildTypes |= workspace.getConfiguration("splus").enable3series === true ? BuildType.Series3 : BuildType.None;
-    buildTypes |= workspace.getConfiguration("splus").enable4series === true ? BuildType.Series4 : BuildType.None;
+    buildTypes |= workspace.getConfiguration("simpl-plus").enable2series === true ? BuildType.Series2 : BuildType.None;
+    buildTypes |= workspace.getConfiguration("simpl-plus").enable3series === true ? BuildType.Series3 : BuildType.None;
+    buildTypes |= workspace.getConfiguration("simpl-plus").enable4series === true ? BuildType.Series4 : BuildType.None;
 
     switch (buildTypes) {
         case BuildType.None:
@@ -73,10 +73,10 @@ function getBuildTaskByType(buildType: BuildType): Task {
     const taskProperties: TaskArguments = {
         name: label,
         scope: TaskScope.Workspace,
-        source: 'Crestron S+',
+        source: 'simpl-plus',
         taskDefinition: { type: "shell" },
         execution: new ShellExecution(`\"${buildCommand}\"`, { executable: 'C:\\Windows\\System32\\cmd.exe', shellArgs: ['/c'] }),
-        problemMatchers: ["$splusCC"],
+        problemMatchers: ["$SIMPL+"],
         group: TaskGroup.Build,
         presentationOptions: { panel: TaskPanelKind.Shared, focus: true, clear: true }
     };

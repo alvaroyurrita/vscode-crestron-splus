@@ -16,7 +16,7 @@ import { buildExtensionTasks, clearExtensionTasks } from './buildExtensionTasks'
 
 // Creates a terminal, calls the command, then closes the terminal
 function callShellCommand(shellCommand: string): void {
-    let term = window.createTerminal('splus', 'c:\\windows\\system32\\cmd.exe');
+    let term = window.createTerminal('simpl-plus', 'c:\\windows\\system32\\cmd.exe');
     term.sendText(`\"${shellCommand}\"`, true);
     term.sendText("exit", true);
 }
@@ -31,20 +31,20 @@ export async function activate(context: ExtensionContext) {
     // }
 
 
-    let localHelp_command = commands.registerCommand("splus.localHelp", () => {
-        const helpLocation = `${workspace.getConfiguration("splus").simplDirectory}\\Simpl+lr.chm`;
+    let localHelp_command = commands.registerCommand("simpl-plus.localHelp", () => {
+        const helpLocation = `${workspace.getConfiguration("simpl-plus").simplDirectory}\\Simpl+lr.chm`;
         callShellCommand(helpLocation);
     });
 
-    let webHelp_command = commands.registerCommand("splus.webHelp", ()=>{
+    let webHelp_command = commands.registerCommand("simpl-plus.webHelp", ()=>{
         env.openExternal(Uri.parse('https://help.crestron.com/simpl_plus'));
     });
 
     let thisFormatProvider = new SimplPlusFormattingProvider();
-    const formatProvider = languages.registerDocumentFormattingEditProvider({ language: 'splus-source' }, thisFormatProvider);
+    const formatProvider = languages.registerDocumentFormattingEditProvider({ language: 'simpl-plus-source' }, thisFormatProvider);
 
     let thisHoverProvider = new SimplPlusHoverProvider();
-    const hoverProvider = languages.registerHoverProvider({ language: 'splus-source' }, thisHoverProvider);
+    const hoverProvider = languages.registerHoverProvider({ language: 'simpl-plus-source' }, thisHoverProvider);
 
     context.subscriptions.push(formatProvider);
     context.subscriptions.push(hoverProvider);

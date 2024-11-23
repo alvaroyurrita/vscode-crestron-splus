@@ -30,8 +30,8 @@ export function simplPlusIncludeLibraryTasks(): Task[] {
             const fileNamePath = path.parse(activeDocument.uri.fsPath);
             const thisFileDir =  fileNamePath.dir;
             const libraryClzDir = path.join(thisFileDir, `${library}.clz`);
-            const simplDirectory = workspace.getConfiguration("splus").simplDirectory;
-            const extensionPath = extensions.getExtension("sentry07.crestron-splus")?.extensionPath;
+            const simplDirectory = workspace.getConfiguration("simpl-plus").simplDirectory;
+            const extensionPath = extensions.getExtension("sentry07.simpl-plus")?.extensionPath;
             if (extensionPath === undefined) { return emptyTasks; }
             const simpPlusApiGeneratorPath = path.join(extensionPath, "ApiGenerator", "SimplPlusApiGenerator.exe");
 

@@ -35,16 +35,17 @@
     ["\"", "\""],
     ["'", "'"]
   ],
-  //First matching group will match positive or negative numbers with optional word character following the decimal digits (-123.45abc)/
-  //Second matching group will match any non-whitespace character except these symbols: ^`~!@#%^&*()-=+[{]}\|;:'",.<>/?']
+  //First and second matching group will match handlebars {{ or }}.
+  //Third matching group will match positive or negative numbers with optional word character following the decimal digits (-123.45abc)/
+  //Fourth matching group will match any non-whitespace character except these symbols: ^`~!@#%^&*()-=+[{]}\|;:'",.<>/?']
   //https://code.visualstudio.com/api/language-extensions/language-configuration-guide#word-pattern
-  "wordPattern": "(-?\\d*\\.\\d\\w*)|([^\\`\\~\\!\\@\\#\\%\\^\\&\\*\\(\\)\\-\\=\\+\\[\\{\\]\\}\\\\\\|\\;\\:\\'\\\"\\,\\.\\<\\>\\/\\?\\s]+)",
+  "wordPattern": "(\\{\\{)|(\\}\\})|(-?\\d*\\.\\d\\w*)|([^\\`\\~\\!\\@\\#\\%\\^\\&\\*\\(\\)\\-\\=\\+\\[\\{\\]\\}\\\\\\|\\;\\:\\'\\\"\\,\\.\\<\\>\\/\\?\\s]+)",
   //match beginning of a block as defined by these symbols: {([ and match end of a block as defined by these symbols: })] 
-  // as long as they are not inside a comment ( // or /*) or string ( " or ')
+  // as long as they are not inside a comment ( // or /*) or string ( " or ' or \) or handlebars {{ or }}.
   //when matched, vscode will increase the indentation of the next line
   //https://code.visualstudio.com/api/language-extensions/language-configuration-guide#indentation-rules
   "indentationRules": {
-    "increaseIndentPattern": "^((?!\\/\\/|['\\\"]|\\\\\\*).)*(\\{[^{}\\v]*|\\([^()\\*\\v]*|\\[[^\\[\\]\\v]*)$",
-    "decreaseIndentPattern": "^((?!.*?\\/\\*).*\\*\\/)?\\s*[\\}\\]\\)].*$"
+    "increaseIndentPattern": "^((?!\\/\\/|['\\\"]|\\\\\\*|\\{\\{).)*(\\{[^{}\\v]*|\\([^()\\*\\v]*|\\[[^\\[\\]\\v]*)$",
+    "decreaseIndentPattern": "^((?!.*?\\/\\*|\\}\\}).*\\*\\/)?\\s*[\\}\\]\\)].*$"
   }
 }

@@ -12,10 +12,10 @@ suiteTeardown(async function () {
 });
 suite('Registration', function () {
     const commandsToTest = [{
-        command: 'splus.localHelp',
+        command: 'simpl-plus.localHelp',
         title: 'Local Help'
     }, {
-        command: 'splus.webHelp',
+        command: 'simpl-plus.webHelp',
         title: 'Web Help'
     }];
     commandsToTest.forEach(function (command) {
@@ -31,9 +31,9 @@ suite('Execution', function () {
         const fakeTerminalCreator = sinon.stub(vscode.window, 'createTerminal').callsFake(() => {
             return fakeTerminal;
         });
-        await vscode.commands.executeCommand('splus.localHelp');
+        await vscode.commands.executeCommand('simpl-plus.localHelp');
         await delay(500);
-        assert.ok(fakeTerminalCreator.args[0][0].toString().includes("splus"));
+        assert.ok(fakeTerminalCreator.args[0][0].toString().includes("simpl-plus"));
         console.log(fakeTerminalCreator.args[0].length);
         assert.ok(typeof fakeTerminalCreator.args !== undefined &&
             fakeTerminalCreator.args[0] !== undefined &&
@@ -49,7 +49,7 @@ suite('Execution', function () {
     test('Web Help should open open a browser link', async function () {
         const fakeShowBrowserCommand = sinon.stub(vscode.env, 'openExternal')
             .returns(Promise.resolve(true));
-        await vscode.commands.executeCommand('splus.webHelp');
+        await vscode.commands.executeCommand('simpl-plus.webHelp');
         await delay(500);
         assert.ok(fakeShowBrowserCommand.calledOnce);
         assert.ok(fakeShowBrowserCommand.args[0][0].toString() === 'https://help.crestron.com/simpl_plus');
