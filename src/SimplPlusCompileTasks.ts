@@ -5,75 +5,72 @@ import {
     TaskScope,
     TaskGroup,
     TaskPanelKind,
-    ShellExecution
+    ShellExecution,
+    tasks
 } from "vscode";
 import { TaskCreator, TaskArguments } from "./taskCreator";
+import { getCompilerPath, getFileName } from "./helperFunctions";
+import { BuildType } from "./built-type";
 
-let compilerPath = "";
-let fileName = "";
 
 export function simplPlusCompileTasks(): Task[] {
     let tasks: Task[] = [];
-    let activeEditor = window.activeTextEditor;
-    let activeDocument = activeEditor?.document;
-    fileName = activeDocument?.fileName ?? "";
     let emptyTasks: Task[] = [];
-    compilerPath = `\"${workspace.getConfiguration("simpl-plus").simplDirectory}\\SPlusCC.exe\"`;
-
-
-    if (activeDocument === undefined) { return emptyTasks; }
+    const fileName = getFileName();
+    const compilerPath = getCompilerPath();
 
     let buildTypes: BuildType = BuildType.None;;
     buildTypes |= workspace.getConfiguration("simpl-plus").enable2series === true ? BuildType.Series2 : BuildType.None;
     buildTypes |= workspace.getConfiguration("simpl-plus").enable3series === true ? BuildType.Series3 : BuildType.None;
     buildTypes |= workspace.getConfiguration("simpl-plus").enable4series === true ? BuildType.Series4 : BuildType.None;
 
+    if (fileName === undefined) { return emptyTasks; }
     switch (buildTypes) {
         case BuildType.None:
             return emptyTasks;
         case BuildType.Series2:
-            tasks.push(getBuildTaskByType(buildTypes));
+            tasks.push(getBuildTaskByType(buildTypes, compilerPath, fileName));
             break;
         case BuildType.Series3:
-            tasks.push(getBuildTaskByType(buildTypes));
+            tasks.push(getBuildTaskByType(buildTypes, compilerPath, fileName));
             break;
         case BuildType.Series4:
-            tasks.push(getBuildTaskByType(buildTypes));
+            tasks.push(getBuildTaskByType(buildTypes, compilerPath, fileName));
             break;
         case BuildType.Series2 | BuildType.Series3:
-            tasks.push(getBuildTaskByType(BuildType.Series2));
-            tasks.push(getBuildTaskByType(BuildType.Series3));
-            tasks.push(getBuildTaskByType(buildTypes));
+            tasks.push(getBuildTaskByType(BuildType.Series2, compilerPath, fileName));
+            tasks.push(getBuildTaskByType(BuildType.Series3, compilerPath, fileName));
+            tasks.push(getBuildTaskByType(buildTypes, compilerPath, fileName));
             break;
         case BuildType.Series2 | BuildType.Series4:
-            tasks.push(getBuildTaskByType(BuildType.Series2));
-            tasks.push(getBuildTaskByType(BuildType.Series4));
-            tasks.push(getBuildTaskByType(buildTypes));
+            tasks.push(getBuildTaskByType(BuildType.Series2, compilerPath, fileName));
+            tasks.push(getBuildTaskByType(BuildType.Series4, compilerPath, fileName));
+            tasks.push(getBuildTaskByType(buildTypes, compilerPath, fileName));
             break;
         case BuildType.Series3 | BuildType.Series4:
-            tasks.push(getBuildTaskByType(BuildType.Series3));
-            tasks.push(getBuildTaskByType(BuildType.Series4));
-            tasks.push(getBuildTaskByType(buildTypes));
+            tasks.push(getBuildTaskByType(BuildType.Series3, compilerPath, fileName));
+            tasks.push(getBuildTaskByType(BuildType.Series4, compilerPath, fileName));
+            tasks.push(getBuildTaskByType(buildTypes, compilerPath, fileName));
             break;
         case BuildType.Series2 | BuildType.Series3 | BuildType.Series4:
         case BuildType.All:
-            tasks.push(getBuildTaskByType(BuildType.Series2));
-            tasks.push(getBuildTaskByType(BuildType.Series3));
-            tasks.push(getBuildTaskByType(BuildType.Series4));
-            tasks.push(getBuildTaskByType(buildTypes));
+            tasks.push(getBuildTaskByType(BuildType.Series2, compilerPath, fileName));
+            tasks.push(getBuildTaskByType(BuildType.Series3, compilerPath, fileName));
+            tasks.push(getBuildTaskByType(BuildType.Series4, compilerPath, fileName));
+            tasks.push(getBuildTaskByType(buildTypes, compilerPath, fileName));
             break;
     }
     tasks.sort((a, b) => a.name.localeCompare(b.name));
     return tasks;
 }
 
-function getBuildTaskByType(buildType: BuildType): Task {
-    let [label, buildCommand] = getBuildParameters(buildType);
+function getBuildTaskByType(buildType: BuildType, compilerPath: string, fileName: string): Task {
+    let [label, buildCommand] = getBuildParameters(buildType, compilerPath, fileName);
 
     const taskProperties: TaskArguments = {
         name: label,
         scope: TaskScope.Workspace,
-        source: 'simpl-plus',
+        source: 'SIMPL+',
         taskDefinition: { type: "shell" },
         execution: new ShellExecution(`\"${buildCommand}\"`, { executable: 'C:\\Windows\\System32\\cmd.exe', shellArgs: ['/c'] }),
         problemMatchers: ["$SIMPL+"],
@@ -86,7 +83,7 @@ function getBuildTaskByType(buildType: BuildType): Task {
 
 
 
-function getBuildParameters(buildType: BuildType): [label: string, command: string] {
+function getBuildParameters(buildType: BuildType, compilerPath: string, fileName: string): [label: string, command: string] {
 
     let commandArguments: string[] = [];
     let seriesTargets: string[] = [];
@@ -113,11 +110,17 @@ function getBuildParameters(buildType: BuildType): [label: string, command: stri
     return [label, command];
 }
 
-
-enum BuildType {
-    None = 0,
-    Series2 = 1 << 0,
-    Series3 = 1 << 2,
-    Series4 = 1 << 4,
-    All = ~(~0 << 4)
+export async function simplPlusCompileCurrent(): Promise<void> {
+    const fileName = getFileName();
+    const compilerPath = getCompilerPath();
+    if (fileName === undefined) { return; }
+    let buildTypes: BuildType = BuildType.None;;
+    buildTypes |= workspace.getConfiguration("simpl-plus").enable2series === true ? BuildType.Series2 : BuildType.None;
+    buildTypes |= workspace.getConfiguration("simpl-plus").enable3series === true ? BuildType.Series3 : BuildType.None;
+    buildTypes |= workspace.getConfiguration("simpl-plus").enable4series === true ? BuildType.Series4 : BuildType.None;
+    const task = getBuildTaskByType(buildTypes, compilerPath, fileName);
+    await tasks.executeTask(task);
 }
+
+
+

@@ -1,6 +1,7 @@
-#USER_SIMPLSHARP_LIBRARY  "SampleSimplSharpLibrary";
+digital_input test;
 
-digital_input Name;
+//#USER_SIMPLSHARP_LIBRARY  "SampleSimplSharpLibrary";
 
-SampleClass TestClass;
+
+//SampleClass TestClass;
 

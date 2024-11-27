@@ -5,14 +5,18 @@ import {
     window,
     commands,
     env,
-    Uri
+    Uri,
+    // StatusBarAlignment
 } from "vscode";
 
-import { SimplPlusFormattingProvider } from './SimplPlusFormattingProvider';
+import { SimplPlusFormattingProvider } from './simplPlusFormattingProvider';
 import { SimplPlusHoverProvider } from "./simplPlusHoverProvider";
+import { buildExtensionTasks, clearExtensionTasks,  } from './buildExtensionTasks';
+// import { showBuildOptionsQuickPick } from "./showBuildOptionsQuickPick";
+// import { updateBuildOptionStatusBar } from './updateBuildOptionsStatusBar';
+// import { simplPlusCompileCurrent } from './simplPlusCompileTasks';
 
 
-import { buildExtensionTasks, clearExtensionTasks } from './buildExtensionTasks';
 
 // Creates a terminal, calls the command, then closes the terminal
 function callShellCommand(shellCommand: string): void {
@@ -40,20 +44,39 @@ export async function activate(context: ExtensionContext) {
         env.openExternal(Uri.parse('https://help.crestron.com/simpl_plus'));
     });
 
+    // let showQuickPick_command = commands.registerCommand("simpl-plus.showQuickPick", () => {
+    //     showBuildOptionsQuickPick();
+    // });
+
+    // let build_command = commands.registerCommand("simpl-plus.build", () => {
+    //     simplPlusCompileCurrent();
+    // });
+
     let thisFormatProvider = new SimplPlusFormattingProvider();
     const formatProvider = languages.registerDocumentFormattingEditProvider({ language: 'simpl-plus-source' }, thisFormatProvider);
 
     let thisHoverProvider = new SimplPlusHoverProvider();
     const hoverProvider = languages.registerHoverProvider({ language: 'simpl-plus-source' }, thisHoverProvider);
 
+
+
     context.subscriptions.push(formatProvider);
     context.subscriptions.push(hoverProvider);
     context.subscriptions.push(localHelp_command);
     context.subscriptions.push(webHelp_command);
+    // context.subscriptions.push(showQuickPick_command);
+    // context.subscriptions.push(build_command);
+    // context.subscriptions.push(test);
+    // updateBuildOptionStatusBar();
+
 
     workspace.onDidChangeConfiguration(buildExtensionTasks);
+    // workspace.onDidChangeConfiguration(updateBuildOptionStatusBar);
     workspace.onDidOpenTextDocument(buildExtensionTasks);
+    // workspace.onDidOpenTextDocument(updateBuildOptionStatusBar);
     workspace.onDidSaveTextDocument(buildExtensionTasks);
+    // workspace.onDidSaveTextDocument(updateBuildOptionStatusBar);
+    // window.onDidChangeActiveTextEditor(updateBuildOptionStatusBar);
     window.onDidChangeActiveTextEditor(buildExtensionTasks);
 
     buildExtensionTasks();

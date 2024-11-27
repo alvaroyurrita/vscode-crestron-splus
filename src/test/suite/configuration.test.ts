@@ -13,7 +13,7 @@ suite('default Settings', function () {
         defaultValue: true
     }, {
         uri: 'enable4series',
-        defaultValue: false
+        defaultValue: true
     }];
     const configurationSplus = vscode.workspace.getConfiguration('simpl-plus');
     settingsToTest.forEach(function (setting) {

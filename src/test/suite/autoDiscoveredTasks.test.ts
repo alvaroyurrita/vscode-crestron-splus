@@ -23,11 +23,14 @@ suite("With Faked Saved File", function () {
         });
     });
     suite("With Default Settings", function () {
-        test("It should have Compile 3 Series Task only", async () => {
+        test("It should have Compile 3 Series and 4 Task", async () => {
             await OpenAndShowSPlusDocument("\/\/Nothing To See");
             const splusTasks = await vscode.tasks.fetchTasks();
-            assert.strictEqual(splusTasks.length, 1);
-            assert.strictEqual(splusTasks[0].name, "Compile 3 Series");
+            console.log("--------->",splusTasks[0].name);
+            assert.strictEqual(splusTasks.length, 3);
+            assert.strictEqual(splusTasks[0].name, "Compile 3 & 4 Series");
+            assert.strictEqual(splusTasks[1].name, "Compile 3 Series");
+            assert.strictEqual(splusTasks[2].name, "Compile 4 Series");
         });
         const libraries = ["USER", "CRESTRON"];
         libraries.forEach(function (library) {
@@ -38,7 +41,9 @@ suite("With Faked Saved File", function () {
                 assert.ok(splusTasks.length > 0, "Should have at least one task");
                 assert.ok(fsExistSyncStub.args.find(a => a[0].toString().includes("My.Test-Library.clz")));
                 assert.strictEqual(splusTasks[0].name, "Generate API file for My.Test-Library");
-                assert.strictEqual(splusTasks[1].name, "Compile 3 Series");
+                assert.strictEqual(splusTasks[1].name, "Compile 3 & 4 Series");
+                assert.strictEqual(splusTasks[2].name, "Compile 3 Series");
+                assert.strictEqual(splusTasks[3].name, "Compile 4 Series");
                 fsExistSyncStub.restore();
             });
         });
