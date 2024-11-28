@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from "sinon";
-import * as fsWrapper from '../../fsWrapper';
+import * as fsWrapper from '../../fsExistsSyncWrapper';
 import { removeWorkspaceCustomSettings, OpenAndShowSPlusDocument, delay } from '../testFunctions';
 import * as vscode from 'vscode';
 
@@ -34,8 +34,8 @@ suite("With Faked Saved File", function () {
         });
         const libraries = ["USER", "CRESTRON"];
         libraries.forEach(function (library) {
-            test(`And file with ${library} Library, it should have Compile 3 Series Task only and Generate API`, async () => {
-                const fsExistSyncStub = sinon.stub(fsWrapper, "existsSync").returns(true);
+            test(`And file with ${library} Library, it should have Compile 3 Series and 4 and Generate API`, async () => {
+                const fsExistSyncStub = sinon.stub(fsWrapper, "existsSyncWrapper").returns(true);
                 await OpenAndShowSPlusDocument(`#${library}_SIMPLSHARP_LIBRARY \"My.Test-Library\";`);
                 const splusTasks = await vscode.tasks.fetchTasks();
                 assert.ok(splusTasks.length > 0, "Should have at least one task");

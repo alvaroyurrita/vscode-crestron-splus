@@ -10,7 +10,7 @@ import {
 } from "vscode";
 import { TaskCreator, TaskArguments } from "./taskCreator";
 import { getCompilerPath, getFileName } from "./helperFunctions";
-import { BuildType } from "./built-type";
+import { BuildType } from "./build-type";
 
 
 export function simplPlusCompileTasks(): Task[] {

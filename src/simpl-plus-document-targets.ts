@@ -1,8 +1,8 @@
 import path from "path";
-import { BuildType } from "./built-type";
-import * as fsWrapper from "./fsWrapper";
-import {  workspace, TextDocument, Uri  } from 'vscode';
-import * as fs from 'fs';
+import { BuildType } from "./build-type";
+import { existsSyncWrapper } from "./fsExistsSyncWrapper";
+import { readFileSyncWrapper } from "./fsReadSyncWrapper";
+import { workspace, TextDocument, Uri  } from 'vscode';
 
 class SimplPlusDocumentTargets {
     private _document: TextDocument | undefined;
@@ -37,13 +37,13 @@ class SimplPlusDocumentTargets {
     private isUshFileExists(filePath: Uri): boolean {
         const docPath = path.parse(filePath.fsPath);
         const ushFilePath = path.join(docPath.dir, docPath.name + ".ush");
-        return fsWrapper.existsSync(ushFilePath);
+        return existsSyncWrapper(ushFilePath);
     }
 
     private getBuildTaskFromCurrentFile(filePath: Uri): BuildType {
         const docPath = path.parse(filePath.fsPath);
         const ushFilePath = path.join(docPath.dir, docPath.name + ".ush");
-        const ushContent = fs.readFileSync(ushFilePath, 'utf8');
+        const ushContent = readFileSyncWrapper(ushFilePath);
         const regex = /(?:Inclusions_CDS=)(.*)/;
         const match = ushContent.match(regex);
         if (match && match[1]) {

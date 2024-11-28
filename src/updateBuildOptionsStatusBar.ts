@@ -1,6 +1,6 @@
 import { window, workspace, StatusBarAlignment } from 'vscode';
 import { getFileName } from "./helperFunctions";
-import * as fsWrapper from './fsWrapper';
+import * as fsExistsWrapper from './fsExistsSyncWrapper';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -27,7 +27,7 @@ function getBuildTargets(): string {
 
 function isUshFileExists(filePath: path.ParsedPath): boolean {
     const ushFilePath = path.join(filePath.dir, filePath.name + ".ush");
-    return fsWrapper.existsSync(ushFilePath);
+    return fsExistsWrapper.existsSyncWrapper(ushFilePath);
 }
 
 function getBuildTaskFromCurrentFile(filePath: path.ParsedPath): string {
