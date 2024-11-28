@@ -12,8 +12,9 @@ import {
 import { SimplPlusFormattingProvider } from './simplPlusFormattingProvider';
 import { SimplPlusHoverProvider } from "./simplPlusHoverProvider";
 import { buildExtensionTasks, clearExtensionTasks,  } from './buildExtensionTasks';
+import { SimplPlusActiveDocuments } from "./simplPlusActiveDocuments";
 // import { showBuildOptionsQuickPick } from "./showBuildOptionsQuickPick";
-// import { updateBuildOptionStatusBar } from './updateBuildOptionsStatusBar';
+import { updateBuildOptionStatusBar } from './updateBuildOptionsStatusBar';
 // import { simplPlusCompileCurrent } from './simplPlusCompileTasks';
 
 
@@ -25,6 +26,7 @@ function callShellCommand(shellCommand: string): void {
     term.sendText("exit", true);
 }
 
+const simplPlusDocuments = new SimplPlusActiveDocuments();
 
 export async function activate(context: ExtensionContext) {
 
@@ -71,15 +73,22 @@ export async function activate(context: ExtensionContext) {
 
 
     workspace.onDidChangeConfiguration(buildExtensionTasks);
-    // workspace.onDidChangeConfiguration(updateBuildOptionStatusBar);
     workspace.onDidOpenTextDocument(buildExtensionTasks);
-    // workspace.onDidOpenTextDocument(updateBuildOptionStatusBar);
+    workspace.onDidOpenTextDocument((document)=>{
+        updateBuildOptionStatusBar(document, simplPlusDocuments);
+    });
     workspace.onDidSaveTextDocument(buildExtensionTasks);
     // workspace.onDidSaveTextDocument(updateBuildOptionStatusBar);
-    // window.onDidChangeActiveTextEditor(updateBuildOptionStatusBar);
-    window.onDidChangeActiveTextEditor(buildExtensionTasks);
+    window.onDidChangeActiveTextEditor((editor)=>{
+        if (editor === undefined) { return; }
+        updateBuildOptionStatusBar(editor.document, simplPlusDocuments);
+    });
 
     buildExtensionTasks();
+    const activeEditor = window.activeTextEditor;
+    if (activeEditor !== undefined) {
+        updateBuildOptionStatusBar(activeEditor.document, simplPlusDocuments);
+    }
 }
 
 // this method is called when your extension is deactivated

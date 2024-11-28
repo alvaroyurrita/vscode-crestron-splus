@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { TextDocument, Uri, workspace } from 'vscode';
-import { SimplPlusActiveDocuments } from '../../simpl-plus-document-targets';
+import { SimplPlusActiveDocuments } from '../../simplPlusActiveDocuments';
 import { BuildType } from '../../build-type';
 import * as fsExistsWrapper from '../../fsExistsSyncWrapper';
 import * as fsFileReadWrapper from '../../fsReadSyncWrapper';
