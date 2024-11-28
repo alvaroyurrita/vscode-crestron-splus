@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import * as sinon from "sinon";
 import * as fsWrapper from '../../fsExistsSyncWrapper';
-import { removeWorkspaceCustomSettings, OpenAndShowSPlusDocument, delay } from '../testFunctions';
+import { removeWorkspaceCustomSettings, OpenAndShowSPlusDocument } from '../testFunctions';
 import * as vscode from 'vscode';
 
 suiteTeardown(async function () {
@@ -50,11 +50,11 @@ suite("With Faked Saved File", function () {
 
     });
     suite("With Modified Settings", function () {
-        suiteSetup(async function () {
+        setup(async function () {
             await removeWorkspaceCustomSettings();
             await OpenAndShowSPlusDocument("\/\/Nothing To See");
         });
-        suiteTeardown(async function () {
+        teardown(async function () {
             await removeWorkspaceCustomSettings();
         });
         const settingsToTest = [{
@@ -168,9 +168,9 @@ suite("With Faked Saved File", function () {
                 let parameter: string[] = [];
 
                 const configurationSplus = vscode.workspace.getConfiguration('simpl-plus');
-                await configurationSplus.update('enable2series', setting.enable2series);
-                await configurationSplus.update('enable3series', setting.enable3series);
-                await configurationSplus.update('enable4series', setting.enable4series);
+                await configurationSplus.update('enable2series', setting.enable2series, vscode.ConfigurationTarget.Workspace);
+                await configurationSplus.update('enable3series', setting.enable3series, vscode.ConfigurationTarget.Workspace);
+                await configurationSplus.update('enable4series', setting.enable4series, vscode.ConfigurationTarget.Workspace);
                 const splusTasks = await vscode.tasks.fetchTasks();
                 assert.ok(splusTasks.length === setting.responses.length);
                 let index = 0;

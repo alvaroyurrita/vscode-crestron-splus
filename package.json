@@ -69,12 +69,12 @@
         {
           "command": "simpl-plus.localHelp",
           "group": "navigation@1",
-          "when": "resourceLangId == simpl-plus-source"
+          "when": "resourceLangId == simpl-plus"
         },
         {
           "command": "simpl-plus.webHelp",
           "group": "navigation@2",
-          "when": "resourceLangId == simpl-plus-source"
+          "when": "resourceLangId == simpl-plus"
         }
       ]
     },
@@ -82,17 +82,17 @@
       {
         "command": "simpl-plus.localHelp",
         "key": "ctrl+shift+f1",
-        "when": "resourceLangId == simpl-plus-source"
+        "when": "resourceLangId == simpl-plus"
       },
       {
         "command": "simpl-plus.webHelp",
         "key": "ctrl+shift+f2",
-        "when": "resourceLangId == simpl-plus-source"
+        "when": "resourceLangId == simpl-plus"
       },
       {
         "command": "simpl-plus.build",
         "key": "F12",
-        "when": "resourceLangId == simpl-plus-source"
+        "when": "resourceLangId == simpl-plus"
       }
     ],
     "languages": [
@@ -100,7 +100,7 @@
         "aliases": [
           "SIMPL+"
         ],
-        "id": "simpl-plus-source",
+        "id": "simpl-plus",
         "extensions": [
           ".usp",
           ".usl",
@@ -117,7 +117,7 @@
         "aliases": [
           "SIMPL# API"
         ],
-        "id": "simpl-sharp-api-source",
+        "id": "simpl-sharp-api",
         "extensions": [
           ".api"
         ],
@@ -153,25 +153,25 @@
     },
     "grammars": [
       {
-        "language": "simpl-plus-source",
+        "language": "simpl-plus",
         "scopeName": "source.simpl-plus",
         "path": "./syntaxes/simpl-plus.tmLanguage.json"
       },
       {
-        "language": "simpl-sharp-api-source",
+        "language": "simpl-sharp-api",
         "scopeName": "source.simpl-sharp-api",
         "path": "./syntaxes/simpl-sharp-api.tmLanguage.json"
       }
     ],
     "snippets": [
       {
-        "language": "simpl-plus-source",
+        "language": "simpl-plus",
         "path": "./snippets/snippets.json"
       }
     ],
     "taskDefinitions": [
       {
-        "type": "simpl-plus-source",
+        "type": "simpl-plus",
         "properties": {
           "label": {
             "type": "string"
@@ -195,7 +195,7 @@
       }
     ],
     "configurationDefaults": {
-      "[simpl-plus-source]": {
+      "[simpl-plus]": {
         "editor.wordBasedSuggestions": "currentDocument",
         "editor.suggest.snippetsPreventQuickSuggestions": false,
         "editor.quickSuggestions": {

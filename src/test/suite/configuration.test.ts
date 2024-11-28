@@ -1,6 +1,7 @@
 import * as assert from 'assert';
 import * as vscode from 'vscode';
 
+
 suite('default Settings', function () {
     const settingsToTest = [{
         uri: 'simplDirectory',

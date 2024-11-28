@@ -1,16 +1,20 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { TextDocument, Uri } from 'vscode';
+import { TextDocument, Uri, workspace } from 'vscode';
 import { SimplPlusActiveDocuments } from '../../simpl-plus-document-targets';
 import { BuildType } from '../../build-type';
 import * as fsExistsWrapper from '../../fsExistsSyncWrapper';
 import * as fsFileReadWrapper from '../../fsReadSyncWrapper';
+import { removeWorkspaceCustomSettings, } from '../testFunctions';
+
+
 
 suite('SimplPlusActiveDocuments', () => {
     let simplPlusActiveDocuments: SimplPlusActiveDocuments;
     let mockDocument: TextDocument;
 
     setup(() => {
+        removeWorkspaceCustomSettings();
         simplPlusActiveDocuments = new SimplPlusActiveDocuments();
         mockDocument = {
             uri: Uri.file('test.usp'),
@@ -88,7 +92,6 @@ suite('SimplPlusActiveDocuments', () => {
 suite('with existing document with ush contents', function ()  {
     let simplPlusActiveDocuments: SimplPlusActiveDocuments;
     let mockDocument: TextDocument;
-    const t = "t";
     const targetsToTest = [
         {
             input: "Inclusions_CDS=5",
@@ -117,9 +120,14 @@ suite('with existing document with ush contents', function ()  {
         {
             input: "Inclusions_CDS=5,6,7",
             expected: 1|2|4
+        },
+        {
+            input: "should return global",
+            expected: 2|4
         }
     ];
     setup(() => {
+        removeWorkspaceCustomSettings();
         simplPlusActiveDocuments = new SimplPlusActiveDocuments();
         mockDocument = {
             uri: Uri.file('test.usp'),
@@ -143,10 +151,9 @@ suite('with existing document with ush contents', function ()  {
     });
 
     targetsToTest.forEach(function (target) {
-        test(`should return ${target.expected} for an existing document with ush contents ${target.input}`, function () {
+        test(`should return ${target.expected} for ${target.input}`, function () {
             const fsExistSyncStub = sinon.stub(fsExistsWrapper, "existsSyncWrapper").returns(true);
             const fakeReadFile = sinon.stub(fsFileReadWrapper, 'readFileSyncWrapper').callsFake((test) => {
-                console.log(test);
                 return target.input;
             });
             const buildType = simplPlusActiveDocuments.GetDocumentBuiltType(mockDocument);

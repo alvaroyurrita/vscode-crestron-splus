@@ -59,9 +59,9 @@ class SimplPlusDocumentTargets {
     private getBuildTaskFromGlobal(): BuildType {
         let fileBuildType: BuildType = BuildType.None;
         const simplConfig = workspace.getConfiguration("simpl-plus");
-        fileBuildType |= simplConfig.enable2series ? BuildType.Series2 : BuildType.None;
-        fileBuildType |= simplConfig.enable3series ? BuildType.Series3 : BuildType.None;
-        fileBuildType |= simplConfig.enable4series ? BuildType.Series4 : BuildType.None;
+        fileBuildType |= simplConfig.get("enable2series") ? BuildType.Series2 : BuildType.None;
+        fileBuildType |= simplConfig.get("enable3series") ? BuildType.Series3 : BuildType.None;
+        fileBuildType |= simplConfig.get("enable4series") ? BuildType.Series4 : BuildType.None;
         return fileBuildType;
     }
 }

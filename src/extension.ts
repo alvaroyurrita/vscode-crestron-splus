@@ -53,10 +53,10 @@ export async function activate(context: ExtensionContext) {
     // });
 
     let thisFormatProvider = new SimplPlusFormattingProvider();
-    const formatProvider = languages.registerDocumentFormattingEditProvider({ language: 'simpl-plus-source' }, thisFormatProvider);
+    const formatProvider = languages.registerDocumentFormattingEditProvider({ language: 'simpl-plus' }, thisFormatProvider);
 
     let thisHoverProvider = new SimplPlusHoverProvider();
-    const hoverProvider = languages.registerHoverProvider({ language: 'simpl-plus-source' }, thisHoverProvider);
+    const hoverProvider = languages.registerHoverProvider({ language: 'simpl-plus' }, thisHoverProvider);
 
 
 

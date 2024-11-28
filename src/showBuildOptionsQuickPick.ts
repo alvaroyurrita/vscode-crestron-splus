@@ -13,9 +13,9 @@ export async function  showBuildOptionsQuickPick() : Promise<void> {
     };
     const selection = await window.showQuickPick<any>(quickPickItems, quickPickOptions) as QuickPickItem[];
     if (selection) {
-        simplConfig.update("enable2series", selection.some((item) => item.label === "2-Series"));
-        simplConfig.update("enable3series", selection.some((item) => item.label === "3-Series"));
-        simplConfig.update("enable4series", selection.some((item) => item.label === "4-Series"));
+        // simplConfig.update("enable2series", selection.some((item) => item.label === "2-Series"));
+        // simplConfig.update("enable3series", selection.some((item) => item.label === "3-Series"));
+        // simplConfig.update("enable4series", selection.some((item) => item.label === "4-Series"));
         updateBuildOptionStatusBar();
     }
 }
