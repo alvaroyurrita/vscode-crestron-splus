@@ -37,6 +37,10 @@ suite("Status Bar ", () => {
         assert.strictEqual(statusBarItem.tooltip, "Click to select SIMPL+ compilation targets");
         assert.strictEqual(statusBarItem.command, "simpl-plus.showQuickPick");
     });
+    // couldn't automate opening several documents with different USH contents.  
+    // VSCode does not trigger the onDidCloseTextDocument after the second document is opened.
+    // the extension is not able to update the status bar with the correct build targets.
+    // https://stackoverflow.com/questions/48693666/detect-when-document-is-closed
     test("Should show series 4 when opening document with USH ", async () => {
         const fsExistSyncStub = sinon.stub(fsExistsWrapper, "existsSyncWrapper").returns(true);
         const fakeReadFile = sinon.stub(fsFileReadWrapper, 'readFileSyncWrapper').callsFake((test) => {

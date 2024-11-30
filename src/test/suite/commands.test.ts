@@ -69,5 +69,33 @@ suite('Execution', function () {
         await delay(500);
         assert.ok(fakeTaskCreator.calledOnce);
         assert.strictEqual(fakeTaskCreator.args[0][0].name, 'Compile 3 & 4 Series');
-    }
+    });
+    test('showQuickPick command should open QuickPick with default build targets enabled', async function ()
+    {
+        const quickPickItems: vscode.QuickPickItem[] =[
+            {
+                label: "2-Series",
+                description: "Control System Target",
+                picked: false,
+            }      ]    ;
+        //@ts-ignore
+        const fakeQuickPic = sinon.stub(vscode.window, 'showQuickPick').resolves(quickPickItems);
+        await OpenAndShowSPlusDocument("\\\\Nothing To See");
+        await vscode.commands.executeCommand('simpl-plus.showQuickPick');
+        await delay(500);
+        assert.ok(fakeQuickPic.calledOnce);
+        //@ts-ignore
+        assert.strictEqual(fakeQuickPic.args[0][0][0].label,"2-Series");
+        //@ts-ignore
+        assert.strictEqual(fakeQuickPic.args[0][0][0].picked,false);
+        //@ts-ignore
+        assert.strictEqual(fakeQuickPic.args[0][0][1].label,"3-Series");
+        //@ts-ignore
+        assert.strictEqual(fakeQuickPic.args[0][0][1].picked,true);
+        //@ts-ignore
+        assert.strictEqual(fakeQuickPic.args[0][0][2].label,"4-Series");
+        //@ts-ignore
+        assert.strictEqual(fakeQuickPic.args[0][0][2].picked,true);
+        fakeQuickPic.resetBehavior();
+    });
 });

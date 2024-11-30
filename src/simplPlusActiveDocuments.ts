@@ -2,7 +2,7 @@ import path from "path";
 import { BuildType } from "./build-type";
 import { existsSyncWrapper } from "./fsExistsSyncWrapper";
 import { readFileSyncWrapper } from "./fsReadSyncWrapper";
-import { workspace, TextDocument, Uri  } from 'vscode';
+import { workspace, TextDocument, Uri , Disposable } from 'vscode';
 
 class SimplPlusDocumentBuildTargets {
     private _document: TextDocument | undefined;
@@ -70,7 +70,7 @@ class SimplPlusDocumentBuildTargets {
     }
 }
 
-export class SimplPlusActiveDocuments  {
+export class SimplPlusActiveDocuments implements Disposable {
 
     private SimpPlusDocuments: SimplPlusDocumentBuildTargets[] = [];
 
@@ -97,5 +97,8 @@ export class SimplPlusActiveDocuments  {
     }
     RemoveAllSimpPlusDocuments() {
         this.SimpPlusDocuments = [];
+    }
+    dispose() {
+        this.RemoveAllSimpPlusDocuments();
     }
 }
