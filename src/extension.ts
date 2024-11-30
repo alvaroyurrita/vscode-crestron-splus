@@ -11,11 +11,12 @@ import {
 
 import { SimplPlusFormattingProvider } from './simplPlusFormattingProvider';
 import { SimplPlusHoverProvider } from "./simplPlusHoverProvider";
-import { buildExtensionTasks, clearExtensionTasks,  } from './buildExtensionTasks';
+import { buildExtensionTasks, clearExtensionTasks, } from './buildExtensionTasks';
 import { SimplPlusActiveDocuments } from "./simplPlusActiveDocuments";
-// import { showBuildOptionsQuickPick } from "./showBuildOptionsQuickPick";
-import { updateBuildOptionStatusBar } from './updateBuildOptionsStatusBar';
-// import { simplPlusCompileCurrent } from './simplPlusCompileTasks';
+import { showBuildTargetsQuickPick as showBuildTargetsQuickPick } from "./showBuildTargetsQuickPick";
+import { updateBuildTargetsStatusBar as updateBuildTargetsStatusBar } from './updateBuildTargetsStatusBar';
+import { simplPlusCompileCurrent } from './simplPlusCompileTasks';
+import { BuildType } from "./build-type";
 
 
 
@@ -42,17 +43,29 @@ export async function activate(context: ExtensionContext) {
         callShellCommand(helpLocation);
     });
 
-    let webHelp_command = commands.registerCommand("simpl-plus.webHelp", ()=>{
+    let webHelp_command = commands.registerCommand("simpl-plus.webHelp", () => {
         env.openExternal(Uri.parse('https://help.crestron.com/simpl_plus'));
     });
 
-    // let showQuickPick_command = commands.registerCommand("simpl-plus.showQuickPick", () => {
-    //     showBuildOptionsQuickPick();
-    // });
+    let showQuickPick_command = commands.registerCommand("simpl-plus.showQuickPick", async () => {
+        const activeEditor = window.activeTextEditor;
+        if (activeEditor !== undefined) {
+            const currentBuildTargets = simplPlusDocuments.GetSimplPlusDocumentBuildTargets(activeEditor.document);
+            const newBuildTargets = await showBuildTargetsQuickPick(currentBuildTargets);
+            if (newBuildTargets === undefined) { return; }
+            const updatedBuildTargets = simplPlusDocuments.UpdateSimpPlusDocumentBuildTargets(activeEditor.document, newBuildTargets);
+            if (updatedBuildTargets === undefined) { return; }
+            updateBuildTargetsStatusBar(updatedBuildTargets);
+        }
+    });
 
-    // let build_command = commands.registerCommand("simpl-plus.build", () => {
-    //     simplPlusCompileCurrent();
-    // });
+    let build_command = commands.registerCommand("simpl-plus.build", () => {
+        const activeEditor = window.activeTextEditor;
+        if (activeEditor !== undefined) {
+            const currentBuildTargets = simplPlusDocuments.GetSimplPlusDocumentBuildTargets(activeEditor.document);
+            simplPlusCompileCurrent(currentBuildTargets);
+        }
+    });
 
     let thisFormatProvider = new SimplPlusFormattingProvider();
     const formatProvider = languages.registerDocumentFormattingEditProvider({ language: 'simpl-plus' }, thisFormatProvider);
@@ -60,39 +73,55 @@ export async function activate(context: ExtensionContext) {
     let thisHoverProvider = new SimplPlusHoverProvider();
     const hoverProvider = languages.registerHoverProvider({ language: 'simpl-plus' }, thisHoverProvider);
 
-
-
     context.subscriptions.push(formatProvider);
     context.subscriptions.push(hoverProvider);
     context.subscriptions.push(localHelp_command);
     context.subscriptions.push(webHelp_command);
-    // context.subscriptions.push(showQuickPick_command);
-    // context.subscriptions.push(build_command);
-    // context.subscriptions.push(test);
-    // updateBuildOptionStatusBar();
+    context.subscriptions.push(showQuickPick_command);
+    context.subscriptions.push(build_command);
 
 
     workspace.onDidChangeConfiguration(buildExtensionTasks);
     workspace.onDidOpenTextDocument(buildExtensionTasks);
-    workspace.onDidOpenTextDocument((document)=>{
-        updateBuildOptionStatusBar(document, simplPlusDocuments);
+    workspace.onDidOpenTextDocument((document) => {
+        if (document.languageId !== "simpl-plus") {
+            updateBuildTargetsStatusBar(BuildType.None);
+            return;
+        }
+        const currentBuildTargets = simplPlusDocuments.GetSimplPlusDocumentBuildTargets(document);
+        updateBuildTargetsStatusBar(currentBuildTargets);
     });
     workspace.onDidSaveTextDocument(buildExtensionTasks);
-    // workspace.onDidSaveTextDocument(updateBuildOptionStatusBar);
-    window.onDidChangeActiveTextEditor((editor)=>{
-        if (editor === undefined) { return; }
-        updateBuildOptionStatusBar(editor.document, simplPlusDocuments);
+    window.onDidChangeActiveTextEditor((editor) => {
+        if (editor === undefined || editor.document.languageId !== "simpl-plus") {
+            updateBuildTargetsStatusBar(BuildType.None);
+            return;
+        }
+        const currentBuildTargets = simplPlusDocuments.GetSimplPlusDocumentBuildTargets(editor.document);
+        updateBuildTargetsStatusBar(currentBuildTargets);
+    });
+    workspace.onDidCloseTextDocument((document) => {
+        if (document.languageId !== "simpl-plus") {
+            return;
+        }
+        simplPlusDocuments.RemoveSimpPlusDocument(document);
     });
 
     buildExtensionTasks();
     const activeEditor = window.activeTextEditor;
-    if (activeEditor !== undefined) {
-        updateBuildOptionStatusBar(activeEditor.document, simplPlusDocuments);
+    if (activeEditor === undefined || activeEditor.document.languageId !== "simpl-plus") {
+        updateBuildTargetsStatusBar(BuildType.None);
+        return;
     }
+    console.log("-----starting Document",activeEditor.document.fileName);
+
+    const currentBuildTargets = simplPlusDocuments.GetSimplPlusDocumentBuildTargets(activeEditor.document);
+    updateBuildTargetsStatusBar(currentBuildTargets);
 }
 
 // this method is called when your extension is deactivated
 export function deactivate(): void {
+    simplPlusDocuments.RemoveAllSimpPlusDocuments();
     clearExtensionTasks();
 }
 

@@ -110,14 +110,10 @@ function getBuildParameters(buildType: BuildType, compilerPath: string, fileName
     return [label, command];
 }
 
-export async function simplPlusCompileCurrent(): Promise<void> {
+export async function simplPlusCompileCurrent(buildTypes: BuildType): Promise<void> {
     const fileName = getFileName();
     const compilerPath = getCompilerPath();
     if (fileName === undefined) { return; }
-    let buildTypes: BuildType = BuildType.None;;
-    buildTypes |= workspace.getConfiguration("simpl-plus").enable2series === true ? BuildType.Series2 : BuildType.None;
-    buildTypes |= workspace.getConfiguration("simpl-plus").enable3series === true ? BuildType.Series3 : BuildType.None;
-    buildTypes |= workspace.getConfiguration("simpl-plus").enable4series === true ? BuildType.Series4 : BuildType.None;
     const task = getBuildTaskByType(buildTypes, compilerPath, fileName);
     await tasks.executeTask(task);
 }

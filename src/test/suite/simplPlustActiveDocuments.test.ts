@@ -39,7 +39,7 @@ suite('SimplPlusActiveDocuments', () => {
     });
 
     test('should return global values BuildType.Series3 and 4 for a new document', () => {
-        const buildType = simplPlusActiveDocuments.GetDocumentBuiltType(mockDocument);
+        const buildType = simplPlusActiveDocuments.GetSimplPlusDocumentBuildTargets(mockDocument);
         assert.strictEqual(buildType, BuildType.Series3 | BuildType.Series4);
     });
 
@@ -62,29 +62,29 @@ suite('SimplPlusActiveDocuments', () => {
             isClosed: false,
             fileName: 'test.usp'
         } as unknown as TextDocument;
-        const buildType = simplPlusActiveDocuments.GetDocumentBuiltType(mockDocument);
+        const buildType = simplPlusActiveDocuments.GetSimplPlusDocumentBuildTargets(mockDocument);
         assert.strictEqual(buildType, BuildType.Series3 | BuildType.Series4);
     });
 
     test('should add a new document to SimpPlusDocuments', () => {
-        simplPlusActiveDocuments.GetDocumentBuiltType(mockDocument);
+        simplPlusActiveDocuments.GetSimplPlusDocumentBuildTargets(mockDocument);
         assert.strictEqual(simplPlusActiveDocuments['SimpPlusDocuments'].length, 1);
     });
 
     test('should remove a document from SimpPlusDocuments', () => {
-        simplPlusActiveDocuments.GetDocumentBuiltType(mockDocument);
+        simplPlusActiveDocuments.GetSimplPlusDocumentBuildTargets(mockDocument);
         simplPlusActiveDocuments.RemoveSimpPlusDocument(mockDocument);
         assert.strictEqual(simplPlusActiveDocuments['SimpPlusDocuments'].length, 0);
     });
 
     test('should update targets for an existing document', () => {
-        simplPlusActiveDocuments.GetDocumentBuiltType(mockDocument);
-        const updatedBuildType = simplPlusActiveDocuments.UpdateSimpPlusDocumentTargets(mockDocument);
-        assert.strictEqual(updatedBuildType, BuildType.Series3 | BuildType.Series4);
+        simplPlusActiveDocuments.GetSimplPlusDocumentBuildTargets(mockDocument);
+        const updatedBuildType = simplPlusActiveDocuments.UpdateSimpPlusDocumentBuildTargets(mockDocument, BuildType.Series3);
+        assert.strictEqual(updatedBuildType, BuildType.Series3 );
     });
 
     test('should return undefined when updating targets for a non-existing document', () => {
-        const updatedBuildType = simplPlusActiveDocuments.UpdateSimpPlusDocumentTargets(mockDocument);
+        const updatedBuildType = simplPlusActiveDocuments.UpdateSimpPlusDocumentBuildTargets(mockDocument);
         assert.strictEqual(updatedBuildType, undefined);
     });
 });
@@ -156,7 +156,7 @@ suite('with existing document with ush contents', function ()  {
             const fakeReadFile = sinon.stub(fsFileReadWrapper, 'readFileSyncWrapper').callsFake((test) => {
                 return target.input;
             });
-            const buildType = simplPlusActiveDocuments.GetDocumentBuiltType(mockDocument);
+            const buildType = simplPlusActiveDocuments.GetSimplPlusDocumentBuildTargets(mockDocument);
             fakeReadFile.restore();
             fsExistSyncStub.restore();
             assert.strictEqual(buildType, target.expected);

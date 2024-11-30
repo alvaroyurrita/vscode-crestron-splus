@@ -4,7 +4,7 @@ import { existsSyncWrapper } from "./fsExistsSyncWrapper";
 import { readFileSyncWrapper } from "./fsReadSyncWrapper";
 import { workspace, TextDocument, Uri  } from 'vscode';
 
-class SimplPlusDocumentTargets {
+class SimplPlusDocumentBuildTargets {
     private _document: TextDocument | undefined;
     public get Document(){ return this._document;}
 
@@ -15,22 +15,26 @@ class SimplPlusDocumentTargets {
         if (document === undefined) {return;}
         if (document.languageId !== "simpl-plus") { return;}
         this._document = document;
-        this.UpdatedTargets(document);
+        this.UpdatedBuildTargets(document);
     }
 
-    public UpdatedTargets(document: TextDocument ): BuildType | undefined
+    public UpdatedBuildTargets(document: TextDocument, newTargets?: BuildType ): BuildType | undefined
     {
         if (this._document !== document) {return undefined;}
+        if (newTargets !== undefined) {
+            this.buildType = newTargets;
+            return this.buildType;
+        }
         if (this._document.isUntitled){
-            this.buildType = this.getBuildTaskFromGlobal();
+            this.buildType = this.getBuildTargetsFromPreferences();
             return;
         }
         if (this.isUshFileExists(this._document.uri))
         {
-            this.buildType = this.getBuildTaskFromCurrentFile(this._document.uri);
+            this.buildType = this.getBuildTargetsFromUshFile(this._document.uri);
             return;
         }
-        this.buildType = this.getBuildTaskFromGlobal();
+        this.buildType = this.getBuildTargetsFromPreferences();
         return this.buildType;
     }
 
@@ -40,7 +44,7 @@ class SimplPlusDocumentTargets {
         return existsSyncWrapper(ushFilePath);
     }
 
-    private getBuildTaskFromCurrentFile(filePath: Uri): BuildType {
+    private getBuildTargetsFromUshFile(filePath: Uri): BuildType {
         const docPath = path.parse(filePath.fsPath);
         const ushFilePath = path.join(docPath.dir, docPath.name + ".ush");
         const ushContent = readFileSyncWrapper(ushFilePath);
@@ -53,10 +57,10 @@ class SimplPlusDocumentTargets {
             fileBuildType |= match[1].includes("7") ? BuildType.Series4 : BuildType.None;
             return fileBuildType;
         }
-        return this.getBuildTaskFromGlobal();
+        return this.getBuildTargetsFromPreferences();
     }
 
-    private getBuildTaskFromGlobal(): BuildType {
+    private getBuildTargetsFromPreferences(): BuildType {
         let fileBuildType: BuildType = BuildType.None;
         const simplConfig = workspace.getConfiguration("simpl-plus");
         fileBuildType |= simplConfig.get("enable2series") ? BuildType.Series2 : BuildType.None;
@@ -66,28 +70,32 @@ class SimplPlusDocumentTargets {
     }
 }
 
-export class SimplPlusActiveDocuments {
-    private SimpPlusDocuments: SimplPlusDocumentTargets[] = [];
+export class SimplPlusActiveDocuments  {
 
-    public GetDocumentBuiltType(document: TextDocument | undefined): BuildType {
-        let simplPlusDocument = this.SimpPlusDocuments.find(sd => sd.Document === document);
+    private SimpPlusDocuments: SimplPlusDocumentBuildTargets[] = [];
+
+    public GetSimplPlusDocumentBuildTargets(document: TextDocument | undefined): BuildType {
+        let simplPlusDocument = this.SimpPlusDocuments.find(sd => sd.Document?.fileName === document?.fileName);
         if (simplPlusDocument === undefined) {
-            simplPlusDocument = new SimplPlusDocumentTargets(document);
+            simplPlusDocument = new SimplPlusDocumentBuildTargets(document);
             this.SimpPlusDocuments.push(simplPlusDocument);
         }
         return simplPlusDocument.BuildType;
     }
 
     public RemoveSimpPlusDocument(document: TextDocument): void {
-        let simplPlusDocumentIndex = this.SimpPlusDocuments.findIndex(sd => sd.Document === document);
+        let simplPlusDocumentIndex = this.SimpPlusDocuments.findIndex(sd => sd.Document?.fileName === document.fileName);
         if (simplPlusDocumentIndex === -1) { return; }
         this.SimpPlusDocuments.splice(simplPlusDocumentIndex,1);
     }
 
-    public UpdateSimpPlusDocumentTargets(document: TextDocument): BuildType | undefined
+    public UpdateSimpPlusDocumentBuildTargets(document: TextDocument, newTarget?: BuildType): BuildType | undefined
     {
-        let simplPlusDocumentIndex = this.SimpPlusDocuments.find(sd => sd.Document === document);
-        if (simplPlusDocumentIndex === undefined) { return undefined; }
-        return simplPlusDocumentIndex.UpdatedTargets(document);
+        let simplPlusDocument = this.SimpPlusDocuments.find(sd => sd.Document?.fileName === document.fileName);
+        if (simplPlusDocument === undefined) { return undefined; }
+        return simplPlusDocument.UpdatedBuildTargets(document, newTarget);
+    }
+    RemoveAllSimpPlusDocuments() {
+        this.SimpPlusDocuments = [];
     }
 }

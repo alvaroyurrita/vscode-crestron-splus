@@ -6,7 +6,7 @@ export function delay(ms: number) {
 }
 
 export async function removeWorkspaceCustomSettings() {
-    await vscode.commands.executeCommand('workbench.action.closeAllGroups');
+    await vscode.commands.executeCommand('workbench.action.closeAllEditors');
     const simplConfig = vscode.workspace.getConfiguration("simpl-plus");
     await simplConfig.update("enable2series",undefined, vscode.ConfigurationTarget.Workspace);
     await simplConfig.update("enable3series",undefined, vscode.ConfigurationTarget.Workspace);
@@ -19,6 +19,6 @@ export async function OpenAndShowSPlusDocument(documentContent: string) {
         language: "simpl-plus",
         content: documentContent,
     });
-    await vscode.window.showTextDocument(document);
+    var test = await vscode.window.showTextDocument(document);
     await delay(100);
 }

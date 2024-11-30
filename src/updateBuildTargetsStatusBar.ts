@@ -1,13 +1,11 @@
-import { window, StatusBarAlignment, TextDocument } from 'vscode';
-import { SimplPlusActiveDocuments } from "./simplPlusActiveDocuments";
+import { window, StatusBarAlignment } from 'vscode';
 import { BuildType } from './build-type';
 
 const statusBarSimplPlusText = window.createStatusBarItem(StatusBarAlignment.Right, 100);
 statusBarSimplPlusText.tooltip = "Click to select SIMPL+ compilation targets";
 statusBarSimplPlusText.command = "simpl-plus.showQuickPick";
-export function updateBuildOptionStatusBar(document: TextDocument, activeSimplPlusDocuments: SimplPlusActiveDocuments): void 
+export function updateBuildTargetsStatusBar(targets: BuildType): void 
 {
-    const targets = activeSimplPlusDocuments.GetDocumentBuiltType(document);
     if (targets === BuildType.None) {
         statusBarSimplPlusText.hide();
         return;
