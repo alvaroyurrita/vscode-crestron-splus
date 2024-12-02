@@ -10,7 +10,7 @@ import {
 } from "vscode";
 import { TaskCreator, TaskArguments } from "./taskCreator";
 import path from "path";
-import * as fsWrapper from './fsWrapper';
+import * as fsExistsWrapper from './fsExistsSyncWrapper';
 
 export function simplPlusIncludeLibraryTasks(): Task[] {
     let tasks: Task[] = [];
@@ -35,7 +35,7 @@ export function simplPlusIncludeLibraryTasks(): Task[] {
             if (extensionPath === undefined) { return emptyTasks; }
             const simpPlusApiGeneratorPath = path.join(extensionPath, "ApiGenerator", "SimplPlusApiGenerator.exe");
 
-            if (fsWrapper.existsSync(libraryClzDir)) {
+            if (fsExistsWrapper.existsSyncWrapper(libraryClzDir)) {
                 let buildCommand = `\"${simpPlusApiGeneratorPath}" \"${libraryClzDir}\" \"${simplDirectory}\"`;
 
                 const taskProperties: TaskArguments = {

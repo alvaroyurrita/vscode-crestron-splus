@@ -18,44 +18,45 @@
     "Snippets",
     "Formatters"
   ],
-  "activationEvents": [
-    "onCommand:workbench.action.tasks.runTask"
-  ],
   "main": "out/extension.js",
   "contributes": {
     "commands": [
       {
         "command": "simpl-plus.localHelp",
-        "title": "Open S+ Help Reference"
+        "title": "SIMPL+: Open S+ Help Reference"
       },
       {
         "command": "simpl-plus.webHelp",
-        "title": "Open S+ Online Reference"
+        "title": "SIMPL+: Open S+ Online Reference"
+      },
+      {
+        "command": "simpl-plus.build",
+        "title": "SIMPL+: Build SIMPL+ Project"
       }
     ],
     "configuration": [
       {
-        "title": "simpl-plus",
+        "title": "SIMPL+",
         "properties": {
           "simpl-plus.simplDirectory": {
             "type": "string",
             "default": "C:\\Program Files (x86)\\Crestron\\Simpl",
-            "description": "Location of the Crestron SIMPL Directory. Please use double \\\\ for the path."
+            "description": "Location of the Crestron SIMPL Directory."
           },
           "simpl-plus.enable2series": {
             "type": "boolean",
             "default": false,
-            "description": "Enable 2-Series target for build tasks"
+            "description": "Default Build Target to Series 2 for new or unknown SIMPL+ files"
           },
           "simpl-plus.enable3series": {
             "type": "boolean",
             "default": true,
-            "description": "Enable 3-Series target for build tasks"
+            "description": "Default Build Target to Series 3 for new or unknown SIMPL+ files"
           },
           "simpl-plus.enable4series": {
             "type": "boolean",
-            "default": false,
-            "description": "Enable 4-Series target for build tasks"
+            "default": true,
+            "description": "Default Build Target to Series 4 for new or unknown SIMPL+ files"
           }
         }
       }
@@ -65,12 +66,12 @@
         {
           "command": "simpl-plus.localHelp",
           "group": "navigation@1",
-          "when": "resourceLangId == simpl-plus-source"
+          "when": "resourceLangId == simpl-plus"
         },
         {
           "command": "simpl-plus.webHelp",
           "group": "navigation@2",
-          "when": "resourceLangId == simpl-plus-source"
+          "when": "resourceLangId == simpl-plus"
         }
       ]
     },
@@ -78,12 +79,17 @@
       {
         "command": "simpl-plus.localHelp",
         "key": "ctrl+shift+f1",
-        "when": "resourceLangId == simpl-plus-source"
+        "when": "resourceLangId == simpl-plus"
       },
       {
         "command": "simpl-plus.webHelp",
         "key": "ctrl+shift+f2",
-        "when": "resourceLangId == simpl-plus-source"
+        "when": "resourceLangId == simpl-plus"
+      },
+      {
+        "command": "simpl-plus.build",
+        "key": "F12",
+        "when": "resourceLangId == simpl-plus"
       }
     ],
     "languages": [
@@ -91,7 +97,7 @@
         "aliases": [
           "SIMPL+"
         ],
-        "id": "simpl-plus-source",
+        "id": "simpl-plus",
         "extensions": [
           ".usp",
           ".usl",
@@ -108,7 +114,7 @@
         "aliases": [
           "SIMPL# API"
         ],
-        "id": "simpl-sharp-api-source",
+        "id": "simpl-sharp-api",
         "extensions": [
           ".api"
         ],
@@ -119,27 +125,50 @@
         "configuration": "./language-configuration.json"
       }
     ],
+    "icons": {
+      "target-two": {
+        "description": "Simpl Plus Target Series 2",
+        "default": {
+          "fontPath": "./icons/simpl-plus-targets.woff",
+          "fontCharacter": "\\20"
+        }
+      },
+      "target-three": {
+        "description": "Simpl Plus Target Series 3",
+        "default": {
+          "fontPath": "./icons/simpl-plus-targets.woff",
+          "fontCharacter": "\\21"
+        }
+      },
+      "target-four": {
+        "description": "Simpl Plus Target Series 4",
+        "default": {
+          "fontPath": "./icons/simpl-plus-targets.woff",
+          "fontCharacter": "\\22"
+        }
+      }
+    },
     "grammars": [
       {
-        "language": "simpl-plus-source",
+        "language": "simpl-plus",
         "scopeName": "source.simpl-plus",
         "path": "./syntaxes/simpl-plus.tmLanguage.json"
       },
       {
-        "language": "simpl-sharp-api-source",
+        "language": "simpl-sharp-api",
         "scopeName": "source.simpl-sharp-api",
         "path": "./syntaxes/simpl-sharp-api.tmLanguage.json"
       }
     ],
     "snippets": [
       {
-        "language": "simpl-plus-source",
+        "language": "simpl-plus",
         "path": "./snippets/snippets.json"
       }
     ],
     "taskDefinitions": [
       {
-        "type": "simpl-plus-source",
+        "type": "simpl-plus",
         "properties": {
           "label": {
             "type": "string"
@@ -163,7 +192,7 @@
       }
     ],
     "configurationDefaults": {
-      "[simpl-plus-source]": {
+      "[simpl-plus]": {
         "editor.wordBasedSuggestions": "currentDocument",
         "editor.suggest.snippetsPreventQuickSuggestions": false,
         "editor.quickSuggestions": {

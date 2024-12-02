@@ -5,14 +5,15 @@ import {
     window,
     commands,
     env,
-    Uri
+    Uri,
 } from "vscode";
 
-import { SimplPlusFormattingProvider } from './SimplPlusFormattingProvider';
+import { SimplPlusFormattingProvider } from './simplPlusFormattingProvider';
 import { SimplPlusHoverProvider } from "./simplPlusHoverProvider";
+import { buildExtensionTasks, clearExtensionTasks, } from './buildExtensionTasks';
+import { simplPlusCompileCurrent } from './simplPlusCompileTasks';
+import { SimplPlusStatusBar } from "./simplPlusStatusBar";
 
-
-import { buildExtensionTasks, clearExtensionTasks } from './buildExtensionTasks';
 
 // Creates a terminal, calls the command, then closes the terminal
 function callShellCommand(shellCommand: string): void {
@@ -30,33 +31,46 @@ export async function activate(context: ExtensionContext) {
     //     commands.executeCommand("vscode.openFolder", Uri.parse(fileFolder));
     // }
 
+    const simplPlusStatusBar = SimplPlusStatusBar.getInstance(context);
+
 
     let localHelp_command = commands.registerCommand("simpl-plus.localHelp", () => {
         const helpLocation = `${workspace.getConfiguration("simpl-plus").simplDirectory}\\Simpl+lr.chm`;
         callShellCommand(helpLocation);
     });
 
-    let webHelp_command = commands.registerCommand("simpl-plus.webHelp", ()=>{
+    let webHelp_command = commands.registerCommand("simpl-plus.webHelp", () => {
         env.openExternal(Uri.parse('https://help.crestron.com/simpl_plus'));
     });
 
+    let build_command = commands.registerCommand("simpl-plus.build", () => {
+        const activeEditor = window.activeTextEditor;
+        if (activeEditor !== undefined) {
+            const currentBuildTargets = simplPlusStatusBar.GetDocumentBuildTargets(activeEditor.document);
+            simplPlusCompileCurrent(currentBuildTargets);
+        }
+    });
+
     let thisFormatProvider = new SimplPlusFormattingProvider();
-    const formatProvider = languages.registerDocumentFormattingEditProvider({ language: 'simpl-plus-source' }, thisFormatProvider);
+    const formatProvider = languages.registerDocumentFormattingEditProvider({ language: 'simpl-plus' }, thisFormatProvider);
 
     let thisHoverProvider = new SimplPlusHoverProvider();
-    const hoverProvider = languages.registerHoverProvider({ language: 'simpl-plus-source' }, thisHoverProvider);
+    const hoverProvider = languages.registerHoverProvider({ language: 'simpl-plus' }, thisHoverProvider);
 
     context.subscriptions.push(formatProvider);
     context.subscriptions.push(hoverProvider);
     context.subscriptions.push(localHelp_command);
     context.subscriptions.push(webHelp_command);
+    context.subscriptions.push(build_command);
+
 
     workspace.onDidChangeConfiguration(buildExtensionTasks);
     workspace.onDidOpenTextDocument(buildExtensionTasks);
     workspace.onDidSaveTextDocument(buildExtensionTasks);
-    window.onDidChangeActiveTextEditor(buildExtensionTasks);
+
 
     buildExtensionTasks();
+
 }
 
 // this method is called when your extension is deactivated

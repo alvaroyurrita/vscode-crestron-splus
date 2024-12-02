@@ -7,6 +7,7 @@ export default defineConfig({
     workspaceFolder: "./testWorkspace",
     mocha: {
       timeout: 200000,
+
     },
   }],
   coverage: {

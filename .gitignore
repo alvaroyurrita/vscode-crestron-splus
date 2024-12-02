@@ -3,8 +3,7 @@ out/
 node_modules/
 dist/
 coverage/
-# package-lock.json
+package-lock.json
 *.vsix
 SPlsWork/
-.vscode/
 *.ush

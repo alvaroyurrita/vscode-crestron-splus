@@ -1,6 +1,7 @@
 import * as assert from 'assert';
 import * as vscode from 'vscode';
 
+
 suite('default Settings', function () {
     const settingsToTest = [{
         uri: 'simplDirectory',
@@ -13,7 +14,7 @@ suite('default Settings', function () {
         defaultValue: true
     }, {
         uri: 'enable4series',
-        defaultValue: false
+        defaultValue: true
     }];
     const configurationSplus = vscode.workspace.getConfiguration('simpl-plus');
     settingsToTest.forEach(function (setting) {
