@@ -57,7 +57,7 @@ suite("Status Bar ", () => {
         assert.strictEqual(statusBarItem.tooltip, "Click to select SIMPL+ compilation targets");
         assert.strictEqual(statusBarItem.command, "simpl-plus.showQuickPick");
         statusBarSpy.restore();
-        fakeReadFile.resetBehavior();
-        fsExistSyncStub.resetBehavior();
+        fakeReadFile.restore();
+        fsExistSyncStub.restore();
     });
 });

@@ -12,93 +12,101 @@ import {
 import { SimplPlusActiveDocuments } from "./simplPlusActiveDocuments";
 import { BuildType } from './build-type';
 
-let _simplPlusDocuments: SimplPlusActiveDocuments;
-let _statusBar: StatusBarItem;
+export class SimplPlusStatusBar {
+    private _statusBar: StatusBarItem;
+    public static instance: SimplPlusStatusBar;
+    private _simplPlusDocuments;
 
-export function register(ctx?: ExtensionContext) {
+    public static getInstance(ctx?: ExtensionContext): SimplPlusStatusBar {
+        if (!SimplPlusStatusBar.instance && ctx) {
+            SimplPlusStatusBar.instance = new SimplPlusStatusBar(ctx);
+        }
+        return SimplPlusStatusBar.instance;
+    }
 
-    _statusBar = window.createStatusBarItem(StatusBarAlignment.Right, 100);
-    _statusBar.text = "SIMPL+";
-    _statusBar.tooltip = "Click to select SIMPL+ compilation targets";
-    _statusBar.command = "simpl-plus.showQuickPick";
-    _simplPlusDocuments = new SimplPlusActiveDocuments();
+    private constructor(ctx?: ExtensionContext) {
+        this._statusBar = window.createStatusBarItem(StatusBarAlignment.Right, 100);
+        this._statusBar.text = "SIMPL+";
+        this._statusBar.tooltip = "Click to select SIMPL+ compilation targets";
+        this._statusBar.command = "simpl-plus.showQuickPick";
+        this._simplPlusDocuments = new SimplPlusActiveDocuments();
 
 
-    let showQuickPick_command = commands.registerCommand("simpl-plus.showQuickPick", showQuickPick);
+        let showQuickPick_command = commands.registerCommand("simpl-plus.showQuickPick", async () => this.showQuickPick());
 
-    let onOpenTextDocument_event = workspace.onDidOpenTextDocument(updateOnOpenTextDocument);
-    let onChangeActiveTextEditor_event = window.onDidChangeActiveTextEditor(updateOnChangeActiveTextEditor);
-    let onCloseTextDocument_event = workspace.onDidCloseTextDocument(updateOnCloseTextDocument);
+        let onOpenTextDocument_event = workspace.onDidOpenTextDocument((document)=> this.updateOnOpenTextDocument(document));
+        let onChangeActiveTextEditor_event = window.onDidChangeActiveTextEditor((editor)=>this.updateOnChangeActiveTextEditor(editor));
+        let onCloseTextDocument_event = workspace.onDidCloseTextDocument((document)=>this.updateOnCloseTextDocument(document));
 
     ctx?.subscriptions.push(
         showQuickPick_command,
         onOpenTextDocument_event,
         onChangeActiveTextEditor_event,
         onCloseTextDocument_event,
-        _statusBar,
-        _simplPlusDocuments
+            this._statusBar,
+            this._simplPlusDocuments
     );
 
 
     const activeEditor = window.activeTextEditor;
     if (activeEditor === undefined || activeEditor.document.languageId !== "simpl-plus") {
-        updateBuildTargetsStatusBar(BuildType.None);
+            this.updateBuildTargetsStatusBar(BuildType.None);
         return;
     }
 
-    const currentBuildTargets = _simplPlusDocuments.GetSimplPlusDocumentBuildTargets(activeEditor.document);
-    updateBuildTargetsStatusBar(currentBuildTargets);
+        const currentBuildTargets = this._simplPlusDocuments.GetSimplPlusDocumentBuildTargets(activeEditor.document);
+        this.updateBuildTargetsStatusBar(currentBuildTargets);
 }
 
-async function showQuickPick() {
+    private async showQuickPick() {
     const activeEditor = window.activeTextEditor;
     if (activeEditor !== undefined) {
-        const currentBuildTargets = _simplPlusDocuments.GetSimplPlusDocumentBuildTargets(activeEditor.document);
-        const newBuildTargets = await showBuildTargetsQuickPick(currentBuildTargets);
+            const currentBuildTargets = this._simplPlusDocuments.GetSimplPlusDocumentBuildTargets(activeEditor.document);
+            const newBuildTargets = await this.showBuildTargetsQuickPick(currentBuildTargets);
         if (newBuildTargets === undefined) { return; }
-        const updatedBuildTargets = _simplPlusDocuments.UpdateSimpPlusDocumentBuildTargets(activeEditor.document, newBuildTargets);
+            const updatedBuildTargets = this._simplPlusDocuments.UpdateSimpPlusDocumentBuildTargets(activeEditor.document, newBuildTargets);
         if (updatedBuildTargets === undefined) { return; }
-        updateBuildTargetsStatusBar(updatedBuildTargets);
+            this.updateBuildTargetsStatusBar(updatedBuildTargets);
     }
 }
 
-function updateOnCloseTextDocument(document: TextDocument) {
+    private updateOnCloseTextDocument(document: TextDocument) {
     if (document.languageId !== "simpl-plus") {
         return;
     }
-    _simplPlusDocuments.RemoveSimpPlusDocument(document);
+        this._simplPlusDocuments.RemoveSimpPlusDocument(document);
 }
-function updateOnChangeActiveTextEditor(editor: TextEditor | undefined) {
+    private updateOnChangeActiveTextEditor(editor: TextEditor | undefined) {
     if (editor === undefined || editor.document.languageId !== "simpl-plus") {
-        updateBuildTargetsStatusBar(BuildType.None);
+            this.updateBuildTargetsStatusBar(BuildType.None);
         return;
     }
-    const currentBuildTargets = _simplPlusDocuments.GetSimplPlusDocumentBuildTargets(editor.document);
-    updateBuildTargetsStatusBar(currentBuildTargets);
+        const currentBuildTargets = this._simplPlusDocuments.GetSimplPlusDocumentBuildTargets(editor.document);
+        this.updateBuildTargetsStatusBar(currentBuildTargets);
 };
-function updateOnOpenTextDocument(document: TextDocument) {
+    private updateOnOpenTextDocument(document: TextDocument) {
     if (document.languageId !== "simpl-plus") {
-        updateBuildTargetsStatusBar(BuildType.None);
+            this.updateBuildTargetsStatusBar(BuildType.None);
         return;
     }
-    const currentBuildTargets = _simplPlusDocuments.GetSimplPlusDocumentBuildTargets(document);
-    updateBuildTargetsStatusBar(currentBuildTargets);
+        const currentBuildTargets = this._simplPlusDocuments.GetSimplPlusDocumentBuildTargets(document);
+        this.updateBuildTargetsStatusBar(currentBuildTargets);
 }
 
-function updateBuildTargetsStatusBar(targets: BuildType): void {
+    private updateBuildTargetsStatusBar(targets: BuildType): void {
     if (targets === BuildType.None) {
-        _statusBar.hide();
+            this._statusBar.hide();
         return;
     }
     let buildTasks = "";
     buildTasks = buildTasks.concat((targets & BuildType.Series2) === BuildType.Series2 ? "$(target-two)" : "");
     buildTasks = buildTasks.concat((targets & BuildType.Series3) === BuildType.Series3 ? "$(target-three)" : "");
     buildTasks = buildTasks.concat((targets & BuildType.Series4) === BuildType.Series4 ? "$(target-four)" : "");
-    _statusBar.text = `Targets: ${buildTasks}`;
-    _statusBar.show();
+        this._statusBar.text = `Targets: ${buildTasks}`;
+        this._statusBar.show();
 }
 
-async function showBuildTargetsQuickPick(currentTypes: BuildType): Promise<BuildType | undefined> {
+    private async showBuildTargetsQuickPick(currentTypes: BuildType): Promise<BuildType | undefined> {
     const simplConfig = workspace.getConfiguration("simpl-plus");
     const quickPickItems: QuickPickItem[] = [
         { label: "2-Series", description: "Control System Target", picked: (currentTypes & BuildType.Series2) === BuildType.Series2 },
@@ -120,6 +128,7 @@ async function showBuildTargetsQuickPick(currentTypes: BuildType): Promise<Build
     return undefined;
 }
 
-export function GetDocumentBuildTargets(document: TextDocument | undefined): BuildType {
-    return _simplPlusDocuments.GetSimplPlusDocumentBuildTargets(document);
+    public GetDocumentBuildTargets(document: TextDocument | undefined): BuildType {
+        return this._simplPlusDocuments.GetSimplPlusDocumentBuildTargets(document);
+    }
 }

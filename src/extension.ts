@@ -12,7 +12,7 @@ import { SimplPlusFormattingProvider } from './simplPlusFormattingProvider';
 import { SimplPlusHoverProvider } from "./simplPlusHoverProvider";
 import { buildExtensionTasks, clearExtensionTasks, } from './buildExtensionTasks';
 import { simplPlusCompileCurrent } from './simplPlusCompileTasks';
-import  * as SimplPlusStatusBar from  "./simplPlusStatusBar";
+import { SimplPlusStatusBar } from "./simplPlusStatusBar";
 
 
 // Creates a terminal, calls the command, then closes the terminal
@@ -31,7 +31,7 @@ export async function activate(context: ExtensionContext) {
     //     commands.executeCommand("vscode.openFolder", Uri.parse(fileFolder));
     // }
 
-    SimplPlusStatusBar.register(context);
+    const simplPlusStatusBar = SimplPlusStatusBar.getInstance(context);
 
 
     let localHelp_command = commands.registerCommand("simpl-plus.localHelp", () => {
@@ -46,7 +46,7 @@ export async function activate(context: ExtensionContext) {
     let build_command = commands.registerCommand("simpl-plus.build", () => {
         const activeEditor = window.activeTextEditor;
         if (activeEditor !== undefined) {
-            const currentBuildTargets = SimplPlusStatusBar.GetDocumentBuildTargets(activeEditor.document);
+            const currentBuildTargets = simplPlusStatusBar.GetDocumentBuildTargets(activeEditor.document);
             simplPlusCompileCurrent(currentBuildTargets);
         }
     });

@@ -6,5 +6,4 @@ coverage/
 package-lock.json
 *.vsix
 SPlsWork/
-.vscode/
 *.ush
