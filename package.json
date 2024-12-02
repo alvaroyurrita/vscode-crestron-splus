@@ -32,6 +32,10 @@
       {
         "command": "simpl-plus.build",
         "title": "SIMPL+: Build SIMPL+ Project"
+      }      ,
+      {
+        "command": "simpl-plus.insertCategory",
+        "title": "SIMPL+: Insert #CATEGORY..."
       }
     ],
     "configuration": [
@@ -71,6 +75,11 @@
         {
           "command": "simpl-plus.webHelp",
           "group": "navigation@2",
+          "when": "resourceLangId == simpl-plus"
+        },
+        {
+          "command": "simpl-plus.insertCategory",
+          "group": "navigation@3",
           "when": "resourceLangId == simpl-plus"
         }
       ]

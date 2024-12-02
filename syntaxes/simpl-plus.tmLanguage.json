@@ -30,6 +30,9 @@
         },
         {
           "include": "#preprocessor-single-line"
+        },
+        {
+          "include": "#comment"
         }
       ]
     },
@@ -43,9 +46,6 @@
       },
       "end": "(?<=$)",
       "patterns": [
-        {
-          "include": "#comment"
-        },
         {
           "include": "#preprocessor-define-constant"
         },
@@ -87,6 +87,9 @@
         },
         {
           "include": "#preprocessor-single"
+        },
+        {
+          "include": "#comment"
         }
       ]
     },
@@ -124,6 +127,9 @@
         {
           "match": "(\\G\\\".*?\\\")",
           "name": "string.quoted.double.usp"
+        },
+        {
+          "include": "#comment-single-line"
         }
       ]
     },
@@ -142,6 +148,9 @@
         {
           "match": "\\G([_[:alpha:]][\\#\\$\\_[:alnum:]]*)",
           "name": "entity.name.variable.preprocessor.symbol.usp"
+        },
+        {
+          "include": "#comment-single-line"
         }
       ]
     },
@@ -165,43 +174,49 @@
         {
           "match": "\\G\\\"[0-9]*?\\\"",
           "name": "constant.numeric.category.usp"
+        },
+        {
+          "include": "#comment-single-line"
         }
       ]
     },
     "preprocessor-library": {
-      "begin": "(?ix)\\G\n  \\b((?:(?:user_simplsharp|crestron_simplsharp|user|crestron)_)library)\\b\\s*",
+      "begin": "(?ix)\\G\n  \\b((?:(?:user_simplsharp|crestron_simplsharp|user|crestron)_)library)\\s*\\b",
       "beginCaptures": {
         "1": {
           "patterns": [
             {
-              "match": "(?i)((?:user_simplsharp).*)",
+              "match": "(?i)USER_SIMPLSHARP_LIBRARY",
               "name": "keyword.preprocessor.usersimplsharplibrary.usp"
             },
             {
-              "match": "(?i)((?:crestron_simplsharp).*)",
+              "match": "(?i)CRESTRON_SIMPLSHARP_LIBRARY",
               "name": "keyword.preprocessor.crestronsimplsharplibrary.usp"
             },
             {
-              "match": "(?i)((?:user).*)",
+              "match": "(?i)USER_LIBRARY",
               "name": "keyword.preprocessor.userlibrary.usp"
             },
             {
-              "match": "(?i)((?:crestron).*)",
+              "match": "(?i)crestron_library",
               "name": "keyword.preprocessor.crestronlibrary.usp"
             }
           ]
         }
       },
-      "end": "(?=$)",
+      "end": "(?<=$)",
       "patterns": [
         {
-          "match": "\\G(\\\".*?\\\")",
+          "match": "(\\\".*?\\\")",
           "name": "string.quoted.double.usp"
+        },
+        {
+          "include": "#comment-single-line"
         }
       ]
     },
     "preprocessor-include-path": {
-      "begin": "(?ix)\\G\n  \\b(includepath)\\b\\s* #Directive",
+      "begin": "(?ix)\\G\n  \\b(includepath)\\b #Directive",
       "beginCaptures": {
         "1": {
           "name": "keyword.preprocessor.includepath.usp"
@@ -212,6 +227,9 @@
         {
           "match": "\\G(\\\".*?\\\")",
           "name": "string.quoted.double.usp"
+        },
+        {
+          "include": "#comment-single-line"
         }
       ]
     },
@@ -227,6 +245,9 @@
         {
           "match": "\\G(\\\".*?\\\")",
           "name": "string.quoted.double.usp"
+        },
+        {
+          "include": "#comment-single-line"
         }
       ]
     },
@@ -242,6 +263,9 @@
         {
           "match": "\\G(\\\".*?\\\")",
           "name": "string.quoted.double.usp"
+        },
+        {
+          "include": "#comment-single-line"
         }
       ]
     },
@@ -257,6 +281,9 @@
         {
           "match": "\\G(\\\".*?\\\")",
           "name": "string.quoted.double.usp"
+        },
+        {
+          "include": "#comment-single-line"
         }
       ]
     },
@@ -286,6 +313,9 @@
         {
           "match": "(?ix)\\G\n  ([a-z]+)$",
           "name": "keyword.control.option.usp"
+        },
+        {
+          "include": "#comment-single-line"
         }
       ]
     },
@@ -301,6 +331,9 @@
         {
           "match": "\\G[0-9]+",
           "name": "constant.numeric.decimal.usp"
+        },
+        {
+          "include": "#comment-single-line"
         }
       ]
     },
@@ -316,11 +349,14 @@
         {
           "match": "\\G[0-9]+",
           "name": "constant.numeric.decimal.usp"
+        },
+        {
+          "include": "#comment-single-line"
         }
       ]
     },
     "preprocessor-single": {
-      "begin": "(?ix)\\G\n  (?:\\b\n    (?:\n      (print_to_trace)|\n      (enable_dynamic)|\n      (enable_stack_checking)|\n      (large_stack)|\n      (enable_trace)|\n      (encoding_ascii)|\n      (encoding_inherit_from_parent)|\n      (encoding_inherit_from_program)|\n      (encoding_utf16)|\n      (default_nonvolatile)|\n      (default_volatile)|\n      (endif)|\n      (if_series2)|\n      (if_series3)|\n      (if_series4)\n    )\\b)\n    \\s* #Directive",
+      "begin": "(?ix)\\G\n  (?:\\b\n    (?:\n      (print_to_trace)|\n      (enable_dynamic)|\n      (enable_stack_checking)|\n      (large_stack)|\n      (enable_trace)|\n      (encoding_ascii)|\n      (encoding_inherit_from_parent)|\n      (encoding_inherit_from_program)|\n      (encoding_utf16)|\n      (default_nonvolatile)|\n      (default_volatile)|\n      (endif)|\n      (if_series2)|\n      (if_series3)|\n      (if_series4)\n    )\\b)  #Directive",
       "end": "(?=$)",
       "beginCaptures": {
         "1": {
@@ -368,7 +404,12 @@
         "15": {
           "name": "keyword.preprocessor.ifseries4.usp"
         }
-      }
+      },
+      "patterns": [
+        {
+          "include": "#comment-single-line"
+        }
+      ]
     },
     "preprocessor-parameter-properties": {
       "name": "meta.preprocessor.properties.usp",

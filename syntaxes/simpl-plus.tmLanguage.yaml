@@ -18,6 +18,7 @@ repository:
       - include: "#preprocessor-parameter-properties"
       - include: "#preprocessor-block-help"
       - include: "#preprocessor-single-line"
+      - include: "#comment"
   preprocessor-single-line:
     name: meta.preprocessor.usp
     begin: ^\s*(\#)
@@ -26,7 +27,6 @@ repository:
         name: punctuation.separator.hash.usp
     end: (?<=$)
     patterns:
-      - include: "#comment"
       - include: "#preprocessor-define-constant"
       - include: "#preprocessor-if-ifnot-defined"
       - include: "#preprocessor-endif"
@@ -41,6 +41,7 @@ repository:
       - include: "#preprocessor-output-shift"
       - include: "#preprocessor-max-internal-buffer-size"
       - include: "#preprocessor-single"
+      - include: "#comment"
   preprocessor-define-constant:
     begin: |-
       (?ix)\G
@@ -65,6 +66,7 @@ repository:
         name: constant.character.usp
       - match: (\G\".*?\")
         name: string.quoted.double.usp
+      - include: "#comment-single-line"
   preprocessor-if-ifnot-defined:
     begin: |-
       (?ix)\G
@@ -78,6 +80,7 @@ repository:
     patterns:
       - match: \G([_[:alpha:]][\#\$\_[:alnum:]]*)
         name: entity.name.variable.preprocessor.symbol.usp
+      - include: "#comment-single-line"
   preprocessor-endif:
     match: |-
       (?ix)\G
@@ -96,29 +99,31 @@ repository:
     patterns:
       - match: \G\"[0-9]*?\"
         name: constant.numeric.category.usp
+      - include: "#comment-single-line"
   preprocessor-library:
     begin: |-
       (?ix)\G
-        \b((?:(?:user_simplsharp|crestron_simplsharp|user|crestron)_)library)\b\s*
+        \b((?:(?:user_simplsharp|crestron_simplsharp|user|crestron)_)library)\s*\b
     beginCaptures:
       "1":
         patterns:
-          - match: (?i)((?:user_simplsharp).*)
+          - match: (?i)USER_SIMPLSHARP_LIBRARY
             name: keyword.preprocessor.usersimplsharplibrary.usp
-          - match: (?i)((?:crestron_simplsharp).*)
+          - match: (?i)CRESTRON_SIMPLSHARP_LIBRARY
             name: keyword.preprocessor.crestronsimplsharplibrary.usp
-          - match: (?i)((?:user).*)
+          - match: (?i)USER_LIBRARY
             name: keyword.preprocessor.userlibrary.usp
-          - match: (?i)((?:crestron).*)
+          - match: (?i)crestron_library
             name: keyword.preprocessor.crestronlibrary.usp
-    end: (?=$)
+    end: (?<=$)
     patterns:
-      - match: \G(\".*?\")
+      - match: (\".*?\")
         name: string.quoted.double.usp
+      - include: "#comment-single-line"
   preprocessor-include-path:
     begin: |-
       (?ix)\G
-        \b(includepath)\b\s* #Directive
+        \b(includepath)\b #Directive
     beginCaptures:
       "1":
         name: keyword.preprocessor.includepath.usp
@@ -126,6 +131,7 @@ repository:
     patterns:
       - match: \G(\".*?\")
         name: string.quoted.double.usp
+      - include: "#comment-single-line"
   preprocessor-symbol-name:
     begin: |-
       (?ix)\G
@@ -137,6 +143,7 @@ repository:
     patterns:
       - match: \G(\".*?\")
         name: string.quoted.double.usp
+      - include: "#comment-single-line"
   preprocessor-hint:
     begin: |-
       (?ix)\G
@@ -148,6 +155,7 @@ repository:
     patterns:
       - match: \G(\".*?\")
         name: string.quoted.double.usp
+      - include: "#comment-single-line"
   preprocessor-help:
     begin: |-
       (?ix)\G
@@ -159,6 +167,7 @@ repository:
     patterns:
       - match: \G(\".*?\")
         name: string.quoted.double.usp
+      - include: "#comment-single-line"
   preprocessor-default-nonvolatile-volatile:
     match: |-
       (?ix)\G
@@ -183,6 +192,7 @@ repository:
           (?ix)\G
             ([a-z]+)$
         name: keyword.control.option.usp
+      - include: "#comment-single-line"
   preprocessor-output-shift:
     begin: |-
       (?ix)\G
@@ -194,6 +204,7 @@ repository:
     patterns:
       - match: \G[0-9]+
         name: constant.numeric.decimal.usp
+      - include: "#comment-single-line"
   preprocessor-max-internal-buffer-size:
     begin: |-
       (?ix)\G
@@ -205,6 +216,7 @@ repository:
     patterns:
       - match: \G[0-9]+
         name: constant.numeric.decimal.usp
+      - include: "#comment-single-line"
   preprocessor-single:
     begin: |-
       (?ix)\G
@@ -225,8 +237,7 @@ repository:
             (if_series2)|
             (if_series3)|
             (if_series4)
-          )\b)
-          \s* #Directive
+          )\b)  #Directive
     end: (?=$)
     beginCaptures:
       '1':
@@ -259,6 +270,8 @@ repository:
         name: keyword.preprocessor.ifseries3.usp
       '15':
         name: keyword.preprocessor.ifseries4.usp
+    patterns:
+      - include: "#comment-single-line"
   preprocessor-parameter-properties:
     name: meta.preprocessor.properties.usp
     begin: |-
