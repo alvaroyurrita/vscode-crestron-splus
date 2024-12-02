@@ -10,8 +10,7 @@ import {
 
 import { SimplPlusFormattingProvider } from './simplPlusFormattingProvider';
 import { SimplPlusHoverProvider } from "./simplPlusHoverProvider";
-import { buildExtensionTasks, clearExtensionTasks, } from './buildExtensionTasks';
-import { simplPlusCompileCurrent } from './simplPlusCompileTasks';
+import { SimplPlusTasks, } from './simplPlusTasks';
 import { SimplPlusStatusBar } from "./simplPlusStatusBar";
 
 
@@ -32,7 +31,7 @@ export async function activate(context: ExtensionContext) {
     // }
 
     const simplPlusStatusBar = SimplPlusStatusBar.getInstance(context);
-
+    const simplPlusTasks = SimplPlusTasks.getInstance(context);
 
     let localHelp_command = commands.registerCommand("simpl-plus.localHelp", () => {
         const helpLocation = `${workspace.getConfiguration("simpl-plus").simplDirectory}\\Simpl+lr.chm`;
@@ -47,7 +46,7 @@ export async function activate(context: ExtensionContext) {
         const activeEditor = window.activeTextEditor;
         if (activeEditor !== undefined) {
             const currentBuildTargets = simplPlusStatusBar.GetDocumentBuildTargets(activeEditor.document);
-            simplPlusCompileCurrent(currentBuildTargets);
+            simplPlusTasks.simplPlusCompileCurrent(currentBuildTargets);
         }
     });
 
@@ -57,25 +56,14 @@ export async function activate(context: ExtensionContext) {
     let thisHoverProvider = new SimplPlusHoverProvider();
     const hoverProvider = languages.registerHoverProvider({ language: 'simpl-plus' }, thisHoverProvider);
 
-    context.subscriptions.push(formatProvider);
-    context.subscriptions.push(hoverProvider);
-    context.subscriptions.push(localHelp_command);
-    context.subscriptions.push(webHelp_command);
-    context.subscriptions.push(build_command);
-
-
-    workspace.onDidChangeConfiguration(buildExtensionTasks);
-    workspace.onDidOpenTextDocument(buildExtensionTasks);
-    workspace.onDidSaveTextDocument(buildExtensionTasks);
-
-
-    buildExtensionTasks();
-
-}
-
-// this method is called when your extension is deactivated
-export function deactivate(): void {
-    clearExtensionTasks();
+    context.subscriptions.push(
+        formatProvider,
+        hoverProvider,
+        localHelp_command,
+        webHelp_command,
+        build_command,
+        simplPlusTasks
+    );
 }
 
 
