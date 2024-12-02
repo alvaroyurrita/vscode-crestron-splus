@@ -4,6 +4,15 @@
 
 // Single Line Comment
 
+//region test
+#DEFINE_CONSTANT HELLO 534343 //test
+#DEFINE_CONSTANT HELLO2 "Something"
+#DEFINE_CONSTANT HELLO3 0x03
+#DEFINE_CONSTANT HELLO4 'A'
+
+
+//endregion
+
 #IF_DEFINED dfdfdf //test
 
 #ENDIF
