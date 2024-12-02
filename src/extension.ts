@@ -12,6 +12,7 @@ import { SimplPlusFormattingProvider } from './simplPlusFormattingProvider';
 import { SimplPlusHoverProvider } from "./simplPlusHoverProvider";
 import { SimplPlusTasks, } from './simplPlusTasks';
 import { SimplPlusStatusBar } from "./simplPlusStatusBar";
+import { insertCategory } from "./simplPlusCategories";
 
 
 // Creates a terminal, calls the command, then closes the terminal
@@ -42,6 +43,10 @@ export async function activate(context: ExtensionContext) {
         env.openExternal(Uri.parse('https://help.crestron.com/simpl_plus'));
     });
 
+    let showCategories_command = commands.registerCommand("simpl-plus.insertCategory", () => {
+        insertCategory();
+    });
+
     let build_command = commands.registerCommand("simpl-plus.build", () => {
         const activeEditor = window.activeTextEditor;
         if (activeEditor !== undefined) {
@@ -62,6 +67,7 @@ export async function activate(context: ExtensionContext) {
         localHelp_command,
         webHelp_command,
         build_command,
+        showCategories_command,
         simplPlusTasks
     );
 }
