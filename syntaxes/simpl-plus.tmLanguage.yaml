@@ -1264,7 +1264,7 @@ repository:
   built-in-constants-file-info:
     match: |-
       (?ix)
-        \b(ARDONLY|AHIDDEN|ASYSTEM|AVOLUME|ADIRENT|ARCHIVE)\b
+        \b(ARDONLY|AHIDDEN|ASYSTEM|AVOLUME|ADIRENT|ARCHIVE|SEEK_SET|SEEK_CUR|SEEK_END)\b
     name: constant.language.file-info.$1.usp
   built-in-constants-boolean:
     match: |-

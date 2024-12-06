@@ -14,6 +14,7 @@ import { SimplPlusTasks, } from './simplPlusTasks';
 import { SimplPlusStatusBar } from "./simplPlusStatusBar";
 import { insertCategory } from "./simplPlusCategories";
 import { ApiCompletionProvider } from "./apiCompletionProvider";
+import { KeywordCompletionProvider } from "./keywordCompletionProvider";
 
 
 // Creates a terminal, calls the command, then closes the terminal
@@ -65,6 +66,9 @@ export async function activate(context: ExtensionContext) {
     let thisApiCompletionProvider = new ApiCompletionProvider();
     const apiCompletionProvider = languages.registerCompletionItemProvider({ language: 'simpl-plus' },thisApiCompletionProvider, '.');
 
+    let thisKeywordCompletionProvider = new KeywordCompletionProvider();
+    const keywordCompletionProvider = languages.registerCompletionItemProvider({ language: 'simpl-plus' }, thisKeywordCompletionProvider);
+
     context.subscriptions.push(
         formatProvider,
         hoverProvider,
@@ -73,8 +77,9 @@ export async function activate(context: ExtensionContext) {
         build_command,
         showCategories_command,
         simplPlusTasks,
-        apiCompletionProvider
-    );
+        apiCompletionProvider,
+        keywordCompletionProvider
+      );
 }
 
 
