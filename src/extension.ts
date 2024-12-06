@@ -13,6 +13,7 @@ import { SimplPlusHoverProvider } from "./simplPlusHoverProvider";
 import { SimplPlusTasks, } from './simplPlusTasks';
 import { SimplPlusStatusBar } from "./simplPlusStatusBar";
 import { insertCategory } from "./simplPlusCategories";
+import { ApiCompletionProvider } from "./apiCompletionProvider";
 
 
 // Creates a terminal, calls the command, then closes the terminal
@@ -61,6 +62,9 @@ export async function activate(context: ExtensionContext) {
     let thisHoverProvider = new SimplPlusHoverProvider();
     const hoverProvider = languages.registerHoverProvider({ language: 'simpl-plus' }, thisHoverProvider);
 
+    let thisApiCompletionProvider = new ApiCompletionProvider();
+    const apiCompletionProvider = languages.registerCompletionItemProvider({ language: 'simpl-plus' },thisApiCompletionProvider, '.');
+
     context.subscriptions.push(
         formatProvider,
         hoverProvider,
@@ -68,7 +72,8 @@ export async function activate(context: ExtensionContext) {
         webHelp_command,
         build_command,
         showCategories_command,
-        simplPlusTasks
+        simplPlusTasks,
+        apiCompletionProvider
     );
 }
 
