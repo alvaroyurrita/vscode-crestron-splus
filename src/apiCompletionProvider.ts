@@ -71,7 +71,7 @@ export class ApiCompletionProvider implements CompletionItemProvider {
         if (tokenParameters.trim().length !== 0) {
             const parameters = tokenParameters.split(",");
             parameters.forEach((parameter, index, parameters) => {
-                const parameterName = parameter.trim().split(" ")[1].trim();
+                const parameterName = parameter.trim().replace(/.*\W(\w+).*/, "$1"); //Grabs las word of the parameter, i.e. parameter name
                 snippetString.appendPlaceholder(parameterName);
                 if (index < parameters.length - 1) {snippetString.appendText(", ");}
             });

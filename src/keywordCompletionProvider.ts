@@ -51,22 +51,29 @@ export class KeywordCompletionProvider implements CompletionItemProvider {
             const helpContentValue = helpContent.value;
             item.documentation = helpContent;
 
-            let helpContentString = convert(helpContentValue, { wordwrap: false }) as string;
-            helpContentString = helpContentString.replace(/\n/g, " ") as string;
-            const parameterRegex = new RegExp(String.raw`${itemLabel}\s*\((.*?)\)`,"i");
-            const parameterMatch = helpContentString.match(parameterRegex);
-            if (parameterMatch && parameterMatch[1]) {
+            const helpContentString = convert(helpContentValue, { wordwrap: false }) as string;
+            const syntaxString = helpContentString.replace(/\n/g,"").match(/Syntax:\s*(.*)\s*Description/i);
+            if (syntaxString && syntaxString[1]) {
                 const snippetString = new SnippetString();
                 snippetString.appendText(itemLabel);
                 snippetString.appendText("(");
-                const parameters = parameterMatch[1].
-                    replace(/\[.*\]/g, "").
-                    split(",");
-                parameters.forEach((parameter, index, parameters) => {
-                    const parameterName = parameter.trim().split(" ")[1].trim();
-                    snippetString.appendPlaceholder(parameterName);
-                    if (index < parameters.length - 1) { snippetString.appendText(", "); }
-                });
+                const parameterRegex = new RegExp(String.raw`${itemLabel}\s*\(([^)]*)`, "i"); //Gather up to closing param of end of line
+                const parameterMatch = syntaxString[1].match(parameterRegex);
+                if (parameterMatch && parameterMatch[1]) {
+                    const parameters = parameterMatch[1].
+                        replace(/\[.*\]/g, "").  //Remove optional parameters
+                        split(",");
+                    parameters.forEach((parameter, index, parameters) => {
+                        const parameterName = parameter.trim().replace(/.*\W(\w+).*/, "$1"); //Grabs las word of the parameter, i.e. parameter name
+                        if (parameterName.length === 0) { return; }
+                        if (index >0 ) { snippetString.appendText(", "); }
+                        snippetString.appendPlaceholder(parameterName);
+                    });
+
+                }
+                else {
+                    snippetString.appendTabstop();
+                }
                 snippetString.appendText(")");
                 item.insertText = snippetString;
             }
