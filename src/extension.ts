@@ -6,6 +6,7 @@ import {
     commands,
     env,
     Uri,
+    DocumentSelector,
 } from "vscode";
 
 import { SimplPlusFormattingProvider } from './simplPlusFormattingProvider';
@@ -15,6 +16,8 @@ import { SimplPlusStatusBar } from "./simplPlusStatusBar";
 import { insertCategory } from "./simplPlusCategories";
 import { ApiCompletionProvider } from "./apiCompletionProvider";
 import { KeywordCompletionProvider } from "./keywordCompletionProvider";
+import { TextMateCompletionProvider } from "./textMateCompletionProvider";
+import { TokenService } from "./tokenService";
 
 
 // Creates a terminal, calls the command, then closes the terminal
@@ -33,7 +36,34 @@ export async function activate(context: ExtensionContext) {
     //     commands.executeCommand("vscode.openFolder", Uri.parse(fileFolder));
     // }
 
-    const simplPlusStatusBar = SimplPlusStatusBar.getInstance(context);
+    const selector: DocumentSelector = 'simpl-plus';
+	// const textmateService = new TextmateLanguageService(selector, context);
+
+    //https://code.visualstudio.com/docs/editor/codebasics#_folding
+	// const foldingRangeProvider = await textmateService.createFoldingRangeProvider();
+    //https://code.visualstudio.com/docs/editor/editingevolved#_go-to-symbol (Activate with Ctrl+Shift+O)
+	// const documentSymbolProvider = await textmateService.createDocumentSymbolProvider();
+    //https://code.visualstudio.com/docs/editor/editingevolved#_open-symbol-by-name (Activate with Ctrl+T)
+	// const workspaceSymbolProvider = await textmateService.createWorkspaceSymbolProvider();
+    ///https://code.visualstudio.com/api/references/vscode-api#DefinitionProvider (Activate with F12)
+	// const definitionProvider = await textmateService.createDefinitionProvider();
+
+    //
+	// context.subscriptions.push(languages.registerDocumentSymbolProvider(selector, documentSymbolProvider));
+	// context.subscriptions.push(languages.registerFoldingRangeProvider(selector, foldingRangeProvider));
+	// context.subscriptions.push(languages.registerWorkspaceSymbolProvider(workspaceSymbolProvider));
+	// context.subscriptions.push(languages.registerDefinitionProvider(selector, definitionProvider));
+
+
+    // const textmateService = new TextmateLanguageService(selector, context);
+    // const textmateTokenService = await textmateService.initTokenService();
+    // const textDocument = window.activeTextEditor!.document;
+    // const tokens = await textmateTokenService.fetch(textDocument);
+
+    const tokenService = TokenService.getInstance(context);
+
+
+    const simplPlusStatusBar =SimplPlusStatusBar.getInstance(context);
     const simplPlusTasks = SimplPlusTasks.getInstance(context);
 
     let localHelp_command = commands.registerCommand("simpl-plus.localHelp", () => {
@@ -64,10 +94,13 @@ export async function activate(context: ExtensionContext) {
     const hoverProvider = languages.registerHoverProvider({ language: 'simpl-plus' }, thisHoverProvider);
 
     let thisApiCompletionProvider = new ApiCompletionProvider();
-    const apiCompletionProvider = languages.registerCompletionItemProvider({ language: 'simpl-plus' },thisApiCompletionProvider, '.');
+    // const apiCompletionProvider = languages.registerCompletionItemProvider({ language: 'simpl-plus' },thisApiCompletionProvider, '.');
 
     let thisKeywordCompletionProvider = new KeywordCompletionProvider();
-    const keywordCompletionProvider = languages.registerCompletionItemProvider({ language: 'simpl-plus' }, thisKeywordCompletionProvider);
+    // const keywordCompletionProvider = languages.registerCompletionItemProvider({ language: 'simpl-plus' }, thisKeywordCompletionProvider);
+
+    let thisTextmateCompletionProvider = new TextMateCompletionProvider();
+    const textMateCompletionProvider = languages.registerCompletionItemProvider({ language: 'simpl-plus' }, thisTextmateCompletionProvider);
 
     context.subscriptions.push(
         formatProvider,
@@ -77,8 +110,9 @@ export async function activate(context: ExtensionContext) {
         build_command,
         showCategories_command,
         simplPlusTasks,
-        apiCompletionProvider,
-        keywordCompletionProvider
+        // apiCompletionProvider,
+        // keywordCompletionProvider,
+        textMateCompletionProvider
       );
 }
 

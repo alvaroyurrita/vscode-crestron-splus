@@ -534,8 +534,9 @@ LONG_INTEGER_FUNCTION LongIntegerFunction1()
 FUNCTION LoopingConstructs()
 {
 	INTEGER a;
-	d = GetEncoding(a,b,3,4,d) + Len(t);
-	
+	INTEGER test;
+	a = GetEncoding(a,b,3,4,d) + Len(t);
+	test = 5;
 	
 	FOR ( a = Len(t) TO Len(t) STEP Len(5) ){
 		PRINT("");

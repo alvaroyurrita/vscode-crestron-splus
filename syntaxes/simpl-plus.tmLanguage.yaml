@@ -52,7 +52,7 @@ repository:
       "1":
         name: keyword.preprocessor.defineconstant.usp
       "2":
-        name: entity.name.variable.preprocessor.symbol.usp
+        name: entity.name.constant.usp
     patterns:
       - match: (\G0[xX])([[:xdigit:]]{1,4})
         captures:
@@ -665,20 +665,21 @@ repository:
           ([_[:alpha:]][\#\$\_[:alnum:]]*)\s*
       beginCaptures:
         '1':
-          name: keyword.type.structure.api
+          name: keyword.type.structure.usp
         '2':
-          name: entity.name.type.structure.api
+          name: entity.name.type.structure.usp
       end: (?=\{)|(?=;)
       patterns:
       - include: "#comment"
     - begin: \{
       beginCaptures:
         '0':
-          name: punctuation.curlybrace.open.api
+          name: punctuation.curlybrace.open.usp
       end: \}
       endCaptures:
         '0':
-          name: punctuation.curlybrace.close.api
+          name: punctuation.curlybrace.close.usp
+      name: meta.block.structure.usp
       patterns:
       - include: "#basic-declaration"
     - include: "#comment"
@@ -737,11 +738,12 @@ repository:
     begin: (?<!\{)\{(?!\{)
     beginCaptures:
       '0':
-        name: punctuation.curlybrace.open.cs
+        name: punctuation.curlybrace.open.api
     end: (?<!\})\}(?!\})
     endCaptures:
       '0':
-        name: punctuation.curlybrace.close.cs
+        name: punctuation.curlybrace.close.api
+    name: meta.block.usp
     patterns:
     - include: "#statement"
     - include: "#variable-declaration"
@@ -843,11 +845,11 @@ repository:
       - begin: \(
         beginCaptures:
           "0":
-            name: punctuation.parenthesis.open.cs
+            name: punctuation.parenthesis.open.api
         end: \)
         endCaptures:
           "0":
-            name: punctuation.parenthesis.close.cs
+            name: punctuation.parenthesis.close.api
         patterns:
           - include: "#expression-no-assignment"
       - include: "#statement"
@@ -858,7 +860,7 @@ repository:
           \b(do)\b
     beginCaptures:
       '1':
-        name: keyword.control.loop.do.cs
+        name: keyword.control.loop.do.api
     end: (?<=\))|(?=;|})
     patterns:
       - include: "#statement"
@@ -869,34 +871,34 @@ repository:
           \b(until)\b\s*(?=\()
     beginCaptures:
       '1':
-        name: keyword.control.loop.until.cs
+        name: keyword.control.loop.until.api
     end: (?<=\))
     patterns:
     - begin: \(
       beginCaptures:
         '0':
-          name: punctuation.parenthesis.open.cs
+          name: punctuation.parenthesis.open.api
       end: \)
       endCaptures:
         '0':
-          name: punctuation.parenthesis.close.cs
+          name: punctuation.parenthesis.close.api
       patterns:
       - include: "#expression-no-assignment"
   for-statement:
     begin: (?i)\b(for)\b
     beginCaptures:
       '1':
-        name: keyword.control.loop.for.cs
+        name: keyword.control.loop.for.api
     end: (?<=\))|(?=;|})
     patterns:
     - begin: \(
       beginCaptures:
         '0':
-          name: punctuation.parenthesis.open-for.cs
+          name: punctuation.parenthesis.open-for.api
       end: \)
       endCaptures:
         '0':
-          name: punctuation.parenthesis.close-for.cs
+          name: punctuation.parenthesis.close-for.api
       patterns:
       - include: "#expression"
   local-variable-declaration:
@@ -956,17 +958,17 @@ repository:
     begin: (?i)(?<!\.)\b(if)\b\s*(?=\()
     beginCaptures:
       '1':
-        name: keyword.control.conditional.if.cs
+        name: keyword.control.conditional.if.api
     end: (?<=})|(?=;)
     patterns:
     - begin: \(
       beginCaptures:
         '0':
-          name: punctuation.parenthesis.open.cs
+          name: punctuation.parenthesis.open.api
       end: \)
       endCaptures:
         '0':
-          name: punctuation.parenthesis.close.cs
+          name: punctuation.parenthesis.close.api
       patterns:
       - include: "#expression-no-assignment"
     - include: "#statement"
@@ -974,7 +976,7 @@ repository:
     begin: (?i)(?<!\.)\b(else)\b
     beginCaptures:
       '1':
-        name: keyword.control.conditional.else.cs
+        name: keyword.control.conditional.else.api
     end: (?<=})|(?=;)
     patterns:
     - include: "#statement"
@@ -982,7 +984,7 @@ repository:
     begin: (?i)(?<!\.)\b(switch|cswitch)\b
     beginCaptures:
       '1':
-        name: keyword.control.conditional.$1.cs
+        name: keyword.control.conditional.$1.api
     end: (?<=})|(?=})
     patterns:
     - include: "#intrusive"
@@ -998,21 +1000,21 @@ repository:
     - begin: \(
       beginCaptures:
         '0':
-          name: punctuation.parenthesis.open.cs
+          name: punctuation.parenthesis.open.api
       end: \)
       endCaptures:
         '0':
-          name: punctuation.parenthesis.close.cs
+          name: punctuation.parenthesis.close.api
       patterns:
       - include: "#expression"
     - begin: \{
       beginCaptures:
         '0':
-          name: punctuation.curlybrace.open.cs
+          name: punctuation.curlybrace.open.api
       end: \}
       endCaptures:
         '0':
-          name: punctuation.curlybrace.close.cs
+          name: punctuation.curlybrace.close.api
       patterns:
       - include: "#switch-label"
       - include: "#statement"
@@ -1020,19 +1022,19 @@ repository:
     begin: (?i)\b(case|default)\b
     beginCaptures:
       '1':
-        name: keyword.control.conditional.$1.cs
+        name: keyword.control.conditional.$1.api
     end: (:)|(?=})
     endCaptures:
       '1':
-        name: punctuation.separator.colon.cs
+        name: punctuation.separator.colon.api
   break-or-continue-statement:
     match: (?i)(?<!\.)\b(break|continue)\b
-    name: keyword.control.flow.$1.cs
+    name: keyword.control.flow.$1.api
   return-statement:
     begin: (?i)(?<!\.)\b(return)\b
     beginCaptures:
       '1':
-        name: keyword.control.flow.return.cs
+        name: keyword.control.flow.return.api
     end: (?=[;}])
     patterns:
     - include: "#expression"
@@ -1044,7 +1046,7 @@ repository:
     begin: (?i)(?<!\.)\b(try)\b
     beginCaptures:
       '1':
-        name: keyword.control.exception.try.cs
+        name: keyword.control.exception.try.api
     end: (?<=\})
     patterns:
     - include: "#comment"
@@ -1053,7 +1055,7 @@ repository:
     begin: (?i)(?<!\.)\b(catch)\b
     beginCaptures:
       '1':
-        name: keyword.control.exception.catch.cs
+        name: keyword.control.exception.catch.api
     end: (?<=\})
     patterns:
     - include: "#comment"
@@ -1316,7 +1318,7 @@ repository:
     begin: (=)
     beginCaptures:
       '1':
-        name: keyword.operator.assignment.cs
+        name: keyword.operator.assignment.api
     end: (?=[,\)\];}])
     patterns:
       - include: "#expression-no-assignment"
@@ -1354,11 +1356,11 @@ repository:
     begin: \(
     beginCaptures:
       '0':
-        name: punctuation.parenthesis.open.cs
+        name: punctuation.parenthesis.open.api
     end: \)
     endCaptures:
       '0':
-        name: punctuation.parenthesis.close.cs
+        name: punctuation.parenthesis.close.api
     patterns:
     - include: "#expression"
 

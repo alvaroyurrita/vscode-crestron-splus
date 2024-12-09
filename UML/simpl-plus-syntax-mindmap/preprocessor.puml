@@ -5,7 +5,7 @@
 preprocessor
 ----
 preprocesor-define-constant
-|= keyword.preprocessor.defineconstant |= entity.name.variable.preprocessor.symbol  |= constant.numeric.hex \n constant.numeric.decimal \n constant.character \n string.quoted.double |
+|= keyword.preprocessor.defineconstant |= entity.name.constant  |= constant.numeric.hex \n constant.numeric.decimal \n constant.character \n string.quoted.double |
 | #DEFINE_CONSTANT  |  name | value |
 ----
 preprocessor-category

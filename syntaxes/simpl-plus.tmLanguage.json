@@ -101,7 +101,7 @@
           "name": "keyword.preprocessor.defineconstant.usp"
         },
         "2": {
-          "name": "entity.name.variable.preprocessor.symbol.usp"
+          "name": "entity.name.constant.usp"
         }
       },
       "patterns": [
@@ -1000,10 +1000,10 @@
           "begin": "(?xi)\n  \\b(structure)\\b\\s+\n  ([_[:alpha:]][\\#\\$\\_[:alnum:]]*)\\s*",
           "beginCaptures": {
             "1": {
-              "name": "keyword.type.structure.api"
+              "name": "keyword.type.structure.usp"
             },
             "2": {
-              "name": "entity.name.type.structure.api"
+              "name": "entity.name.type.structure.usp"
             }
           },
           "end": "(?=\\{)|(?=;)",
@@ -1017,15 +1017,16 @@
           "begin": "\\{",
           "beginCaptures": {
             "0": {
-              "name": "punctuation.curlybrace.open.api"
+              "name": "punctuation.curlybrace.open.usp"
             }
           },
           "end": "\\}",
           "endCaptures": {
             "0": {
-              "name": "punctuation.curlybrace.close.api"
+              "name": "punctuation.curlybrace.close.usp"
             }
           },
+          "name": "meta.block.structure.usp",
           "patterns": [
             {
               "include": "#basic-declaration"
@@ -1119,15 +1120,16 @@
       "begin": "(?<!\\{)\\{(?!\\{)",
       "beginCaptures": {
         "0": {
-          "name": "punctuation.curlybrace.open.cs"
+          "name": "punctuation.curlybrace.open.api"
         }
       },
       "end": "(?<!\\})\\}(?!\\})",
       "endCaptures": {
         "0": {
-          "name": "punctuation.curlybrace.close.cs"
+          "name": "punctuation.curlybrace.close.api"
         }
       },
+      "name": "meta.block.usp",
       "patterns": [
         {
           "include": "#statement"
@@ -1345,13 +1347,13 @@
           "begin": "\\(",
           "beginCaptures": {
             "0": {
-              "name": "punctuation.parenthesis.open.cs"
+              "name": "punctuation.parenthesis.open.api"
             }
           },
           "end": "\\)",
           "endCaptures": {
             "0": {
-              "name": "punctuation.parenthesis.close.cs"
+              "name": "punctuation.parenthesis.close.api"
             }
           },
           "patterns": [
@@ -1372,7 +1374,7 @@
       "begin": "(?xi)\n  \\b(do)\\b",
       "beginCaptures": {
         "1": {
-          "name": "keyword.control.loop.do.cs"
+          "name": "keyword.control.loop.do.api"
         }
       },
       "end": "(?<=\\))|(?=;|})",
@@ -1389,7 +1391,7 @@
       "begin": "(?xi)\n  \\b(until)\\b\\s*(?=\\()",
       "beginCaptures": {
         "1": {
-          "name": "keyword.control.loop.until.cs"
+          "name": "keyword.control.loop.until.api"
         }
       },
       "end": "(?<=\\))",
@@ -1398,13 +1400,13 @@
           "begin": "\\(",
           "beginCaptures": {
             "0": {
-              "name": "punctuation.parenthesis.open.cs"
+              "name": "punctuation.parenthesis.open.api"
             }
           },
           "end": "\\)",
           "endCaptures": {
             "0": {
-              "name": "punctuation.parenthesis.close.cs"
+              "name": "punctuation.parenthesis.close.api"
             }
           },
           "patterns": [
@@ -1419,7 +1421,7 @@
       "begin": "(?i)\\b(for)\\b",
       "beginCaptures": {
         "1": {
-          "name": "keyword.control.loop.for.cs"
+          "name": "keyword.control.loop.for.api"
         }
       },
       "end": "(?<=\\))|(?=;|})",
@@ -1428,13 +1430,13 @@
           "begin": "\\(",
           "beginCaptures": {
             "0": {
-              "name": "punctuation.parenthesis.open-for.cs"
+              "name": "punctuation.parenthesis.open-for.api"
             }
           },
           "end": "\\)",
           "endCaptures": {
             "0": {
-              "name": "punctuation.parenthesis.close-for.cs"
+              "name": "punctuation.parenthesis.close-for.api"
             }
           },
           "patterns": [
@@ -1526,7 +1528,7 @@
       "begin": "(?i)(?<!\\.)\\b(if)\\b\\s*(?=\\()",
       "beginCaptures": {
         "1": {
-          "name": "keyword.control.conditional.if.cs"
+          "name": "keyword.control.conditional.if.api"
         }
       },
       "end": "(?<=})|(?=;)",
@@ -1535,13 +1537,13 @@
           "begin": "\\(",
           "beginCaptures": {
             "0": {
-              "name": "punctuation.parenthesis.open.cs"
+              "name": "punctuation.parenthesis.open.api"
             }
           },
           "end": "\\)",
           "endCaptures": {
             "0": {
-              "name": "punctuation.parenthesis.close.cs"
+              "name": "punctuation.parenthesis.close.api"
             }
           },
           "patterns": [
@@ -1559,7 +1561,7 @@
       "begin": "(?i)(?<!\\.)\\b(else)\\b",
       "beginCaptures": {
         "1": {
-          "name": "keyword.control.conditional.else.cs"
+          "name": "keyword.control.conditional.else.api"
         }
       },
       "end": "(?<=})|(?=;)",
@@ -1573,7 +1575,7 @@
       "begin": "(?i)(?<!\\.)\\b(switch|cswitch)\\b",
       "beginCaptures": {
         "1": {
-          "name": "keyword.control.conditional.$1.cs"
+          "name": "keyword.control.conditional.$1.api"
         }
       },
       "end": "(?<=})|(?=})",
@@ -1605,13 +1607,13 @@
           "begin": "\\(",
           "beginCaptures": {
             "0": {
-              "name": "punctuation.parenthesis.open.cs"
+              "name": "punctuation.parenthesis.open.api"
             }
           },
           "end": "\\)",
           "endCaptures": {
             "0": {
-              "name": "punctuation.parenthesis.close.cs"
+              "name": "punctuation.parenthesis.close.api"
             }
           },
           "patterns": [
@@ -1624,13 +1626,13 @@
           "begin": "\\{",
           "beginCaptures": {
             "0": {
-              "name": "punctuation.curlybrace.open.cs"
+              "name": "punctuation.curlybrace.open.api"
             }
           },
           "end": "\\}",
           "endCaptures": {
             "0": {
-              "name": "punctuation.curlybrace.close.cs"
+              "name": "punctuation.curlybrace.close.api"
             }
           },
           "patterns": [
@@ -1648,25 +1650,25 @@
       "begin": "(?i)\\b(case|default)\\b",
       "beginCaptures": {
         "1": {
-          "name": "keyword.control.conditional.$1.cs"
+          "name": "keyword.control.conditional.$1.api"
         }
       },
       "end": "(:)|(?=})",
       "endCaptures": {
         "1": {
-          "name": "punctuation.separator.colon.cs"
+          "name": "punctuation.separator.colon.api"
         }
       }
     },
     "break-or-continue-statement": {
       "match": "(?i)(?<!\\.)\\b(break|continue)\\b",
-      "name": "keyword.control.flow.$1.cs"
+      "name": "keyword.control.flow.$1.api"
     },
     "return-statement": {
       "begin": "(?i)(?<!\\.)\\b(return)\\b",
       "beginCaptures": {
         "1": {
-          "name": "keyword.control.flow.return.cs"
+          "name": "keyword.control.flow.return.api"
         }
       },
       "end": "(?=[;}])",
@@ -1690,7 +1692,7 @@
       "begin": "(?i)(?<!\\.)\\b(try)\\b",
       "beginCaptures": {
         "1": {
-          "name": "keyword.control.exception.try.cs"
+          "name": "keyword.control.exception.try.api"
         }
       },
       "end": "(?<=\\})",
@@ -1707,7 +1709,7 @@
       "begin": "(?i)(?<!\\.)\\b(catch)\\b",
       "beginCaptures": {
         "1": {
-          "name": "keyword.control.exception.catch.cs"
+          "name": "keyword.control.exception.catch.api"
         }
       },
       "end": "(?<=\\})",
@@ -2019,7 +2021,7 @@
       "name": "constant.language.io.$1.usp"
     },
     "built-in-constants-file-info": {
-      "match": "(?ix)\n  \\b(ARDONLY|AHIDDEN|ASYSTEM|AVOLUME|ADIRENT|ARCHIVE)\\b",
+      "match": "(?ix)\n  \\b(ARDONLY|AHIDDEN|ASYSTEM|AVOLUME|ADIRENT|ARCHIVE|SEEK_SET|SEEK_CUR|SEEK_END)\\b",
       "name": "constant.language.file-info.$1.usp"
     },
     "built-in-constants-boolean": {
@@ -2104,7 +2106,7 @@
       "begin": "(=)",
       "beginCaptures": {
         "1": {
-          "name": "keyword.operator.assignment.cs"
+          "name": "keyword.operator.assignment.api"
         }
       },
       "end": "(?=[,\\)\\];}])",
@@ -2168,13 +2170,13 @@
       "begin": "\\(",
       "beginCaptures": {
         "0": {
-          "name": "punctuation.parenthesis.open.cs"
+          "name": "punctuation.parenthesis.open.api"
         }
       },
       "end": "\\)",
       "endCaptures": {
         "0": {
-          "name": "punctuation.parenthesis.close.cs"
+          "name": "punctuation.parenthesis.close.api"
         }
       },
       "patterns": [

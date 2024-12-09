@@ -1,56 +1,7 @@
 import * as fsExistsWrapper from './fsReadSyncWrapper';
 import { workspace, Uri } from 'vscode';
+import { ClassMembers, Token, FunctionMembers, StructureMembers, TokenType, DocumentMembers } from './tokenTypes';
 
-type  TokenType = "delegate" | "event" | "function" | "property" | "variable" | "delegateProperty" | "class";
-
-type DelegateToken = {
-    name: string;
-    type: TokenType;
-    parameters: string;
-    returnType: string;
-}
-
-type EventToken = {
-    name: string;
-    type: TokenType;
-    parameters: string;
-}
-
-type FunctionToken = {
-    name: string;
-    type: TokenType;
-    parameters: string;
-    returnType: string;
-}
-
-type VariableToken = {
-    name: string;
-    type: TokenType;
-    dataType: string;
-}
-
-type PropertyToken = {
-    name: string;
-    type: TokenType;
-    dataType: string;
-}
-
-type DelegatePropertyToken = {
-    name: string;
-    type: TokenType;
-    dataType: string;
-}
-
-type ClassMembers ={
-    name: string;
-    type: TokenType;
-    delegates: DelegateToken[];
-    events: EventToken[];
-    functions: FunctionToken[];
-    properties: PropertyToken[];
-    variables: VariableToken[];
-    delegateProperties: DelegatePropertyToken[];
-}
 
 export function provideClassTokens(): ClassMembers[] {
 
@@ -61,12 +12,12 @@ export function provideClassTokens(): ClassMembers[] {
     const classTokenMatches = apiDocument.matchAll(/class\s*([_\w][\w]*)\s*{([^}]*)/gm);
     const classMembers: ClassMembers[] = [];
     for (let tokenMatch of classTokenMatches) {
-        let delegates: DelegateToken[] = [];
-        let events: EventToken[] = [];
-        let functions: FunctionToken[] = [];
-        let properties: PropertyToken[] = [];
-        let variables: VariableToken[] = [];
-        let delegateProperties: DelegatePropertyToken[] = [];
+        let delegates: Token[] = [];
+        let events: Token[] = [];
+        let functions: Token[] = [];
+        let properties: Token[] = [];
+        let variables: Token[] = [];
+        let delegateProperties: Token[] = [];
         const delegatesArea = tokenMatch[2].match(/class delegates([^\/]*)/m);
         if (delegatesArea && delegatesArea[1]) {
             delegates = getDelegates(delegatesArea[1]);
@@ -106,8 +57,8 @@ export function provideClassTokens(): ClassMembers[] {
     return classMembers;
 }
 
-function getDelegates(delegatesArea: string) :DelegateToken[] {
-    let delegates: DelegateToken[] = [];
+function getDelegates(delegatesArea: string) :Token[] {
+    let delegates: Token[] = [];
     const classDelegates = delegatesArea.matchAll(/delegate\s*([_\w][\w]*)\s*([_\w][\w]*)\s*\((.*)\)/gm);
     for (let delegate of classDelegates) {
         delegates.push({
@@ -120,8 +71,8 @@ function getDelegates(delegatesArea: string) :DelegateToken[] {
     return delegates;
 }
 
-function getEvents(eventsArea: string): EventToken[] {
-    let events: EventToken[] = [];
+function getEvents(eventsArea: string): Token[] {
+    let events: Token[] = [];
     const classEvents = eventsArea.matchAll(/EventHandler\s*([_\w][\w]*)\s*\((.*)\)/gm);
     for (let event of classEvents) {
         events.push({
@@ -133,8 +84,8 @@ function getEvents(eventsArea: string): EventToken[] {
     return events;
 }
 
-function getFunctions(functionsArea: string): FunctionToken[] {
-    let functions: FunctionToken[] = [];
+function getFunctions(functionsArea: string): Token[] {
+    let functions: Token[] = [];
     const classFunctions = functionsArea.matchAll(/([\w]*)\s*([_\w][\w]*)\s*\((.*)\)/gm);
     for (let func of classFunctions) {
         functions.push({
@@ -147,8 +98,8 @@ function getFunctions(functionsArea: string): FunctionToken[] {
     return functions;
 }
 
-function getVariables(variablesArea: string): VariableToken[] {
-    let variables: VariableToken[] = [];
+function getVariables(variablesArea: string): Token[] {
+    let variables: Token[] = [];
     const classVariables = variablesArea.matchAll(/([\w]*)\s*([_\w][\w\[\]]*)\s*;/gm);
     for (let variable of classVariables) {
         variables.push({
@@ -160,8 +111,8 @@ function getVariables(variablesArea: string): VariableToken[] {
     return variables;
 }
 
-function getProperties(propertiesArea: string): PropertyToken[] {
-    let properties: VariableToken[] = [];
+function getProperties(propertiesArea: string): Token[] {
+    let properties: Token[] = [];
     const classProperties = propertiesArea.matchAll(/(?:([\w]*)\s*)?([\w]*)\s*([_\w][\w\[\]]*)\s*;/gm);
     for (let property of classProperties) {
         if (property[1] !== "") {continue;};
@@ -174,8 +125,8 @@ function getProperties(propertiesArea: string): PropertyToken[] {
     return properties;
 }
 
-function getDelegateProperties(delegatePropertiesArea: string): DelegatePropertyToken[] {
-    let delegateProperties: DelegatePropertyToken[] = [];
+function getDelegateProperties(delegatePropertiesArea: string): Token[] {
+    let delegateProperties: Token[] = [];
     const classProperties = delegatePropertiesArea.matchAll(/(?:([\w]*)\s*)?([\w]*)\s*([_\w][\w\[\]]*)\s*;/gm);
     for (let delegateProperty of classProperties) {
         if (delegateProperty[1] === "") {continue;};
