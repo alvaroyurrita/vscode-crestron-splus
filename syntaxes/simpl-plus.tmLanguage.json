@@ -13,9 +13,6 @@
       "include": "#comment"
     },
     {
-      "include": "#directives"
-    },
-    {
       "include": "#declaration"
     }
   ],
@@ -23,397 +20,231 @@
     "preprocessor": {
       "patterns": [
         {
-          "include": "#preprocessor-parameter-properties"
-        },
-        {
           "include": "#preprocessor-block-help"
         },
         {
-          "include": "#preprocessor-single-line"
+          "include": "#preprocessor-single-directive"
         },
-        {
-          "include": "#comment"
-        }
-      ]
-    },
-    "preprocessor-single-line": {
-      "name": "meta.preprocessor.usp",
-      "begin": "^\\s*(\\#)",
-      "beginCaptures": {
-        "1": {
-          "name": "punctuation.separator.hash.usp"
-        }
-      },
-      "end": "(?<=$)",
-      "patterns": [
         {
           "include": "#preprocessor-define-constant"
         },
         {
-          "include": "#preprocessor-if-ifnot-defined"
-        },
-        {
-          "include": "#preprocessor-endif"
-        },
-        {
-          "include": "#preprocessor-category"
-        },
-        {
-          "include": "#preprocessor-library"
-        },
-        {
-          "include": "#preprocessor-include-path"
-        },
-        {
-          "include": "#preprocessor-symbol-name"
-        },
-        {
-          "include": "#preprocessor-hint"
-        },
-        {
-          "include": "#preprocessor-help"
-        },
-        {
-          "include": "#preprocessor-default-nonvolatile-volatile"
+          "include": "#preprocessor-directive-with-value"
         },
         {
           "include": "#preprocessor-analog-digital-expand"
         },
         {
-          "include": "#preprocessor-output-shift"
+          "include": "#preprocessor-if-ifnot-defined"
         },
         {
-          "include": "#preprocessor-max-internal-buffer-size"
-        },
-        {
-          "include": "#preprocessor-single"
+          "include": "#preprocessor-parameter-properties"
         },
         {
           "include": "#comment"
         }
       ]
     },
-    "preprocessor-define-constant": {
-      "begin": "(?ix)\\G\n  \\b(define_constant)\\b\\s*  #Directive\n  \\b([_[:alpha:]][\\#\\$\\_[:alnum:]]*)\\b\\s* #Constant Name",
-      "end": "(?=$)",
+    "preprocessor-block-help": {
+      "name": "meta.preprocessor.properties.help.usp",
+      "contentName": "comment.block.documentation.usp",
+      "begin": "(?i)(\\#)(help_begin)",
       "beginCaptures": {
         "1": {
-          "name": "keyword.preprocessor.defineconstant.usp"
+          "name": "punctuation.separator.hash.usp"
         },
         "2": {
-          "name": "entity.name.constant.usp"
+          "name": "keyword.preprocessor.$2.usp"
         }
       },
-      "patterns": [
-        {
-          "match": "(\\G0[xX])([[:xdigit:]]{1,4})",
-          "captures": {
-            "1": {
-              "name": "constant.numeric.other.prefix.hex.usp"
-            },
-            "2": {
-              "name": "constant.numeric.hex.usp"
-            }
-          }
-        },
-        {
-          "match": "(\\G[0-9]+)",
-          "name": "constant.numeric.decimal.usp"
-        },
-        {
-          "match": "(\\G\\'.\\')",
-          "name": "constant.character.usp"
-        },
-        {
-          "match": "(\\G\\\".*?\\\")",
-          "name": "string.quoted.double.usp"
-        },
-        {
-          "include": "#comment-single-line"
-        }
-      ]
-    },
-    "preprocessor-if-ifnot-defined": {
-      "begin": "(?ix)\\G\n  \\b(?:(if_defined)|(if_not_defined))\\b\\s* #Directive",
-      "beginCaptures": {
+      "end": "(?i)(\\#)(help_end)",
+      "endCaptures": {
         "1": {
-          "name": "keyword.preprocessor.ifdefined.usp"
+          "name": "punctuation.separator.hash.usp"
         },
         "2": {
-          "name": "keyword.preprocessor.ifnotdefined.usp"
+          "name": "keyword.preprocessor.$2.usp"
         }
       },
-      "end": "(?=$)",
       "patterns": [
         {
-          "match": "\\G([_[:alpha:]][\\#\\$\\_[:alnum:]]*)",
-          "name": "entity.name.variable.preprocessor.symbol.usp"
-        },
-        {
-          "include": "#comment-single-line"
+          "include": "#comment"
         }
       ]
     },
-    "preprocessor-endif": {
-      "match": "(?ix)\\G\n  \\b(endif)\\b #Directive",
-      "captures": {
-        "1": {
-          "name": "keyword.preprocessor.endif.usp"
-        }
-      }
-    },
-    "preprocessor-category": {
-      "begin": "(?ix)\\G\n  \\b(category)\\b\\s* #Directive",
+    "preprocessor-single-directive": {
+      "begin": "(?ix)\n  ^\\s*(\\#)\\s*\n  (PRINT_TO_TRACE|ENABLE_DYNAMIC|ENABLE_STACK_CHECKING|LARGE_STACK|ENABLE_TRACE|ENCODING_ASCII|\n  ENCODING_INHERIT_FROM_PARENT|ENCODING_INHERIT_FROM_PROGRAM|ENCODING_UTF16|DEFAULT_NONVOLATILE|\n  DEFAULT_VOLATILE|ENDIF|IF_SERIES2|IF_SERIES3|IF_SERIES4)",
       "beginCaptures": {
         "1": {
-          "name": "keyword.preprocessor.category.usp"
+          "name": "punctuation.separator.hash.usp"
+        },
+        "2": {
+          "name": "keyword.preprocessor.$2.usp"
         }
       },
-      "end": "(?=$)",
-      "patterns": [
-        {
-          "match": "\\G\\\"[0-9]*?\\\"",
-          "name": "constant.numeric.category.usp"
-        },
-        {
-          "include": "#comment-single-line"
-        }
-      ]
-    },
-    "preprocessor-library": {
-      "begin": "(?ix)\\G\n  \\b((?:(?:user_simplsharp|crestron_simplsharp|user|crestron)_)library)\\s*\\b",
-      "beginCaptures": {
+      "end": "(.*)(?<=$)",
+      "endCaptures": {
         "1": {
           "patterns": [
             {
-              "match": "(?i)USER_SIMPLSHARP_LIBRARY",
-              "name": "keyword.preprocessor.usersimplsharplibrary.usp"
-            },
-            {
-              "match": "(?i)CRESTRON_SIMPLSHARP_LIBRARY",
-              "name": "keyword.preprocessor.crestronsimplsharplibrary.usp"
-            },
-            {
-              "match": "(?i)USER_LIBRARY",
-              "name": "keyword.preprocessor.userlibrary.usp"
-            },
-            {
-              "match": "(?i)crestron_library",
-              "name": "keyword.preprocessor.crestronlibrary.usp"
+              "include": "#comment"
             }
           ]
         }
       },
-      "end": "(?<=$)",
-      "patterns": [
-        {
-          "match": "(\\\".*?\\\")",
-          "name": "string.quoted.double.usp"
-        },
-        {
-          "include": "#comment-single-line"
-        }
-      ]
+      "name": "meta.preprocessor.usp"
     },
-    "preprocessor-include-path": {
-      "begin": "(?ix)\\G\n  \\b(includepath)\\b #Directive",
+    "preprocessor-define-constant": {
+      "begin": "(?ix)\n  ^\\s*(\\#)\\s*\n  (DEFINE_CONSTANT)\\s*  #Directive\n  ([_[:alpha:]][\\#\\$\\_[:alnum:]]*) #Constant Name",
       "beginCaptures": {
         "1": {
-          "name": "keyword.preprocessor.includepath.usp"
-        }
-      },
-      "end": "(?=$)",
-      "patterns": [
-        {
-          "match": "\\G(\\\".*?\\\")",
-          "name": "string.quoted.double.usp"
-        },
-        {
-          "include": "#comment-single-line"
-        }
-      ]
-    },
-    "preprocessor-symbol-name": {
-      "begin": "(?ix)\\G\n  \\b(symbol_name)\\b\\s* #Directive",
-      "beginCaptures": {
-        "1": {
-          "name": "keyword.preprocessor.symbolname.usp"
-        }
-      },
-      "end": "(?=$)",
-      "patterns": [
-        {
-          "match": "\\G(\\\".*?\\\")",
-          "name": "string.quoted.double.usp"
-        },
-        {
-          "include": "#comment-single-line"
-        }
-      ]
-    },
-    "preprocessor-hint": {
-      "begin": "(?ix)\\G\n  \\b(hint)\\b\\s* #Directive",
-      "beginCaptures": {
-        "1": {
-          "name": "keyword.preprocessor.hint.usp"
-        }
-      },
-      "end": "(?=$)",
-      "patterns": [
-        {
-          "match": "\\G(\\\".*?\\\")",
-          "name": "string.quoted.double.usp"
-        },
-        {
-          "include": "#comment-single-line"
-        }
-      ]
-    },
-    "preprocessor-help": {
-      "begin": "(?ix)\\G\n  \\b(help)\\b\\s* #Directive",
-      "beginCaptures": {
-        "1": {
-          "name": "keyword.preprocessor.help.usp"
-        }
-      },
-      "end": "(?=$)",
-      "patterns": [
-        {
-          "match": "\\G(\\\".*?\\\")",
-          "name": "string.quoted.double.usp"
-        },
-        {
-          "include": "#comment-single-line"
-        }
-      ]
-    },
-    "preprocessor-default-nonvolatile-volatile": {
-      "match": "(?ix)\\G\n  \\b(default_nonvolatile)|(default_volatile)\\b #Directive",
-      "captures": {
-        "1": {
-          "name": "keyword.preprocessor.defaultnonvolatile.usp"
+          "name": "punctuation.separator.hash.usp"
         },
         "2": {
-          "name": "keyword.preprocessor.defaultvolatile.usp"
-        }
-      }
-    },
-    "preprocessor-analog-digital-expand": {
-      "begin": "(?ix)\\G\n  \\b(?:(analog_serial_expand)|(digital_expand))\\b\\s* #Directive",
-      "end": "(?=$)",
-      "beginCaptures": {
-        "1": {
-          "name": "keyword.preprocessor.analogserialexpand.usp"
-        },
-        "2": {
-          "name": "keyword.preprocessor.digitalexpand.usp"
-        }
-      },
-      "patterns": [
-        {
-          "match": "(?ix)\\G\n  ([a-z]+)$",
-          "name": "keyword.control.option.usp"
-        },
-        {
-          "include": "#comment-single-line"
-        }
-      ]
-    },
-    "preprocessor-output-shift": {
-      "begin": "(?ix)\\G\n  \\b(output_shift)\\b\\s* #Directive",
-      "end": "(?=$)",
-      "beginCaptures": {
-        "1": {
-          "name": "keyword.preprocessor.outputshift.usp"
-        }
-      },
-      "patterns": [
-        {
-          "match": "\\G[0-9]+",
-          "name": "constant.numeric.decimal.usp"
-        },
-        {
-          "include": "#comment-single-line"
-        }
-      ]
-    },
-    "preprocessor-max-internal-buffer-size": {
-      "begin": "(?ix)\\G\n  \\b(max_internal_buffer_size)\\b\\s* #Directive",
-      "end": "(?=$)",
-      "beginCaptures": {
-        "1": {
-          "name": "keyword.preprocessor.outputshift.usp"
-        }
-      },
-      "patterns": [
-        {
-          "match": "\\G[0-9]+",
-          "name": "constant.numeric.decimal.usp"
-        },
-        {
-          "include": "#comment-single-line"
-        }
-      ]
-    },
-    "preprocessor-single": {
-      "begin": "(?ix)\\G\n  (?:\\b\n    (?:\n      (print_to_trace)|\n      (enable_dynamic)|\n      (enable_stack_checking)|\n      (large_stack)|\n      (enable_trace)|\n      (encoding_ascii)|\n      (encoding_inherit_from_parent)|\n      (encoding_inherit_from_program)|\n      (encoding_utf16)|\n      (default_nonvolatile)|\n      (default_volatile)|\n      (endif)|\n      (if_series2)|\n      (if_series3)|\n      (if_series4)\n    )\\b)  #Directive",
-      "end": "(?=$)",
-      "beginCaptures": {
-        "1": {
-          "name": "keyword.preprocessor.printtotrace.usp"
-        },
-        "2": {
-          "name": "keyword.preprocessor.enabledynamic.usp"
+          "name": "keyword.preprocessor.$2.usp"
         },
         "3": {
-          "name": "keyword.preprocessor.enablestackchecking.usp"
-        },
-        "4": {
-          "name": "keyword.preprocessor.largestack.usp"
-        },
-        "5": {
-          "name": "keyword.preprocessor.enabletrace.usp"
-        },
-        "6": {
-          "name": "keyword.preprocessor.encodingascii.usp"
-        },
-        "7": {
-          "name": "keyword.preprocessor.encodinginheritfromparent.usp"
-        },
-        "8": {
-          "name": "keyword.preprocessor.encodinginheritfromprogram.usp"
-        },
-        "9": {
-          "name": "keyword.preprocessor.encodingutf16.usp"
-        },
-        "10": {
-          "name": "keyword.preprocessor.defaultnonvolatile.usp"
-        },
-        "11": {
-          "name": "keyword.preprocessor.defaultvolatile.usp"
-        },
-        "12": {
-          "name": "keyword.preprocessor.endif.usp"
-        },
-        "13": {
-          "name": "keyword.preprocessor.ifseries2.usp"
-        },
-        "14": {
-          "name": "keyword.preprocessor.ifseries3.usp"
-        },
-        "15": {
-          "name": "keyword.preprocessor.ifseries4.usp"
+          "name": "entity.name.constant.usp"
         }
       },
-      "patterns": [
-        {
-          "include": "#comment-single-line"
+      "end": "(.*)(?=$)",
+      "endCaptures": {
+        "1": {
+          "patterns": [
+            {
+              "match": "(0[xX])([[:xdigit:]]{1,4})",
+              "captures": {
+                "1": {
+                  "name": "constant.numeric.other.prefix.hex.usp"
+                },
+                "2": {
+                  "name": "constant.numeric.hex.usp"
+                }
+              }
+            },
+            {
+              "match": "([0-9]+)",
+              "name": "constant.numeric.decimal.usp"
+            },
+            {
+              "match": "(\\'.\\')",
+              "name": "constant.character.usp"
+            },
+            {
+              "match": "(\\\".*?\\\")",
+              "name": "string.quoted.double.usp"
+            },
+            {
+              "include": "#comment"
+            }
+          ]
         }
-      ]
+      },
+      "name": "meta.preprocessor.usp"
+    },
+    "preprocessor-directive-with-value": {
+      "begin": "(?ix)\n  ^\\s*(\\#)\\s*\n  (CATEGORY|CRESTRON_LIBRARY|USER_LIBRARY|CRESTRON_SIMPLSHARP_LIBRARY|USER_SIMPLSHARP_LIBRARY|INCLUDEPATH|HINT|HELP|SYMBOL_NAME|OUTPUT_SHIFT|MAX_INTERNAL_BUFFER_SIZE)  #Directive",
+      "beginCaptures": {
+        "1": {
+          "name": "punctuation.separator.hash.usp"
+        },
+        "2": {
+          "name": "keyword.preprocessor.$2.usp"
+        },
+        "3": {
+          "name": "entity.name.constant.usp"
+        }
+      },
+      "end": "(.*)(?=$)",
+      "endCaptures": {
+        "1": {
+          "patterns": [
+            {
+              "match": "(0[xX])([[:xdigit:]]{1,4})",
+              "captures": {
+                "1": {
+                  "name": "constant.numeric.other.prefix.hex.usp"
+                },
+                "2": {
+                  "name": "constant.numeric.hex.usp"
+                }
+              }
+            },
+            {
+              "match": "([0-9]+)",
+              "name": "constant.numeric.decimal.usp"
+            },
+            {
+              "match": "(\\'.\\')",
+              "name": "constant.character.usp"
+            },
+            {
+              "match": "(\\\".*?\\\")",
+              "name": "string.quoted.double.usp"
+            },
+            {
+              "include": "#comment"
+            }
+          ]
+        }
+      },
+      "name": "meta.preprocessor.usp"
+    },
+    "preprocessor-analog-digital-expand": {
+      "begin": "(?ix)\n  ^\\s*(\\#)\\s*\n  (analog_serial_expand|digital_expand) #Directive",
+      "beginCaptures": {
+        "1": {
+          "name": "punctuation.separator.hash.usp"
+        },
+        "2": {
+          "name": "keyword.preprocessor.$2.usp"
+        }
+      },
+      "end": "(.*)(?=$)",
+      "endCaptures": {
+        "1": {
+          "patterns": [
+            {
+              "match": "(?ix)\n  (Separately|OutputsWithParams|InputsWithOutputs|InputsWithParams|AllWithAny|PWithIxorO)",
+              "name": "keyword.control.option.$1.usp"
+            },
+            {
+              "include": "#comment"
+            }
+          ]
+        }
+      },
+      "name": "meta.preprocessor.usp"
+    },
+    "preprocessor-if-ifnot-defined": {
+      "begin": "(?ix)\n  ^\\s*(\\#)\\s*\n  (if_defined|if_not_defined)\\s* #Directive",
+      "beginCaptures": {
+        "1": {
+          "name": "punctuation.separator.hash.usp"
+        },
+        "2": {
+          "name": "keyword.preprocessor.$2.usp"
+        }
+      },
+      "end": "(.*)(?=$)",
+      "endCaptures": {
+        "1": {
+          "patterns": [
+            {
+              "match": "([_[:alpha:]][\\#\\$\\_[:alnum:]]*)",
+              "name": "entity.name.variable.preprocessor.symbol.usp"
+            },
+            {
+              "include": "#comment"
+            }
+          ]
+        }
+      },
+      "name": "meta.preprocessor.usp"
     },
     "preprocessor-parameter-properties": {
       "name": "meta.preprocessor.properties.usp",
-      "begin": "(?ix)\n  (\\#)(begin_parameter_properties)\n  (\n    [\\_\\#\\_\\$\\,[:alnum:]\\s]*\n  )? #Parameter Properties Directive",
+      "begin": "(?ix)\n  \\s*(\\#)\\s*\n  (BEGIN_PARAMETER_PROPERTIES)\n  (\n    [\\_\\#\\_\\$\\,[:alnum:]\\s]*\n  )? #Parameter Properties Directive",
       "beginCaptures": {
         "0": {
           "name": "meta.preprocessor.usp"
@@ -436,7 +267,7 @@
           ]
         }
       },
-      "end": "(?ix)\n  (\\#)(END_PARAMETER_PROPERTIES)",
+      "end": "(?ix)\n  \\s*(\\#)\\s*\n  (END_PARAMETER_PROPERTIES)",
       "endCaptures": {
         "0": {
           "name": "meta.preprocessor.usp"
@@ -476,91 +307,97 @@
       ]
     },
     "preprocessor-parameter-properties-valid-unit": {
-      "begin": "(?ix)\n  (\\#)\\b(propValidUnits)\\b #directive",
+      "begin": "(?ix)\n  \\s*(\\#)\\s*\n  (propValidUnits) #directive",
       "beginCaptures": {
-        "0": {
-          "name": "meta.preprocessor.usp"
-        },
         "1": {
           "name": "punctuation.separator.hash.usp"
         },
         "2": {
-          "name": "keyword.preprocessor.propvalidunits.usp"
+          "name": "keyword.preprocessor.$2.usp"
         }
       },
-      "end": "(;)",
+      "end": "(.*)(?=$)",
       "endCaptures": {
         "1": {
-          "name": "punctuation.terminator.parameteryproperty.usp"
+          "patterns": [
+            {
+              "match": "(=)",
+              "name": "punctuation.separator.assignment.usp"
+            },
+            {
+              "include": "#punctuation-pipe"
+            },
+            {
+              "include": "#preprocessor-parameter-units"
+            },
+            {
+              "include": "#comment"
+            }
+          ]
         }
       },
-      "patterns": [
-        {
-          "include": "#punctuation-assignment"
-        },
-        {
-          "include": "#punctuation-pipe"
-        },
-        {
-          "include": "#preprocessor-parameter-units"
-        }
-      ]
+      "name": "meta.preprocessor.usp"
     },
     "preprocessor-parameter-properties-default-unit": {
-      "begin": "(?ix)\n  (\\#)\\b(propDefaultUnits)\\b #directive",
+      "begin": "(?ix)\n  \\s*(\\#)\\s*\n  (propDefaultUnits) #directive",
       "beginCaptures": {
-        "0": {
-          "name": "meta.preprocessor.usp"
-        },
         "1": {
           "name": "punctuation.separator.hash.usp"
         },
         "2": {
-          "name": "keyword.preprocessor.propdefaultunits.usp"
+          "name": "keyword.preprocessor.$2.usp"
         }
       },
-      "end": "(;)",
+      "end": "(.*)(?=$)",
       "endCaptures": {
         "1": {
-          "name": "punctuation.terminator.parameteryproperty.usp"
+          "patterns": [
+            {
+              "match": "(=)",
+              "name": "punctuation.separator.assignment.usp"
+            },
+            {
+              "include": "#preprocessor-parameter-units"
+            },
+            {
+              "include": "#comment"
+            }
+          ]
         }
       },
-      "patterns": [
-        {
-          "include": "#punctuation-assignment"
-        },
-        {
-          "include": "#preprocessor-parameter-units"
-        }
-      ]
+      "name": "meta.preprocessor.usp"
     },
     "preprocessor-parameter-properties-default-value": {
-      "begin": "(?ix)\n  (\\#)\\b(propDefaultValue)\\b #directive",
+      "begin": "(?ix)\n  \\s*(\\#)\\s*\n  (propDefaultValue) #directive",
       "beginCaptures": {
-        "0": {
-          "name": "meta.preprocessor.usp"
-        },
         "1": {
           "name": "punctuation.separator.hash.usp"
         },
         "2": {
-          "name": "keyword.preprocessor.propdefaultunits.usp"
+          "name": "keyword.preprocessor.$2.usp"
         }
       },
-      "end": "(;)",
+      "end": "(.*)(?=$)",
       "endCaptures": {
         "1": {
-          "name": "punctuation.terminator.parameteryproperty.usp"
+          "patterns": [
+            {
+              "match": "(=)",
+              "name": "punctuation.separator.assignment.usp"
+            },
+            {
+              "include": "#preprocessor-property-literals"
+            },
+            {
+              "include": "#comment"
+            }
+          ]
         }
       },
-      "patterns": [
-        {
-          "include": "#preprocessor-property-literals"
-        }
-      ]
+      "name": "meta.preprocessor.usp"
     },
     "preprocessor-parameter-properties-list": {
-      "begin": "(?ix)\n  (\\#)\\b(propList)\\b #directive",
+      "begin": "(?ix)\n  \\s*(\\#)\\s*\n  (propList) #directive",
       "beginCaptures": {
         "0": {
           "name": "meta.preprocessor.usp"
@@ -569,58 +406,63 @@
           "name": "punctuation.separator.hash.usp"
         },
         "2": {
-          "name": "keyword.preprocessor.proplist.usp"
+          "name": "keyword.preprocessor.$2.usp"
         }
       },
-      "end": "(;)",
+      "end": "(.*)(?=$)",
       "endCaptures": {
         "1": {
-          "name": "punctuation.terminator.parameteryproperty.usp"
+          "patterns": [
+            {
+              "match": "(=)",
+              "name": "punctuation.separator.assignment.usp"
+            },
+            {
+              "include": "#preprocessor-property-list-pair"
+            },
+            {
+              "include": "#punctuation-comma"
+            },
+            {
+              "include": "#comment"
+            }
+          ]
         }
       },
-      "patterns": [
-        {
-          "include": "#preprocessor-property-list-pair"
-        },
-        {
-          "include": "#punctuation-comma"
-        }
-      ]
+      "name": "meta.preprocessor.usp"
     },
     "preprocessor-parameter-properties-bounds": {
-      "begin": "(?ix)\n  (\\#)\\b(propBounds)\\b #directive",
+      "begin": "(?ix)\n  \\s*(\\#)\\s*\n  (propUpperBound|propLowerBound) #directive",
       "beginCaptures": {
-        "0": {
-          "name": "meta.preprocessor.usp"
-        },
         "1": {
           "name": "punctuation.separator.hash.usp"
         },
         "2": {
-          "name": "keyword.preprocessor.propBounds.usp"
+          "name": "keyword.preprocessor.$2.usp"
         }
       },
-      "end": "(;)",
+      "end": "(.*)(?=$)",
       "endCaptures": {
         "1": {
-          "name": "punctuation.terminator.parameteryproperty.usp"
+          "patterns": [
+            {
+              "match": "(=)",
+              "name": "punctuation.separator.assignment.usp"
+            },
+            {
+              "include": "#preprocessor-property-literals"
+            },
+            {
+              "include": "#comment"
+            }
+          ]
         }
       },
-      "patterns": [
-        {
-          "include": "#numeric-literal"
-        },
-        {
-          "include": "#punctuation-comma"
-        }
-      ]
+      "name": "meta.preprocessor.usp"
     },
     "preprocessor-parameter-properties-short-description": {
-      "begin": "(?ix)\n  (\\#)\\b(propShortDescription)\\b #directive",
+      "begin": "(?ix)\n  \\s*(\\#)\\s*\n  (propShortDescription) #directive",
       "beginCaptures": {
-        "0": {
-          "name": "meta.preprocessor.usp"
-        },
         "1": {
           "name": "punctuation.separator.hash.usp"
         },
@@ -628,44 +470,20 @@
           "name": "keyword.preprocessor.propShortDescription.usp"
         }
       },
-      "end": "(;)",
+      "end": "(.*)(?=$)",
       "endCaptures": {
         "1": {
-          "name": "punctuation.terminator.parameteryproperty.usp"
+          "patterns": [
+            {
+              "include": "#string-literal"
+            },
+            {
+              "include": "#comment"
+            }
+          ]
         }
       },
-      "patterns": [
-        {
-          "include": "#string-literal"
-        }
-      ]
-    },
-    "preprocessor-block-help": {
-      "name": "meta.preprocessor.properties.help.usp",
-      "contentName": "comment.block.documentation.usp",
-      "begin": "(?i)(\\#)(help_begin)",
-      "beginCaptures": {
-        "1": {
-          "name": "punctuation.separator.hash.usp"
-        },
-        "2": {
-          "name": "keyword.preprocessor.helpbegin.usp"
-        }
-      },
-      "end": "(?i)(\\#)(help_end)",
-      "endCaptures": {
-        "1": {
-          "name": "punctuation.separator.hash.usp"
-        },
-        "2": {
-          "name": "keyword.preprocessor.helpend.usp"
-        }
-      },
-      "patterns": [
-        {
-          "include": "#comment"
-        }
-      ]
+      "name": "meta.preprocessor.usp"
     },
     "preprocessor-properties-block-description-notes": {
       "name": "meta.preprocessor.properties.description.usp",
@@ -825,64 +643,51 @@
     "comment": {
       "patterns": [
         {
-          "include": "#comment-single-line"
+          "name": "comment.line.double-slash.cs",
+          "begin": "(^\\s+)?(//).*$",
+          "while": "^(\\s*)(//).*$",
+          "captures": {
+            "1": {
+              "name": "punctuation.whitespace.comment.leading.cs"
+            },
+            "2": {
+              "name": "punctuation.definition.comment.cs"
+            }
+          }
         },
         {
-          "include": "#comment-block"
-        }
-      ]
-    },
-    "comment-single-line": {
-      "name": "comment.line.double-slash.usp",
-      "begin": "(^\\s+)?(\\/\\/).*$",
-      "while": "^(\\s*)(\\/\\/).*$",
-      "captures": {
-        "1": {
-          "name": "punctuation.whitespace.comment.leading.usp"
-        },
-        "2": {
-          "name": "punctuation.definition.comment.usp"
-        }
-      }
-    },
-    "comment-block": {
-      "name": "comment.block.usp",
-      "begin": "\\/\\*",
-      "end": "\\*\\/",
-      "captures": {
-        "0": {
-          "name": "punctuation.definition.comment.usp"
-        }
-      }
-    },
-    "directives": {
-      "patterns": [
-        {
-          "include": "#punctuation-semicolon"
+          "name": "comment.block.cs",
+          "begin": "/\\*",
+          "end": "\\*/",
+          "captures": {
+            "0": {
+              "name": "punctuation.definition.comment.cs"
+            }
+          }
         }
       ]
     },
     "declaration": {
       "patterns": [
         {
-          "include": "#event-declaration"
-        },
-        {
-          "include": "#basic-declaration"
-        },
-        {
-          "include": "#function-declaration"
+          "include": "#punctuation-semicolon"
         },
         {
           "include": "#structure-declaration"
         },
         {
-          "include": "#punctuation-semicolon"
+          "include": "#event-declaration"
+        },
+        {
+          "include": "#function-declaration"
+        },
+        {
+          "include": "#global-variable-declaration"
         }
       ]
     },
-    "basic-declaration": {
-      "begin": "(?ix)\n  (?:\n    (?:\\b([[:alnum:]]*)\\b\\s+)?           #possibly grab modifier\n    ([_[:alpha:]][\\#\\$\\_[:alnum:]]*)\\s   #grab variable type\n    (\n      (?:[_[:alpha:]][\\#\\$\\_[:alnum:]]*)\\s* #grab variable name\n      (?:(?<array>\\[.*?\\])?)(?:\\g<array>)?  #that possible has an array punctuation series\n    )\n)\n(?=,|;|=|\\))  #stop before a comma, semicolon, assignment operator, or closing parenthesis without grabbing any",
+    "global-variable-declaration": {
+      "begin": "(?ix)\n  (?:\\s*\n    (?:\\b(dynamic|volatile|nonvolatile|ascii|utf16|inherit|delegateproperty)\\b\\s+)?         #possibly grab modifier\n    ([_[:alpha:]][\\#\\$\\_[:alnum:]]*)\\s+   #grab variable type\n    (\n      (?:[_[:alpha:]][\\#\\$\\_[:alnum:]]*)\\s* #grab variable name\n      (?:(?<array>\\[.*?\\])?)(?:\\g<array>)?  #that possible has an array punctuation series\n    )\n)\n(?=,|;|=|\\))  #stop before a comma, semicolon, assignment operator, or closing parenthesis without grabbing any",
       "beginCaptures": {
         "1": {
           "patterns": [
@@ -894,10 +699,11 @@
         "2": {
           "patterns": [
             {
-              "include": "#declaration-keywords"
+              "include": "#global-variable-declaration-keywords"
             },
             {
-              "include": "#type-name"
+              "match": "([_[:alpha:]][\\#\\$\\_[:alnum:]]*)",
+              "name": "entity.name.type.usp"
             }
           ]
         },
@@ -913,6 +719,15 @@
         }
       },
       "end": "(?ix)\n  (\\;)  #stop pattern before the closing curly brace or before semicolon without grabbing any characters",
+      "endCaptures": {
+        "1": {
+          "patterns": [
+            {
+              "include": "#punctuation-semicolon"
+            }
+          ]
+        }
+      },
       "patterns": [
         {
           "include": "#variable-name"
@@ -929,15 +744,18 @@
       ]
     },
     "function-declaration": {
-      "begin": "(?ix)\n  (\\bcallback\\b\\s*)?  # possible grab callback\n  ([_[:alpha:]][\\#\\$\\_[:alnum:]]*)\\s* # grab the built-in function type or\n  ([_[:alpha:]][\\#\\$\\_[:alnum:]]*)\\s* # the function name\n  (?=\\() #and stop before the opening parenthesis",
+      "begin": "(?ix)\\s*\n  (?:\\b(callback)\\b\\s+)?   # possible grab callback\n  ([_[:alpha:]][\\#\\$\\_[:alnum:]]*)\\s* # grab the built-in function type or\n  ([_[:alpha:]][\\#\\$\\_[:alnum:]]*)\\s* # the function name\n  (?=\\() #and stop before the opening parenthesis",
       "beginCaptures": {
+        "0": {
+          "name": "meta.function.declaration.usp"
+        },
         "1": {
           "name": "storage.modifier.callback.usp"
         },
         "2": {
           "patterns": [
             {
-              "include": "#declaration-keywords"
+              "include": "#declaration-keyword-function"
             }
           ]
         },
@@ -945,7 +763,7 @@
           "name": "entity.name.function.usp"
         }
       },
-      "end": "(?ix)\n  (?<=})|(?=;)   #stop pattern after the closing curly bracket or first semicolon without grabbing any characters",
+      "end": "(?ix)\n  (?<=})  #stop pattern after the closing curly bracket without grabbing any characters",
       "patterns": [
         {
           "include": "#comment"
@@ -959,11 +777,11 @@
       ]
     },
     "event-declaration": {
-      "begin": "(?ix)\n  (\\bthreadsafe\\b\\s+)? #Possibly grab threadsafe\n  \\b(push|event|change|release|socketconnect|socketdisconnect|socketreceive|socketstatus)\\b\\s? # grab event type \n  ([_[:alpha:]][\\#\\$\\_[:alnum:]]*)?\\s*         # posibly grab first event name\n(?=,|$|{)  #stop before a comma, end of line or opening curly brace without grabbing any characters",
+      "begin": "(?ix)\n  \\s*\n  (?:\\b(threadsafe)\\b\\s+)?  #Possibly grab threadsafe\n  \\b(push|event|change|release|socketconnect|socketdisconnect|socketreceive|socketstatus)\\b\\s+ # grab event type \n  ([_[:alpha:]][\\#\\$\\_[:alnum:]]*)\\s*         # grab first event name\n(?=,|$|{)  #stop before a comma, end of line or opening curly brace without grabbing any characters",
       "end": "(?ix)\n  (?<=})   #stop pattern after the closing curly bracket or first semicolon without grabbing any characters",
       "beginCaptures": {
         "1": {
-          "name": "storage.modifier.threadsafe.usp"
+          "name": "storage.modifier.$1.usp"
         },
         "2": {
           "name": "keyword.type.$2.usp"
@@ -1020,28 +838,28 @@
               "name": "punctuation.curlybrace.open.usp"
             }
           },
-          "end": "\\}",
+          "end": "(\\})",
           "endCaptures": {
-            "0": {
+            "1": {
               "name": "punctuation.curlybrace.close.usp"
             }
           },
           "name": "meta.block.structure.usp",
           "patterns": [
             {
-              "include": "#basic-declaration"
+              "include": "#structure-members"
             }
           ]
-        },
-        {
-          "include": "#comment"
         }
       ]
     },
     "structure-members": {
       "patterns": [
         {
-          "include": "#variable-declaration"
+          "include": "#local-variable-declaration"
+        },
+        {
+          "include": "#comment"
         }
       ]
     },
@@ -1058,6 +876,7 @@
           "name": "punctuation.parenthesis.close.usp"
         }
       },
+      "name": "meta.parenthesized.parameter-list.usp",
       "patterns": [
         {
           "include": "#comment"
@@ -1116,30 +935,7 @@
         }
       ]
     },
-    "block": {
-      "begin": "(?<!\\{)\\{(?!\\{)",
-      "beginCaptures": {
-        "0": {
-          "name": "punctuation.curlybrace.open.api"
-        }
-      },
-      "end": "(?<!\\})\\}(?!\\})",
-      "endCaptures": {
-        "0": {
-          "name": "punctuation.curlybrace.close.api"
-        }
-      },
-      "name": "meta.block.usp",
-      "patterns": [
-        {
-          "include": "#statement"
-        },
-        {
-          "include": "#variable-declaration"
-        }
-      ]
-    },
-    "declaration-keywords": {
+    "global-variable-declaration-keywords": {
       "patterns": [
         {
           "include": "#declaration-keyword-input"
@@ -1155,15 +951,6 @@
         },
         {
           "include": "#declaration-keyword-parameter"
-        },
-        {
-          "include": "#declaration-keyword-structure"
-        },
-        {
-          "include": "#declaration-keyword-function"
-        },
-        {
-          "include": "#declaration-keyword-eventhandler"
         },
         {
           "include": "#declaration-keyword-variable"
@@ -1194,30 +981,6 @@
         }
       ]
     },
-    "declaration-keyword-structure": {
-      "patterns": [
-        {
-          "match": "(?i)\\b(structure)\\b",
-          "name": "storage.type.$1.usp"
-        }
-      ]
-    },
-    "declaration-keyword-function": {
-      "patterns": [
-        {
-          "match": "(?i)\\b(eventhandler|function|integer_function|string_function|long_integer_function|signed_integer_function|signed_long_integer_function|simplsharpstring_function)\\b",
-          "name": "keyword.type.$1.usp"
-        }
-      ]
-    },
-    "declaration-keyword-eventhandler": {
-      "patterns": [
-        {
-          "match": "(?i)\\b(GatherEventHandler|EventhHandler)\\b",
-          "name": "keyword.type.$1.usp"
-        }
-      ]
-    },
     "declaration-keyword-variable": {
       "patterns": [
         {
@@ -1238,6 +1001,14 @@
       "patterns": [
         {
           "match": "(?i)\\b(tcp_client|tcp_server|udp_socket)\\b",
+          "name": "keyword.type.$1.usp"
+        }
+      ]
+    },
+    "declaration-keyword-function": {
+      "patterns": [
+        {
+          "match": "(?i)\\b(eventhandler|function|integer_function|string_function|long_integer_function|signed_integer_function|signed_long_integer_function|simplsharpstring_function|GatherEventHandler)\\b",
           "name": "keyword.type.$1.usp"
         }
       ]
@@ -1269,6 +1040,26 @@
         }
       ]
     },
+    "block": {
+      "begin": "(?<!\\{)\\{(?!\\{)",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.curlybrace.open.api"
+        }
+      },
+      "end": "(?<!\\})\\}(?!\\})",
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.curlybrace.close.api"
+        }
+      },
+      "name": "meta.block.usp",
+      "patterns": [
+        {
+          "include": "#statement"
+        }
+      ]
+    },
     "statement": {
       "patterns": [
         {
@@ -1285,6 +1076,9 @@
         },
         {
           "include": "#block"
+        },
+        {
+          "include": "#local-variable-declaration"
         },
         {
           "include": "#punctuation-semicolon"
@@ -1444,11 +1238,14 @@
               "include": "#expression"
             }
           ]
+        },
+        {
+          "name": "test.api"
         }
       ]
     },
     "local-variable-declaration": {
-      "begin": "(?ix)\n  (?:\n    (?:\\b([[:alnum:]]*)\\b\\s+)?           #possibly grab modifier\n    ([_[:alpha:]][\\#\\$\\_[:alnum:]]*)\\s   #grab variable type\n    (\n      (?:[_[:alpha:]][\\#\\$\\_[:alnum:]]*)\\s* #grab variable name\n      (?:(?<array>\\[.*?\\])?)(?:\\g<array>)?  #that possible has an array punctuation series\n    )\n)\n(?=,|;|=|\\))  #stop before a comma, semicolon, assignment operator, or closing parenthesis without grabbing any",
+      "begin": "(?ix)\n  (?:\\s*\n    (?:\\b([[:alnum:]]*)\\b\\s+)?            #possibly grab modifier\n    ([_[:alpha:]][\\#\\$\\_[:alnum:]]*)\\s+   #grab variable type\n    (\n      (?:[_[:alpha:]][\\#\\$\\_[:alnum:]]*)\\s* #grab variable name\n      (?:(?<array>\\[.*?\\])?)(?:\\g<array>)?  #that possible has an array punctuation series\n    )\n)\n(?=,|;|=|\\))  #stop before a comma, semicolon, assignment operator, or closing parenthesis without grabbing any",
       "beginCaptures": {
         "1": {
           "patterns": [
@@ -1463,7 +1260,8 @@
               "include": "#local-declaration-keywords"
             },
             {
-              "include": "#type-name"
+              "match": "([_[:alpha:]][\\#\\$\\_[:alnum:]]*)",
+              "name": "entity.name.type.usp"
             }
           ]
         },
@@ -1478,7 +1276,17 @@
           ]
         }
       },
+      "name": "meta.local-variable.declaration.usp",
       "end": "(?ix)\n  (\\;)  #stop pattern before the closing curly brace or before semicolon without grabbing any characters",
+      "endCaptures": {
+        "1": {
+          "patterns": [
+            {
+              "include": "#punctuation-semicolon"
+            }
+          ]
+        }
+      },
       "patterns": [
         {
           "include": "#variable-name"
@@ -1753,6 +1561,9 @@
           "include": "#built-in-constants"
         },
         {
+          "include": "#built-in-looping-keywords"
+        },
+        {
           "include": "#built-in-variables"
         },
         {
@@ -1861,7 +1672,7 @@
       "name": "keyword.support.function.invocation.usp"
     },
     "functions-file": {
-      "match": "(?ix)\n  \\b(FileBOF|FileClose|FileDelete|FileDeleteShared|FileEOF|FileLength|CheckForDisk|GetCurrentDirectory|\n  FileOpen|FileOpenShared|FileRead|FileSeek|FileWrite|FindClose|FindFirst|FindFirstShared|FindNext|\n  IsDirectory|IsHidden|IsReadOnly|IsSystem|IsVolume|MakeDirectory|MakeDirectoryShared|ReadInteger|\n  ReadIntegerArray|ReadLongInteger|ReadLongIntegerArray|ReadSignedInteger|ReadSignedIntegerArray|\n  ReadSignedLongInteger|ReadSignedLongIntegerArray|ReadString|ReadStringArray|CheckForNVRAMDisk|\n  RemoveDirectory|RemoveDirectoryShared|SetCurrentDirectory|StartFileOperations|EndFileOperations|WaitForNewDisk|\n  WriteInteger|WriteIntegerArray|WriteLongInteger|WriteLongIntegerArray|WriteSignedInteger|\n  WriteSignedIntegerArray|WriteSignedLongInteger|WriteSignedLongIntegerArray|WriteString|WriteStringArray)\\b",
+      "match": "(?ix)\n  \\b(FileBOF|FileClose|FileDelete|FileDeleteShared|FileEOF|FileLength|CheckForDisk|GetCurrentDirectory|\n  FileOpen|FileOpenShared|FileRead|FileSeek|FileWrite|FindClose|FindFirst|FindFirstShared|FindNext|\n  IsDirectory|IsHidden|IsReadOnly|IsSystem|IsVolume|MakeDirectory|MakeDirectoryShared|ReadInteger|\n  ReadIntegerArray|ReadLongInteger|ReadLongIntegerArray|ReadSignedInteger|ReadSignedIntegerArray|\n  ReadSignedLongInteger|ReadSignedLongIntegerArray|ReadString|ReadStringArray|CheckForNVRAMDisk|\n  RemoveDirectory|RemoveDirectoryShared|SetCurrentDirectory|StartFileOperations|EndFileOperations|WaitForNewDisk|\n  WriteInteger|WriteIntegerArray|WriteLongInteger|WriteLongIntegerArray|WriteSignedInteger|\n  WriteSignedIntegerArray|WriteSignedLongInteger|WriteSignedLongIntegerArray|WriteString|WriteStringArray|IsNull)\\b",
       "name": "keyword.support.function.invocation.usp"
     },
     "functions-time-and-date": {
@@ -2028,6 +1839,10 @@
       "match": "(?ix)\n  \\b(ON|OFF)\\b",
       "name": "constant.language.boolean.$1.usp"
     },
+    "built-in-looping-keywords": {
+      "match": "(?i)\\b(to|step)\\b",
+      "name": "keyword.control.loop.$1.usp"
+    },
     "type-name": {
       "patterns": [
         {
@@ -2053,8 +1868,8 @@
           }
         },
         {
-          "name": "variable.other.readwrite-ie.usp",
-          "match": "([_[:alpha:]][\\#\\$\\_[:alnum:]]*)(?![<>])"
+          "name": "variable.other.readwrite.usp",
+          "match": "([_[:alpha:]][\\#\\$\\_[:alnum:]]*)"
         }
       ]
     },
@@ -2120,7 +1935,11 @@
       "patterns": [
         {
           "name": "keyword.operator.relational.usp",
-          "match": "<=|>=|<|>|S<=|S>=|S<|S>"
+          "match": "<=|>=|S<=|S>=|S<|S>"
+        },
+        {
+          "match": "(?<!\\<)<(?!\\<)|(?<!\\>)>(?!\\>)",
+          "name": "keyword.operator.relational.usp"
         },
         {
           "name": "keyword.operator.arithmetic.usp",
@@ -2145,10 +1964,6 @@
         {
           "match": "(=)",
           "name": "keyword.operator.comparison.usp"
-        },
-        {
-          "match": "<>",
-          "name": "keyword.operator.relational.usp"
         }
       ]
     },

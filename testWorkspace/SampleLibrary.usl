@@ -34,18 +34,24 @@ UTF16 string Utf16String[10];
 INHERIT STRING InheritString[10];
 STRING InheritString[10][20]; //tes
 
+
 CEvent cEven$_#tClass;
 CMutex cMutexClass;
 
+test test;
+
 STRUCTURE mySruct //test
 {
-	INTEGER Variable#1, _Variable2[4], __Variable3[4][2];
+	INTEGER Variable#1, _Variable2[4], __Variable3[4][2]; //test
 	INTEGER Variable#1, _Variable2[4], __Variable3[4][2];
 	LONG_INTEGER Variable4, Variable5[4], Variable6[4][2];
 	SIGNED_INTEGER Variable7, V$_#ariable8[4], Variable9[4][2];
 	SIGNED_LONG_INTEGER Variable10[4][2];
 	STRING Variable11$[6], Variable11[4][6];
 };
+
+myStruct test;
+
 
 FUNCTION MyFunction(){
 	SIGNED_LONG_INTEGER Variable10[4][2];
@@ -54,6 +60,8 @@ FUNCTION MyFunction(){
 
 INTEGER_FUNCTION MyFunction2(ReadOnlyByRef INTEGER myvar1[], LONG_INTEGER myvar2[], SIGNED_INTEGER myVar3[],  SIGNED_LONG_INTEGER myvar4[], ReadOnlyByRef mySruct myvar5[])
 {
+	myStruct test;
+
 	//statements
 }
 LONG_INTEGER_FUNCTION MyFunction3(INTEGER myvar1[][], LONG_INTEGER myvar2[][], SIGNED_INTEGER myVar3[][],  SIGNED_LONG_INTEGER myvar4[][], mySruct myvar5[])
@@ -62,7 +70,9 @@ LONG_INTEGER_FUNCTION MyFunction3(INTEGER myvar1[][], LONG_INTEGER myvar2[][], S
 }
 SIGNED_INTEGER_FUNCTION MyFunction4(string myvar1, string myvar2[])
 {
-	STRING Variable13$[6], Variable14[4][6];
+	STRING Variable13$[6], Variable14[4][6], test, test[5], test, test;
+	object.objectProperty = variableReadWrite;
+	entityNameType  entityNameVariableLocal; //local declaration
 	MyFunction4(Variable13$, Variable14);
 }
 SIGNED_LONG_INTEGER_FUNCTION MyFunction5()

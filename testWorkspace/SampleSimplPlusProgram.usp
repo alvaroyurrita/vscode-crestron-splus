@@ -1,7 +1,6 @@
-digital_input test;
-
-//#USER_SIMPLSHARP_LIBRARY  "SampleSimplSharpLibrary";
-
-
-//SampleClass TestClass;
-
+FUNCTION LoopingConstructs()
+{
+	FOR 						( to step  a = Len(t) TO Len(t) 					STEP Len(5) ){
+		CONTINUE;
+	}
+}

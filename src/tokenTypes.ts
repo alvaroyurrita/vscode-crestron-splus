@@ -25,25 +25,23 @@ export type StructureMembers ={
     name: string;
     type: TokenType;
     variables: Token[];
+    line?: number;
+    column?: number;
 }
 
 export type FunctionMembers ={
     name: string;
     type: TokenType;
-    parameters: string;
     returnType: string;
     variables: Token[];
+    line?: number;
+    column?: number;
+    parameters?: Token[];
 }
 
 export type DocumentMembers ={
-    classes: ClassMembers[];
     structures: StructureMembers[];
     functions: FunctionMembers[];
-    inputs: Token[];
-    outputs: Token[];
     variables: Token[];
     constants: Token[];
-    events: Token[];
-    enums: Token[];
-
 }

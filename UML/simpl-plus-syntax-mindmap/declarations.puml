@@ -62,7 +62,7 @@ eventhandler:
 ----
 callbacks:
 |= storage.modifier.callback |= keyword.type.{name below} |= entity.name.function | parameters | contents |
-| \n CALLBACK  | FUNCTION\n INTEGER_FUNCTION\n SIGNED_INTEGER_FUNCTION\n LONG_INTEGER_FUNCTION\n SIGNED_LONG_INTEGER_FUNCTION\n STRING_FUNCTION \n SIMPLSHARPSTRING_FUNCTION | \n  name | \n  parenthesized-parameter-list  | \n  {..statements..}  |;
+| \n CALLBACK  | FUNCTION\n INTEGER_FUNCTION\n SIGNED_INTEGER_FUNCTION\n LONG_INTEGER_FUNCTION\n SIGNED_LONG_INTEGER_FUNCTION\n STRING_FUNCTION \n SIMPLSHARPSTRING_FUNCTION \n GatherEventHandler | \n  name | \n  parenthesized-parameter-list  | \n  {..statements..}  |;
 
 **:== Events
 event-declaration
