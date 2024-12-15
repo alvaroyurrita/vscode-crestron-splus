@@ -1,6 +1,12 @@
-FUNCTION LoopingConstructs()
+
+#USER_SIMPLSHARP_LIBRARY "SampleSimplSharpLibrary"
+
+DIGITAL_INPUT Test;
+
+
+SampleClass test2;
+
+push Test
 {
-	FOR 						( to step  a = Len(t) TO Len(t) 					STEP Len(5) ){
-		CONTINUE;
-	}
+	print("Enum Test %i",test2.sampleEnum);
 }

@@ -11,7 +11,7 @@
 * return-statement
 * break-or-continue-statement
 * variable-declaration
-* condtional-compilation
+* conditional-compilation
 * block
 * expression
 * punctuation-semicolon
