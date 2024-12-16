@@ -1,8 +1,8 @@
-import { DocumentSelector, ExtensionContext, TextDocument,  window, workspace, TextDocumentChangeEvent, Position } from "vscode";
+import { DocumentSelector, ExtensionContext, TextDocument, window, workspace, TextDocumentChangeEvent, Position, Range } from "vscode";
 import TextmateLanguageService, { TextmateToken } from "vscode-textmate-languageservice";
-import { DocumentMembers, Token, FunctionMembers, StructureMembers } from "./tokenTypes";
+import { DocumentToken } from "./tokenTypes";
 export class TokenService {
-    private _documents = new Map<string, DocumentMembers>();
+    private _documents = new Map<string, DocumentToken[]>();
     private static _instance: TokenService;
     private selector: DocumentSelector = 'simpl-plus';
     private _textmateService: TextmateLanguageService;
@@ -13,7 +13,7 @@ export class TokenService {
         return TokenService._instance;
     }
 
-    public getDocumentMembers(uri: string): DocumentMembers | undefined {
+    public getDocumentMembers(uri: string): DocumentToken[] | undefined {
         return this._documents.get(uri);
     }
 
@@ -51,68 +51,101 @@ export class TokenService {
         if (document.languageId !== this.selector.toString()) { return; }
         const textmateTokenService = await this._textmateService.initTokenService();
         const tokens = await textmateTokenService.fetch(document);
-        
+
         const structures = this.getGlobalStructures(tokens);
         const constants = this.getGlobalConstants(tokens);
         const variables = this.getGlobalVariables(tokens);
         const functions = this.getGlobalFunctions(tokens);
         const events = this.getGlobalEvents(tokens);
 
-        const documentMembers: DocumentMembers = {
-            structures: structures,
-            functions: functions,
-            variables: variables,
-            constants: constants,
-            events: events,
-        };
-        
+        const documentMembers: DocumentToken[] = structures.
+            concat(constants).
+            concat(variables).
+            concat(functions).
+            concat(events);
+
         this._documents.set(document.uri.toString(), documentMembers);
         console.log(documentMembers);
 
     }
 
-    private getGlobalVariables(tokens: TextmateToken[]): Token[] {
+    private getGlobalVariables(tokens: TextmateToken[]): DocumentToken[] {
         return tokens.filter(token => token.scopes.includes("entity.name.variable.usp")
             && !(token.scopes.includes("meta.block.structure.usp")
                 || token.scopes.includes("meta.block.usp"))).map(token => {
                     const variableType = this.getType(token, tokens);
-                    const variable: Token = {
+                    const variableNameRange = new Range(
+                        new Position(token.line, token.startIndex),
+                        new Position(token.line, token.startIndex + token.text.length)
+                    );
+                    const variable: DocumentToken = {
                         name: token.text,
                         type: "variable",
-                        column: token.startIndex,
-                        line: token.line,
+                        nameRange: variableNameRange,
                         dataType: variableType,
                     };
                     return variable;
                 });
     }
 
-    private getGlobalConstants(tokens: TextmateToken[]): Token[] {
+    private getGlobalConstants(tokens: TextmateToken[]): DocumentToken[] {
         return tokens.filter(token => token.scopes.includes("entity.name.constant.usp")).map(token => {
-            const constant: Token = {
+            const constantNameRange = new Range(
+                new Position(token.line, token.startIndex),
+                new Position(token.line, token.startIndex + token.text.length)
+            );
+            const constantIndex = tokens.indexOf(token);
+            let dataType = "";
+            if (constantIndex + 2 < tokens.length) {
+                const constantValueToken = tokens[constantIndex + 2];
+                switch (constantValueToken.type) {
+                    case "constant.numeric.decimal.usp":
+                    case "constant.numeric.hex.usp":
+                    case "constant.numeric.character.usp":
+                        dataType = "integer";
+                        break;
+                    case "string.quoted.double.usp":
+                        dataType = "string";
+                    default:
+                        break;
+                }
+            }
+            const constant: DocumentToken = {
                 name: token.text,
                 type: "constant",
-                column: token.startIndex,
-                line: token.line,
+                nameRange: constantNameRange,
+                dataType
             };
             return constant;
         });
     }
 
-    private getGlobalFunctions(tokens: TextmateToken[]): FunctionMembers[] {
+    private getGlobalFunctions(tokens: TextmateToken[]): DocumentToken[] {
         return tokens.filter(token => token.scopes.includes("entity.name.function.usp")).map(token => {
+            const functionType = this.getType(token, tokens);
+            const functionNameRange = new Range(
+                new Position(token.line, token.startIndex),
+                new Position(token.line, token.startIndex + token.text.length)
+            );
             //look for function block statement range
-            const functionTokens = this.getBlockRangeTokens(tokens, token,"meta.block.usp");
+            const functionTokens = this.getBlockRangeTokens(tokens, token, "meta.block.usp");
+            const functionBlockRange = new Range(
+                new Position(functionTokens[0].line, functionTokens[0].startIndex),
+                new Position(functionTokens[functionTokens.length - 1].line, functionTokens[functionTokens.length - 1].startIndex + functionTokens[functionTokens.length - 1].text.length)
+            );
             //grab all variables from range
             const functionVariables = functionTokens.
                 filter(token => token.scopes.includes("entity.name.variable.usp")).
                 map(token => {
                     const variableType = this.getType(token, tokens);
-                    const variable: Token = {
+                    const variableNameRange = new Range(
+                        new Position(token.line, token.startIndex),
+                        new Position(token.line, token.startIndex + token.text.length)
+                    );
+                    const variable: DocumentToken = {
                         name: token.text,
                         type: "variable",
-                        column: token.startIndex,
-                        line: token.line,
+                        nameRange: variableNameRange,
                         dataType: variableType,
                     };
                     return variable;
@@ -131,28 +164,122 @@ export class TokenService {
             const functionParameters = tokens.
                 filter(token => (token.line >= functionParameterBeginLine && token.line <= functionParameterEndLine) && token.scopes.includes("entity.name.variable.parameter.usp")).
                 map(token => {
-                    const variableType = this.getType(token, tokens);
-                    const variable: Token = {
+                    const parameterType = this.getType(token, tokens);
+                    const parameterNameRange = new Range(
+                        new Position(token.line, token.startIndex),
+                        new Position(token.line, token.startIndex + token.text.length)
+                    );
+                    const variable: DocumentToken = {
                         name: token.text,
                         type: "variable",
-                        column: token.startIndex,
-                        line: token.line,
+                        nameRange: parameterNameRange,
+                        dataType: parameterType,
+                    };
+                    return variable;
+                });
+            const fun: DocumentToken = {
+                name: token.text,
+                type: "function",
+                nameRange: functionNameRange,
+                dataType: functionType,
+                parameters: functionParameters,
+                blockRange: functionBlockRange,
+                internalVariables: functionVariables,
+            };
+            return fun;
+        });
+    }
+
+    private getGlobalStructures(tokens: TextmateToken[]): DocumentToken[] {
+        return tokens.filter(token => token.scopes.includes("entity.name.type.structure.usp")).map(token => {
+            const structureNameRange = new Range(
+                new Position(token.line, token.startIndex),
+                new Position(token.line, token.startIndex + token.text.length)
+            );
+            //look for structure block statement range
+            const structureTokens = this.getBlockRangeTokens(tokens, token, "meta.block.structure.usp");
+            const structureBlockRange = new Range(
+                new Position(structureTokens[0].line, structureTokens[0].startIndex),
+                new Position(structureTokens[structureTokens.length - 1].line, structureTokens[structureTokens.length - 1].startIndex + structureTokens[structureTokens.length - 1].text.length)
+            );
+            //grab all variables from range
+            const structureVariables = structureTokens.
+                filter(token => token.scopes.includes("entity.name.variable.usp")).
+                map(token => {
+                    const variableType = this.getType(token, tokens);
+                    const variableNameRange = new Range(
+                        new Position(token.line, token.startIndex),
+                        new Position(token.line, token.startIndex + token.text.length)
+                    );
+                    const variable: DocumentToken = {
+                        name: token.text,
+                        type: "variable",
+                        nameRange: variableNameRange,
                         dataType: variableType,
                     };
                     return variable;
                 });
-            const functionType = this.getType(token, tokens);
-            const fun: FunctionMembers = {
+            const struct: DocumentToken = {
                 name: token.text,
-                type: "function",
-                column: token.startIndex,
-                line: token.line,
-                variables: functionVariables,
-                returnType: functionType,
-                parameters: functionParameters,
+                type: "struct",
+                nameRange: structureNameRange,
+                dataType: token.text,
+                blockRange: structureBlockRange,
+                internalVariables: structureVariables,
             };
-            return fun;
+            return struct;
         });
+    }
+
+    private getGlobalEvents(tokens: TextmateToken[]): DocumentToken[] {
+        return tokens.filter(token => token.scopes.includes("entity.name.variable.event.usp")).map(token => {
+            const eventType = this.getType(token, tokens);
+            const eventNameRange = new Range(
+                new Position(token.line, token.startIndex),
+                new Position(token.line, token.startIndex + token.text.length)
+            );
+            //look for event block statement range
+            const eventTokens = this.getBlockRangeTokens(tokens, token, "meta.block.usp");
+            const eventBlockRange = new Range(
+                new Position(eventTokens[0].line, eventTokens[0].startIndex),
+                new Position(eventTokens[eventTokens.length - 1].line, eventTokens[eventTokens.length - 1].startIndex + eventTokens[eventTokens.length - 1].text.length)
+            );
+            //grab all variables from range
+            const eventVariables = eventTokens.
+                filter(token => token.scopes.includes("entity.name.variable.usp")).
+                map(token => {
+                    const variableType = this.getType(token, tokens);
+                    const variableNameRange = new Range(
+                        new Position(token.line, token.startIndex),
+                        new Position(token.line, token.startIndex + token.text.length)
+                    );
+                    const variable: DocumentToken = {
+                        name: token.text,
+                        type: "variable",
+                        nameRange: variableNameRange,
+                        dataType: variableType,
+                    };
+                    return variable;
+                });
+            const event: DocumentToken = {
+                name: token.text,
+                type: "event",
+                nameRange: eventNameRange,
+                dataType: eventType,
+                blockRange: eventBlockRange,
+                internalVariables: eventVariables,
+            };
+            return event;
+        });
+    }
+
+    private getType(token: TextmateToken, tokens: TextmateToken[]): string {
+        let tokenIndex = tokens.indexOf(token);
+        if (tokenIndex < 0) { return ""; }
+        do {
+            --tokenIndex;
+        } while (tokenIndex >= 0 && !(tokens[tokenIndex].type.includes("keyword.type") || tokens[tokenIndex].type.includes("entity.name.type")));
+        return tokens[tokenIndex].text;
     }
 
     private getBlockRangeTokens(tokens: TextmateToken[], token: TextmateToken, scopeName: string): TextmateToken[] {
@@ -169,73 +296,6 @@ export class TokenService {
         } while (functionTokenEnd < tokens.length);
         if (functionTokenEnd >= tokens.length) { return []; }
         return tokens.slice(functionTokenBegin, functionTokenEnd);
-    }
-
-    private getGlobalStructures(tokens: TextmateToken[]): StructureMembers[] {
-        return tokens.filter(token => token.scopes.includes("entity.name.type.structure.usp")).map(token => {
-            //look for structure block statement range
-            const structureTokens = this.getBlockRangeTokens(tokens, token,"meta.block.structure.usp");
-            //grab all variables from range
-            const structureVariables = structureTokens.
-                filter(token =>  token.scopes.includes("entity.name.variable.usp")).
-                map(token => {
-                    const variableType = this.getType(token, tokens);
-                    const variable: Token = {
-                        name: token.text,
-                        type: "variable",
-                        column: token.startIndex,
-                        line: token.line,
-                        dataType: variableType,
-                    };
-                    return variable;
-                });
-            const struct: StructureMembers = {
-                name: token.text,
-                type: "struct",
-                column: token.startIndex,
-                line: token.line,
-                variables: structureVariables,
-            };
-            return struct;
-        });
-    }
-
-    private getGlobalEvents(tokens: TextmateToken[]): StructureMembers[] {
-        return tokens.filter(token => token.scopes.includes("entity.name.variable.event.usp")).map(token => {
-            //look for structure block statement range
-            const structureTokens = this.getBlockRangeTokens(tokens, token,"meta.block.usp");
-            //grab all variables from range
-            const eventVariables = structureTokens.
-                filter(token =>  token.scopes.includes("entity.name.variable.usp")).
-                map(token => {
-                    const variableType = this.getType(token, tokens);
-                    const variable: Token = {
-                        name: token.text,
-                        type: "variable",
-                        column: token.startIndex,
-                        line: token.line,
-                        dataType: variableType,
-                    };
-                    return variable;
-                });
-            const event: StructureMembers = {
-                name: token.text,
-                type: "event",
-                column: token.startIndex,
-                line: token.line,
-                variables: eventVariables,
-            };
-            return event;
-        });
-    }
-
-    private getType(token: TextmateToken, tokens: TextmateToken[]): string {
-        let tokenIndex = tokens.indexOf(token);
-        if (tokenIndex < 0) { return ""; }
-        do {
-            --tokenIndex;
-        } while (tokenIndex >= 0 && !(tokens[tokenIndex].type.includes("keyword.type") || tokens[tokenIndex].type.includes("entity.name.type")));
-        return tokens[tokenIndex].text;
     }
 
 
