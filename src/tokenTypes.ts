@@ -29,6 +29,14 @@ export type StructureMembers ={
     column?: number;
 }
 
+export type EventMembers ={
+    name: string;
+    type: TokenType;
+    variables: Token[];
+    line?: number;
+    column?: number;
+}
+
 export type FunctionMembers ={
     name: string;
     type: TokenType;
@@ -42,6 +50,7 @@ export type FunctionMembers ={
 export type DocumentMembers ={
     structures: StructureMembers[];
     functions: FunctionMembers[];
+    events: EventMembers[];
     variables: Token[];
     constants: Token[];
 }

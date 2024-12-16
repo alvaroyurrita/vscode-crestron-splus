@@ -98,4 +98,23 @@ suite("testing tokenization", function () {
         assert.strictEqual(documentMembers?.functions[0].variables[0].line, 2);
         assert.strictEqual(documentMembers?.functions[0].variables[0].column,13);
     });
+    test("It should have an event with an inside variable", async () => {
+        await OpenAndShowSPlusDocument("push DigitalInput1\n{\nBUFFER_INPUT BufferInput1[20];\n};");
+        await delay(500);
+        const mockExtensionContext = (global as any).testExtensionContext;
+        const tokenService = TokenService.getInstance(mockExtensionContext);
+        const documentMembers = tokenService.getDocumentMembers(vscode.window.activeTextEditor?.document.uri.toString());
+        assert.strictEqual(documentMembers?.events.length, 1);
+        assert.strictEqual(documentMembers?.events[0].name, "DigitalInput1");
+        assert.strictEqual(documentMembers?.events[0].type, "event");
+        assert.strictEqual(documentMembers?.events[0].line, 0);
+        assert.strictEqual(documentMembers?.events[0].column,5);
+
+        assert.strictEqual(documentMembers?.events[0].variables.length, 1);
+        assert.strictEqual(documentMembers?.events[0].variables[0].name, "BufferInput1");
+        assert.strictEqual(documentMembers?.events[0].variables[0].type, "variable");
+        assert.strictEqual(documentMembers?.events[0].variables[0].dataType, "BUFFER_INPUT");
+        assert.strictEqual(documentMembers?.events[0].variables[0].line, 2);
+        assert.strictEqual(documentMembers?.events[0].variables[0].column,13);
+    });
 });

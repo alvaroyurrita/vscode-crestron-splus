@@ -239,7 +239,7 @@ ASCII 							LONG_INTEGER 					Variable4, Variable5[4], Variable6[4][2];
 UTF16 							SIGNED_INTEGER 					Variable7, Variable8[4], Variable9[4][2];
 INHERIT 						SIGNED_LONG_INTEGER 			Variable10, Variable11[4], Variable12[4][2];
 //storage.modifier.{name below}	entity.name.type				entity.name.variable.local
-		mySruct 						internalStruct1, internalStuct2[10];
+								mySruct 						internalStruct1, internalStuct2[10];
 }
 
 //endregion

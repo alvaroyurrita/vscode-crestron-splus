@@ -1,4 +1,4 @@
-import { DocumentSelector, ExtensionContext, TextDocument,  window, workspace, TextDocumentChangeEvent } from "vscode";
+import { DocumentSelector, ExtensionContext, TextDocument,  window, workspace, TextDocumentChangeEvent, Position } from "vscode";
 import TextmateLanguageService, { TextmateToken } from "vscode-textmate-languageservice";
 import { DocumentMembers, Token, FunctionMembers, StructureMembers } from "./tokenTypes";
 export class TokenService {
@@ -51,21 +51,23 @@ export class TokenService {
         if (document.languageId !== this.selector.toString()) { return; }
         const textmateTokenService = await this._textmateService.initTokenService();
         const tokens = await textmateTokenService.fetch(document);
-        console.log(tokens);
-
+        
         const structures = this.getGlobalStructures(tokens);
         const constants = this.getGlobalConstants(tokens);
         const variables = this.getGlobalVariables(tokens);
         const functions = this.getGlobalFunctions(tokens);
+        const events = this.getGlobalEvents(tokens);
 
         const documentMembers: DocumentMembers = {
             structures: structures,
             functions: functions,
             variables: variables,
             constants: constants,
+            events: events,
         };
-
+        
         this._documents.set(document.uri.toString(), documentMembers);
+        console.log(documentMembers);
 
     }
 
@@ -99,17 +101,11 @@ export class TokenService {
 
     private getGlobalFunctions(tokens: TextmateToken[]): FunctionMembers[] {
         return tokens.filter(token => token.scopes.includes("entity.name.function.usp")).map(token => {
-            const functionBeginLine = token.line;
-            let functionEndLine = functionBeginLine;
-            let functionEnd = false;
-            do {
-                ++functionEndLine;
-                const nextLineTokens = tokens.find(token => token.line === functionEndLine && token.scopes.includes("meta.block.usp"));
-                if (nextLineTokens === undefined) { functionEnd = true; break; }
-
-            } while (!functionEnd);
-            const functionVariables = tokens.
-                filter(token => (token.line >= functionBeginLine && token.line <= functionEndLine) && token.scopes.includes("entity.name.variable.usp")).
+            //look for function block statement range
+            const functionTokens = this.getBlockRangeTokens(tokens, token,"meta.block.usp");
+            //grab all variables from range
+            const functionVariables = functionTokens.
+                filter(token => token.scopes.includes("entity.name.variable.usp")).
                 map(token => {
                     const variableType = this.getType(token, tokens);
                     const variable: Token = {
@@ -122,6 +118,7 @@ export class TokenService {
                     return variable;
                 });
 
+            //grab all tokens inside the parenthesized parameter list
             const functionParameterBeginLine = token.line;
             let functionParameterEndLine = functionParameterBeginLine;
             let functionParameterEnd = false;
@@ -129,8 +126,8 @@ export class TokenService {
                 const nextLineTokens = tokens.find(token => token.line === functionParameterEndLine && token.scopes.includes("meta.parenthesized.parameter-list.usp"));
                 if (nextLineTokens === undefined) { functionParameterEnd = true; break; }
                 ++functionParameterEndLine;
-            } while (!functionEnd);
-
+            } while (!functionParameterEnd);
+            //extract parameter variable names
             const functionParameters = tokens.
                 filter(token => (token.line >= functionParameterBeginLine && token.line <= functionParameterEndLine) && token.scopes.includes("entity.name.variable.parameter.usp")).
                 map(token => {
@@ -158,19 +155,29 @@ export class TokenService {
         });
     }
 
+    private getBlockRangeTokens(tokens: TextmateToken[], token: TextmateToken, scopeName: string): TextmateToken[] {
+        let functionTokenBegin = tokens.indexOf(token);
+        do {
+            ++functionTokenBegin;
+            if (tokens[functionTokenBegin].scopes.includes(scopeName)) { break; }
+        } while (functionTokenBegin < tokens.length);
+        if (functionTokenBegin >= tokens.length) { return []; }
+        let functionTokenEnd = functionTokenBegin;
+        do {
+            ++functionTokenEnd;
+            if (!tokens[functionTokenEnd].scopes.includes(scopeName)) { break; }
+        } while (functionTokenEnd < tokens.length);
+        if (functionTokenEnd >= tokens.length) { return []; }
+        return tokens.slice(functionTokenBegin, functionTokenEnd);
+    }
+
     private getGlobalStructures(tokens: TextmateToken[]): StructureMembers[] {
         return tokens.filter(token => token.scopes.includes("entity.name.type.structure.usp")).map(token => {
-            const functionBeginLine = token.line;
-            let functionEndLine = functionBeginLine;
-            let functionEnd = false;
-            do {
-                ++functionEndLine;
-                const nextLineTokens = tokens.find(token => token.line === functionEndLine && token.scopes.includes("meta.block.structure.usp"));
-                if (nextLineTokens === undefined) { functionEnd = true; break; }
-
-            } while (!functionEnd);
-            const functionVariables = tokens.
-                filter(token => (token.line >= functionBeginLine && token.line <= functionEndLine) && token.scopes.includes("entity.name.variable.usp")).
+            //look for structure block statement range
+            const structureTokens = this.getBlockRangeTokens(tokens, token,"meta.block.structure.usp");
+            //grab all variables from range
+            const structureVariables = structureTokens.
+                filter(token =>  token.scopes.includes("entity.name.variable.usp")).
                 map(token => {
                     const variableType = this.getType(token, tokens);
                     const variable: Token = {
@@ -187,9 +194,38 @@ export class TokenService {
                 type: "struct",
                 column: token.startIndex,
                 line: token.line,
-                variables: functionVariables,
+                variables: structureVariables,
             };
             return struct;
+        });
+    }
+
+    private getGlobalEvents(tokens: TextmateToken[]): StructureMembers[] {
+        return tokens.filter(token => token.scopes.includes("entity.name.variable.event.usp")).map(token => {
+            //look for structure block statement range
+            const structureTokens = this.getBlockRangeTokens(tokens, token,"meta.block.usp");
+            //grab all variables from range
+            const eventVariables = structureTokens.
+                filter(token =>  token.scopes.includes("entity.name.variable.usp")).
+                map(token => {
+                    const variableType = this.getType(token, tokens);
+                    const variable: Token = {
+                        name: token.text,
+                        type: "variable",
+                        column: token.startIndex,
+                        line: token.line,
+                        dataType: variableType,
+                    };
+                    return variable;
+                });
+            const event: StructureMembers = {
+                name: token.text,
+                type: "event",
+                column: token.startIndex,
+                line: token.line,
+                variables: eventVariables,
+            };
+            return event;
         });
     }
 
