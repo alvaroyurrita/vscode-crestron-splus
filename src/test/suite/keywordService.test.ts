@@ -39,9 +39,17 @@ suite('With Keyword Service', () => {
         const keywords = keywordService.getKeywords(["inputType"]);
         assert.strictEqual(keywords.length, 4);
     });
-    test('gets 12 modifier Keywords', () => {
-        const keywords = keywordService.getKeywords(["modifier"]);
-        assert.strictEqual(keywords.length, 12);
+    test('gets 3 functionModifier Keywords', () => {
+        const keywords = keywordService.getKeywords(["functionModifier"]);
+        assert.strictEqual(keywords.length, 3);
+    });
+    test('gets 6 variableModifier Keywords', () => {
+        const keywords = keywordService.getKeywords(["variableModifier"]);
+        assert.strictEqual(keywords.length, 6);
+    });
+    test('gets 3 parameterModifier Keywords', () => {
+        const keywords = keywordService.getKeywords(["parameterModifier"]);
+        assert.strictEqual(keywords.length, 3);
     });
     test('gets 4 outputType Keywords', () => {
         const keywords = keywordService.getKeywords(["outputType"]);

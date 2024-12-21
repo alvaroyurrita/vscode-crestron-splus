@@ -154,3 +154,26 @@ suite("testing tokenization", function () {
         assert.strictEqual(documentMembers[0].internalVariables[0].nameRange.end.character, 25);
     });
 });
+
+suite("with a position", function () {
+    test("not inside a block, it should return undefined", async () => {
+        await OpenAndShowSPlusDocument("push DigitalInput1\n{\nBUFFER_INPUT BufferInput1[20];\n};");
+        await delay(500);
+        const mockExtensionContext = (global as any).testExtensionContext;
+        const tokenService = TokenService.getInstance(mockExtensionContext);
+        const uri = vscode.window.activeTextEditor?.document.uri.toString();
+        const position = new vscode.Position(0, 0);
+        const token = tokenService.getDocumentMemberAtPosition(uri, position);
+        assert.strictEqual(token, undefined);
+    });
+    test("inside a block, should return top most token", async () => {
+        await OpenAndShowSPlusDocument("push DigitalInput1\n{\nBUFFER_INPUT BufferInput1[20];\n};");
+        await delay(500);
+        const mockExtensionContext = (global as any).testExtensionContext;
+        const tokenService = TokenService.getInstance(mockExtensionContext);
+        const uri = vscode.window.activeTextEditor?.document.uri.toString();
+        const position = new vscode.Position(2, 5);
+        const token = tokenService.getDocumentMemberAtPosition(uri, position);
+        assert.strictEqual(token.name, "DigitalInput1");
+    });
+});

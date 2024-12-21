@@ -18,6 +18,7 @@ import { ApiCompletionProvider } from "./apiCompletionProvider";
 import { KeywordCompletionProvider } from "./keywordCompletionProvider";
 import { TextMateCompletionProvider } from "./textMateCompletionProvider";
 import { TokenService } from "./tokenService";
+import { KeywordService } from "./keywordService";
 
 
 // Creates a terminal, calls the command, then closes the terminal
@@ -61,8 +62,7 @@ export async function activate(context: ExtensionContext) {
     // const tokens = await textmateTokenService.fetch(textDocument);
 
     const tokenService = TokenService.getInstance(context);
-
-
+    const keywordService = KeywordService.getInstance();
     const simplPlusStatusBar =SimplPlusStatusBar.getInstance(context);
     const simplPlusTasks = SimplPlusTasks.getInstance(context);
 
@@ -90,29 +90,29 @@ export async function activate(context: ExtensionContext) {
     let thisFormatProvider = new SimplPlusFormattingProvider();
     const formatProvider = languages.registerDocumentFormattingEditProvider({ language: 'simpl-plus' }, thisFormatProvider);
 
-    let thisHoverProvider = new SimplPlusHoverProvider();
-    const hoverProvider = languages.registerHoverProvider({ language: 'simpl-plus' }, thisHoverProvider);
+    // let thisHoverProvider = new SimplPlusHoverProvider();
+    // const hoverProvider = languages.registerHoverProvider({ language: 'simpl-plus' }, thisHoverProvider);
 
-    let thisApiCompletionProvider = new ApiCompletionProvider();
+    // let thisApiCompletionProvider = new ApiCompletionProvider();
     // const apiCompletionProvider = languages.registerCompletionItemProvider({ language: 'simpl-plus' },thisApiCompletionProvider, '.');
 
-    let thisKeywordCompletionProvider = new KeywordCompletionProvider();
-    // const keywordCompletionProvider = languages.registerCompletionItemProvider({ language: 'simpl-plus' }, thisKeywordCompletionProvider);
+    let thisKeywordCompletionProvider = new KeywordCompletionProvider(keywordService, tokenService);
+    const keywordCompletionProvider = languages.registerCompletionItemProvider({ language: 'simpl-plus' }, thisKeywordCompletionProvider);
 
-    let thisTextmateCompletionProvider = new TextMateCompletionProvider(tokenService);
-    const textMateCompletionProvider = languages.registerCompletionItemProvider({ language: 'simpl-plus' }, thisTextmateCompletionProvider);
+    // let thisTextmateCompletionProvider = new TextMateCompletionProvider(tokenService);
+    // const textMateCompletionProvider = languages.registerCompletionItemProvider({ language: 'simpl-plus' }, thisTextmateCompletionProvider);
 
     context.subscriptions.push(
         formatProvider,
-        hoverProvider,
+        // hoverProvider,
         localHelp_command,
         webHelp_command,
         build_command,
         showCategories_command,
         simplPlusTasks,
         // apiCompletionProvider,
-        // keywordCompletionProvider,
-        textMateCompletionProvider
+        keywordCompletionProvider,
+        // textMateCompletionProvider
       );
 }
 

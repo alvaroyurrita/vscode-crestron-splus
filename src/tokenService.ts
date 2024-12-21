@@ -17,6 +17,12 @@ export class TokenService {
         return this._documents.get(uri);
     }
 
+    public getDocumentMemberAtPosition(uri: string, position: Position): DocumentToken | undefined {
+        const documentMembers = this.getDocumentMembers(uri);
+        if (documentMembers === undefined) { return undefined; }
+        return documentMembers.find(member => member.blockRange.contains(position));
+    }
+
     private constructor(ctx: ExtensionContext) {
         this._textmateService = new TextmateLanguageService(this.selector.toString(), ctx);
         const onOpenTextDocument_event = workspace.onDidOpenTextDocument((document) => this.updateOnOpenTextDocument(document));
@@ -129,30 +135,33 @@ export class TokenService {
             );
             //look for function block statement range
             const functionTokens = this.getBlockRangeTokens(tokens, token, "meta.block.usp");
-            const functionBlockRange = new Range(
-                new Position(functionTokens[0].line, functionTokens[0].startIndex),
-                new Position(functionTokens[functionTokens.length - 1].line, functionTokens[functionTokens.length - 1].startIndex + functionTokens[functionTokens.length - 1].text.length)
-            );
-            //grab all variables from range
-            const functionVariables = functionTokens.
-                filter(token => token.scopes.includes("entity.name.variable.usp")).
-                map(token => {
-                    const variableType = this.getType(token, tokens);
-                    const variableNameRange = new Range(
-                        new Position(token.line, token.startIndex),
-                        new Position(token.line, token.startIndex + token.text.length)
-                    );
-                    const variable: DocumentToken = {
-                        name: token.text,
-                        type: "variable",
-                        nameRange: variableNameRange,
-                        dataType: variableType,
-                    };
-                    return variable;
-                });
-
+            let functionBlockRange: Range;
+            let functionVariables: DocumentToken[] = [];
+            if (functionTokens.length !== 0) {
+                functionBlockRange = new Range(
+                    new Position(functionTokens[0].line, functionTokens[0].startIndex),
+                    new Position(functionTokens[functionTokens.length - 1].line, functionTokens[functionTokens.length - 1].startIndex + functionTokens[functionTokens.length - 1].text.length)
+                );
+                //grab all variables from range
+                functionVariables = functionTokens.
+                    filter(token => token.scopes.includes("entity.name.variable.usp")).
+                    map(token => {
+                        const variableType = this.getType(token, tokens);
+                        const variableNameRange = new Range(
+                            new Position(token.line, token.startIndex),
+                            new Position(token.line, token.startIndex + token.text.length)
+                        );
+                        const variable: DocumentToken = {
+                            name: token.text,
+                            type: "variable",
+                            nameRange: variableNameRange,
+                            dataType: variableType,
+                        };
+                        return variable;
+                    });
+            }
             //grab all tokens inside the parenthesized parameter list
-            const functionParameterBeginLine = token.line;
+            const functionParameterBeginLine = token.   line;
             let functionParameterEndLine = functionParameterBeginLine;
             let functionParameterEnd = false;
             do {
@@ -285,16 +294,15 @@ export class TokenService {
     private getBlockRangeTokens(tokens: TextmateToken[], token: TextmateToken, scopeName: string): TextmateToken[] {
         let functionTokenBegin = tokens.indexOf(token);
         do {
-            ++functionTokenBegin;
             if (tokens[functionTokenBegin].scopes.includes(scopeName)) { break; }
+            ++functionTokenBegin;
         } while (functionTokenBegin < tokens.length);
         if (functionTokenBegin >= tokens.length) { return []; }
         let functionTokenEnd = functionTokenBegin;
         do {
-            ++functionTokenEnd;
             if (!tokens[functionTokenEnd].scopes.includes(scopeName)) { break; }
+            ++functionTokenEnd;
         } while (functionTokenEnd < tokens.length);
-        if (functionTokenEnd >= tokens.length) { return []; }
         return tokens.slice(functionTokenBegin, functionTokenEnd);
     }
 

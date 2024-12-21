@@ -1,4 +1,4 @@
-import { extensions } from "vscode";
+import { extensions, CompletionItemKind } from "vscode";
 import { readFileSyncWrapper } from "./fsReadSyncWrapper";
 import * as fsExistsWrapper from './fsExistsSyncWrapper';
 import path from "path";
@@ -13,7 +13,9 @@ export type KeywordType =
     "function" |
     "functionType" |
     "inputType" |
-    "modifier" |
+    "parameterModifier" |
+    "variableModifier" |
+    "functionModifier" |
     "outputType" |
     "parameterType" |
     "statement" |
@@ -24,9 +26,9 @@ export type KeywordType =
     "voidFunction";
 
 
-type Keyword = {
+export type Keyword = {
     name: string,
-    kind: string,
+    kind: CompletionItemKind,
     type: KeywordType
 }
 
@@ -52,7 +54,7 @@ export class KeywordService {
                 if (elements.length!==3) {return;}
                 const definition:Keyword = {
                     name : elements[0].trim(),
-                    kind : elements[1].trim(),
+                    kind : CompletionItemKind[elements[1].trim()],
                     type : elements[2].trim() as KeywordType
                 };
                 this._keywordDefinitions.push(definition);
