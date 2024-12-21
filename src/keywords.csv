@@ -1,363 +1,359 @@
-digital_input, Keyword, joinInputs
-analog_input, Keyword, joinInputs
-string_input, Keyword, joinInputs
-buffer_input , Keyword, joinInputs
-digital_output, Keyword, joinOutputs
-analog_output, Keyword, joinOutputs
-string_output, Keyword, joinOutputs
-buffer_output, Keyword, joinOutputs
-integer_parameter, Keyword, parameters
-signed_integer_parameter, Keyword, parameters
-long_integer_parameter, Keyword, parameters
-signed_long_integer_parameter, Keyword, parameters
-string_parameter , Keyword, parameters
-volatile, Keyword, modifier
-nonvolatile, Keyword, modifier
-dynamic, Keyword, modifier
-ascii, Keyword, modifier
-utf16, Keyword, modifier
-inherit, Keyword, modifier
-delegateProperty, Keyword, modifier
-integer, Keyword, Variables
-signed_integer, Keyword, Variables
-long_integer, Keyword, Variables
-signed_long_integer, Keyword, Variables
-string, Keyword, Variables
-simplSharpString_Function, Keyword, Variables
-cEvent, class, classes
-cMutex, class, classes
-tcp_client, Keyword, tcp-client-structure
-tcp_server, Keyword, tcp-server-structure
-udp_socket, Keyword, ud-socket-structure
-file_info, Keyword, file-info-structure
-structure, Keyword, structures
-Function, Keyword, Functions
-integer_Function, Keyword, Functions
-signed_integer_Function, Keyword, Functions
-long_integer_Function, Keyword, Functions
-signed_long_integer_Function, Keyword, Functions
-string_Function, Keyword, Functions
-simplSharpString_Function, Keyword, Functions
-eventHandler, Keyword, event-handler
-callback, Keyword, modifier
-threadSafe, Keyword, modifier
-push, Function, event-handler
-event, Function, event-handler
-change, Function, event-handler
-release, Function, event-handler
-socketConnect, Function, event-handler
-socketDisconnect , Function, event-handler
-socketReceive , Function, event-handler
-socketStatus , Function, event-handler
-byVal, Keyword, modifier
-byRef, Keyword, modifier
-ReadOnlyRef, Keyword, modifier
-eventArgs, Keyword, type
-#define_Constant, Keyword, declaration
-#category, Keyword, declaration
-#user_simplSharp_library, Keyword, declaration
-#crestron_simplSharp_library, Keyword, declaration
-#user_library, Keyword, declaration
-#crestron_library, Keyword, declaration
-#includePath, Keyword, declaration
-#symbol_name, Keyword, declaration
-#hint, Keyword, declaration
-#help, Keyword, declaration
-#default_nonvolatile, Keyword, declaration
-#default_volatile, Keyword, declaration
-#analog_serial_expand, Keyword, declaration
-#digital_expand, Keyword, declaration
-#output_shift, Keyword, declaration
-#max_internal_buffer_size, Keyword, declaration
-#print_to_trace, Keyword, declaration
-#enable_dynamic, Keyword, declaration
-#enable_stack_checking, Keyword, declaration
-#large_stack, Keyword, declaration
-#enable_trace, Keyword, declaration
-#encoding_ascii, Keyword, declaration
-#encoding_inherit_from_parent, Keyword, declaration
-#encoding_inherit_from_program, Keyword, declaration
-#encoding_utf16, Keyword, declaration
-#default_nonvolatile, Keyword, declaration
-#default_volatile, Keyword, declaration
-#begin_parameter_properties, Keyword, declaration
-#begin_parameter_properties, Keyword, declaration
-#propValidUnits, Keyword, declaration
-#propDefaultUnits, Keyword, declaration
-#propDefaultValue, Keyword, declaration
-#propDefaultValue, Keyword, declaration
-#propBounds, Keyword, declaration
-#help_begin, Keyword, declaration
-#help_end, Keyword, declaration
-#begin_prop_full_description, Keyword, declaration
-#begin_prop_notes, Keyword, declaration
-#end_prop_full_description, Keyword, declaration
-#end_prop_notes, Keyword, declaration
-#if_defined, Keyword, declaration
-#if_not_defined, Keyword, declaration
-#if_series2, Keyword, declaration
-#if_series3, Keyword, declaration
-#if_series4, Keyword, declaration
-#endif, Keyword, declaration
-while, Keyword, statement
-do, Keyword, statement
-until, Keyword, statement
-for, Keyword, statement
-to, Keyword, statement
-step, Keyword, statement
-wait, Keyword, statement
-if, Keyword, statement
-else, Keyword, statement
-case, Keyword, statement
-default, Keyword, statement
-return, Keyword, statement
-break, Keyword, statement
-continue, Keyword, statement
-try, Keyword, statement
-catch, Keyword, statement
-_oem_break, Variable, var
-_oem_cd, Variable, var
-_oem_cts, Variable, var
-_oem_dtr, Variable, var
-_oem_long_break, Variable, var
-_oem_max_string, Variable, var
-_oem_pacing, Variable, var
-_oem_rts, Variable, var
-_oem_str_in, Variable, var
-_oem_str_out, Variable, var
-_O_APPEND, Constant, con
-_O_CREAT, Constant, con
-_O_EXCL, Constant, con
-_O_TRUNC, Constant, con
-_O_TEXT, Constant, con
-_O_BINARY, Constant, con
-_O_RDONLY, Constant, con
-_O_RDWR, Constant, con
-_O_WRONLY, Constant, con
-SEEK_SET, Constant, con
-SEEK_CUR, Constant, con
-SEEK_END, Constant, con
-ARdOnly, Constant, con
-AHidden, Constant, con
-ASystem, Constant, con
-AVolume, Constant, con
-ADirEnt, Constant, con
-Archive, Constant, con
-On, Constant, con
-Off, Constant, con
-aToI, Function, fun
-aToSi, Function, fun
-aToL, Function, fun
-aToSl, Function, fun
-chr, Function, fun
-hexToI, Function, fun
-hexToL, Function, fun
-hexToSi, Function, fun
-hexToSl, Function, fun
-iToA, Function, fun
-iToHex, Function, fun
-lToA, Function, fun
-lToHex, Function, fun
-random, Function, fun
-rnd, Function, fun
-compareStrings, Function, fun
-compareStringsNoCase, Function, fun
-find, Function, fun
-findNoCase, Function, fun
-gather, Function, fun
-gatherByLength, Function, fun
-gatherAsync, Function, fun
-gatherAsyncByLength, Function, fun
-gatherByLengthWithDest, Function, fun
-reArmGatherAsync, Function, fun
-removeGatherAsync, Function, fun
-getC, Function, fun
-left, Function, fun
-len, Function, fun
-lower, Function, fun
-upper, Function, fun
-mid, Function, fun
-remove, Function, fun
-removeByLength, Function, fun
-resizeString, Function, fun
-reverseFind, Function, fun
-reverseFindNoCase, Function, fun
-right, Function, fun
-setString, Function, fun
-abs, Function, fun
-max, Function, fun
-min, Function, fun
-mulDiv, Function, fun
-sMax, Function, fun
-sMin, Function, fun
-bit, Function, fun
-byte, Function, fun
-high, Function, fun
-highWord, Function, fun
-low, Function, fun
-lowWord, Function, fun
-lowerChar, Function, fun
-rotateLeft, Function, fun
-rotateLeftLong, Function, fun
-rotateRight, Function, fun
-rotateRightLong, Function, fun
-setByte, Function, fun
-upperChar, Function, fun
-fileBof, Function, fun
-fileClose, Function, fun
-fileDelete, Function, fun
-fileDeleteShared, Function, fun
-fileEof, Function, fun
-fileLength, Function, fun
-checkForDisk, Function, fun
-getCurrentDirectory, Function, fun
-fileOpen, Function, fun
-fileOpenShared, Function, fun
-fileRead, Function, fun
-fileSeek, Function, fun
-fileWrite, Function, fun
-findClose, Function, fun
-findFirst, Function, fun
-findFirstShared, Function, fun
-findNext, Function, fun
-isDirectory, Function, fun
-isHidden, Function, fun
-isReadOnly, Function, fun
-isSystem, Function, fun
-isVolume, Function, fun
-makeDirectory, Function, fun
-makeDirectoryShared, Function, fun
-readInteger, Function, fun
-readIntegerArray, Function, fun
-readLongInteger, Function, fun
-readLongIntegerArray, Function, fun
-readSignedInteger, Function, fun
-readSignedIntegerArray, Function, fun
-readSignedLongInteger, Function, fun
-readSignedLongIntegerArray, Function, fun
-readString, Function, fun
-readStringArray, Function, fun
-checkForNvramDisk, Function, fun
-removeDirectory, Function, fun
-removeDirectoryShared, Function, fun
-setCurrentDirectory, Function, fun
-startFileOperations, Function, fun
-endFileOperations, Function, fun
-waitForNewDisk, Function, fun
-writeInteger, Function, fun
-writeIntegerArray, Function, fun
-writeLongInteger, Function, fun
-writeLongIntegerArray, Function, fun
-writeSignedInteger, Function, fun
-writeSignedIntegerArray, Function, fun
-writeSignedLongInteger, Function, fun
-writeSignedLongIntegerArray, Function, fun
-writeString, Function, fun
-writeStringArray, Function, fun
-date, Function, fun
-day, Function, fun
-fileDate, Function, fun
-fileDay, Function, fun
-fileGetDateNum, Function, fun
-fileGetDayOfWeekNum, Function, fun
-fileGetHourNum, Function, fun
-fileGetMinutesNum, Function, fun
-fileGetMonthNum, Function, fun
-fileGetSecondsNum, Function, fun
-fileGetYearNum, Function, fun
-fileMonth, Function, fun
-fileTime, Function, fun
-getDateNum, Function, fun
-getDayOfWeekNum, Function, fun
-getDst, Function, fun
-getGmtOffset, Function, fun
-getHourNum, Function, fun
-getHSeconds, Function, fun
-getMinutesNum, Function, fun
-getMonthNum, Function, fun
-getSecondsNum, Function, fun
-getTicks, Function, fun
-getYearNum, Function, fun
-month, Function, fun
-setGmtOffset, Function, fun
-time, Function, fun
-socketConnectClient, Function, fun
-socketDisconnectClient, Function, fun
-socketGetAddressAsRequested, Function, fun
-socketGetPortNumber, Function, fun
-socketGetRemoteIpAddress, Function, fun
-socketGetSenderIpAddress, Function, fun
-socketGetStatus, Function, fun
-socketIsBroadcast, Function, fun
-socketIsMulticast, Function, fun
-socketSend, Function, fun
-socketServerStartListen, Function, fun
-socketServerStopListen, Function, fun
-socketUdp_Disable, Function, fun
-socketUdp_Enable, Function, fun
-sendMail, Function, fun
-sendMailAdvance, Function, fun
-sendMailWithAttachments, Function, fun
-compareRampsByAttribute, Function, fun
-compareRampsById, Function, fun
-createRamp, Function, fun
-getRampInfo, Function, fun
-isRamping, Function, fun
-rampInfo, Function, fun
-stopRamp, Function, fun
-getEncoding, Function, fun
-setEncoding, Function, fun
-toAscii, Function, fun
-toUtf16, Function, fun
-getSlot, Function, fun
-getCresnet, Function, fun
-getCip, Function, fun
-getSymbolInstanceName, Function, fun
-getSymbolReferenceName, Function, fun
-makeProgramFilename, Function, fun
-getModelNumber, Function, fun
-getSeries, Function, fun
-isSignalDefined, Function, fun
-getLastModifiedArrayIndex, Function, fun
-getNumArrayCols, Function, fun
-getNumArrayRows, Function, fun
-getNumStructureArrayCols, Function, fun
-resizeArray, Function, fun
-resizeStructureArray, Function, fun
-getExceptionCode, Function, fun
-getExceptionMessage, Function, fun
-not, Function, fun
-seed, Function, fun
-clearBuffer, Function, fun
-delay, Function, fun
-processLogic, Function, fun
-pulse, Function, fun
-waitForInitializationComplete, Function, fun
-generateUserNotice, Function, fun
-generateUserWarning, Function, fun
-generateUserError, Function, fun
-sendPacketToCpu, Function, fun
-sendCresnetPacket, Function, fun
-setCresnet, Function, fun
-setSlot, Function, fun
-setCip, Function, fun
-cancelAllWait, Function, fun
-cancelWait, Function, fun
-pauseAllWait, Function, fun
-pauseWait, Function, fun
-resumeAllWait, Function, fun
-resumeWait, Function, fun
-retimeWait, Function, fun
-makeString, Function, fun
-print, Function, fun
-trace, Function, fun
-readStructure, Function, fun
-writeStructure, Function, fun
-setDate, Function, fun
-setClock, Function, fun
-initializeRampInfoArray, Function, fun
-initializeRampInfo, Function, fun
-setEncoding, Function, fun
-registerDelegate, Function, fun
-registerEvent, Function, fun
-setArray, Function, fun
+CEvent,Keyword,classBuiltIn
+CMutex,Keyword,classBuiltIn
+_O_APPEND,Constant,constant
+_O_BINARY,Constant,constant
+_O_CREAT,Constant,constant
+_O_EXCL,Constant,constant
+_O_RDONLY,Constant,constant
+_O_RDWR,Constant,constant
+_O_TEXT,Constant,constant
+_O_TRUNC,Constant,constant
+_O_WRONLY,Constant,constant
+ADirEnt,Constant,constant
+AHidden,Constant,constant
+Archive,Constant,constant
+ARdOnly,Constant,constant
+ASystem,Constant,constant
+AVolume,Constant,constant
+Off,Constant,constant
+On,Constant,constant
+SEEK_CUR,Constant,constant
+SEEK_END,Constant,constant
+SEEK_SET,Constant,constant
+#Analog_Serial_Expand,Keyword,declaration
+#Begin_Parameter_Properties,Keyword,declaration
+#Begin_Prop_Full_Description,Keyword,declaration
+#Begin_Prop_Notes,Keyword,declaration
+#Category,Keyword,declaration
+#Crestron_Library,Keyword,declaration
+#Crestron_SimplSharp_Library,Keyword,declaration
+#Default_NonVolatile,Keyword,declaration
+#Default_Volatile,Keyword,declaration
+#Define_Constant,Keyword,declaration
+#Digital_Expand,Keyword,declaration
+#Enable_Dynamic,Keyword,declaration
+#Enable_Stack_Checking,Keyword,declaration
+#Enable_Trace,Keyword,declaration
+#Encoding_Ascii,Keyword,declaration
+#Encoding_Inherit_From_Parent,Keyword,declaration
+#Encoding_Inherit_From_Program,Keyword,declaration
+#Encoding_Utf16,Keyword,declaration
+#End_Prop_Full_Description,Keyword,declaration
+#End_Prop_Notes,Keyword,declaration
+#EndIf,Keyword,declaration
+#Help,Keyword,declaration
+#Help_Begin,Keyword,declaration
+#Help_End,Keyword,declaration
+#Hint,Keyword,declaration
+#If_Defined,Keyword,declaration
+#If_Not_Defined,Keyword,declaration
+#If_Series2,Keyword,declaration
+#If_Series3,Keyword,declaration
+#If_Series4,Keyword,declaration
+#IncludePath,Keyword,declaration
+#Large_Stack,Keyword,declaration
+#Max_Internal_Buffer_Size,Keyword,declaration
+#Output_Shift,Keyword,declaration
+#Print_To_Trace,Keyword,declaration
+#PropBounds,Keyword,declaration
+#PropDefaultUnits,Keyword,declaration
+#PropDefaultValue,Keyword,declaration
+#PropDefaultValue,Keyword,declaration
+#PropValidUnits,Keyword,declaration
+#Symbol_Name,Keyword,declaration
+#User_Library,Keyword,declaration
+#User_SimplSharp_Library,Keyword,declaration
+EventHandler,Keyword,event-handler
+Change,Function,eventType
+Event,Function,eventType
+Push,Function,eventType
+Release,Function,eventType
+SocketConnect,Function,eventType
+SocketDisconnect ,Function,eventType
+SocketReceive ,Function,eventType
+SocketStatus ,Function,eventType
+Abs,Function,function
+AToI,Function,function
+AToL,Function,function
+AToSi,Function,function
+AToSl,Function,function
+Bit,Function,function
+Byte,Function,function
+CancelAllWait,Function,voidFunction
+CancelWait,Function,voidFunction
+CheckForDisk,Function,function
+CheckForNvramDisk,Function,function
+Chr,Function,function
+ClearBuffer,Function,voidFunction
+CompareRampsByAttribute,Function,function
+CompareRampsById,Function,function
+CompareStrings,Function,function
+CompareStringsNoCase,Function,function
+CreateRamp,Function,function
+Date,Function,function
+Day,Function,function
+Delay,Function,voidFunction
+EndFileOperations,Function,function
+FileBof,Function,function
+FileClose,Function,function
+FileDate,Function,function
+FileDay,Function,function
+FileDelete,Function,function
+FileDeleteShared,Function,function
+FileEof,Function,function
+FileGetDateNum,Function,function
+FileGetDayOfWeekNum,Function,function
+FileGetHourNum,Function,function
+FileGetMinutesNum,Function,function
+FileGetMonthNum,Function,function
+FileGetSecondsNum,Function,function
+FileGetYearNum,Function,function
+FileLength,Function,function
+FileMonth,Function,function
+FileOpen,Function,function
+FileOpenShared,Function,function
+FileRead,Function,function
+FileSeek,Function,function
+FileTime,Function,function
+FileWrite,Function,function
+Find,Function,function
+FindClose,Function,function
+FindFirst,Function,function
+FindFirstShared,Function,function
+FindNext,Function,function
+FindNoCase,Function,function
+Gather,Function,function
+GatherAsync,Function,function
+GatherAsyncByLength,Function,function
+GatherByLength,Function,function
+GatherByLengthWithDest,Function,function
+GenerateUserError,Function,voidFunction
+GenerateUserNotice,Function,voidFunction
+GenerateUserWarning,Function,voidFunction
+GetC,Function,function
+GetCip,Function,function
+GetCresnet,Function,function
+GetCurrentDirectory,Function,function
+GetDateNum,Function,function
+GetDayOfWeekNum,Function,function
+GetDst,Function,function
+GetEncoding,Function,function
+GetExceptionCode,Function,function
+GetExceptionMessage,Function,function
+GetGmtOffset,Function,function
+GetHourNum,Function,function
+GetHSeconds,Function,function
+GetLastModifiedArrayIndex,Function,function
+GetMinutesNum,Function,function
+GetModelNumber,Function,function
+GetMonthNum,Function,function
+GetNumArrayCols,Function,function
+GetNumArrayRows,Function,function
+GetNumStructureArrayCols,Function,function
+GetRampInfo,Function,function
+GetSecondsNum,Function,function
+GetSeries,Function,function
+GetSlot,Function,function
+GetSymbolInstanceName,Function,function
+GetSymbolReferenceName,Function,function
+GetTicks,Function,function
+GetYearNum,Function,function
+HexToI,Function,function
+HexToL,Function,function
+HexToSi,Function,function
+HexToSl,Function,function
+High,Function,function
+HighWord,Function,function
+InitializeRampInfo,Function,voidFunction
+InitializeRampInfoArray,Function,voidFunction
+IsDirectory,Function,function
+IsHidden,Function,function
+IsRamping,Function,function
+IsReadOnly,Function,function
+IsSignalDefined,Function,function
+IsSystem,Function,function
+IsVolume,Function,function
+IToA,Function,function
+IToHex,Function,function
+Left,Function,function
+Len,Function,function
+Low,Function,function
+Lower,Function,function
+LowerChar,Function,function
+LowWord,Function,function
+LToA,Function,function
+LToHex,Function,function
+MakeDirectory,Function,function
+MakeDirectoryShared,Function,function
+MakeProgramFilename,Function,function
+MakeString,Function,voidFunction
+Max,Function,function
+Mid,Function,function
+Min,Function,function
+Month,Function,function
+MulDiv,Function,function
+Not,Function,function
+PauseAllWait,Function,voidFunction
+PauseWait,Function,voidFunction
+Print,Function,voidFunction
+ProcessLogic,Function,voidFunction
+Pulse,Function,voidFunction
+RampInfo,Function,function
+Random,Function,function
+ReadInteger,Function,function
+ReadIntegerArray,Function,function
+ReadLongInteger,Function,function
+ReadLongIntegerArray,Function,function
+ReadSignedInteger,Function,function
+ReadSignedIntegerArray,Function,function
+ReadSignedLongInteger,Function,function
+ReadSignedLongIntegerArray,Function,function
+ReadString,Function,function
+ReadStringArray,Function,function
+ReadStructure,Function,voidFunction
+ReArmGatherAsync,Function,function
+RegisterDelegate,Function,voidFunction
+RegisterEvent,Function,voidFunction
+Remove,Function,function
+RemoveByLength,Function,function
+RemoveDirectory,Function,function
+RemoveDirectoryShared,Function,function
+RemoveGatherAsync,Function,function
+ResizeArray,Function,function
+ResizeString,Function,function
+ResizeStructureArray,Function,function
+ResumeAllWait,Function,voidFunction
+ResumeWait,Function,voidFunction
+ReTimeWait,Function,voidFunction
+ReverseFind,Function,function
+ReverseFindNoCase,Function,function
+Right,Function,function
+Rnd,Function,function
+RotateLeft,Function,function
+RotateLeftLong,Function,function
+RotateRight,Function,function
+RotateRightLong,Function,function
+Seed,Function,voidFunction
+SendCresnetPacket,Function,voidFunction
+SendMail,Function,function
+SendMailAdvance,Function,function
+SendMailWithAttachments,Function,function
+SendPacketToCpu,Function,voidFunction
+SetArray,Function,voidFunction
+SetByte,Function,function
+SetCip,Function,function
+SetClock,Function,voidFunction
+SetCresnet,Function,voidFunction
+SetCurrentDirectory,Function,function
+SetDate,Function,voidFunction
+SetEncoding,Function,voidFunction
+SetGmtOffset,Function,function
+SetSlot,Function,voidFunction
+SetString,Function,function
+SMax,Function,function
+SMin,Function,function
+SocketConnectClient,Function,function
+SocketDisconnectClient,Function,function
+SocketGetAddressAsRequested,Function,function
+SocketGetPortNumber,Function,function
+SocketGetRemoteIpAddress,Function,function
+SocketGetSenderIpAddress,Function,function
+SocketGetStatus,Function,function
+SocketIsBroadcast,Function,function
+SocketIsMulticast,Function,function
+SocketSend,Function,function
+SocketServerStartListen,Function,function
+SocketServerStopListen,Function,function
+SocketUdp_Disable,Function,function
+SocketUdp_Enable,Function,function
+StartFileOperations,Function,function
+StopRamp,Function,function
+Time,Function,function
+ToAscii,Function,function
+ToUtf16,Function,function
+Trace,Function,voidFunction
+Upper,Function,function
+UpperChar,Function,function
+WaitForInitializationComplete,Function,voidFunction
+WaitForNewDisk,Function,function
+WriteInteger,Function,function
+WriteIntegerArray,Function,function
+WriteLongInteger,Function,function
+WriteLongIntegerArray,Function,function
+WriteSignedInteger,Function,function
+WriteSignedIntegerArray,Function,function
+WriteSignedLongInteger,Function,function
+WriteSignedLongIntegerArray,Function,function
+WriteString,Function,function
+WriteStringArray,Function,function
+WriteStructure,Function,voidFunction
+Function,Keyword,functionType
+Integer_Function,Keyword,functionType
+Long_Integer_Function,Keyword,functionType
+Signed_Integer_Function,Keyword,functionType
+Signed_Long_Integer_Function,Keyword,functionType
+SimplSharpString_Function,Keyword,functionType
+String_Function,Keyword,functionType
+Analog_input,Keyword,inputType
+Buffer_input ,Keyword,inputType
+Digital_Input,Keyword,inputType
+String_input,Keyword,inputType
+Ascii,Keyword,modifier
+ByRef,Keyword,modifier
+ByVal,Keyword,modifier
+Callback,Keyword,modifier
+DelegateProperty,Keyword,modifier
+Dynamic,Keyword,modifier
+Inherit,Keyword,modifier
+Nonvolatile,Keyword,modifier
+ReadOnlyRef,Keyword,modifier
+ThreadSafe,Keyword,modifier
+Utf16,Keyword,modifier
+Volatile,Keyword,modifier
+Analog_Output,Keyword,outputType
+Buffer_Output,Keyword,outputType
+Digital_Output,Keyword,outputType
+String_Output,Keyword,outputType
+Integer_Parameter,Keyword,parameterType
+Long_Integer_Parameter,Keyword,parameterType
+Signed_Integer_Parameter,Keyword,parameterType
+Signed_Long_Integer_Parameter,Keyword,parameterType
+String_Parameter,Keyword,parameterType
+Break,Keyword,statement
+Case,Keyword,statement
+Catch,Keyword,statement
+Continue,Keyword,statement
+Default,Keyword,statement
+Do,Keyword,statement
+Else,Keyword,statement
+For,Keyword,statement
+If,Keyword,statement
+Return,Keyword,statement
+Step,Keyword,statement
+To,Keyword,statement
+Try,Keyword,statement
+Until,Keyword,statement
+Wait,Keyword,statement
+While,Keyword,statement
+File_Info,Keyword,structureBuiltIn
+Structure,Keyword,structureBuiltIn
+Tcp_Client,Keyword,structureBuiltIn
+Tcp_Server,Keyword,structureBuiltIn
+Udp_socket,Keyword,structureBuiltIn
+EventArgs,Keyword,type
+_Oem_Break,Variable,variable
+_Oem_Cd,Variable,variable
+_Oem_Cts,Variable,variable
+_Oem_Dtr,Variable,variable
+_Oem_Long_Break,Variable,variable
+_Oem_Max_String,Variable,variable
+_Oem_Pacing,Variable,variable
+_Oem_Rts,Variable,variable
+_Oem_Str_In,Variable,variable
+_Oem_Str_Out,Variable,variable
+Integer,Keyword,variableType
+Long_Integer,Keyword,variableType
+Signed_Integer,Keyword,variableType
+Signed_Long_Integer,Keyword,variableType
+SimplSharpString_Function,Keyword,variableType
+String,Keyword,variableType

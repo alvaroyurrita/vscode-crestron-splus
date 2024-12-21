@@ -2,14 +2,14 @@ import { CompletionItemProvider, TextDocument, Position, CancellationToken, Comp
 import { provideClassTokens } from "./apiParser";
 
 export class ApiCompletionProvider implements CompletionItemProvider {
-    public provideCompletionItems(
+     public async provideCompletionItems(
         document: TextDocument,
         position: Position,
         token: CancellationToken,
         context: CompletionContext):
-        CompletionItem[] | undefined {
+        Promise<CompletionItem[] | undefined> {
 
-        const apiTokens = provideClassTokens();
+        const apiTokens = await provideClassTokens();
         const classes = apiTokens.map(classToken => classToken.name);
         let linePrefix = document.lineAt(position).text.slice(0, position.character);
         const wordWithDotMatch = linePrefix.match(/(\w+)\.$/);
@@ -21,40 +21,40 @@ export class ApiCompletionProvider implements CompletionItemProvider {
         const classMembers = apiTokens.find(classToken => classToken.name === linePrefix);
         if (classMembers === undefined) { return undefined; }
         const completionItems: CompletionItem[] = [];
-        const delegateItems = classMembers.delegates.map(member => {
+        const delegateItems = classMembers.internalDelegates.map(member => {
             const completionItem = new CompletionItem(member.name);
             completionItem.kind = this.getItemKindFromApiToken(member.type);
             completionItem.documentation = `${member.type} ${member.name}(${member.parameters})`;
-            completionItem.insertText = this.createSnippetString(member.name, member.parameters);
+            // completionItem.insertText = this.createSnippetString(member.name, member.parameters);
             return completionItem;
         });
-        const eventItems = classMembers.events.map(member => {
+        const eventItems = classMembers.internalEvents.map(member => {
             const completionItem = new CompletionItem(member.name);
             completionItem.kind = this.getItemKindFromApiToken(member.type);
             completionItem.documentation = `${member.name}(${member.parameters})`;
-            completionItem.insertText = this.createSnippetString(member.name, member.parameters);
+            // completionItem.insertText = this.createSnippetString(member.name, member.parameters);
             return completionItem;
         });
-        const functionItems = classMembers.functions.map(member => {
+        const functionItems = classMembers.internalFunctions.map(member => {
             const completionItem = new CompletionItem(member.name);
             completionItem.kind = this.getItemKindFromApiToken(member.type);
-            completionItem.documentation = `${member.returnType} ${member.name}(${member.parameters})`;
-            completionItem.insertText = this.createSnippetString(member.name, member.parameters);
+            completionItem.documentation = `${member.dataType} ${member.name}(${member.parameters})`;
+            // completionItem.insertText = this.createSnippetString(member.name, member.parameters);
             return completionItem;
         });
-        const propertyItems = classMembers.properties.map(member => {
-            const completionItem = new CompletionItem(member.name);
-            completionItem.kind = this.getItemKindFromApiToken(member.type);
-            completionItem.documentation = `${member.dataType} ${member.name}`;
-            return completionItem;
-        });
-        const variableItems = classMembers.variables.map(member => {
+        const propertyItems = classMembers.internalProperties.map(member => {
             const completionItem = new CompletionItem(member.name);
             completionItem.kind = this.getItemKindFromApiToken(member.type);
             completionItem.documentation = `${member.dataType} ${member.name}`;
             return completionItem;
         });
-        const delegatePropertyItems = classMembers.delegateProperties.map(member => {
+        const variableItems = classMembers.internalVariables.map(member => {
+            const completionItem = new CompletionItem(member.name);
+            completionItem.kind = this.getItemKindFromApiToken(member.type);
+            completionItem.documentation = `${member.dataType} ${member.name}`;
+            return completionItem;
+        });
+        const delegatePropertyItems = classMembers.internalProperties.map(member => {
             const completionItem = new CompletionItem(member.name);
             completionItem.kind = this.getItemKindFromApiToken(member.type);
             completionItem.documentation = `${member.dataType} ${member.name}`;

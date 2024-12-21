@@ -99,7 +99,7 @@ export async function activate(context: ExtensionContext) {
     let thisKeywordCompletionProvider = new KeywordCompletionProvider();
     // const keywordCompletionProvider = languages.registerCompletionItemProvider({ language: 'simpl-plus' }, thisKeywordCompletionProvider);
 
-    let thisTextmateCompletionProvider = new TextMateCompletionProvider();
+    let thisTextmateCompletionProvider = new TextMateCompletionProvider(tokenService);
     const textMateCompletionProvider = languages.registerCompletionItemProvider({ language: 'simpl-plus' }, thisTextmateCompletionProvider);
 
     context.subscriptions.push(

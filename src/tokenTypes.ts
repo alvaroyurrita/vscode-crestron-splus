@@ -9,5 +9,10 @@ export type DocumentToken = {
     dataType: string;
     parameters?: DocumentToken[];
     blockRange?: Range;
+    internalDelegates?: DocumentToken[];
+    internalEvents?: DocumentToken[];
+    internalFunctions?: DocumentToken[];
     internalVariables?: DocumentToken[];
+    internalProperties?: DocumentToken[];
+    internalDelegateProperties?: DocumentToken[];
 }

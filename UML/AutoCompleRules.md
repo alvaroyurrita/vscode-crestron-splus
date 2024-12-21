@@ -5,17 +5,18 @@ Note:  All Keywords to be provided with the users prefernece on keyword casing: 
 ## When in the Global Area 
 (not inside a function, or an event driver) and:
 * The cursor is at the beginning of a line
-    * Input Keyword
+    * All Declarations
+    * InputType Keyword
         * Digital_Input
         * Analog_Input
         * String_Input
         * Buffer_Input
-    * Output Keyword
+    * OutputType Keyword
         * Digital_Output
         * Analog_Output
         * String_Output
         * Buffer_Output
-    * Parameter Keywords
+    * ParameterType Keywords
         * Integer_Parameter
         * Signed_integer_Parameter
         * Long_integer_Parameter
@@ -29,7 +30,7 @@ Note:  All Keywords to be provided with the users prefernece on keyword casing: 
         * Utf16
         * Inherit
         * DelegateProperty
-    * Variable Types
+    * VariableType Keywords
         * Integer
         * Signed_integer
         * Long_integer
@@ -43,7 +44,7 @@ Note:  All Keywords to be provided with the users prefernece on keyword casing: 
         * Structure
     * Function Storage Modifier (and then Function Keywords after space)
         * CallBack
-    * Function Keywords
+    * FunctionType Keywords
         * Function
         * Integer_Function
         * Signed_integer_Function
@@ -55,7 +56,7 @@ Note:  All Keywords to be provided with the users prefernece on keyword casing: 
         * GatherEventHandler
     * Event Storage Modifier (and then Event Keywords after space)
         * ThreadSafe
-    * Event Keywords
+    * EventType Keywords
         * Push
         * Event
         * Change
@@ -67,11 +68,11 @@ Note:  All Keywords to be provided with the users prefernece on keyword casing: 
     * User Defined Classes From the SIMPL# APIs
 * After user press space after the following Keyword Groups: 
     * Variable Storage Modifiers
-        * Variable Types
+        * VariableType Keywords
     * Function Storage Modifier
-        * Function Keywords
+        * FunctionType Keywords
     * Event Storage Modifier
-        * Event Keywords
+        * EventType Keywords
 * All Other Keywords, don't provide any auto-complete suggestions
 
 * When Inside a Parenthesized-Parameter-List

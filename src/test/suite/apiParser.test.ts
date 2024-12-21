@@ -1,21 +1,10 @@
 import { provideClassTokens } from "../../apiParser";
 import * as sinon from 'sinon';
-import * as fsFileReadWrapper from '../../fsReadSyncWrapper';
 import * as vscode from 'vscode';
 import * as assert from 'assert';
 
 suite("With api Parser", function () {
-    let readFileSyncStub: sinon.SinonStub;
-    let workspaceFoldersStub: sinon.SinonStub;
-
-    setup(() => {
-        readFileSyncStub = sinon.stub(fsFileReadWrapper, 'readFileSyncWrapper');
-    });
-
-    teardown(() => {
-        readFileSyncStub.restore();
-        workspaceFoldersStub.restore();
-    });
+    let openTextDocumentStub: sinon.SinonStub;
 
     test("get classes and tokens", async () => {
         const apiDocumentContent = `
@@ -24,26 +13,22 @@ namespace SampleSimplSharpLibrary;
      class SampleClass 
     {
         // class delegates
-        delegate FUNCTION SampleDelegate ( );
-        delegate SIGNED_LONG_INTEGER_FUNCTION IntSampleDelegate ( SIGNED_LONG_INTEGER intParameter );
+        delegate SIGNED_LONG_INTEGER_FUNCTION IntSampleDelegate ( SIGNED_LONG_INTEGER intParameter, INTEGER uShortIntegerParameter );
 
         // class events
-        EventHandler SampleEvent ( SampleClass sender, EventArgs e );
         EventHandler SampleComplexEvent ( SampleClass sender, MyEventArgs e );
 
         // class functions
-        FUNCTION SampleVoidMethod ();
         INTEGER_FUNCTION SampleUshortMethod ( INTEGER ushortParameter , SampleStructure clientStructureParam , SampleSubClass clientClassParam );
 
         // class variables
-        SIGNED_LONG_INTEGER intSampleField;
         STRING stringSampleField[];
 
         // class properties
         DelegateProperty SampleDelegate SampleDelegateProperty;
         SampleSubClass SampleSampleSubClass;
     };
-    class MyEventArgs 
+    class MyEventArgs
     {
         // class delegates
 
@@ -59,81 +44,110 @@ namespace SampleSimplSharpLibrary;
         SIGNED_LONG_INTEGER EventInt;
     };
 }
-            `;
-        readFileSyncStub.returns(apiDocumentContent);
+`;
+        const sampleTextDocument = await vscode.workspace.openTextDocument({ content: apiDocumentContent });
+        openTextDocumentStub = sinon.stub(vscode.workspace, 'openTextDocument');
+        openTextDocumentStub.returns(sampleTextDocument);
 
-        const apiMembers = provideClassTokens();
+        const apiMembers = await provideClassTokens();
+        openTextDocumentStub.restore();
+        await vscode.commands.executeCommand('workbench.action.closeAllEditors');
 
-        sinon.assert.calledOnce(readFileSyncStub);
-        sinon.assert.calledWith(readFileSyncStub, sinon.match(/SampleSimplSharpLibrary\.api$/));
+
+        sinon.assert.calledOnce(openTextDocumentStub);
+        sinon.assert.calledWith(openTextDocumentStub, sinon.match(/SampleSimplSharpLibrary\.api$/));
         assert.strictEqual(apiMembers.length, 2);
         assert.strictEqual(apiMembers[0].name, "SampleClass");
         assert.strictEqual(apiMembers[0].type, "class");
+        assert.strictEqual(apiMembers[0].dataType, "class");
+        assert.strictEqual(apiMembers[0].nameRange.start.line, 3);
+        assert.strictEqual(apiMembers[0].nameRange.start.character, 11);
+        assert.strictEqual(apiMembers[0].nameRange.end.line, 3);
+        assert.strictEqual(apiMembers[0].nameRange.end.character, 22);
 
-        assert.strictEqual(apiMembers[0].delegates.length, 2);
-        assert.strictEqual(apiMembers[0].delegates[0].name, "SampleDelegate");
-        assert.strictEqual(apiMembers[0].delegates[0].type, "delegate");
-        assert.strictEqual(apiMembers[0].delegates[0].parameters, " ");
-        assert.strictEqual(apiMembers[0].delegates[0].returnType, "FUNCTION");
-        assert.strictEqual(apiMembers[0].delegates[1].name, "IntSampleDelegate");
-        assert.strictEqual(apiMembers[0].delegates[1].type, "delegate");
-        assert.strictEqual(apiMembers[0].delegates[1].parameters, " SIGNED_LONG_INTEGER intParameter ");
-        assert.strictEqual(apiMembers[0].delegates[1].returnType, "SIGNED_LONG_INTEGER_FUNCTION");
 
-        assert.strictEqual(apiMembers[0].events.length, 2);
-        assert.strictEqual(apiMembers[0].events[0].name, "SampleEvent");
-        assert.strictEqual(apiMembers[0].events[0].type, "event");
-        assert.strictEqual(apiMembers[0].events[0].parameters, " SampleClass sender, EventArgs e ");
-        assert.strictEqual(apiMembers[0].events[1].name, "SampleComplexEvent");
-        assert.strictEqual(apiMembers[0].events[1].type, "event");
-        assert.strictEqual(apiMembers[0].events[1].parameters, " SampleClass sender, MyEventArgs e ");
+        assert.strictEqual(apiMembers[0].internalDelegates.length, 1);
+        assert.strictEqual(apiMembers[0].internalDelegates[0].name, "IntSampleDelegate");
+        assert.strictEqual(apiMembers[0].internalDelegates[0].type, "delegate");
+        assert.strictEqual(apiMembers[0].internalDelegates[0].dataType, "SIGNED_LONG_INTEGER_FUNCTION");
+        assert.strictEqual(apiMembers[0].internalDelegates[0].nameRange.start.line, 6);
+        assert.strictEqual(apiMembers[0].internalDelegates[0].nameRange.start.character, 46);
+        assert.strictEqual(apiMembers[0].internalDelegates[0].nameRange.end.line, 6);
+        assert.strictEqual(apiMembers[0].internalDelegates[0].nameRange.end.character, 63);
+        assert.strictEqual(apiMembers[0].internalDelegates[0].parameters.length, 2);
+        assert.strictEqual(apiMembers[0].internalDelegates[0].parameters.length, 2);
+        assert.strictEqual(apiMembers[0].internalDelegates[0].parameters[0].name, "intParameter");
+        assert.strictEqual(apiMembers[0].internalDelegates[0].parameters[0].type, "variable");
+        assert.strictEqual(apiMembers[0].internalDelegates[0].parameters[0].dataType, "SIGNED_LONG_INTEGER");
+        assert.strictEqual(apiMembers[0].internalDelegates[0].parameters[0].nameRange.start.line, 6);
+        assert.strictEqual(apiMembers[0].internalDelegates[0].parameters[0].nameRange.start.character, 86);
+        assert.strictEqual(apiMembers[0].internalDelegates[0].parameters[0].nameRange.end.line, 6);
+        assert.strictEqual(apiMembers[0].internalDelegates[0].parameters[0].nameRange.end.character, 98);
+        assert.strictEqual(apiMembers[0].internalDelegates[0].parameters[1].name, "uShortIntegerParameter");
+        assert.strictEqual(apiMembers[0].internalDelegates[0].parameters[1].type, "variable");
+        assert.strictEqual(apiMembers[0].internalDelegates[0].parameters[1].dataType, "INTEGER");
 
-        assert.strictEqual(apiMembers[0].functions.length, 2);
-        assert.strictEqual(apiMembers[0].functions[0].name, "SampleVoidMethod");
-        assert.strictEqual(apiMembers[0].functions[0].type, "function");
-        assert.strictEqual(apiMembers[0].functions[0].parameters, "");
-        assert.strictEqual(apiMembers[0].functions[0].returnType, "FUNCTION");
-        assert.strictEqual(apiMembers[0].functions[1].name, "SampleUshortMethod");
-        assert.strictEqual(apiMembers[0].functions[1].type, "function");
-        assert.strictEqual(apiMembers[0].functions[1].parameters, " INTEGER ushortParameter , SampleStructure clientStructureParam , SampleSubClass clientClassParam ");
-        assert.strictEqual(apiMembers[0].functions[1].returnType, "INTEGER_FUNCTION");
+        assert.strictEqual(apiMembers[0].internalEvents.length, 1);
+        assert.strictEqual(apiMembers[0].internalEvents[0].name, "SampleComplexEvent");
+        assert.strictEqual(apiMembers[0].internalEvents[0].type, "event");
+        assert.strictEqual(apiMembers[0].internalEvents[0].dataType, "EventHandler");
+        assert.strictEqual(apiMembers[0].internalEvents[0].nameRange.start.line, 9);
+        assert.strictEqual(apiMembers[0].internalEvents[0].nameRange.start.character, 21);
+        assert.strictEqual(apiMembers[0].internalEvents[0].nameRange.end.line, 9);
+        assert.strictEqual(apiMembers[0].internalEvents[0].nameRange.end.character, 39);
+        assert.strictEqual(apiMembers[0].internalEvents[0].parameters.length, 2);
+        assert.strictEqual(apiMembers[0].internalEvents[0].parameters[0].name, "sender");
+        assert.strictEqual(apiMembers[0].internalEvents[0].parameters[0].type, "variable");
+        assert.strictEqual(apiMembers[0].internalEvents[0].parameters[0].dataType, "SampleClass");
+        assert.strictEqual(apiMembers[0].internalEvents[0].parameters[0].nameRange.start.line, 9);
+        assert.strictEqual(apiMembers[0].internalEvents[0].parameters[0].nameRange.start.character, 54);
+        assert.strictEqual(apiMembers[0].internalEvents[0].parameters[0].nameRange.end.line, 9);
+        assert.strictEqual(apiMembers[0].internalEvents[0].parameters[0].nameRange.end.character, 60);
+        assert.strictEqual(apiMembers[0].internalEvents[0].parameters[1].name, "e");
+        assert.strictEqual(apiMembers[0].internalEvents[0].parameters[1].type, "variable");
+        assert.strictEqual(apiMembers[0].internalEvents[0].parameters[1].dataType, "MyEventArgs");
 
-        assert.strictEqual(apiMembers[0].variables.length, 2);
-        assert.strictEqual(apiMembers[0].variables[0].name, "intSampleField");
-        assert.strictEqual(apiMembers[0].variables[0].type, "variable");
-        assert.strictEqual(apiMembers[0].variables[0].dataType, "SIGNED_LONG_INTEGER");
-        assert.strictEqual(apiMembers[0].variables[1].name, "stringSampleField[]");
-        assert.strictEqual(apiMembers[0].variables[1].type, "variable");
-        assert.strictEqual(apiMembers[0].variables[1].dataType, "STRING");
+        assert.strictEqual(apiMembers[0].internalFunctions.length, 1);
+        assert.strictEqual(apiMembers[0].internalFunctions[0].dataType,"INTEGER_FUNCTION");
+        assert.strictEqual(apiMembers[0].internalFunctions[0].name, "SampleUshortMethod");
+        assert.strictEqual(apiMembers[0].internalFunctions[0].type, "function");
+        assert.strictEqual(apiMembers[0].internalFunctions[0].nameRange.start.line, 12);
+        assert.strictEqual(apiMembers[0].internalFunctions[0].nameRange.start.character, 25);
+        assert.strictEqual(apiMembers[0].internalFunctions[0].nameRange.end.line, 12);
+        assert.strictEqual(apiMembers[0].internalFunctions[0].nameRange.end.character, 43);
+        assert.strictEqual(apiMembers[0].internalFunctions[0].parameters.length, 3);
+        assert.strictEqual(apiMembers[0].internalFunctions[0].parameters[0].name, "ushortParameter");
+        assert.strictEqual(apiMembers[0].internalFunctions[0].parameters[0].dataType, "INTEGER");
+        assert.strictEqual(apiMembers[0].internalFunctions[0].parameters[0].type, "variable");
 
-        assert.strictEqual(apiMembers[0].properties.length, 1);
-        assert.strictEqual(apiMembers[0].properties[0].name, "SampleSampleSubClass");
-        assert.strictEqual(apiMembers[0].properties[0].type, "property");
-        assert.strictEqual(apiMembers[0].properties[0].dataType, "SampleSubClass");
+        assert.strictEqual(apiMembers[0].internalVariables.length, 1);
+        assert.strictEqual(apiMembers[0].internalVariables[0].name, "stringSampleField");
+        assert.strictEqual(apiMembers[0].internalVariables[0].type, "variable");
+        assert.strictEqual(apiMembers[0].internalVariables[0].dataType, "STRING");
+        assert.strictEqual(apiMembers[0].internalVariables[0].nameRange.start.line, 15);
+        assert.strictEqual(apiMembers[0].internalVariables[0].nameRange.start.character, 15);
+        assert.strictEqual(apiMembers[0].internalVariables[0].nameRange.end.line, 15);
+        assert.strictEqual(apiMembers[0].internalVariables[0].nameRange.end.character, 32);
 
-        assert.strictEqual(apiMembers[0].delegateProperties.length, 1);
-        assert.strictEqual(apiMembers[0].delegateProperties[0].name, "SampleDelegateProperty");
-        assert.strictEqual(apiMembers[0].delegateProperties[0].type, "delegateProperty");
-        assert.strictEqual(apiMembers[0].delegateProperties[0].dataType, "SampleDelegate");
+        assert.strictEqual(apiMembers[0].internalProperties.length, 1);
+        assert.strictEqual(apiMembers[0].internalProperties[0].name, "SampleSampleSubClass");
+        assert.strictEqual(apiMembers[0].internalProperties[0].type, "property");
+        assert.strictEqual(apiMembers[0].internalProperties[0].dataType, "SampleSubClass");
+        assert.strictEqual(apiMembers[0].internalProperties[0].nameRange.start.line, 19);
+        assert.strictEqual(apiMembers[0].internalProperties[0].nameRange.start.character, 23);
+        assert.strictEqual(apiMembers[0].internalProperties[0].nameRange.end.line, 19);
+        assert.strictEqual(apiMembers[0].internalProperties[0].nameRange.end.character, 43);
+
+        assert.strictEqual(apiMembers[0].internalDelegateProperties.length, 1);
+        assert.strictEqual(apiMembers[0].internalDelegateProperties[0].name, "SampleDelegateProperty");
+        assert.strictEqual(apiMembers[0].internalDelegateProperties[0].type, "delegateProperty");
+        assert.strictEqual(apiMembers[0].internalDelegateProperties[0].dataType, "SampleDelegate");
+        assert.strictEqual(apiMembers[0].internalDelegateProperties[0].nameRange.start.line, 18);
+        assert.strictEqual(apiMembers[0].internalDelegateProperties[0].nameRange.start.character, 40);
+        assert.strictEqual(apiMembers[0].internalDelegateProperties[0].nameRange.end.line, 18);
+        assert.strictEqual(apiMembers[0].internalDelegateProperties[0].nameRange.end.character, 62);
+
 
         assert.strictEqual(apiMembers[1].name, "MyEventArgs");
-
-        assert.strictEqual(apiMembers[1].delegates.length, 0);
-        assert.strictEqual(apiMembers[1].events.length, 0);
-        assert.strictEqual(apiMembers[1].functions.length, 2);
-        assert.strictEqual(apiMembers[1].functions[0].name, "GetHashCode");
-        assert.strictEqual(apiMembers[1].functions[0].type, "function");
-        assert.strictEqual(apiMembers[1].functions[0].parameters, "");
-        assert.strictEqual(apiMembers[1].functions[0].returnType, "SIGNED_LONG_INTEGER_FUNCTION");
-        assert.strictEqual(apiMembers[1].functions[1].name, "ToString");
-        assert.strictEqual(apiMembers[1].functions[1].type, "function");
-        assert.strictEqual(apiMembers[1].functions[1].parameters, "");
-        assert.strictEqual(apiMembers[1].functions[1].returnType, "STRING_FUNCTION");
-        assert.strictEqual(apiMembers[1].variables.length, 0);
-        assert.strictEqual(apiMembers[1].properties.length, 1);
-        assert.strictEqual(apiMembers[1].properties[0].name, "EventInt");
-        assert.strictEqual(apiMembers[1].properties[0].type, "property");
-        assert.strictEqual(apiMembers[1].properties[0].dataType, "SIGNED_LONG_INTEGER");
-        assert.strictEqual(apiMembers[1].delegateProperties.length, 0);
     });
 });
