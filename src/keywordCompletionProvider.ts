@@ -38,30 +38,49 @@ export class KeywordCompletionProvider implements CompletionItemProvider {
         ProviderResult<CompletionItem[]> {
         const uri = document.uri;
         const currentBlock = this._tokenService.getDocumentMemberAtPosition(uri.toString(), position);
-        if (currentBlock === undefined) { 
+        if (currentBlock === undefined) {
             const completionItems = this.getRootItems(uri);
             return completionItems;
-         }
-         switch (currentBlock.type) {
+        }
+        switch (currentBlock.type) {
             case "function":
+                if (this._tokenService.isAtParameterRange(uri.toString(), position)) {
+                    return this.getParameterItems(uri);
+                }
                 return this.getFunctionItems(currentBlock);
             case "class":
-                // return this.getClassItems(uri);
+            // return this.getClassItems(uri);
             case "variable":
-                // return this.getVariableItems(uri);
+            // return this.getVariableItems(uri);
             case "constant":
-                // return this.getConstantItems(uri);
+            // return this.getConstantItems(uri);
             case "method":
-                // return this.getMethodItems(uri);
+            // return this.getMethodItems(uri);
             case "field":
-                // return this.getFieldItems(uri);
+            // return this.getFieldItems(uri);
             case "struct":
-                // return this.getStructItems(uri);
+            // return this.getStructItems(uri);
             case "enum":
-                // return this.getEnumItems(uri);
+            // return this.getEnumItems(uri);
+            case "parameter":
+                return this.getParameterItems(uri);
             default:
                 return this.getRootItems(uri);
-         }
+        }
+    }
+    
+    getParameterItems(uri: Uri): ProviderResult<CompletionItem[]> {
+        const functionKeyword: KeywordType[] = [
+            "parameterModifier",
+            "variableType",
+        ];
+        const keywordDefinitions = this._keywordService.getKeywords(functionKeyword);
+        const functionKeywords: CompletionItem[] = keywordDefinitions.map(kd => {
+            const item = new CompletionItem(kd.name, kd.kind);
+            item.documentation = "I am in a function";
+            return item;
+        });
+        return functionKeywords;
     }
     getFunctionItems(functionToken: DocumentToken): ProviderResult<CompletionItem[]> {
         const functionKeyword: KeywordType[] = [

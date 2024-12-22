@@ -1,6 +1,6 @@
 import { DocumentSelector, ExtensionContext, TextDocument, window, workspace, TextDocumentChangeEvent, Position, Range } from "vscode";
 import TextmateLanguageService, { TextmateToken } from "vscode-textmate-languageservice";
-import { DocumentToken } from "./tokenTypes";
+import { DocumentToken, DocumentArea } from "./tokenTypes";
 export class TokenService {
     private _documents = new Map<string, DocumentToken[]>();
     private static _instance: TokenService;
@@ -20,8 +20,21 @@ export class TokenService {
     public getDocumentMemberAtPosition(uri: string, position: Position): DocumentToken | undefined {
         const documentMembers = this.getDocumentMembers(uri);
         if (documentMembers === undefined) { return undefined; }
-        return documentMembers.find(member => member.blockRange.contains(position));
+        let documentMember: DocumentToken | undefined;
+        documentMember = documentMembers.find(member => member.blockRange.contains(position));
+        if (documentMember === undefined) {
+            documentMember = documentMembers.find(member => member.parameterRange.contains(position));
+        }
+        return documentMember;
     }
+
+    public isAtParameterRange(uri: string, position: Position): boolean {
+        const documentMembers = this.getDocumentMembers(uri);
+        if (documentMembers === undefined) { return false; }
+        const documentMember = documentMembers.find(member => member.parameterRange.contains(position));
+        return documentMember !== undefined;
+    }
+
 
     private constructor(ctx: ExtensionContext) {
         this._textmateService = new TextmateLanguageService(this.selector.toString(), ctx);
@@ -140,7 +153,8 @@ export class TokenService {
             if (functionTokens.length !== 0) {
                 functionBlockRange = new Range(
                     new Position(functionTokens[0].line, functionTokens[0].startIndex),
-                    new Position(functionTokens[functionTokens.length - 1].line, functionTokens[functionTokens.length - 1].startIndex + functionTokens[functionTokens.length - 1].text.length)
+                    new Position(functionTokens[functionTokens.length - 1].line,
+                        functionTokens[functionTokens.length - 1].startIndex + functionTokens[functionTokens.length - 1].text.length)
                 );
                 //grab all variables from range
                 functionVariables = functionTokens.
@@ -161,31 +175,33 @@ export class TokenService {
                     });
             }
             //grab all tokens inside the parenthesized parameter list
-            const functionParameterBeginLine = token.   line;
-            let functionParameterEndLine = functionParameterBeginLine;
-            let functionParameterEnd = false;
-            do {
-                const nextLineTokens = tokens.find(token => token.line === functionParameterEndLine && token.scopes.includes("meta.parenthesized.parameter-list.usp"));
-                if (nextLineTokens === undefined) { functionParameterEnd = true; break; }
-                ++functionParameterEndLine;
-            } while (!functionParameterEnd);
-            //extract parameter variable names
-            const functionParameters = tokens.
-                filter(token => (token.line >= functionParameterBeginLine && token.line <= functionParameterEndLine) && token.scopes.includes("entity.name.variable.parameter.usp")).
-                map(token => {
-                    const parameterType = this.getType(token, tokens);
-                    const parameterNameRange = new Range(
-                        new Position(token.line, token.startIndex),
-                        new Position(token.line, token.startIndex + token.text.length)
-                    );
-                    const variable: DocumentToken = {
-                        name: token.text,
-                        type: "variable",
-                        nameRange: parameterNameRange,
-                        dataType: parameterType,
-                    };
-                    return variable;
-                });
+            const parameterTokens = this.getBlockRangeTokens(tokens, token, "meta.parenthesized.parameter-list.usp");
+            let functionParameters: DocumentToken[] = [];
+            let parameterBlockRange: Range;
+            if (parameterTokens.length !== 0) {
+                parameterBlockRange = new Range(
+                    new Position(parameterTokens[0].line, parameterTokens[0].startIndex),
+                    new Position(parameterTokens[parameterTokens.length - 1].line,
+                        parameterTokens[parameterTokens.length - 1].startIndex + parameterTokens[parameterTokens.length - 1].text.length)
+                );
+                //extract parameter variable names
+                functionParameters = parameterTokens.
+                    filter(token => token.scopes.includes("entity.name.variable.parameter.usp")).
+                    map(token => {
+                        const parameterType = this.getType(token, tokens);
+                        const parameterNameRange = new Range(
+                            new Position(token.line, token.startIndex),
+                            new Position(token.line, token.startIndex + token.text.length)
+                        );
+                        const variable: DocumentToken = {
+                            name: token.text,
+                            type: "parameter",
+                            nameRange: parameterNameRange,
+                            dataType: parameterType,
+                        };
+                        return variable;
+                    });
+            }
             const fun: DocumentToken = {
                 name: token.text,
                 type: "function",
@@ -193,6 +209,7 @@ export class TokenService {
                 dataType: functionType,
                 parameters: functionParameters,
                 blockRange: functionBlockRange,
+                parameterRange: parameterBlockRange,
                 internalVariables: functionVariables,
             };
             return fun;

@@ -106,10 +106,14 @@ suite("testing tokenization", function () {
         assert.strictEqual(documentMembers[0].blockRange.start.character, 0);
         assert.strictEqual(documentMembers[0].blockRange.end.line, 3);
         assert.strictEqual(documentMembers[0].blockRange.end.character, 1);
+        assert.strictEqual(documentMembers[0].parameterRange.start.line, 0);
+        assert.strictEqual(documentMembers[0].parameterRange.start.character, 29);
+        assert.strictEqual(documentMembers[0].parameterRange.end.line, 0);
+        assert.strictEqual(documentMembers[0].parameterRange.end.character, 48);
 
         assert.strictEqual(documentMembers[0].parameters.length, 1);
         assert.strictEqual(documentMembers[0].parameters[0].name, "testParam");
-        assert.strictEqual(documentMembers[0].parameters[0].type, "variable");
+        assert.strictEqual(documentMembers[0].parameters[0].type, "parameter");
         assert.strictEqual(documentMembers[0].parameters[0].dataType, "integer");
         assert.strictEqual(documentMembers[0].parameters[0].nameRange.start.line, 0);
         assert.strictEqual(documentMembers[0].parameters[0].nameRange.start.character, 38);
@@ -125,6 +129,28 @@ suite("testing tokenization", function () {
         assert.strictEqual(documentMembers[0].internalVariables[0].nameRange.end.line, 2);
         assert.strictEqual(documentMembers[0].internalVariables[0].nameRange.end.character, 25);
     });
+
+    test("test that position is inside parameters", async () => {
+        await OpenAndShowSPlusDocument("INTEGER_FUNCTION testFunction(integer testParam)\n{\nBUFFER_INPUT BufferInput1[20];\n};");
+        await delay(500);
+        const mockExtensionContext = (global as any).testExtensionContext;
+        const tokenService = TokenService.getInstance(mockExtensionContext);
+        const position = new vscode.Position(0, 32);
+        const isInsideParameter = tokenService.isAtParameterRange(vscode.window.activeTextEditor?.document.uri.toString(), position);
+        assert.ok(isInsideParameter);
+    });
+
+    test("test that position is not inside parameters", async () => {
+        await OpenAndShowSPlusDocument("INTEGER_FUNCTION testFunction(integer testParam)\n{\nBUFFER_INPUT BufferInput1[20];\n};");
+        await delay(500);
+        const mockExtensionContext = (global as any).testExtensionContext;
+        const tokenService = TokenService.getInstance(mockExtensionContext);
+        const position = new vscode.Position(2, 2);
+        const isInsideParameter = tokenService.isAtParameterRange(vscode.window.activeTextEditor?.document.uri.toString(), position);
+        assert.ok(!isInsideParameter);
+    });
+
+    
     test("It should have an event with an inside variable", async () => {
         await OpenAndShowSPlusDocument("push DigitalInput1\n{\nBUFFER_INPUT BufferInput1[20];\n};");
         await delay(500);

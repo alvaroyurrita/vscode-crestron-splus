@@ -6,6 +6,7 @@ export type TokenType =
     "function" |
     "property" |
     "variable" |
+    "parameter" |
     "delegateProperty" |
     "class" |
     "constant" |
@@ -14,12 +15,23 @@ export type TokenType =
     "struct" |
     "enum";
 
+export type DocumentArea =
+    "function" |
+    "event" |
+    "parameter" |
+    "expression" |
+    "root" |
+    "enum" |
+    "struct";
+
+
 export type DocumentToken = {
     name: string;
     type: TokenType;
     nameRange: Range;
     dataType: string;
     parameters?: DocumentToken[];
+    parameterRange?: Range;
     blockRange?: Range;
     internalDelegates?: DocumentToken[];
     internalEvents?: DocumentToken[];
