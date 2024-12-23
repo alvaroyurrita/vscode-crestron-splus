@@ -39,15 +39,23 @@ export class KeywordCompletionProvider implements CompletionItemProvider {
         const uri = document.uri;
         const currentBlock = this._tokenService.getDocumentMemberAtPosition(uri.toString(), position);
         if (currentBlock === undefined) {
-            const completionItems = this.getRootItems(uri);
+            const completionItems = this.getRootKeywords(uri);
             return completionItems;
         }
         switch (currentBlock.type) {
             case "function":
                 if (this._tokenService.isAtParameterRange(uri.toString(), position)) {
-                    return this.getParameterItems(uri);
+                    const parameterKeywords = this.getParameterKeywords(uri);
+                    return parameterKeywords;
                 }
-                return this.getFunctionItems(currentBlock);
+                const rootVariables = this.getRootVariables(uri);
+                let functionKeywords = this.getFunctionKeywords();
+                const functionVariables = this.getFunctionVariables(currentBlock);
+                const lineUntilPosition = document.lineAt(position.line).text.slice(0, position.character);
+                if (lineUntilPosition.includes("=")) {
+                    functionKeywords = this.getExpressionKeywords();
+                }
+                return functionVariables.concat(rootVariables).concat(functionKeywords);
             case "class":
             // return this.getClassItems(uri);
             case "variable":
@@ -63,13 +71,27 @@ export class KeywordCompletionProvider implements CompletionItemProvider {
             case "enum":
             // return this.getEnumItems(uri);
             case "parameter":
-                return this.getParameterItems(uri);
+                return this.getParameterKeywords(uri);
             default:
-                return this.getRootItems(uri);
+                return this.getRootKeywords(uri);
         }
     }
-    
-    getParameterItems(uri: Uri): ProviderResult<CompletionItem[]> {
+    private getExpressionKeywords(): CompletionItem[] {
+        const functionKeyword: KeywordType[] = [
+            "function",
+            "variable",
+            "constant",
+            "statement",
+        ];
+        const keywordDefinitions = this._keywordService.getKeywords(functionKeyword);
+        const functionKeywords: CompletionItem[] = keywordDefinitions.map(kd => {
+            const item = new CompletionItem(kd.name, kd.kind);
+            item.documentation = "I am in a function";
+            return item;
+        });
+        return functionKeywords;
+    }
+    private getParameterKeywords(uri: Uri): CompletionItem[]{
         const functionKeyword: KeywordType[] = [
             "parameterModifier",
             "variableType",
@@ -82,7 +104,7 @@ export class KeywordCompletionProvider implements CompletionItemProvider {
         });
         return functionKeywords;
     }
-    getFunctionItems(functionToken: DocumentToken): ProviderResult<CompletionItem[]> {
+    private getFunctionKeywords(): CompletionItem[]{
         const functionKeyword: KeywordType[] = [
             "variableModifier",
             "variableType",
@@ -96,15 +118,24 @@ export class KeywordCompletionProvider implements CompletionItemProvider {
             item.documentation = "I am in a function";
             return item;
         });
+        return functionKeywords;
+    }
+    private getFunctionVariables(functionToken: DocumentToken): CompletionItem[]{
         const functionVariables: CompletionItem[] = functionToken.internalVariables?.map(v => {
             const item = new CompletionItem(v.name, CompletionItemKind.Variable);
             item.documentation = "I am a function Variable";
             return item;
         });
-        return functionKeywords.concat(functionVariables);
+        const functionParameters: CompletionItem[] = functionToken.parameters?.map(p => {
+            const item = new CompletionItem(p.name, CompletionItemKind.Variable);
+            item.documentation = "I am a function Parameter";
+            return item;
+        });
+        return functionVariables.concat(functionParameters);
+
     }
 
-    private getRootItems(uri: Uri): CompletionItem[] {
+    private getRootKeywords(uri: Uri): CompletionItem[] {
         const rootKeywords: KeywordType[] = [
             "inputType",
             "outputType",
@@ -125,14 +156,20 @@ export class KeywordCompletionProvider implements CompletionItemProvider {
             item.documentation = "Its mE";
             return item;
         });
-
         return rootItems;
     }
 
-    private convertKeywordToCompletionItem(keyword: Keyword): CompletionItem {
-        const item = new CompletionItem(keyword.name, keyword.kind);
-        item.documentation = keyword.name;
-        return item;
+    private getRootVariables(uri: Uri): CompletionItem[] {
+        const documentItems = this._tokenService.getDocumentMembers(uri.toString());
+        if (documentItems === undefined) {
+            return [];
+        }
+        const items: CompletionItem[] =  documentItems.map(d => {
+            const item = new CompletionItem(d.name, this._tokenService.convertTypeToKind(d.type));
+            item.documentation = "I am a root variable";
+            return item;
+        });
+        return items;
     }
 
     // resolveCompletionItem(item: CompletionItem, token: CancellationToken): ProviderResult<CompletionItem> {

@@ -1,6 +1,16 @@
-import { DocumentSelector, ExtensionContext, TextDocument, window, workspace, TextDocumentChangeEvent, Position, Range } from "vscode";
+import {
+    DocumentSelector,
+    ExtensionContext,
+    TextDocument,
+    window,
+    workspace,
+    TextDocumentChangeEvent,
+    Position,
+    Range,
+    CompletionItemKind
+} from "vscode";
 import TextmateLanguageService, { TextmateToken } from "vscode-textmate-languageservice";
-import { DocumentToken, DocumentArea } from "./tokenTypes";
+import { DocumentToken } from "./tokenTypes";
 export class TokenService {
     private _documents = new Map<string, DocumentToken[]>();
     private static _instance: TokenService;
@@ -21,9 +31,10 @@ export class TokenService {
         const documentMembers = this.getDocumentMembers(uri);
         if (documentMembers === undefined) { return undefined; }
         let documentMember: DocumentToken | undefined;
-        documentMember = documentMembers.find(member => member.blockRange.contains(position));
+        documentMember = documentMembers.find(member => member.blockRange?.contains(position) ?? false);
+        //if not found in block range, check parameter range
         if (documentMember === undefined) {
-            documentMember = documentMembers.find(member => member.parameterRange.contains(position));
+            documentMember = documentMembers.find(member => member.parameterRange?.contains(position) ?? false);
         }
         return documentMember;
     }
@@ -31,8 +42,39 @@ export class TokenService {
     public isAtParameterRange(uri: string, position: Position): boolean {
         const documentMembers = this.getDocumentMembers(uri);
         if (documentMembers === undefined) { return false; }
-        const documentMember = documentMembers.find(member => member.parameterRange.contains(position));
+        const documentMember = documentMembers.find(member => member.parameterRange?.contains(position)??false);
         return documentMember !== undefined;
+    }
+
+    public convertTypeToKind(type: string): CompletionItemKind {
+        switch (type) {
+            case "delegateProperty":
+            case "parameter":
+            case "variable":
+                return CompletionItemKind.Variable;
+            case "constant":
+                return CompletionItemKind.Constant;
+            case "delegate":
+            case "function":
+            case "method":
+                return CompletionItemKind.Function;
+            case "struct":
+                return CompletionItemKind.Struct;
+            case "event":
+                return CompletionItemKind.Event;
+            case "property":
+                return CompletionItemKind.Property;
+            case "class":
+                return CompletionItemKind.Class;
+            case "field":
+                return CompletionItemKind.Field;
+            case "enum":
+                return CompletionItemKind.Enum;
+            case "event":
+                return CompletionItemKind.Event;
+            default:
+                return CompletionItemKind.Text;
+        }
     }
 
 
@@ -85,7 +127,6 @@ export class TokenService {
 
         this._documents.set(document.uri.toString(), documentMembers);
         console.log(documentMembers);
-
     }
 
     private getGlobalVariables(tokens: TextmateToken[]): DocumentToken[] {

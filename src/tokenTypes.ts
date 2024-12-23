@@ -15,16 +15,6 @@ export type TokenType =
     "struct" |
     "enum";
 
-export type DocumentArea =
-    "function" |
-    "event" |
-    "parameter" |
-    "expression" |
-    "root" |
-    "enum" |
-    "struct";
-
-
 export type DocumentToken = {
     name: string;
     type: TokenType;
