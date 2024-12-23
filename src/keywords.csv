@@ -9,6 +9,9 @@ _O_RDWR,Constant,constant
 _O_TEXT,Constant,constant
 _O_TRUNC,Constant,constant
 _O_WRONLY,Constant,constant
+ENCODING_ASCII,Constant,constant
+ENCODING_UTF16,Constant,constant
+ENCODING_INHERIT,Constant,constant
 ADirEnt,Constant,constant
 AHidden,Constant,constant
 Archive,Constant,constant
@@ -168,6 +171,7 @@ InitializeRampInfo,Function,voidFunction
 InitializeRampInfoArray,Function,voidFunction
 IsDirectory,Function,function
 IsHidden,Function,function
+IsNull,Function,function
 IsRamping,Function,function
 IsReadOnly,Function,function
 IsSignalDefined,Function,function
@@ -211,7 +215,7 @@ ReadSignedLongIntegerArray,Function,function
 ReadString,Function,function
 ReadStringArray,Function,function
 ReadStructure,Function,voidFunction
-ReArmGatherAsync,Function,function
+ReArmGatherAsync,Function,voidFunction
 RegisterDelegate,Function,voidFunction
 RegisterEvent,Function,voidFunction
 Remove,Function,function
@@ -294,10 +298,10 @@ Signed_Integer_Function,Keyword,functionType
 Signed_Long_Integer_Function,Keyword,functionType
 SimplSharpString_Function,Keyword,functionType
 String_Function,Keyword,functionType
-Analog_input,Keyword,inputType
-Buffer_input ,Keyword,inputType
+Analog_Input,Keyword,inputType
+Buffer_Input ,Keyword,inputType
 Digital_Input,Keyword,inputType
-String_input,Keyword,inputType
+String_Input,Keyword,inputType
 Ascii,Keyword,variableModifier
 ByRef,Keyword,parameterModifier
 ByVal,Keyword,parameterModifier
@@ -333,13 +337,13 @@ Step,Keyword,statement
 To,Keyword,statement
 Try,Keyword,statement
 Until,Keyword,statement
-Wait,Keyword,statement
+Wait,Function,voidFunction
 While,Keyword,statement
 File_Info,Keyword,structureBuiltIn
 Structure,Keyword,structureBuiltIn
 Tcp_Client,Keyword,structureBuiltIn
 Tcp_Server,Keyword,structureBuiltIn
-Udp_socket,Keyword,structureBuiltIn
+Udp_Socket,Keyword,structureBuiltIn
 EventArgs,Keyword,type
 _Oem_Break,Variable,variable
 _Oem_Cd,Variable,variable

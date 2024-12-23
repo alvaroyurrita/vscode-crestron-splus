@@ -1,0 +1,10 @@
+string_input test[3];
+digital_input testdigital;
+analog_input testanalog;
+
+Integer var;
+
+change test
+{
+    var
+}

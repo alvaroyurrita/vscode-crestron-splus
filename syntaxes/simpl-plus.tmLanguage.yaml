@@ -1130,7 +1130,7 @@ repository:
   built-in-constants-io:
     match: |-
       (?ix)
-        \b(_O_APPEND|_O_CREAT|_O_EXCL|_O_TRUNC|_O_TEXT|_O_BINARY|_O_RDONLY|_O_RDWR|_O_WRONLY)\b
+        \b(_O_APPEND|_O_CREAT|_O_EXCL|_O_TRUNC|_O_TEXT|_O_BINARY|_O_RDONLY|_O_RDWR|_O_WRONLY|ENCODING_ASCII|ENCODING_UTF16|ENCODING_INHERIT)\b
     name: constant.language.io.$1.usp
   built-in-constants-file-info:
     match: |-

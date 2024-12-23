@@ -728,17 +728,16 @@ Function FileFunctions()
 	a=StartFileOperations();
 	nFileHandle = FileOpen ( "\\CF0\\MyFile", _O_WRONLY | _O_TEXT );
 	nNumWritten=FileWrite( nFileHandle, sBuf, 500 );
-	FileClose( nFileHandle );
-	a=EndFileOperations();
-	a=StartFileOperations();
-	FileEOF ( nFileHandle ) ;
-	a= SEEK_SET | SEEK_CUR | SEEK_END;
-	FileSeek( nFileHandle, 0, SEEK_SET) 
-	FileClose ( nFileHandle ) ;
-	FileDelete ( "\\CF0\\MyFile" ) 
+	a = FileClose( nFileHandle );
+	a = EndFileOperations();
+	a = FileEOF ( nFileHandle ) ;
+	a = SEEK_SET | SEEK_CUR | SEEK_END;
+	a = FileSeek( nFileHandle, 0, SEEK_SET) 
+	a = FileClose ( nFileHandle ) ;
+	a = FileDelete ( "\\CF0\\MyFile" ) 
 	nFileHandle = FileOpen ( "\\CF0\\MyFile", _O_RDONLY | _O_TEXT);
-	FileBOF ( nFileHandle ) 
-	FileRead(nFileHandle, sBuf, 4096)
+	a = FileBOF ( nFileHandle ) 
+	a = FileRead(nFileHandle, sBuf, 4096)
 	iErrorCode = ReadString( nFileHandle, s2);
 	iErrorCode = WriteStringArray( nFileHandle, s);
 	iErrorCode = ReadStringArray( nFileHandle, s);
@@ -757,90 +756,27 @@ Function FileFunctions()
 	iErrorCode = ReadInteger(nFileHandle, i);
 	ReadStructure( nFileHandle, struct, nTotalBytesRead );
 	
-	WaitForNewDisk() 
-	FileDeleteShared ( "\\CF0\\MyFile" )
+	a = WaitForNewDisk() 
+	a = FileDeleteShared ( "\\CF0\\MyFile" )
 	a = ARDONLY | AHIDDEN | ASYSTEM | AVOLUME | ADIRENT | ARCHIVE  ;      
-	CheckForNVRAMDisk() 
-	MakeDirectoryShared("NewDirect") 
-	RemoveDirectoryShared("\\CF0\\NewDirect") 
-	CheckForDisk () 
-	GetCurrentDirectory()
-	SetCurrentDirectory("\\CF0\\NewDirect")
-	RemoveDirectory("\\CF0\\NewDirect") 
-	MakeDirectory("NewDirect") 
-	FindFirst("*.dat", FileInfo );
-	IsVolume(FileInfo)
-	IsSystem(FileInfo)
-	IsReadOnly(FileInfo)
-	Found = FindNext(FileInfo);
-	IsDirectory(FileInfo)
-	IsHidden(FileInfo)
-	iErrorCode = WriteSignedIntegerArray(nFileHandle, isArray);
-	FindClose() < 0 
-	a = _O_APPEND | _O_CREAT | _O_EXCL | _O_TRUNC | _O_TEXT | _O_BINARY | _O_RDONLY | _O_RDWR | _O_WRONLY;
-	
-	s2 = FileInfo.Name;
-	a = FileInfo.iAttributes;
-	a = FileInfo.iTime;
-	a = FileInfo.iDate;
-	li = FileInfo.lSize;
-}
+	a = CheckForNVRAMDisk() 
+	a = MakeDirectoryShared("NewDirect") 
+	a = RemoveDirectoryShared("\\CF0\\NewDirect") 
+	a = CheckForDisk () 
+	a = GetCurrentDirectory()
+	a = SetCurrentDirectory("\\CF0\\NewDirect")
+	a = RemoveDirectory("\\CF0\\NewDirect") 
+	a = MakeDirectory("NewDirect") 
+	a = FindFirst("*.dat", FileInfo );
+	a = IsVolume(FileInfo)
+	a = IsSystem(FileInfo)
+	a = IsReadOnly(FileInfo)
 
-FUNCTION FileFunctions()
-{
-	a = IsNull(cMutexClass);
-	a=StartFileOperations();
-	nFileHandle = FileOpen ( "\\CF0\\MyFile", _O_WRONLY | _O_TEXT );
-	nNumWritten=FileWrite( nFileHandle, sBuf, 500 );
-	FileClose( nFileHandle );
-	a=EndFileOperations();
-	nFileHandle = FileOpen ( "\\CF0\\MyFile", _O_RDONLY | _O_TEXT);
-	IF ( FileEOF ( nFileHandle ) = 1 )
-	a= SEEK_SET | SEEK_CUR | SEEK_END;
-	IF (FileSeek( nFileHandle, 0, SEEK_SET) < 0 )
-	IF ( FileClose ( nFileHandle ) <> 0 )
-	IF ( FileDelete ( "\\CF0\\MyFile" ) <> 0 )
-	IF ( FileBOF ( nFileHandle )  = 1 )
-	WHILE (FileRead(nFileHandle, sBuf, 4096) > 0)
-	iErrorCode = ReadString( nFileHandle, s2);
-	iErrorCode = WriteStringArray( nFileHandle, s);
-	iErrorCode = ReadStringArray( nFileHandle, s);
-	iErrorCode = WriteSignedLongInteger(nFileHandle, sli);
-	iErrorCode = WriteLongInteger(nFileHandle, li);
-	iErrorCode = WriteInteger(nFileHandle, i);
-	iErrorCode = WriteString( nFileHandle, s2);
-	iErrorCode = ReadSignedLongIntegerArray(nFileHandle, sliArray);
-	iErrorCode = ReadIntegerArray(nFileHandle, iArray);
-	iErrorCode = ReadSignedIntegerArray(nFileHandle, isArray);
-	iErrorCode = ReadLongIntegerArray(nFileHandle, ilArray);
-	iErrorCode = ReadIntegerArray(nFileHandle, iArray);
-	iErrorCode = ReadSignedLongInteger(nFileHandle, sli);
-	iErrorCode = ReadSignedInteger(nFileHandle, si);
-	iErrorCode = ReadLongInteger(nFileHandle, li);
-	iErrorCode = ReadInteger(nFileHandle, i);
-	ReadStructure( nFileHandle, struct, nTotalBytesRead );
-	if ( WaitForNewDisk() < 0 )
-	IF ( FileDeleteShared ( "\\CF0\\MyFile" ) <> 0 )
-	a = ARDONLY | AHIDDEN | ASYSTEM | AVOLUME | ADIRENT | ARCHIVE  ;      
-	IF ((FileInfo.iAttributes & ADIRENT)<>0)
-	IF ( CheckForNVRAMDisk() = 1 )
-	IF( MakeDirectoryShared("NewDirect") < 0)
-	IF( RemoveDirectoryShared("\\CF0\\NewDirect") < 0)
-	EndFileOperations();
-	StartFileOperations(); 
-	IF ( CheckForDisk () = 1 )
-	PRINT( "The current directory =  %s\n", GetCurrentDirectory());
-	IF( SetCurrentDirectory("\\CF0\\NewDirect") < 0)
-	IF( RemoveDirectory("\\CF0\\NewDirect") < 0)
-	IF( MakeDirectory("NewDirect") < 0)
-	Found = FindFirst("*.dat", FileInfo );
-	if (IsVolume(FileInfo))
-	if (IsSystem(FileInfo))
-	if (IsReadOnly(FileInfo))
 	Found = FindNext(FileInfo);
-	if (IsDirectory(FileInfo))
-	if (IsHidden(FileInfo))
+	a = IsDirectory(FileInfo)
+	a = IsHidden(FileInfo)
 	iErrorCode = WriteSignedIntegerArray(nFileHandle, isArray);
+	if (FindClose() < 0) 
 	a = _O_APPEND | _O_CREAT | _O_EXCL | _O_TRUNC | _O_TEXT | _O_BINARY | _O_RDONLY | _O_RDWR | _O_WRONLY;
 	s2 = FileInfo.Name;
 	a = FileInfo.iAttributes;
@@ -848,7 +784,6 @@ FUNCTION FileFunctions()
 	a = FileInfo.iDate;
 	li = FileInfo.lSize;
 }
-
 
 FUNCTION TimeAndDateFunctions()
 {
@@ -937,7 +872,7 @@ FUNCTION RampingFunctions()
 	status = CompareRampsByID (AnalogOutput1,4) ;
 	InitializeRampInfo(InputRampInfo);
 	InitializeRampInfoArray(InputRampInfo2) ;
-	
+
 }
 
 FUNCTION TryAndCatchHandling()
@@ -951,5 +886,4 @@ FUNCTION TryAndCatchHandling()
 	{
 		Print( "Exception thrown: %s", GetExceptionMessage() );
 	}
-	
 }
