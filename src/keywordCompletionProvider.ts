@@ -13,7 +13,7 @@ import {
 } from "vscode";
 import * as fs from "fs";
 import * as path from "path";
-import { SimplPlusKeywordHelp } from "./simplPlusKeywordHelp";
+import { SimplPlusKeywordHelpService } from "./simplPlusKeywordHelpService";
 import { KeywordService, KeywordType, Keyword } from "./keywordService";
 import { TokenService } from "./tokenService";
 import { DocumentToken } from "./tokenTypes";
@@ -22,7 +22,7 @@ const { convert } = require('html-to-text');
 
 export class KeywordCompletionProvider implements CompletionItemProvider {
     private keywordItems: CompletionItem[];
-    private helpDefinitions = new SimplPlusKeywordHelp();
+    private helpDefinitions = SimplPlusKeywordHelpService.getInstance();
     private _keywordService: KeywordService;
     private _tokenService: TokenService;
 

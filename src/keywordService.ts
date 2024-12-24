@@ -29,7 +29,8 @@ export type KeywordType =
 export type Keyword = {
     name: string,
     kind: CompletionItemKind,
-    type: KeywordType
+    type: KeywordType,
+    hasHelp: boolean
 }
 
 export class KeywordService {
@@ -48,17 +49,17 @@ export class KeywordService {
         const keywordDefinitionsPath = path.join(extensionPath, "src", "keywords.csv");
         if (!fsExistsWrapper.existsSyncWrapper(keywordDefinitionsPath)) {return;};
         const keywordDefinitionsContent = readFileSyncWrapper(keywordDefinitionsPath);
-        keywordDefinitionsContent.split("\n").
-            forEach(kd => {
-                const elements = kd.split(",");
-                if (elements.length!==3) {return;}
-                const definition:Keyword = {
-                    name : elements[0].trim(),
-                    kind : CompletionItemKind[elements[1].trim()],
-                    type : elements[2].trim() as KeywordType
-                };
-                this._keywordDefinitions.push(definition);
-            });
+        for (const entry of keywordDefinitionsContent.split("\n")) {
+            const elements = entry.split(",");
+            if (elements.length !== 3) { continue; }
+            const definition = {
+                name: elements[0].trim(),
+                kind : CompletionItemKind[elements[1].trim()],
+                type : elements[2].trim() as KeywordType,
+                hasHelp: elements[3].trim() !== "trie"
+            };
+            this._keywordDefinitions.push(definition);
+        }
     }
     public  getKeywords(types:KeywordType[]) : Keyword[]{
         return this._keywordDefinitions.filter(kd=>types.includes(kd.type));

@@ -1,11 +1,19 @@
-import axios from 'axios';
 import { MarkdownString } from 'vscode';
+import * as https from 'https';
 
-
-export class SimplPlusKeywordHelp {
+export class SimplPlusKeywordHelpService {
+    public static instance: SimplPlusKeywordHelpService;
     readonly CRESTRON_SIMPL_HELP_URL: string = "https://help.crestron.com/simpl_plus";
     helpUrls: HelpUrl[] = [];
-    constructor() {
+
+    public static getInstance(): SimplPlusKeywordHelpService {
+        if (!SimplPlusKeywordHelpService.instance) {
+            SimplPlusKeywordHelpService.instance = new SimplPlusKeywordHelpService();
+        }
+        return SimplPlusKeywordHelpService.instance;
+    }
+
+    private constructor() {
         this.GetToc();
     }
 
@@ -18,16 +26,18 @@ export class SimplPlusKeywordHelp {
             toc = await this.GetPartialToc("Data/Tocs/Simpl_lr_Chunk2.js");
             this.helpUrls.push(...toc);
         }
-        catch {}
+        catch { }
     };
 
     private async GetPartialToc(partialUrl: string): Promise<HelpUrl[]> {
         let helpUrls: HelpUrl[] = [];
         const tocUrl = `${this.CRESTRON_SIMPL_HELP_URL}/${partialUrl}`;
         try {
-            const response = await axios.get(tocUrl);
-            if (response.status !== 200) { return []; }
-            const tocEntries = response.data.replace("define({", "").replace("});", "").replaceAll("'", '"').replaceAll("{i:", '{"i":').replaceAll(",t:", ',"t":').replaceAll(",b:", ',"b":').split("},");
+            // const response = await axios.get(tocUrl);
+            // if (response.status !== 200) { return []; }
+            const response = await this.fetchHttpPage(tocUrl);
+            // const tocEntries = response.data.replace("define({", "").replace("});", "").replaceAll("'", '"').replaceAll("{i:", '{"i":').replaceAll(",t:", ',"t":').replaceAll(",b:", ',"b":').split("},");
+            const tocEntries = response.replace("define({", "").replace("});", "").replaceAll("'", '"').replaceAll("{i:", '{"i":').replaceAll(",t:", ',"t":').replaceAll(",b:", ',"b":').split("},");
             tocEntries.forEach((entry: string) => {
                 try {
                     const tocObject = JSON.parse(`{${entry}}}`);
@@ -53,9 +63,10 @@ export class SimplPlusKeywordHelp {
         if (helpUrlEntry === undefined || helpUrlEntry.url === undefined) { return undefined; }
         const theUrl = new URL(helpUrlEntry.url);
         try {
-            const response = await axios.get(helpUrlEntry.url);
-            if (response.status !== 200) { return undefined; }
-            const markdownContent = response.data;
+            // const response = await axios.get(helpUrlEntry.url);
+            const response = await this.fetchHttpPage(helpUrlEntry.url);
+            // if (response.status !== 200) { return undefined; }
+            const markdownContent = response;
             const sanitizedContent = this.replacePartialPathWithFull(theUrl, markdownContent);
             const markdownString = new MarkdownString(sanitizedContent);
             markdownString.isTrusted = true;
@@ -79,9 +90,39 @@ export class SimplPlusKeywordHelp {
         }
         return content;
     }
+
+    private fetchHttpPage(url: string): Promise<string> {
+        return new Promise((resolve, reject) => {
+            https.get(url, (response) => {
+                let data = '';
+
+                // A chunk of data has been received.
+                response.on('data', (chunk) => {
+                    data += chunk;
+                });
+
+                // The whole response has been received.
+                response.on('end', () => {
+                    if (response.statusCode && response.statusCode >= 200 && response.statusCode < 300) {
+                        resolve(data);
+                    } else {
+                        reject(new Error(`HTTP error! status: ${response.statusCode}`));
+                    }
+                });
+            }).on('error', (error) => {
+                reject(error);
+            });
+        });
+    }
+
 }
+
 
 type HelpUrl = {
     functionName: string;
     url: string;
 }
+
+
+
+
