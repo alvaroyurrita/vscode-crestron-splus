@@ -76,7 +76,7 @@ export async function provideClassTokens(): Promise<DocumentToken[]> {
             internalDelegateProperties: delegateProperties
         });
     }
-    console.log(apiClasses);
+    console.log("API Classes",apiClasses);
     return apiClasses;
 }
 

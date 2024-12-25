@@ -189,7 +189,7 @@ suite("with a position", function () {
         const tokenService = TokenService.getInstance(mockExtensionContext);
         const uri = vscode.window.activeTextEditor?.document.uri.toString();
         const position = new vscode.Position(0, 0);
-        const token = tokenService.getDocumentMemberAtPosition(uri, position);
+        const token = tokenService.getBlockStatementTokenAtPosition(uri, position);
         assert.strictEqual(token, undefined);
     });
     test("inside a block, should return top most token", async () => {
@@ -199,7 +199,7 @@ suite("with a position", function () {
         const tokenService = TokenService.getInstance(mockExtensionContext);
         const uri = vscode.window.activeTextEditor?.document.uri.toString();
         const position = new vscode.Position(2, 5);
-        const token = tokenService.getDocumentMemberAtPosition(uri, position);
+        const token = tokenService.getBlockStatementTokenAtPosition(uri, position);
         assert.strictEqual(token.name, "DigitalInput1");
     });
 });

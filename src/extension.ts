@@ -15,10 +15,11 @@ import { SimplPlusTasks, } from './simplPlusTasks';
 import { SimplPlusStatusBar } from "./simplPlusStatusBar";
 import { insertCategory } from "./simplPlusCategories";
 import { ApiCompletionProvider } from "./apiCompletionProvider";
-import { KeywordCompletionProvider } from "./keywordCompletionProvider";
+import { SimplPlusCompletionProvider } from "./simplPlusCompletionProvider";
 import { TextMateCompletionProvider } from "./textMateCompletionProvider";
 import { TokenService } from "./services/tokenService";
 import { KeywordService } from "./services/keywordService";
+import { SimplPlusSignatureHelpProvider } from "./simplPlusSignatureHelpProvider";
 
 
 // Creates a terminal, calls the command, then closes the terminal
@@ -96,8 +97,11 @@ export async function activate(context: ExtensionContext) {
     // let thisApiCompletionProvider = new ApiCompletionProvider();
     // const apiCompletionProvider = languages.registerCompletionItemProvider({ language: 'simpl-plus' },thisApiCompletionProvider, '.');
 
-    let thisKeywordCompletionProvider = new KeywordCompletionProvider(keywordService, tokenService);
-    const keywordCompletionProvider = languages.registerCompletionItemProvider({ language: 'simpl-plus' }, thisKeywordCompletionProvider);
+    let thisCompletionProvider = new SimplPlusCompletionProvider(keywordService, tokenService);
+    const keywordCompletionProvider = languages.registerCompletionItemProvider({ language: 'simpl-plus' }, thisCompletionProvider);
+
+    let thisSignatureHelpProvider = new SimplPlusSignatureHelpProvider(tokenService);
+    const signatureHelpProvider = languages.registerSignatureHelpProvider({ language: 'simpl-plus' }, thisSignatureHelpProvider, '(', ',');
 
     // let thisTextmateCompletionProvider = new TextMateCompletionProvider(tokenService);
     // const textMateCompletionProvider = languages.registerCompletionItemProvider({ language: 'simpl-plus' }, thisTextmateCompletionProvider);
@@ -112,6 +116,7 @@ export async function activate(context: ExtensionContext) {
         simplPlusTasks,
         // apiCompletionProvider,
         keywordCompletionProvider,
+        signatureHelpProvider,
         // textMateCompletionProvider
       );
 }

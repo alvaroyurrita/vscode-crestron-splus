@@ -87,7 +87,7 @@ export class SimplPlusTasks implements Disposable {
         }
         catch (err) {
             let channel = this.getOutputChannel();
-            console.log(err);
+            console.log("Error while calculating Simpl Plus Tasks",err);
 
             if (err instanceof Error) {
                 channel.appendLine(err.message);

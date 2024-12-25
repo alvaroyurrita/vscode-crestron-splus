@@ -27,7 +27,7 @@ export class TokenService {
         return this._documents.get(uri);
     }
 
-    public getDocumentMemberAtPosition(uri: string, position: Position): DocumentToken | undefined {
+    public getBlockStatementTokenAtPosition(uri: string, position: Position): DocumentToken | undefined {
         const documentMembers = this.getDocumentMembers(uri);
         if (documentMembers === undefined) { return undefined; }
         let documentMember: DocumentToken | undefined;
@@ -37,6 +37,18 @@ export class TokenService {
             documentMember = documentMembers.find(member => member.parameterRange?.contains(position) ?? false);
         }
         return documentMember;
+    }
+
+    public getDocumentMemberAtPosition(uri: string, position: Position): DocumentToken | undefined {
+        const documentMembers = this.getDocumentMembers(uri);
+        if (documentMembers === undefined) { return undefined; }
+        return documentMembers.find(member => member.nameRange.contains(position));
+    }
+
+    public getDocumentMemberByName(uri: string, name: string): DocumentToken | undefined {
+        const documentMembers = this.getDocumentMembers(uri);
+        if (documentMembers === undefined) { return undefined; }
+        return documentMembers.find(member => member.name === name);
     }
 
     public isAtParameterRange(uri: string, position: Position): boolean {

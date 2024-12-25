@@ -13,18 +13,16 @@ import {
     window,
     CompletionItemLabel,
 } from "vscode";
-import * as fs from "fs";
-import * as path from "path";
 import { SimplPlusKeywordHelpService } from "./services/simplPlusKeywordHelpService";
 import { KeywordService, KeywordType, Keyword } from "./services/keywordService";
 import { TokenService } from "./services/tokenService";
 import { DocumentToken } from "./services/tokenTypes";
-const { convert } = require('html-to-text');
 
-export class KeywordCompletionProvider implements CompletionItemProvider {
-    private keywordItems: CompletionItem[];
+export class SimplPlusCompletionProvider implements CompletionItemProvider {
     private _keywordService: KeywordService;
     private _tokenService: TokenService;
+    private _uri: Uri;
+    private _position: Position;
 
     constructor(keywordService: KeywordService, tokenService: TokenService) {
         this._keywordService = keywordService;
@@ -37,8 +35,10 @@ export class KeywordCompletionProvider implements CompletionItemProvider {
         token: CancellationToken,
         context: CompletionContext):
         ProviderResult<CompletionItem[]> {
+        this._uri = document.uri;
+        this._position = position;
         const uri = document.uri;
-        const currentBlock = this._tokenService.getDocumentMemberAtPosition(uri.toString(), position);
+        const currentBlock = this._tokenService.getBlockStatementTokenAtPosition(uri.toString(), position);
         if (currentBlock === undefined) {
             const lineUntilPosition = document.lineAt(position.line).text.slice(0, position.character);
             if (lineUntilPosition.toLowerCase().match(/(push|release|change|event)/)) {
@@ -180,14 +180,18 @@ export class KeywordCompletionProvider implements CompletionItemProvider {
                 description: d.dataType
             };
             let documentation: string = "";
+            const item = new CompletionItem(itemLabel, this._tokenService.convertTypeToKind(d.type));
             if (tokenKind === CompletionItemKind.Function) {
                 documentation = `${d.dataType} ${d.name}(`;
                 if (d.parameters.length > 0) {
                     documentation += d.parameters.map(p => `${p.dataType} ${p.name}`).join(", ");
                 }
                 documentation += ")";
+                item.command = {
+                    command: "editor.action.triggerParameterHints",
+                    title: "triggerSignatureHelp",
+                };
             }
-            const item = new CompletionItem(itemLabel, this._tokenService.convertTypeToKind(d.type));
             item.documentation = documentation;
             return item;
         });
@@ -201,6 +205,12 @@ export class KeywordCompletionProvider implements CompletionItemProvider {
                 description: kd.type.toString()
             };
             const item = new CompletionItem(itemLabel, kd.kind);
+            if (kd.kind === CompletionItemKind.Function) {
+                item.command = {
+                    command: "editor.action.triggerParameterHints",
+                    title: "triggerSignatureHelp",
+                };
+            }
             return item;
         });
         return items;
