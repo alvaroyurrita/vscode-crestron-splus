@@ -1,20 +1,22 @@
 import { MarkdownString } from 'vscode';
 import * as https from 'https';
+import { DocumentToken } from './tokenTypes';
+const { convert } = require('html-to-text');
 
 export class SimplPlusKeywordHelpService {
     public static instance: SimplPlusKeywordHelpService;
     readonly CRESTRON_SIMPL_HELP_URL: string = "https://help.crestron.com/simpl_plus";
     helpUrls: HelpUrl[] = [];
 
-    public static getInstance(): SimplPlusKeywordHelpService {
+    public static async getInstance(): Promise<SimplPlusKeywordHelpService> {
         if (!SimplPlusKeywordHelpService.instance) {
             SimplPlusKeywordHelpService.instance = new SimplPlusKeywordHelpService();
+            await SimplPlusKeywordHelpService.instance.GetToc();
         }
         return SimplPlusKeywordHelpService.instance;
     }
 
     private constructor() {
-        this.GetToc();
     }
 
     private async GetToc() {
@@ -26,17 +28,16 @@ export class SimplPlusKeywordHelpService {
             toc = await this.GetPartialToc("Data/Tocs/Simpl_lr_Chunk2.js");
             this.helpUrls.push(...toc);
         }
-        catch { }
+        catch (error) {
+            console.error("Failed to fetch help content", error);
+        }
     };
 
     private async GetPartialToc(partialUrl: string): Promise<HelpUrl[]> {
         let helpUrls: HelpUrl[] = [];
         const tocUrl = `${this.CRESTRON_SIMPL_HELP_URL}/${partialUrl}`;
         try {
-            // const response = await axios.get(tocUrl);
-            // if (response.status !== 200) { return []; }
             const response = await this.fetchHttpPage(tocUrl);
-            // const tocEntries = response.data.replace("define({", "").replace("});", "").replaceAll("'", '"').replaceAll("{i:", '{"i":').replaceAll(",t:", ',"t":').replaceAll(",b:", ',"b":').split("},");
             const tocEntries = response.replace("define({", "").replace("});", "").replaceAll("'", '"').replaceAll("{i:", '{"i":').replaceAll(",t:", ',"t":').replaceAll(",b:", ',"b":').split("},");
             tocEntries.forEach((entry: string) => {
                 try {
@@ -59,13 +60,12 @@ export class SimplPlusKeywordHelpService {
     }
 
     public async GetSimplHelp(keyword: string): Promise<MarkdownString | undefined> {
-        var helpUrlEntry = this.helpUrls.find((entry) => entry.functionName === keyword.toLowerCase());
+        keyword = keyword.trim();
+        var helpUrlEntry = this.helpUrls.find((entry) => entry.functionName.toLowerCase() === keyword.toLowerCase());
         if (helpUrlEntry === undefined || helpUrlEntry.url === undefined) { return undefined; }
         const theUrl = new URL(helpUrlEntry.url);
         try {
-            // const response = await axios.get(helpUrlEntry.url);
             const response = await this.fetchHttpPage(helpUrlEntry.url);
-            // if (response.status !== 200) { return undefined; }
             const markdownContent = response;
             const sanitizedContent = this.replacePartialPathWithFull(theUrl, markdownContent);
             const markdownString = new MarkdownString(sanitizedContent);
@@ -75,6 +75,44 @@ export class SimplPlusKeywordHelpService {
         }
         catch {
             return undefined;
+        }
+    }
+
+    public GetFunctionInfoFromHelp(itemLabel: string, helpMarkDownString: MarkdownString): DocumentToken {
+        itemLabel = itemLabel.trim();
+        const helpContentString = convert(helpMarkDownString.value, { wordwrap: false }) as string;
+        const functionToken: DocumentToken = {
+            name: itemLabel,
+            type: "function",
+            nameRange: null,
+            dataType: "",
+            parameters: [],
+        };
+        const syntaxString = helpContentString.replace(/\n/g, "").match(/Syntax:\s*(.*)\s*Description/i);
+        if (syntaxString && syntaxString[1]) {
+            const parameterRegex = new RegExp(String.raw`(\w*)?\s*${itemLabel}\s*\(([^)]*)`, "i"); //Gather  return value and closing param of end of line
+            const parameterMatch = syntaxString[1].match(parameterRegex);
+            functionToken.dataType = (parameterMatch && parameterMatch[1]) ?
+                parameterMatch[1].trim() :
+                "void";
+            if (parameterMatch && parameterMatch[2]) {
+                const parameters = parameterMatch[2].
+                    replace(/\[.*\]/g, "").  //Remove optional parameters
+                    split(",");
+                parameters.forEach((parameter, index, parameters) => {
+                    const parameterName = parameter.match(/(\w+)\W(\w+).*/); //Grabs parameter type and name
+                    if (parameterName && parameterName[1] && parameterName[2]) {
+                        functionToken.parameters.push({
+                            name: parameterName[2],
+                            dataType: parameterName[1],
+                            nameRange: null,
+                            type: "parameter",
+                        });
+                    }
+                });
+
+            }
+            return functionToken;
         }
     }
 

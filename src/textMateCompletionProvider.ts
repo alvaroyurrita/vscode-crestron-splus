@@ -11,7 +11,7 @@ import {
     window,
 } from "vscode";
 import TextmateLanguageService from "vscode-textmate-languageservice";
-import { TokenService } from "./tokenService";
+import { TokenService } from "./services/tokenService";
 
 export class TextMateCompletionProvider implements CompletionItemProvider {
     constructor(private readonly _tokenService: TokenService){}

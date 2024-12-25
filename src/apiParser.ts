@@ -1,6 +1,6 @@
-import * as fsExistsWrapper from './fsReadSyncWrapper';
+import * as fsExistsWrapper from './helpers/fsReadSyncWrapper';
 import { workspace, Uri, Position, Range, TextDocument, } from 'vscode';
-import { DocumentToken } from './tokenTypes';
+import { DocumentToken } from './services/tokenTypes';
 
 
 export async function provideClassTokens(): Promise<DocumentToken[]> {

@@ -1,6 +1,6 @@
 
 import * as assert from 'assert';
-import { KeywordService } from '../../keywordService';
+import { KeywordService } from '../../services/keywordService';
 
 suite('With Keyword Service', () => {
     let keywordService: KeywordService;
@@ -13,7 +13,7 @@ suite('With Keyword Service', () => {
     });
     test('gets 20 constant Keywords', () => {
         const keywords = keywordService.getKeywords(["constant"]);
-        assert.strictEqual(keywords.length, 20);
+        assert.strictEqual(keywords.length, 23);
     });
     test('gets 43 declaration Keywords', () => {
         const keywords = keywordService.getKeywords(["declaration"]);
@@ -61,7 +61,7 @@ suite('With Keyword Service', () => {
     });
     test('gets 16 statement Keywords', () => {
         const keywords = keywordService.getKeywords(["statement"]);
-        assert.strictEqual(keywords.length, 16);
+        assert.strictEqual(keywords.length, 15);
     });
     test('gets 5 structureBuiltIn Keywords', () => {
         const keywords = keywordService.getKeywords(["structureBuiltIn"]);
@@ -81,6 +81,6 @@ suite('With Keyword Service', () => {
     });
     test('gets 33 voidFunction Keywords', () => {
         const keywords = keywordService.getKeywords(["voidFunction"]);
-        assert.strictEqual(keywords.length, 33);
+        assert.strictEqual(keywords.length, 35);
     });
 });

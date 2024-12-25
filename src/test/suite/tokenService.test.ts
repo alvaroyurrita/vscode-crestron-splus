@@ -1,9 +1,9 @@
 import * as assert from 'assert';
 import * as sinon from "sinon";
-import * as fsWrapper from '../../fsExistsSyncWrapper';
+import * as fsWrapper from '../../helpers/fsExistsSyncWrapper';
 import { removeWorkspaceCustomSettings, OpenAndShowSPlusDocument, delay } from '../testFunctions';
 import * as vscode from 'vscode';
-import { TokenService } from '../../tokenService';
+import { TokenService } from '../../services/tokenService';
 
 
 suite("testing tokenization", function () {

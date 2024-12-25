@@ -16,8 +16,8 @@ import {
     TaskPresentationOptions,
 } from "vscode";
 import path from "path";
-import * as fsExistsWrapper from './fsExistsSyncWrapper';
-import { getCompilerPath, getFileName } from "./helperFunctions";
+import * as fsExistsWrapper from './helpers/fsExistsSyncWrapper';
+import { getCompilerPath, getFileName } from "./helpers/helperFunctions";
 import { BuildType } from "./build-type";
 
 export class SimplPlusTasks implements Disposable {

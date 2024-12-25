@@ -3,8 +3,8 @@ import * as sinon from 'sinon';
 import { TextDocument, Uri, workspace } from 'vscode';
 import { SimplPlusActiveDocuments } from '../../simplPlusActiveDocuments';
 import { BuildType } from '../../build-type';
-import * as fsExistsWrapper from '../../fsExistsSyncWrapper';
-import * as fsFileReadWrapper from '../../fsReadSyncWrapper';
+import * as fsExistsWrapper from '../../helpers/fsExistsSyncWrapper';
+import * as fsFileReadWrapper from '../../helpers/fsReadSyncWrapper';
 import { removeWorkspaceCustomSettings, } from '../testFunctions';
 
 

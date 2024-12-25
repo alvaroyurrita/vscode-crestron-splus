@@ -1,6 +1,6 @@
 import { extensions, CompletionItemKind } from "vscode";
-import { readFileSyncWrapper } from "./fsReadSyncWrapper";
-import * as fsExistsWrapper from './fsExistsSyncWrapper';
+import { readFileSyncWrapper } from "../helpers/fsReadSyncWrapper";
+import * as fsExistsWrapper from '../helpers/fsExistsSyncWrapper';
 import path from "path";
 
 
@@ -51,17 +51,21 @@ export class KeywordService {
         const keywordDefinitionsContent = readFileSyncWrapper(keywordDefinitionsPath);
         for (const entry of keywordDefinitionsContent.split("\n")) {
             const elements = entry.split(",");
-            if (elements.length !== 3) { continue; }
+            if (elements.length !== 4) { continue; }
             const definition = {
                 name: elements[0].trim(),
                 kind : CompletionItemKind[elements[1].trim()],
                 type : elements[2].trim() as KeywordType,
-                hasHelp: elements[3].trim() !== "trie"
+                hasHelp: elements[3].trim() === "true"
             };
             this._keywordDefinitions.push(definition);
         }
     }
     public  getKeywords(types:KeywordType[]) : Keyword[]{
         return this._keywordDefinitions.filter(kd=>types.includes(kd.type));
+    }
+
+    public getKeyword(name: string): Keyword | undefined {
+        return this._keywordDefinitions.find(kd => kd.name.toLowerCase() === name.toLowerCase());
     }
 }

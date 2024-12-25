@@ -1,17 +1,18 @@
 import { HoverProvider, Hover, TextDocument, CancellationToken, Position } from 'vscode';
-import { SimplPlusKeywordHelpService } from './simplPlusKeywordHelpService';
+import { SimplPlusKeywordHelpService } from './services/simplPlusKeywordHelpService';
 
 export class SimplPlusHoverProvider implements HoverProvider {
-    private helpDefinitions = SimplPlusKeywordHelpService.getInstance();
     constructor() {
 
     }
     async provideHover(document: TextDocument, position: Position, Token: CancellationToken) {
+        const helpDefinitions = await SimplPlusKeywordHelpService.getInstance();
+
         const range = document.getWordRangeAtPosition(position);
         const word = document.getText(range);
 
         try {
-            const helpContent = await this.helpDefinitions.GetSimplHelp(word);
+            const helpContent = await helpDefinitions.GetSimplHelp(word);
             if (helpContent === undefined) { return undefined; }
             return new Hover(helpContent);
         } catch (error) {

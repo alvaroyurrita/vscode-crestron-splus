@@ -17,8 +17,8 @@ import { insertCategory } from "./simplPlusCategories";
 import { ApiCompletionProvider } from "./apiCompletionProvider";
 import { KeywordCompletionProvider } from "./keywordCompletionProvider";
 import { TextMateCompletionProvider } from "./textMateCompletionProvider";
-import { TokenService } from "./tokenService";
-import { KeywordService } from "./keywordService";
+import { TokenService } from "./services/tokenService";
+import { KeywordService } from "./services/keywordService";
 
 
 // Creates a terminal, calls the command, then closes the terminal
@@ -90,8 +90,8 @@ export async function activate(context: ExtensionContext) {
     let thisFormatProvider = new SimplPlusFormattingProvider();
     const formatProvider = languages.registerDocumentFormattingEditProvider({ language: 'simpl-plus' }, thisFormatProvider);
 
-    // let thisHoverProvider = new SimplPlusHoverProvider();
-    // const hoverProvider = languages.registerHoverProvider({ language: 'simpl-plus' }, thisHoverProvider);
+    let thisHoverProvider = new SimplPlusHoverProvider();
+    const hoverProvider = languages.registerHoverProvider({ language: 'simpl-plus' }, thisHoverProvider);
 
     // let thisApiCompletionProvider = new ApiCompletionProvider();
     // const apiCompletionProvider = languages.registerCompletionItemProvider({ language: 'simpl-plus' },thisApiCompletionProvider, '.');
@@ -104,7 +104,7 @@ export async function activate(context: ExtensionContext) {
 
     context.subscriptions.push(
         formatProvider,
-        // hoverProvider,
+        hoverProvider,
         localHelp_command,
         webHelp_command,
         build_command,

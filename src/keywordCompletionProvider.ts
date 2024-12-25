@@ -10,19 +10,19 @@ import {
     CompletionItemKind,
     SnippetString,
     Uri,
+    window,
+    CompletionItemLabel,
 } from "vscode";
 import * as fs from "fs";
 import * as path from "path";
-import { SimplPlusKeywordHelpService } from "./simplPlusKeywordHelpService";
-import { KeywordService, KeywordType, Keyword } from "./keywordService";
-import { TokenService } from "./tokenService";
-import { DocumentToken } from "./tokenTypes";
-import { match } from "assert";
+import { SimplPlusKeywordHelpService } from "./services/simplPlusKeywordHelpService";
+import { KeywordService, KeywordType, Keyword } from "./services/keywordService";
+import { TokenService } from "./services/tokenService";
+import { DocumentToken } from "./services/tokenTypes";
 const { convert } = require('html-to-text');
 
 export class KeywordCompletionProvider implements CompletionItemProvider {
     private keywordItems: CompletionItem[];
-    private helpDefinitions = SimplPlusKeywordHelpService.getInstance();
     private _keywordService: KeywordService;
     private _tokenService: TokenService;
 
@@ -31,7 +31,7 @@ export class KeywordCompletionProvider implements CompletionItemProvider {
         this._tokenService = tokenService;
     }
 
-    provideCompletionItems(
+    public provideCompletionItems(
         document: TextDocument,
         position: Position,
         token: CancellationToken,
@@ -85,19 +85,17 @@ export class KeywordCompletionProvider implements CompletionItemProvider {
         }
         const items: CompletionItem[] = documentItems.filter(di => di.type === "variable" && di.dataType.toLowerCase().match(/input/)).map(d => {
             const item = new CompletionItem(d.name, this._tokenService.convertTypeToKind(d.type));
-            item.documentation = "I am a input variable";
             return item;
         });
         return items;
     }
-    getStructureVariables(uri: Uri): CompletionItem[] {
+    private getStructureVariables(uri: Uri): CompletionItem[] {
         const documentItems = this._tokenService.getDocumentMembers(uri.toString());
         if (documentItems === undefined) {
             return [];
         }
         const items: CompletionItem[] = documentItems.filter(di => di.type === "struct" || di.type === "class").map(d => {
             const item = new CompletionItem(d.name, this._tokenService.convertTypeToKind(d.type));
-            item.documentation = "I am a root variable";
             return item;
         });
         return items;
@@ -110,12 +108,7 @@ export class KeywordCompletionProvider implements CompletionItemProvider {
             "statement",
         ];
         const keywordDefinitions = this._keywordService.getKeywords(functionKeyword);
-        const functionKeywords: CompletionItem[] = keywordDefinitions.map(kd => {
-            const item = new CompletionItem(kd.name, kd.kind);
-            item.documentation = "I am in a function";
-            return item;
-        });
-        return functionKeywords;
+        return this.getKeywordItems(keywordDefinitions);
     }
     private getParameterKeywords(uri: Uri): CompletionItem[] {
         const functionKeyword: KeywordType[] = [
@@ -123,12 +116,7 @@ export class KeywordCompletionProvider implements CompletionItemProvider {
             "variableType",
         ];
         const keywordDefinitions = this._keywordService.getKeywords(functionKeyword);
-        const functionKeywords: CompletionItem[] = keywordDefinitions.map(kd => {
-            const item = new CompletionItem(kd.name, kd.kind);
-            item.documentation = "I am in a function";
-            return item;
-        });
-        return functionKeywords;
+        return this.getKeywordItems(keywordDefinitions);
     }
     private getFunctionKeywords(): CompletionItem[] {
         const functionKeyword: KeywordType[] = [
@@ -140,12 +128,7 @@ export class KeywordCompletionProvider implements CompletionItemProvider {
             "constant"
         ];
         const keywordDefinitions = this._keywordService.getKeywords(functionKeyword);
-        const functionKeywords: CompletionItem[] = keywordDefinitions.map(kd => {
-            const item = new CompletionItem(kd.name, kd.kind);
-            item.documentation = "I am in a function";
-            return item;
-        });
-        return functionKeywords;
+        return this.getKeywordItems(keywordDefinitions);
     }
     private getStructureKeywords(): CompletionItem[] {
         const functionKeyword: KeywordType[] = [
@@ -153,24 +136,17 @@ export class KeywordCompletionProvider implements CompletionItemProvider {
             "variableType",
         ];
         const keywordDefinitions = this._keywordService.getKeywords(functionKeyword);
-        const functionKeywords: CompletionItem[] = keywordDefinitions.map(kd => {
-            const item = new CompletionItem(kd.name, kd.kind);
-            item.documentation = "I am in a structure";
-            return item;
-        });
-        return functionKeywords;
+        return this.getKeywordItems(keywordDefinitions);
     }
     private getFunctionVariables(functionToken: DocumentToken): CompletionItem[] {
         const functionVariables: CompletionItem[] = functionToken.internalVariables?.map(v => {
             const item = new CompletionItem(v.name, CompletionItemKind.Variable);
-            item.documentation = "I am a function Variable";
             return item;
-        })??[];
+        }) ?? [];
         const functionParameters: CompletionItem[] = functionToken.parameters?.map(p => {
             const item = new CompletionItem(p.name, CompletionItemKind.Variable);
-            item.documentation = "I am a function Parameter";
             return item;
-        })??[];
+        }) ?? [];
         return functionVariables.concat(functionParameters);
 
     }
@@ -190,12 +166,7 @@ export class KeywordCompletionProvider implements CompletionItemProvider {
             "declaration",
         ];
         const keywordDefinitions = this._keywordService.getKeywords(rootKeywords);
-        const rootItems: CompletionItem[] = keywordDefinitions.map(kd => {
-            const item = new CompletionItem(kd.name, kd.kind);
-            item.documentation = "Its mE";
-            return item;
-        });
-        return rootItems;
+        return this.getKeywordItems(keywordDefinitions);
     }
     private getRootVariables(uri: Uri): CompletionItem[] {
         const documentItems = this._tokenService.getDocumentMembers(uri.toString());
@@ -203,51 +174,80 @@ export class KeywordCompletionProvider implements CompletionItemProvider {
             return [];
         }
         const items: CompletionItem[] = documentItems.map(d => {
-            const item = new CompletionItem(d.name, this._tokenService.convertTypeToKind(d.type));
-            item.documentation = "I am a root variable";
+            const tokenKind = this._tokenService.convertTypeToKind(d.type);
+            let itemLabel: CompletionItemLabel = {
+                label: d.name,
+                description: d.dataType
+            };
+            let documentation: string = "";
+            if (tokenKind === CompletionItemKind.Function) {
+                documentation = `${d.dataType} ${d.name}(`;
+                if (d.parameters.length > 0) {
+                    documentation += d.parameters.map(p => `${p.dataType} ${p.name}`).join(", ");
+                }
+                documentation += ")";
+            }
+            const item = new CompletionItem(itemLabel, this._tokenService.convertTypeToKind(d.type));
+            item.documentation = documentation;
             return item;
         });
         return items;
     }
 
-    // resolveCompletionItem(item: CompletionItem, token: CancellationToken): ProviderResult<CompletionItem> {
-    //     return new Promise(async resolve => {
-    //         const itemLabel = item.label.toString();
-    //         const helpContent = await this.helpDefinitions.GetSimplHelp(itemLabel);
-    //         if (helpContent === undefined) { return item; }
-    //         const helpContentValue = helpContent.value;
-    //         item.documentation = helpContent;
+    private getKeywordItems(keywords: Keyword[]): CompletionItem[] {
+        const items: CompletionItem[] = keywords.map(kd => {
+            let itemLabel: CompletionItemLabel = {
+                label: kd.name,
+                description: kd.type.toString()
+            };
+            const item = new CompletionItem(itemLabel, kd.kind);
+            return item;
+        });
+        return items;
+    }
 
-    //         const helpContentString = convert(helpContentValue, { wordwrap: false }) as string;
-    //         const syntaxString = helpContentString.replace(/\n/g, "").match(/Syntax:\s*(.*)\s*Description/i);
-    //         if (syntaxString && syntaxString[1]) {
-    //             const snippetString = new SnippetString();
-    //             snippetString.appendText(itemLabel);
-    //             snippetString.appendText("(");
-    //             const parameterRegex = new RegExp(String.raw`${itemLabel}\s*\(([^)]*)`, "i"); //Gather up to closing param of end of line
-    //             const parameterMatch = syntaxString[1].match(parameterRegex);
-    //             if (parameterMatch && parameterMatch[1]) {
-    //                 const parameters = parameterMatch[1].
-    //                     replace(/\[.*\]/g, "").  //Remove optional parameters
-    //                     split(",");
-    //                 parameters.forEach((parameter, index, parameters) => {
-    //                     const parameterName = parameter.trim().replace(/.*\W(\w+).*/, "$1"); //Grabs las word of the parameter, i.e. parameter name
-    //                     if (parameterName.length === 0) { return; }
-    //                     if (index > 0) { snippetString.appendText(", "); }
-    //                     snippetString.appendPlaceholder(parameterName);
-    //                 });
-
-    //             }
-    //             else {
-    //                 snippetString.appendTabstop();
-    //             }
-    //             snippetString.appendText(")");
-    //             item.insertText = snippetString;
-    //         }
-    //         resolve(item);
-    //     });
-    // }
-
-
-
+    public resolveCompletionItem(item: CompletionItem, token: CancellationToken): ProviderResult<CompletionItem> {
+        return new Promise(async resolve => {
+            const uri = window.activeTextEditor?.document.uri;
+            const itemLabel = typeof item.label === "string" ? item.label : item.label.label;
+            let functionInfo = this._tokenService.getFunctionInfo(uri.toString(), itemLabel);
+            if (functionInfo === undefined) {
+                const keyword = this._keywordService.getKeyword(itemLabel);
+                if (keyword === undefined || !keyword.hasHelp) { resolve(item); return; }
+                const helpDefinitions = await SimplPlusKeywordHelpService.getInstance();
+                const helpContent = await helpDefinitions.GetSimplHelp(itemLabel);
+                if (helpContent !== undefined) {
+                    item.documentation = helpContent;
+                    if (keyword.type === "function" || keyword.type === "voidFunction") {
+                        functionInfo = helpDefinitions.GetFunctionInfoFromHelp(itemLabel, helpContent);
+                    }
+                }
+            }
+            else {
+                let functionDocs = `${functionInfo.dataType} ${functionInfo.name}(`;
+                if (functionInfo.parameters.length > 0) {
+                    functionDocs += functionInfo.parameters.map(p => `${p.dataType} ${p.name}`).join(", ");
+                }
+                functionDocs += ")";
+                const functionLabel: CompletionItemLabel = {
+                    label: itemLabel,
+                    description: functionDocs,
+                };
+                item.label = functionLabel;
+            }
+            const snippetString = new SnippetString();
+            snippetString.appendText(itemLabel);
+            snippetString.appendText("(");
+            if (functionInfo !== undefined && functionInfo.parameters.length > 0) {
+                functionInfo.parameters.forEach((parameter, index, parameters) => {
+                    if (index > 0) { snippetString.appendText(", "); }
+                    snippetString.appendPlaceholder(parameter.name);
+                });
+            }
+            snippetString.appendText(")");
+            item.insertText = snippetString;
+            console.log(item.insertText.toString());
+            resolve(item);
+        });
+    }
 }

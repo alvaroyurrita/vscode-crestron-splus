@@ -4,7 +4,12 @@ analog_input testanalog;
 
 Integer var;
 
+function testFunction(Integer a1, Integer a2)
+{
+        
+}
+
 change test
 {
-        tes
+        
 }

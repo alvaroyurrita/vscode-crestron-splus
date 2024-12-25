@@ -46,6 +46,12 @@ export class TokenService {
         return documentMember !== undefined;
     }
 
+    public getFunctionInfo(uri: string, tokenLabel: string): DocumentToken | undefined {
+        const documentMembers = this.getDocumentMembers(uri);
+        if (documentMembers === undefined) { return undefined; }
+        return documentMembers.find(member => member.name === tokenLabel && member.type === "function");
+    }
+
     public convertTypeToKind(type: string): CompletionItemKind {
         switch (type) {
             case "delegateProperty":
@@ -94,20 +100,20 @@ export class TokenService {
             onCloseTextDocument_event,
         );
     }
-    async updateOnCloseTextDocument(document: TextDocument): Promise<void> {
+    private async updateOnCloseTextDocument(document: TextDocument): Promise<void> {
         console.log("Document closed");
     }
-    async updateOnDidChangeTextDocument(editor: TextDocumentChangeEvent | undefined): Promise<void> {
+    private async updateOnDidChangeTextDocument(editor: TextDocumentChangeEvent | undefined): Promise<void> {
         if (editor === undefined) { return; }
         const document = editor.document;
         if (document.languageId !== this.selector.toString()) { return; }
         await this.tokenize(document);
     }
-    async updateOnOpenTextDocument(document: TextDocument): Promise<void> {
+    private async updateOnOpenTextDocument(document: TextDocument): Promise<void> {
         if (document.languageId !== this.selector.toString()) { return; }
         await this.tokenize(document);
     }
-    async tokenize(document: TextDocument | undefined): Promise<void> {
+    private async tokenize(document: TextDocument | undefined): Promise<void> {
         if (document === undefined) { return; }
         if (document.languageId !== this.selector.toString()) { return; }
         const textmateTokenService = await this._textmateService.initTokenService();
@@ -126,7 +132,6 @@ export class TokenService {
             concat(events);
 
         this._documents.set(document.uri.toString(), documentMembers);
-        console.log(documentMembers);
     }
 
     private getGlobalVariables(tokens: TextmateToken[]): DocumentToken[] {

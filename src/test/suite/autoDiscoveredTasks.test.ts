@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from "sinon";
-import * as fsWrapper from '../../fsExistsSyncWrapper';
+import * as fsWrapper from '../../helpers/fsExistsSyncWrapper';
 import { removeWorkspaceCustomSettings, OpenAndShowSPlusDocument } from '../testFunctions';
 import * as vscode from 'vscode';
 
@@ -26,7 +26,6 @@ suite("With Faked Saved File", function () {
         test("It should have Compile 3 Series and 4 Task", async () => {
             await OpenAndShowSPlusDocument("\/\/Nothing To See");
             const splusTasks = await vscode.tasks.fetchTasks();
-            console.log("--------->",splusTasks[0].name);
             assert.strictEqual(splusTasks.length, 3);
             assert.strictEqual(splusTasks[0].name, "Compile 3 & 4 Series");
             assert.strictEqual(splusTasks[1].name, "Compile 3 Series");
