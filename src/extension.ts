@@ -16,6 +16,7 @@ import { SimplPlusStatusBar } from "./simplPlusStatusBar";
 import { insertCategory } from "./simplPlusCategories";
 import { ApiCompletionProvider } from "./apiCompletionProvider";
 import { SimplPlusCompletionProvider } from "./simplPlusCompletionProvider";
+import { SimplPlusDotCompletionProvider } from "./simplPlustDotCompletionProvider";
 import { TextMateCompletionProvider } from "./textMateCompletionProvider";
 import { TokenService } from "./services/tokenService";
 import { KeywordService } from "./services/keywordService";
@@ -98,7 +99,11 @@ export async function activate(context: ExtensionContext) {
     // const apiCompletionProvider = languages.registerCompletionItemProvider({ language: 'simpl-plus' },thisApiCompletionProvider, '.');
 
     let thisCompletionProvider = new SimplPlusCompletionProvider(keywordService, tokenService);
-    const keywordCompletionProvider = languages.registerCompletionItemProvider({ language: 'simpl-plus' }, thisCompletionProvider);
+    const completionProvider = languages.registerCompletionItemProvider({ language: 'simpl-plus' }, thisCompletionProvider);
+
+    let thisDotCompletionProvider = new SimplPlusDotCompletionProvider(keywordService, tokenService);
+    const dotCompletionProvider = languages.registerCompletionItemProvider({ language: 'simpl-plus' }, thisDotCompletionProvider, '.');
+
 
     let thisSignatureHelpProvider = new SimplPlusSignatureHelpProvider(tokenService);
     const signatureHelpProvider = languages.registerSignatureHelpProvider({ language: 'simpl-plus' }, thisSignatureHelpProvider, '(', ',');
@@ -115,7 +120,8 @@ export async function activate(context: ExtensionContext) {
         showCategories_command,
         simplPlusTasks,
         // apiCompletionProvider,
-        keywordCompletionProvider,
+        completionProvider,
+        dotCompletionProvider,
         signatureHelpProvider,
         // textMateCompletionProvider
       );

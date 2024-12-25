@@ -7,7 +7,9 @@ import {
     TextDocumentChangeEvent,
     Position,
     Range,
-    CompletionItemKind
+    CompletionItemKind,
+    CompletionItem,
+    CompletionItemLabel
 } from "vscode";
 import TextmateLanguageService, { TextmateToken } from "vscode-textmate-languageservice";
 import { DocumentToken } from "./tokenTypes";
@@ -54,7 +56,7 @@ export class TokenService {
     public isAtParameterRange(uri: string, position: Position): boolean {
         const documentMembers = this.getDocumentMembers(uri);
         if (documentMembers === undefined) { return false; }
-        const documentMember = documentMembers.find(member => member.parameterRange?.contains(position)??false);
+        const documentMember = documentMembers.find(member => member.parameterRange?.contains(position) ?? false);
         return documentMember !== undefined;
     }
 
@@ -83,7 +85,6 @@ export class TokenService {
             case "property":
                 return CompletionItemKind.Property;
             case "class":
-                return CompletionItemKind.Class;
             case "field":
                 return CompletionItemKind.Field;
             case "enum":
@@ -380,6 +381,30 @@ export class TokenService {
         } while (functionTokenEnd < tokens.length);
         return tokens.slice(functionTokenBegin, functionTokenEnd);
     }
-
+    public getCompletionItemsFromDocumentTokens(tokens: DocumentToken[]): CompletionItem[] {
+        const items: CompletionItem[] = tokens.map(t => {
+            let itemLabel: CompletionItemLabel = {
+                label: t.name,
+                description: t.type.toString()
+            };
+            const type = this.convertTypeToKind(t.type);
+            let documentation: string = "";
+            const item = new CompletionItem(itemLabel, type);
+            if (type === CompletionItemKind.Function) {
+                documentation = `${t.dataType} ${t.name}(`;
+                if (t.parameters.length > 0) {
+                    documentation += t.parameters.map(p => `${p.dataType} ${p.name}`).join(", ");
+                }
+                documentation += ")";
+                item.command = {
+                    command: "editor.action.triggerParameterHints",
+                    title: "triggerSignatureHelp",
+                };
+            }
+            item.documentation = documentation;
+            return item;
+        });
+        return items;
+    }
 
 }

@@ -1,4 +1,4 @@
-import { extensions, CompletionItemKind } from "vscode";
+import { extensions, CompletionItemKind, CompletionItem, CompletionItemLabel } from "vscode";
 import { readFileSyncWrapper } from "../helpers/fsReadSyncWrapper";
 import * as fsExistsWrapper from '../helpers/fsExistsSyncWrapper';
 import path from "path";
@@ -67,5 +67,23 @@ export class KeywordService {
 
     public getKeyword(name: string): Keyword | undefined {
         return this._keywordDefinitions.find(kd => kd.name.toLowerCase() === name.toLowerCase());
+    }
+
+    public getCompletionItemsFromKeywords(keywords: Keyword[]): CompletionItem[] {
+        const items: CompletionItem[] = keywords.map(kd => {
+            let itemLabel: CompletionItemLabel = {
+                label: kd.name,
+                description: kd.type.toString()
+            };
+            const item = new CompletionItem(itemLabel, kd.kind);
+            if (kd.kind === CompletionItemKind.Function) {
+                item.command = {
+                    command: "editor.action.triggerParameterHints",
+                    title: "triggerSignatureHelp",
+                };
+            }
+            return item;
+        });
+        return items;
     }
 }

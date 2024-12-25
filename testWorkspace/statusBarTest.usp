@@ -4,12 +4,19 @@ analog_input testanalog;
 
 Integer var;
 
+Structure myStructure1{
+	Integer test1;
+	Long_Integer test2;
+}
+
 function testFunction(Integer a1, Integer a2)
 {
-        
+	testFunction(a1, a2)
 }
 
 change test
 {
-        
+	
 }
+
+
