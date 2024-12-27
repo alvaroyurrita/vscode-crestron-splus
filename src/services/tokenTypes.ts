@@ -1,23 +1,9 @@
-import { Range } from "vscode";
+import { Range, CompletionItemKind } from "vscode";
 
-export type TokenType =
-    "delegate" |
-    "event" |
-    "function" |
-    "property" |
-    "variable" |
-    "parameter" |
-    "delegateProperty" |
-    "class" |
-    "constant" |
-    "method" |
-    "field" |
-    "struct" |
-    "enum";
 
 export type DocumentToken = {
     name: string;
-    type: TokenType;
+    kind: CompletionItemKind;
     nameRange: Range;
     dataType: string;
     parameters?: DocumentToken[];

@@ -13,7 +13,7 @@ import {
     CompletionItemLabel,
 } from "vscode";
 import { SimplPlusKeywordHelpService } from "./services/simplPlusKeywordHelpService";
-import { KeywordService, KeywordType, Keyword } from "./services/keywordService";
+import { KeywordService, KeywordType } from "./services/keywordService";
 import { TokenService } from "./services/tokenService";
 import { DocumentToken } from "./services/tokenTypes";
 
@@ -43,9 +43,9 @@ export class SimplPlusCompletionProvider implements CompletionItemProvider {
             const completionItems = this.getRootKeywords(uri);
             return completionItems;
         }
-        switch (currentBlock.type) {
-            case "event":
-            case "function":
+        switch (currentBlock.kind) {
+            case CompletionItemKind.Event:
+            case CompletionItemKind.Function:
                 if (this._tokenService.isAtParameterRange(uri.toString(), position)) {
                     const parameterKeywords = this.getParameterKeywords(uri);
                     return parameterKeywords;
@@ -58,22 +58,11 @@ export class SimplPlusCompletionProvider implements CompletionItemProvider {
                     functionKeywords = this.getExpressionKeywords();
                 }
                 return functionVariables.concat(rootVariables).concat(functionKeywords);
-            case "struct":
+            case CompletionItemKind.Struct:
                 const structureKeywords = this.getStructureKeywords();
                 //structures can have other nested structures or classes as structure members;
                 const structureVariables = this.getStructureVariables(uri);
                 return structureVariables.concat(structureKeywords);
-            case "class":
-            case "variable":
-            case "constant":
-            case "method":
-            case "field":
-            case "enum":
-            case "field":
-            case "delegate":
-            case "delegateProperty":
-            case "parameter":
-            case "property":
             default:
                 return this.getRootKeywords(uri);
         }
@@ -127,7 +116,7 @@ export class SimplPlusCompletionProvider implements CompletionItemProvider {
         if (documentItems === undefined) {
             return [];
         }
-        const items = documentItems.filter(di => di.type === "variable" && di.dataType.toLowerCase().match(/input/));
+        const items = documentItems.filter(di => di.kind === CompletionItemKind.Variable && di.dataType.toLowerCase().match(/input/));
         return this._tokenService.getCompletionItemsFromDocumentTokens(items);
     }
     private getStructureVariables(uri: Uri): CompletionItem[] {
@@ -135,7 +124,7 @@ export class SimplPlusCompletionProvider implements CompletionItemProvider {
         if (documentItems === undefined) {
             return [];
         }
-        const structureVariables = documentItems.filter(di => di.type === "struct" || di.type === "class");
+        const structureVariables = documentItems.filter(di => di.kind === CompletionItemKind.Struct || di.kind === CompletionItemKind.Class);
         return this._tokenService.getCompletionItemsFromDocumentTokens(structureVariables);
     }
     private getExpressionKeywords(): CompletionItem[] {

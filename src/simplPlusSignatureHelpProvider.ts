@@ -10,10 +10,9 @@ import {
     ParameterInformation,
 } from "vscode";
 import { TokenService } from "./services/tokenService";
-import { DocumentToken, TokenType } from "./services/tokenTypes";
+import { DocumentToken } from "./services/tokenTypes";
 import { KeywordService } from "./services/keywordService";
 import { SimplPlusKeywordHelpService } from "./services/simplPlusKeywordHelpService";
-import { sign } from "crypto";
 
 export class SimplPlusSignatureHelpProvider implements SignatureHelpProvider {
     private _tokenService: TokenService;

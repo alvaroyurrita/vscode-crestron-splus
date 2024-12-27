@@ -1,5 +1,5 @@
 import * as fsExistsWrapper from './helpers/fsReadSyncWrapper';
-import { workspace, Uri, Position, Range, TextDocument, } from 'vscode';
+import { workspace, Uri, Range, TextDocument, CompletionItemKind} from 'vscode';
 import { DocumentToken } from './services/tokenTypes';
 
 
@@ -64,7 +64,7 @@ export async function provideClassTokens(): Promise<DocumentToken[]> {
 
         apiClasses.push({
             name: apiClass[1],
-            type: "class",
+            kind: CompletionItemKind.Class,
             nameRange: classNameRange,
             dataType: "class",
             blockRange: classBodyRange,
@@ -96,7 +96,7 @@ function getDelegates(delegatesArea: Range, document: TextDocument): DocumentTok
         const parameters = getParameters(parametersRange, document);
         delegates.push({
             name: delegateMatch[2],
-            type: "delegate",
+            kind: CompletionItemKind.Method,
             nameRange,
             dataType: delegateMatch[1],
             parameters
@@ -119,7 +119,7 @@ function getEvents(eventsArea: Range, document: TextDocument): DocumentToken[] {
         const parameters = getParameters(parametersRange, document);
         events.push({
             name: eventMatch[1],
-            type: "event",
+            kind: CompletionItemKind.Event,
             nameRange,
             parameters,
             dataType: "EventHandler"
@@ -142,7 +142,7 @@ function getFunctions(functionsArea: Range, document: TextDocument): DocumentTok
         const parameters = getParameters(parametersRange, document);
         functions.push({
             name: functionMatch[2],
-            type: "function",
+            kind: CompletionItemKind.Function,
             nameRange,
             parameters,
             dataType: functionMatch[1]
@@ -161,7 +161,7 @@ function getVariables(variablesArea: Range, document: TextDocument): DocumentTok
         );
         variables.push({
             name: variableMatch[2],
-            type: "variable",
+            kind: CompletionItemKind.Variable,
             nameRange,
             dataType: variableMatch[1]
         });
@@ -180,7 +180,7 @@ function getProperties(propertiesArea: Range, document: TextDocument): DocumentT
         );
         properties.push({
             name: propertyMatch[3],
-            type: "property",
+            kind: CompletionItemKind.Property,
             nameRange,
             dataType: propertyMatch[2]
         });
@@ -199,7 +199,7 @@ function getDelegateProperties(delegatePropertiesArea: Range, document: TextDocu
         );
         delegateProperties.push({
             name: delegatePropertyMatch[3],
-            type: "delegateProperty",
+            kind: CompletionItemKind.Property,
             nameRange,
             dataType: delegatePropertyMatch[2]
         });
@@ -219,7 +219,7 @@ function getParameters(parameterArea: Range, document: TextDocument): DocumentTo
         );
         parameters.push({
             name: parameterMatch[2].trim(),
-            type: "variable",
+            kind: CompletionItemKind.Variable,
             dataType: parameterMatch[1].trim(),
             nameRange,
         });

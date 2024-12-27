@@ -9,7 +9,8 @@ import {
     Range,
     CompletionItemKind,
     CompletionItem,
-    CompletionItemLabel
+    CompletionItemLabel,
+    SymbolKind
 } from "vscode";
 import TextmateLanguageService, { TextmateToken } from "vscode-textmate-languageservice";
 import { DocumentToken } from "./tokenTypes";
@@ -63,39 +64,8 @@ export class TokenService {
     public getFunctionInfo(uri: string, tokenLabel: string): DocumentToken | undefined {
         const documentMembers = this.getDocumentMembers(uri);
         if (documentMembers === undefined) { return undefined; }
-        return documentMembers.find(member => member.name === tokenLabel && member.type === "function");
+        return documentMembers.find(member => member.name === tokenLabel && member.kind === CompletionItemKind.Function);
     }
-
-    public convertTypeToKind(type: string): CompletionItemKind {
-        switch (type) {
-            case "delegateProperty":
-            case "parameter":
-            case "variable":
-                return CompletionItemKind.Variable;
-            case "constant":
-                return CompletionItemKind.Constant;
-            case "delegate":
-            case "function":
-            case "method":
-                return CompletionItemKind.Function;
-            case "struct":
-                return CompletionItemKind.Struct;
-            case "event":
-                return CompletionItemKind.Event;
-            case "property":
-                return CompletionItemKind.Property;
-            case "class":
-            case "field":
-                return CompletionItemKind.Field;
-            case "enum":
-                return CompletionItemKind.Enum;
-            case "event":
-                return CompletionItemKind.Event;
-            default:
-                return CompletionItemKind.Text;
-        }
-    }
-
 
     private constructor(ctx: ExtensionContext) {
         this._textmateService = new TextmateLanguageService(this.selector.toString(), ctx);
@@ -158,7 +128,7 @@ export class TokenService {
                     );
                     const variable: DocumentToken = {
                         name: token.text,
-                        type: "variable",
+                        kind: CompletionItemKind.Variable,
                         nameRange: variableNameRange,
                         dataType: variableType,
                     };
@@ -190,7 +160,7 @@ export class TokenService {
             }
             const constant: DocumentToken = {
                 name: token.text,
-                type: "constant",
+                kind: CompletionItemKind.Constant,
                 nameRange: constantNameRange,
                 dataType
             };
@@ -226,7 +196,7 @@ export class TokenService {
                         );
                         const variable: DocumentToken = {
                             name: token.text,
-                            type: "variable",
+                            kind: CompletionItemKind.Variable,
                             nameRange: variableNameRange,
                             dataType: variableType,
                         };
@@ -254,7 +224,7 @@ export class TokenService {
                         );
                         const variable: DocumentToken = {
                             name: token.text,
-                            type: "parameter",
+                            kind: CompletionItemKind.TypeParameter,
                             nameRange: parameterNameRange,
                             dataType: parameterType,
                         };
@@ -263,7 +233,7 @@ export class TokenService {
             }
             const fun: DocumentToken = {
                 name: token.text,
-                type: "function",
+                kind: CompletionItemKind.Function,
                 nameRange: functionNameRange,
                 dataType: functionType,
                 parameters: functionParameters,
@@ -298,7 +268,7 @@ export class TokenService {
                     );
                     const variable: DocumentToken = {
                         name: token.text,
-                        type: "variable",
+                        kind: CompletionItemKind.Variable,
                         nameRange: variableNameRange,
                         dataType: variableType,
                     };
@@ -306,7 +276,7 @@ export class TokenService {
                 });
             const struct: DocumentToken = {
                 name: token.text,
-                type: "struct",
+                kind: CompletionItemKind.Struct,
                 nameRange: structureNameRange,
                 dataType: token.text,
                 blockRange: structureBlockRange,
@@ -340,7 +310,7 @@ export class TokenService {
                     );
                     const variable: DocumentToken = {
                         name: token.text,
-                        type: "variable",
+                        kind: CompletionItemKind.Variable,
                         nameRange: variableNameRange,
                         dataType: variableType,
                     };
@@ -348,7 +318,7 @@ export class TokenService {
                 });
             const event: DocumentToken = {
                 name: token.text,
-                type: "event",
+                kind: CompletionItemKind.Event,
                 nameRange: eventNameRange,
                 dataType: eventType,
                 blockRange: eventBlockRange,
@@ -385,12 +355,11 @@ export class TokenService {
         const items: CompletionItem[] = tokens.map(t => {
             let itemLabel: CompletionItemLabel = {
                 label: t.name,
-                description: t.type.toString()
+                description: t.dataType.toString()
             };
-            const type = this.convertTypeToKind(t.type);
             let documentation: string = "";
-            const item = new CompletionItem(itemLabel, type);
-            if (type === CompletionItemKind.Function) {
+            const item = new CompletionItem(itemLabel, t.kind);
+            if (t.kind === CompletionItemKind.Function) {
                 documentation = `${t.dataType} ${t.name}(`;
                 if (t.parameters.length > 0) {
                     documentation += t.parameters.map(p => `${p.dataType} ${p.name}`).join(", ");

@@ -23,7 +23,7 @@ suite("testing tokenization", function () {
         const documentMembers = tokenService.getDocumentMembers(vscode.window.activeTextEditor?.document.uri.toString());
         assert.strictEqual(documentMembers?.length, 1);
         assert.strictEqual(documentMembers[0].name, "MYCONSTANT");
-        assert.strictEqual(documentMembers[0].type, "constant");
+        assert.strictEqual(documentMembers[0].kind, vscode.CompletionItemKind.Constant);
         assert.strictEqual(documentMembers[0].dataType, "integer");
         assert.strictEqual(documentMembers[0].nameRange.start.line, 0);
         assert.strictEqual(documentMembers[0].nameRange.start.character, 17);
@@ -38,7 +38,7 @@ suite("testing tokenization", function () {
         const documentMembers = tokenService.getDocumentMembers(vscode.window.activeTextEditor?.document.uri.toString());
         assert.strictEqual(documentMembers?.length, 1);
         assert.strictEqual(documentMembers[0].name, "BufferInput1");
-        assert.strictEqual(documentMembers[0].type, "variable");
+        assert.strictEqual(documentMembers[0].kind, vscode.CompletionItemKind.Variable);
         assert.strictEqual(documentMembers[0].dataType, "BUFFER_INPUT");
         assert.strictEqual(documentMembers[0].nameRange.start.line, 0);
         assert.strictEqual(documentMembers[0].nameRange.start.character, 13);
@@ -53,7 +53,7 @@ suite("testing tokenization", function () {
         const documentMembers = tokenService.getDocumentMembers(vscode.window.activeTextEditor?.document.uri.toString());
         assert.strictEqual(documentMembers?.length, 1);
         assert.strictEqual(documentMembers[0].name, "myVariableOfType");
-        assert.strictEqual(documentMembers[0].type, "variable");
+        assert.strictEqual(documentMembers[0].kind, vscode.CompletionItemKind.Variable);
         assert.strictEqual(documentMembers[0].dataType, "myType");
         assert.strictEqual(documentMembers[0].nameRange.start.line, 0);
         assert.strictEqual(documentMembers[0].nameRange.start.character, 7);
@@ -68,7 +68,7 @@ suite("testing tokenization", function () {
         const documentMembers = tokenService.getDocumentMembers(vscode.window.activeTextEditor?.document.uri.toString());
         assert.strictEqual(documentMembers?.length, 1);
         assert.strictEqual(documentMembers[0].name, "testStructure");
-        assert.strictEqual(documentMembers[0].type, "struct");
+        assert.strictEqual(documentMembers[0].kind, vscode.CompletionItemKind.Struct);
         assert.strictEqual(documentMembers[0].dataType, "testStructure");
         assert.strictEqual(documentMembers[0].nameRange.start.line, 0);
         assert.strictEqual(documentMembers[0].nameRange.start.character, 10);
@@ -81,7 +81,7 @@ suite("testing tokenization", function () {
 
         assert.strictEqual(documentMembers[0].internalVariables.length, 1);
         assert.strictEqual(documentMembers[0].internalVariables[0].name, "BufferInput1");
-        assert.strictEqual(documentMembers[0].internalVariables[0].type, "variable");
+        assert.strictEqual(documentMembers[0].internalVariables[0].kind, vscode.CompletionItemKind.Variable);
         assert.strictEqual(documentMembers[0].internalVariables[0].dataType, "BUFFER_INPUT");
         assert.strictEqual(documentMembers[0].internalVariables[0].nameRange.start.line, 2);
         assert.strictEqual(documentMembers[0].internalVariables[0].nameRange.start.character, 13);
@@ -96,7 +96,7 @@ suite("testing tokenization", function () {
         const documentMembers = tokenService.getDocumentMembers(vscode.window.activeTextEditor?.document.uri.toString());
         assert.strictEqual(documentMembers?.length, 1);
         assert.strictEqual(documentMembers[0].name, "testFunction");
-        assert.strictEqual(documentMembers[0].type, "function");
+        assert.strictEqual(documentMembers[0].kind, vscode.CompletionItemKind.Function);
         assert.strictEqual(documentMembers[0].dataType, "INTEGER_FUNCTION");
         assert.strictEqual(documentMembers[0].nameRange.start.line, 0);
         assert.strictEqual(documentMembers[0].nameRange.start.character, 17);
@@ -113,7 +113,7 @@ suite("testing tokenization", function () {
 
         assert.strictEqual(documentMembers[0].parameters.length, 1);
         assert.strictEqual(documentMembers[0].parameters[0].name, "testParam");
-        assert.strictEqual(documentMembers[0].parameters[0].type, "parameter");
+        assert.strictEqual(documentMembers[0].parameters[0].kind, vscode.CompletionItemKind.TypeParameter);
         assert.strictEqual(documentMembers[0].parameters[0].dataType, "integer");
         assert.strictEqual(documentMembers[0].parameters[0].nameRange.start.line, 0);
         assert.strictEqual(documentMembers[0].parameters[0].nameRange.start.character, 38);
@@ -122,7 +122,7 @@ suite("testing tokenization", function () {
 
         assert.strictEqual(documentMembers[0].internalVariables.length, 1);
         assert.strictEqual(documentMembers[0].internalVariables[0].name, "BufferInput1");
-        assert.strictEqual(documentMembers[0].internalVariables[0].type, "variable");
+        assert.strictEqual(documentMembers[0].internalVariables[0].kind, vscode.CompletionItemKind.Variable);
         assert.strictEqual(documentMembers[0].internalVariables[0].dataType, "BUFFER_INPUT");
         assert.strictEqual(documentMembers[0].internalVariables[0].nameRange.start.line, 2);
         assert.strictEqual(documentMembers[0].internalVariables[0].nameRange.start.character, 13);
@@ -159,7 +159,7 @@ suite("testing tokenization", function () {
         const documentMembers = tokenService.getDocumentMembers(vscode.window.activeTextEditor?.document.uri.toString());
         assert.strictEqual(documentMembers?.length, 1);
         assert.strictEqual(documentMembers[0].name, "DigitalInput1");
-        assert.strictEqual(documentMembers[0].type, "event");
+        assert.strictEqual(documentMembers[0].kind, vscode.CompletionItemKind.Event);
         assert.strictEqual(documentMembers[0].dataType, "push");
         assert.strictEqual(documentMembers[0].nameRange.start.line, 0);
         assert.strictEqual(documentMembers[0].nameRange.start.character, 5);
@@ -172,7 +172,7 @@ suite("testing tokenization", function () {
 
         assert.strictEqual(documentMembers[0].internalVariables.length, 1);
         assert.strictEqual(documentMembers[0].internalVariables[0].name, "BufferInput1");
-        assert.strictEqual(documentMembers[0].internalVariables[0].type, "variable");
+        assert.strictEqual(documentMembers[0].internalVariables[0].kind, vscode.CompletionItemKind.Variable);
         assert.strictEqual(documentMembers[0].internalVariables[0].dataType, "BUFFER_INPUT");
         assert.strictEqual(documentMembers[0].internalVariables[0].nameRange.start.line, 2);
         assert.strictEqual(documentMembers[0].internalVariables[0].nameRange.start.character, 13);

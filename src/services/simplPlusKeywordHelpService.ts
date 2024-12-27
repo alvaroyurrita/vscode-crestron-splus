@@ -1,4 +1,4 @@
-import { MarkdownString } from 'vscode';
+import { MarkdownString, CompletionItemKind } from 'vscode';
 import * as https from 'https';
 import { DocumentToken } from './tokenTypes';
 const { convert } = require('html-to-text');
@@ -83,7 +83,7 @@ export class SimplPlusKeywordHelpService {
         const helpContentString = convert(helpMarkDownString.value, { wordwrap: false }) as string;
         const functionToken: DocumentToken = {
             name: itemLabel,
-            type: "function",
+            kind: CompletionItemKind.Function,
             nameRange: null,
             dataType: "",
             parameters: [],
@@ -106,7 +106,7 @@ export class SimplPlusKeywordHelpService {
                             name: parameterName[2],
                             dataType: parameterName[1],
                             nameRange: null,
-                            type: "parameter",
+                            kind: CompletionItemKind.TypeParameter,
                         });
                     }
                 });

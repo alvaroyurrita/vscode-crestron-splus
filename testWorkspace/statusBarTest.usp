@@ -9,9 +9,24 @@ Structure myStructure1{
 	Long_Integer test2;
 }
 
+Structure myStructure2{
+	Integer test3;
+	Long_Integer test4;
+	myStructure1 test5;
+}
+
+Structure myStructure3{
+	Integer test6;
+	Long_Integer test7;
+	myStructure2 test8;
+}
+
+
+
 function testFunction(Integer a1, Integer a2)
 {
-	testFunction(a1, a2)
+	testFunction(a1, a2);
+
 }
 
 change test

@@ -7,15 +7,9 @@ import {
     ProviderResult,
     TextDocument,
     CompletionItemKind,
-    SnippetString,
-    Uri,
-    window,
-    CompletionItemLabel,
 } from "vscode";
-import { SimplPlusKeywordHelpService } from "./services/simplPlusKeywordHelpService";
-import { KeywordService, KeywordType, Keyword } from "./services/keywordService";
+import { KeywordService } from "./services/keywordService";
 import { TokenService } from "./services/tokenService";
-import { DocumentToken, TokenType } from "./services/tokenTypes";
 
 export class SimplPlusDotCompletionProvider implements CompletionItemProvider {
     private _keywordService: KeywordService;
@@ -32,30 +26,28 @@ export class SimplPlusDotCompletionProvider implements CompletionItemProvider {
         token: CancellationToken,
         context: CompletionContext):
         ProviderResult<CompletionItem[]> {
-        const uri = document.uri;
+        const uri = document.uri.toString();
         const completionItems: CompletionItem[] = [];
         let linePrefix = document.lineAt(position).text.slice(0, position.character);
-        const wordWithDotMatch = linePrefix.match(/(\w+)\.$/);
-        const dotToken = this._tokenService.getDocumentMemberByName(document.uri.toString(), wordWithDotMatch[1]);
-        if (!dotToken) {
+        const wordWithDotMatch = linePrefix.match(/(?:(?:[_\w][_#$\w]*)*\s*\.\s*)*(?:[_\w][_#$\w]*\s*)*\.$/);//grab any group of words followed by a dot (ie: test.test.  or test.)
+        if (!wordWithDotMatch) { return []; }
+        console.log("wordWithDotMatch: ", wordWithDotMatch[0]);
+        const tokenTree = wordWithDotMatch[0].match(/[_\w][_#$\w]*/g);
+        let currentToken = tokenTree.shift();
+        let currentObject = this._tokenService.getDocumentMemberByName(uri, currentToken);
+        if (!currentObject) {
             return completionItems;
         }
-        switch (dotToken.type) {
-            case "struct":
-                const structTokens = dotToken.internalVariables;
-                return this._tokenService.getCompletionItemsFromDocumentTokens(structTokens);
-            case "class":
-            case "function":
-            case "constant":
-            case "delegate":
-            case "delegateProperty":
-            case "enum":
-            case "event":
-            case "field":
-            case "method":
-            case "parameter":
-            case "property":
-            case "variable":
+        switch (currentObject.kind) {
+            case CompletionItemKind.Struct:
+                currentToken = tokenTree.shift();
+                while (currentToken) {
+                    const property = currentObject.internalVariables.find(v => v.name === currentToken);
+                    currentObject = this._tokenService.getDocumentMemberByName(uri, property.dataType);
+                    currentToken = tokenTree.shift();
+                }
+                return this._tokenService.getCompletionItemsFromDocumentTokens(currentObject.internalVariables);
+            default:
                 return [];
         }
 
