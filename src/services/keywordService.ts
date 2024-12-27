@@ -47,22 +47,22 @@ export class KeywordService {
         const extensionPath = extensions.getExtension("sentry07.simpl-plus")?.extensionPath;
         if (extensionPath === undefined) { return; }
         const keywordDefinitionsPath = path.join(extensionPath, "src", "keywords.csv");
-        if (!fsExistsWrapper.existsSyncWrapper(keywordDefinitionsPath)) {return;};
+        if (!fsExistsWrapper.existsSyncWrapper(keywordDefinitionsPath)) { return; };
         const keywordDefinitionsContent = readFileSyncWrapper(keywordDefinitionsPath);
         for (const entry of keywordDefinitionsContent.split("\n")) {
             const elements = entry.split(",");
             if (elements.length !== 4) { continue; }
             const definition = {
                 name: elements[0].trim(),
-                kind : CompletionItemKind[elements[1].trim()],
-                type : elements[2].trim() as KeywordType,
+                kind: CompletionItemKind[elements[1].trim()],
+                type: elements[2].trim() as KeywordType,
                 hasHelp: elements[3].trim() === "true"
             };
             this._keywordDefinitions.push(definition);
         }
     }
-    public  getKeywords(types:KeywordType[]) : Keyword[]{
-        return this._keywordDefinitions.filter(kd=>types.includes(kd.type));
+    public getKeywords(types: KeywordType[]): Keyword[] {
+        return this._keywordDefinitions.filter(kd => types.includes(kd.type));
     }
 
     public getKeyword(name: string): Keyword | undefined {
@@ -86,4 +86,143 @@ export class KeywordService {
         });
         return items;
     }
+
+
+    public getCompletionItemsFromBuiltInTypes(builtInKeyword: string): CompletionItem[] {
+        switch (builtInKeyword.toLowerCase()) {
+            case "tcp_client":
+            case "udp_client":
+            case "tcp_server":
+                return socketStrucMembers.map(kd => {
+                    let itemLabel: CompletionItemLabel = {
+                        label: kd.name,
+                        description: kd.type.toString()
+                    };
+                    return new CompletionItem(itemLabel, kd.kind);
+                });
+            case "file_info":
+                return fileInfoStructMembers.map(kd => {
+                    let itemLabel: CompletionItemLabel = {
+                        label: kd.name,
+                        description: kd.type.toString()
+                    };
+                    return new CompletionItem(itemLabel, kd.kind);
+                });
+            case "cevent":
+                return cEventClassMembers.map(kd => {
+                    let itemLabel: CompletionItemLabel = {
+                        label: kd.name,
+                        description: kd.type.toString()
+                    };
+                    return new CompletionItem(itemLabel, kd.kind);
+                });
+            case "cmutex":
+                return cMutexClassMembers.map(kd => {
+                    let itemLabel: CompletionItemLabel = {
+                        label: kd.name,
+                        description: kd.type.toString()
+                    };
+                    return new CompletionItem(itemLabel, kd.kind);
+                });
+            default:
+                break;
+        }
+        return [];
+    }
 }
+
+const socketStrucMembers = [
+    {
+        name: "SocketStatus",
+        kind: CompletionItemKind.Variable,
+        type: "INTEGER",
+        hasHelp: false
+    },
+    {
+        name: "SocketRxBuf",
+        kind: CompletionItemKind.Variable,
+        type: "STRING",
+        hasHelp: false
+    }
+];
+
+const cEventClassMembers = [
+    {
+        name: "Close",
+        kind: CompletionItemKind.Method,
+        type: "void",
+        hasHelp: false
+    },
+    {
+        name: "Reset",
+        kind: CompletionItemKind.Method,
+        type: "Signed_Long",
+        hasHelp: false
+    },
+    {
+        name: "Set",
+        kind: CompletionItemKind.Method,
+        type: "Signed_Long",
+        hasHelp: false
+    },
+    {
+        name: "Wait",
+        kind: CompletionItemKind.Method,
+        type: "Signed_Long",
+        hasHelp: false
+    },
+];
+
+const cMutexClassMembers = [
+    {
+        name: "Close",
+        kind: CompletionItemKind.Method,
+        type: "void",
+        hasHelp: false
+    },
+    {
+        name: "ReleaseMutex",
+        kind: CompletionItemKind.Method,
+        type: "void",
+        hasHelp: false
+    },
+    {
+        name: "WaitForMutex",
+        kind: CompletionItemKind.Method,
+        type: "Signed_Long",
+        hasHelp: false
+    }
+];
+
+const fileInfoStructMembers = [
+    {
+        name: "Name",
+        kind: CompletionItemKind.Variable,
+        type: "STRING",
+        hasHelp: false
+    },
+    {
+        name: "iAttributes",
+        kind: CompletionItemKind.Variable,
+        type: "INTEGER",
+        hasHelp: false
+    },
+    {
+        name: "iTime",
+        kind: CompletionItemKind.Variable,
+        type: "INTEGER",
+        hasHelp: false
+    },
+    {
+        name: "iDate",
+        kind: CompletionItemKind.Variable,
+        type: "INTEGER",
+        hasHelp: false
+    },
+    {
+        name: "lSize",
+        kind: CompletionItemKind.Variable,
+        type: "LONG_INTEGER",
+        hasHelp: false
+    }
+];

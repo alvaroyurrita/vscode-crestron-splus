@@ -16,7 +16,7 @@ import { SimplPlusStatusBar } from "./simplPlusStatusBar";
 import { insertCategory } from "./simplPlusCategories";
 import { ApiCompletionProvider } from "./apiCompletionProvider";
 import { SimplPlusCompletionProvider } from "./simplPlusCompletionProvider";
-import { SimplPlusDotCompletionProvider } from "./simplPlustDotCompletionProvider";
+import { SimplPlusDotCompletionProvider } from "./simplPlusDotCompletionProvider";
 import { TextMateCompletionProvider } from "./textMateCompletionProvider";
 import { TokenService } from "./services/tokenService";
 import { KeywordService } from "./services/keywordService";

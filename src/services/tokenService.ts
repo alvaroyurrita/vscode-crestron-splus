@@ -48,10 +48,16 @@ export class TokenService {
         return documentMembers.find(member => member.nameRange.contains(position));
     }
 
-    public getDocumentMemberByName(uri: string, name: string): DocumentToken | undefined {
+    public getGlobalDocumentMemberByName(uri: string, name: string): DocumentToken | undefined {
         const documentMembers = this.getDocumentMembers(uri);
         if (documentMembers === undefined) { return undefined; }
         return documentMembers.find(member => member.name === name);
+    }
+
+    public getLocalDocumentMemberByName(uri: string, name: string, position: Position): DocumentToken | undefined {
+        const blockMember = this.getBlockStatementTokenAtPosition(uri, position);
+        if (blockMember === undefined) { return undefined; }
+        return blockMember.internalVariables.find(member => member.name === name);
     }
 
     public isAtParameterRange(uri: string, position: Position): boolean {

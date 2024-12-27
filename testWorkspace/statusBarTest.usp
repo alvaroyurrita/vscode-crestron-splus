@@ -21,12 +21,18 @@ Structure myStructure3{
 	myStructure2 test8;
 }
 
+TCP_CLIENT MyClient[1024];
+TCP_SERVER MyServer[1024];
+UDP_SOCKET MyUDP[1024];
 
+CEvent myCEvent;
+CMutex myCMutex;
 
 function testFunction(Integer a1, Integer a2)
 {
 	testFunction(a1, a2);
-
+	File_Info testFileInfo;
+	
 }
 
 change test

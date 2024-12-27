@@ -34,7 +34,7 @@ export class SimplPlusSignatureHelpProvider implements SignatureHelpProvider {
                 return undefined;
             }
             const functionName = match[1];
-            functionToken = this._tokenService.getDocumentMemberByName(document.uri.toString(), functionName);
+            functionToken = this._tokenService.getGlobalDocumentMemberByName(document.uri.toString(), functionName);
             if (!functionToken) {
                 const keywordService = KeywordService.getInstance();
                 const keyword = keywordService.getKeyword(functionName);

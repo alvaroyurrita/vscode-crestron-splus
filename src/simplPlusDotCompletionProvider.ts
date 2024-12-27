@@ -34,19 +34,27 @@ export class SimplPlusDotCompletionProvider implements CompletionItemProvider {
         console.log("wordWithDotMatch: ", wordWithDotMatch[0]);
         const tokenTree = wordWithDotMatch[0].match(/[_\w][_#$\w]*/g);
         let currentToken = tokenTree.shift();
-        let currentObject = this._tokenService.getDocumentMemberByName(uri, currentToken);
+        //Look for global variables first
+        let currentObject = this._tokenService.getGlobalDocumentMemberByName(uri, currentToken);
         if (!currentObject) {
-            return completionItems;
+            //then local variables
+            currentObject = this._tokenService.getLocalDocumentMemberByName(uri, currentToken, position);
+            if (!currentObject) { return completionItems; }
         }
         switch (currentObject.kind) {
             case CompletionItemKind.Struct:
                 currentToken = tokenTree.shift();
                 while (currentToken) {
                     const property = currentObject.internalVariables.find(v => v.name === currentToken);
-                    currentObject = this._tokenService.getDocumentMemberByName(uri, property.dataType);
+                    currentObject = this._tokenService.getGlobalDocumentMemberByName(uri, property.dataType);
                     currentToken = tokenTree.shift();
                 }
                 return this._tokenService.getCompletionItemsFromDocumentTokens(currentObject.internalVariables);
+            case CompletionItemKind.Variable:
+                const builtInMembers = this._keywordService.getCompletionItemsFromBuiltInTypes(currentObject.dataType);
+                if (builtInMembers.length > 0) {
+                    return builtInMembers;
+                };
             default:
                 return [];
         }

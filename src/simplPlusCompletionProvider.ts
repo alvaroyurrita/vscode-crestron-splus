@@ -40,6 +40,10 @@ export class SimplPlusCompletionProvider implements CompletionItemProvider {
                 const inputVariables = this.getInputVariables(uri);
                 return inputVariables;
             }
+            if (lineUntilPosition.toLowerCase().match(/(socketconnect|socketdisconnect|socketstatus|socketreceive)/)) {
+                const socketVariables = this.getSocketVariables(uri);
+                return socketVariables;
+            }
             const completionItems = this.getRootKeywords(uri);
             return completionItems;
         }
@@ -98,16 +102,17 @@ export class SimplPlusCompletionProvider implements CompletionItemProvider {
             }
             const snippetString = new SnippetString();
             snippetString.appendText(itemLabel);
-            snippetString.appendText("(");
-            if (functionInfo !== undefined && functionInfo.parameters.length > 0) {
-                functionInfo.parameters.forEach((parameter, index, parameters) => {
-                    if (index > 0) { snippetString.appendText(", "); }
-                    snippetString.appendPlaceholder(parameter.name);
-                });
+            if (functionInfo !== undefined) {
+                snippetString.appendText("(");
+                if (functionInfo.parameters.length > 0) {
+                    functionInfo.parameters.forEach((parameter, index, parameters) => {
+                        if (index > 0) { snippetString.appendText(", "); }
+                        snippetString.appendPlaceholder(parameter.name);
+                    });
+                }
+                snippetString.appendText(")");
+                item.insertText = snippetString;
             }
-            snippetString.appendText(")");
-            item.insertText = snippetString;
-            console.log(item.insertText.toString());
             resolve(item);
         });
     }
@@ -117,6 +122,14 @@ export class SimplPlusCompletionProvider implements CompletionItemProvider {
             return [];
         }
         const items = documentItems.filter(di => di.kind === CompletionItemKind.Variable && di.dataType.toLowerCase().match(/input/));
+        return this._tokenService.getCompletionItemsFromDocumentTokens(items);
+    }
+    private getSocketVariables(uri: Uri): CompletionItem[] {
+        const documentItems = this._tokenService.getDocumentMembers(uri.toString());
+        if (documentItems === undefined) {
+            return [];
+        }
+        const items = documentItems.filter(di => di.kind === CompletionItemKind.Variable && di.dataType.toLowerCase().match(/(tcp_client|tcp_server|udp_socket)/));
         return this._tokenService.getCompletionItemsFromDocumentTokens(items);
     }
     private getStructureVariables(uri: Uri): CompletionItem[] {
