@@ -1846,18 +1846,20 @@
     "type-name": {
       "patterns": [
         {
-          "match": "([_[:alpha:]][\\#\\$\\_[:alnum:]]*)\\s*(\\.)",
-          "captures": {
-            "1": {
-              "name": "variable.other.object.usp"
-            },
-            "2": {
-              "name": "punctuation.accessor.usp"
-            }
-          }
+          "include": "#type-name-property"
         },
         {
-          "match": "(\\.)\\s*([_[:alpha:]][\\#\\$\\_[:alnum:]]*)(?![<>])",
+          "include": "#type-name-object"
+        },
+        {
+          "include": "#type-name-readwrite"
+        }
+      ]
+    },
+    "type-name-property": {
+      "patterns": [
+        {
+          "match": "(\\.)\\s*([_[:alpha:]][\\#\\$\\_[:alnum:]]*)",
           "captures": {
             "1": {
               "name": "punctuation.accessor.usp"
@@ -1866,7 +1868,26 @@
               "name": "variable.other.object.property.usp"
             }
           }
-        },
+        }
+      ]
+    },
+    "type-name-object": {
+      "patterns": [
+        {
+          "match": "(\\.)?([_[:alpha:]][\\#\\$\\_[:alnum:]]*)(?=\\s*\\.\\s*[_[:alpha:]][\\#\\$\\_[:alnum:]]*)",
+          "captures": {
+            "1": {
+              "name": "punctuation.accessor.usp"
+            },
+            "2": {
+              "name": "variable.other.object.usp"
+            }
+          }
+        }
+      ]
+    },
+    "type-name-readwrite": {
+      "patterns": [
         {
           "name": "variable.other.readwrite.usp",
           "match": "([_[:alpha:]][\\#\\$\\_[:alnum:]]*)"

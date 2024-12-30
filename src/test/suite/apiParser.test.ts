@@ -1,4 +1,4 @@
-import { provideClassTokens } from "../../apiParser";
+import { provideClassTokens } from "../../helpers/apiParser";
 import * as sinon from 'sinon';
 import * as vscode from 'vscode';
 import * as assert from 'assert';

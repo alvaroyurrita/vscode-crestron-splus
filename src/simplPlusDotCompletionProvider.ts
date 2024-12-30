@@ -31,7 +31,6 @@ export class SimplPlusDotCompletionProvider implements CompletionItemProvider {
         let linePrefix = document.lineAt(position).text.slice(0, position.character);
         const wordWithDotMatch = linePrefix.match(/(?:(?:[_\w][_#$\w]*)*\s*\.\s*)*(?:[_\w][_#$\w]*\s*)*\.$/);//grab any group of words followed by a dot (ie: test.test.  or test.)
         if (!wordWithDotMatch) { return []; }
-        console.log("wordWithDotMatch: ", wordWithDotMatch[0]);
         const tokenTree = wordWithDotMatch[0].match(/[_\w][_#$\w]*/g);
         let currentToken = tokenTree.shift();
         //Look for global variables first
@@ -55,12 +54,10 @@ export class SimplPlusDotCompletionProvider implements CompletionItemProvider {
                 if (builtInMembers.length > 0) {
                     return builtInMembers;
                 };
+                return [];
             default:
                 return [];
         }
-
-        return completionItems;
-
     }
 
 };

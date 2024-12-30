@@ -100,19 +100,6 @@ export class SimplPlusCompletionProvider implements CompletionItemProvider {
                 };
                 item.label = functionLabel;
             }
-            const snippetString = new SnippetString();
-            snippetString.appendText(itemLabel);
-            if (functionInfo !== undefined) {
-                snippetString.appendText("(");
-                if (functionInfo.parameters.length > 0) {
-                    functionInfo.parameters.forEach((parameter, index, parameters) => {
-                        if (index > 0) { snippetString.appendText(", "); }
-                        snippetString.appendPlaceholder(parameter.name);
-                    });
-                }
-                snippetString.appendText(")");
-                item.insertText = snippetString;
-            }
             resolve(item);
         });
     }

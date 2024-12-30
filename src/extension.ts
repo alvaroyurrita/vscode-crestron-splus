@@ -21,6 +21,7 @@ import { TextMateCompletionProvider } from "./textMateCompletionProvider";
 import { TokenService } from "./services/tokenService";
 import { KeywordService } from "./services/keywordService";
 import { SimplPlusSignatureHelpProvider } from "./simplPlusSignatureHelpProvider";
+import { ApiTokenService } from "./services/apiTokenService";
 
 
 // Creates a terminal, calls the command, then closes the terminal
@@ -63,6 +64,8 @@ export async function activate(context: ExtensionContext) {
     // const textDocument = window.activeTextEditor!.document;
     // const tokens = await textmateTokenService.fetch(textDocument);
 
+    const apiTokenService = ApiTokenService.getInstance(context);
+
     const tokenService = TokenService.getInstance(context);
     const keywordService = KeywordService.getInstance();
     const simplPlusStatusBar =SimplPlusStatusBar.getInstance(context);
@@ -95,8 +98,8 @@ export async function activate(context: ExtensionContext) {
     let thisHoverProvider = new SimplPlusHoverProvider();
     const hoverProvider = languages.registerHoverProvider({ language: 'simpl-plus' }, thisHoverProvider);
 
-    // let thisApiCompletionProvider = new ApiCompletionProvider();
-    // const apiCompletionProvider = languages.registerCompletionItemProvider({ language: 'simpl-plus' },thisApiCompletionProvider, '.');
+    let thisApiCompletionProvider = new ApiCompletionProvider(tokenService);
+    const apiCompletionProvider = languages.registerCompletionItemProvider({ language: 'simpl-plus' },thisApiCompletionProvider, '.');
 
     let thisCompletionProvider = new SimplPlusCompletionProvider(keywordService, tokenService);
     const completionProvider = languages.registerCompletionItemProvider({ language: 'simpl-plus' }, thisCompletionProvider);
@@ -119,10 +122,11 @@ export async function activate(context: ExtensionContext) {
         build_command,
         showCategories_command,
         simplPlusTasks,
-        // apiCompletionProvider,
+        apiCompletionProvider,
         completionProvider,
         dotCompletionProvider,
         signatureHelpProvider,
+        apiTokenService
         // textMateCompletionProvider
       );
 }

@@ -10,7 +10,8 @@ import {
     CompletionItemKind,
     CompletionItem,
     CompletionItemLabel,
-    SymbolKind
+    SymbolKind,
+    SnippetString
 } from "vscode";
 import TextmateLanguageService, { TextmateToken } from "vscode-textmate-languageservice";
 import { DocumentToken } from "./tokenTypes";
@@ -371,6 +372,20 @@ export class TokenService {
                     documentation += t.parameters.map(p => `${p.dataType} ${p.name}`).join(", ");
                 }
                 documentation += ")";
+                const snippetString = new SnippetString();
+                snippetString.appendText(t.name);
+                snippetString.appendText("(");
+                if (t.parameters.length > 0) {
+                    t.parameters.forEach((parameter, index, parameters) => {
+                        if (index > 0) { snippetString.appendText(", "); }
+                        snippetString.appendPlaceholder(parameter.name);
+                    });
+                }
+                else{
+                    snippetString.appendTabstop();
+                }
+                snippetString.appendText(")");
+                item.insertText = snippetString;
                 item.command = {
                     command: "editor.action.triggerParameterHints",
                     title: "triggerSignatureHelp",

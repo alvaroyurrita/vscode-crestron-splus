@@ -1,14 +1,12 @@
-import * as fsExistsWrapper from './helpers/fsReadSyncWrapper';
+import * as fsExistsWrapper from './fsReadSyncWrapper';
 import { workspace, Uri, Range, TextDocument, CompletionItemKind} from 'vscode';
-import { DocumentToken } from './services/tokenTypes';
+import { DocumentToken } from '../services/tokenTypes';
 
 
-export async function provideClassTokens(): Promise<DocumentToken[]> {
+export async function provideClassTokens(apiFullPath: string): Promise<DocumentToken[]> {
 
-    const currentWorkspace = workspace.workspaceFolders;
     //@ts-ignore
-    const dirtyDocumentPath = Uri.joinPath(currentWorkspace[0].uri, "SPlsWork", "SampleSimplSharpLibrary.api");
-    const apiDocument = await workspace.openTextDocument(dirtyDocumentPath.fsPath);
+    const apiDocument = await workspace.openTextDocument(apiFullPath);
     const apiDocumentContent = apiDocument.getText();
     const apiClassesMatches = apiDocumentContent.matchAll(/class\s*([\w]*)\s*{([^}]*)/gm);
     const apiClasses: DocumentToken[] = [];
