@@ -11,10 +11,10 @@ import {
     window,
 } from "vscode";
 import TextmateLanguageService from "vscode-textmate-languageservice";
-import { TokenService } from "./services/tokenService";
+import { DocumentTokenService } from "./services/documentTokenService";
 
 export class TextMateCompletionProvider implements CompletionItemProvider {
-    constructor(private readonly _tokenService: TokenService){}
+    constructor(private readonly _tokenService: DocumentTokenService){}
     provideCompletionItems(document: TextDocument, position: Position, token: CancellationToken, context: CompletionContext): ProviderResult<CompletionItem[] | CompletionList<CompletionItem>> {
         return new Promise(async resolve => {
 

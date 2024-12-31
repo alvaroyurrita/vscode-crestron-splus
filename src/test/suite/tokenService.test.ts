@@ -20,7 +20,7 @@ suite("testing tokenization", function () {
         await delay(500);
         const mockExtensionContext = (global as any).testExtensionContext;
         const tokenService = TokenService.getInstance(mockExtensionContext);
-        const documentMembers = tokenService.getDocumentMembers(vscode.window.activeTextEditor?.document.uri.toString());
+        const documentMembers = tokenService.getDocumentMembers(vscode.window.activeTextEditor?.document.uri);
         assert.strictEqual(documentMembers?.length, 1);
         assert.strictEqual(documentMembers[0].name, "MYCONSTANT");
         assert.strictEqual(documentMembers[0].kind, vscode.CompletionItemKind.Constant);
@@ -35,7 +35,7 @@ suite("testing tokenization", function () {
         await delay(500);
         const mockExtensionContext = (global as any).testExtensionContext;
         const tokenService = TokenService.getInstance(mockExtensionContext);
-        const documentMembers = tokenService.getDocumentMembers(vscode.window.activeTextEditor?.document.uri.toString());
+        const documentMembers = tokenService.getDocumentMembers(vscode.window.activeTextEditor?.document.uri);
         assert.strictEqual(documentMembers?.length, 1);
         assert.strictEqual(documentMembers[0].name, "BufferInput1");
         assert.strictEqual(documentMembers[0].kind, vscode.CompletionItemKind.Variable);
@@ -50,7 +50,7 @@ suite("testing tokenization", function () {
         await delay(500);
         const mockExtensionContext = (global as any).testExtensionContext;
         const tokenService = TokenService.getInstance(mockExtensionContext);
-        const documentMembers = tokenService.getDocumentMembers(vscode.window.activeTextEditor?.document.uri.toString());
+        const documentMembers = tokenService.getDocumentMembers(vscode.window.activeTextEditor?.document.uri);
         assert.strictEqual(documentMembers?.length, 1);
         assert.strictEqual(documentMembers[0].name, "myVariableOfType");
         assert.strictEqual(documentMembers[0].kind, vscode.CompletionItemKind.Variable);
@@ -65,7 +65,7 @@ suite("testing tokenization", function () {
         await delay(500);
         const mockExtensionContext = (global as any).testExtensionContext;
         const tokenService = TokenService.getInstance(mockExtensionContext);
-        const documentMembers = tokenService.getDocumentMembers(vscode.window.activeTextEditor?.document.uri.toString());
+        const documentMembers = tokenService.getDocumentMembers(vscode.window.activeTextEditor?.document.uri);
         assert.strictEqual(documentMembers?.length, 1);
         assert.strictEqual(documentMembers[0].name, "testStructure");
         assert.strictEqual(documentMembers[0].kind, vscode.CompletionItemKind.Struct);
@@ -93,7 +93,7 @@ suite("testing tokenization", function () {
         await delay(500);
         const mockExtensionContext = (global as any).testExtensionContext;
         const tokenService = TokenService.getInstance(mockExtensionContext);
-        const documentMembers = tokenService.getDocumentMembers(vscode.window.activeTextEditor?.document.uri.toString());
+        const documentMembers = tokenService.getDocumentMembers(vscode.window.activeTextEditor?.document.uri);
         assert.strictEqual(documentMembers?.length, 1);
         assert.strictEqual(documentMembers[0].name, "testFunction");
         assert.strictEqual(documentMembers[0].kind, vscode.CompletionItemKind.Function);
@@ -136,7 +136,7 @@ suite("testing tokenization", function () {
         const mockExtensionContext = (global as any).testExtensionContext;
         const tokenService = TokenService.getInstance(mockExtensionContext);
         const position = new vscode.Position(0, 32);
-        const isInsideParameter = tokenService.isAtParameterRange(vscode.window.activeTextEditor?.document.uri.toString(), position);
+        const isInsideParameter = tokenService.isAtParameterRange(vscode.window.activeTextEditor?.document.uri, position);
         assert.ok(isInsideParameter);
     });
 
@@ -146,7 +146,7 @@ suite("testing tokenization", function () {
         const mockExtensionContext = (global as any).testExtensionContext;
         const tokenService = TokenService.getInstance(mockExtensionContext);
         const position = new vscode.Position(2, 2);
-        const isInsideParameter = tokenService.isAtParameterRange(vscode.window.activeTextEditor?.document.uri.toString(), position);
+        const isInsideParameter = tokenService.isAtParameterRange(vscode.window.activeTextEditor?.document.uri, position);
         assert.ok(!isInsideParameter);
     });
 
@@ -156,7 +156,7 @@ suite("testing tokenization", function () {
         await delay(500);
         const mockExtensionContext = (global as any).testExtensionContext;
         const tokenService = TokenService.getInstance(mockExtensionContext);
-        const documentMembers = tokenService.getDocumentMembers(vscode.window.activeTextEditor?.document.uri.toString());
+        const documentMembers = tokenService.getDocumentMembers(vscode.window.activeTextEditor?.document.uri);
         assert.strictEqual(documentMembers?.length, 1);
         assert.strictEqual(documentMembers[0].name, "DigitalInput1");
         assert.strictEqual(documentMembers[0].kind, vscode.CompletionItemKind.Event);
@@ -187,7 +187,7 @@ suite("with a position", function () {
         await delay(500);
         const mockExtensionContext = (global as any).testExtensionContext;
         const tokenService = TokenService.getInstance(mockExtensionContext);
-        const uri = vscode.window.activeTextEditor?.document.uri.toString();
+        const uri = vscode.window.activeTextEditor?.document.uri;
         const position = new vscode.Position(0, 0);
         const token = tokenService.getBlockStatementTokenAtPosition(uri, position);
         assert.strictEqual(token, undefined);
@@ -197,7 +197,7 @@ suite("with a position", function () {
         await delay(500);
         const mockExtensionContext = (global as any).testExtensionContext;
         const tokenService = TokenService.getInstance(mockExtensionContext);
-        const uri = vscode.window.activeTextEditor?.document.uri.toString();
+        const uri = vscode.window.activeTextEditor?.document.uri;
         const position = new vscode.Position(2, 5);
         const token = tokenService.getBlockStatementTokenAtPosition(uri, position);
         assert.strictEqual(token.name, "DigitalInput1");

@@ -15,4 +15,5 @@ export type DocumentToken = {
     internalVariables?: DocumentToken[];
     internalProperties?: DocumentToken[];
     internalDelegateProperties?: DocumentToken[];
+    isExternalLibrary?: boolean;
 }

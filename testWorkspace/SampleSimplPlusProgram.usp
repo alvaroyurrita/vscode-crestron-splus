@@ -1,12 +1,16 @@
+#USER_SIMPLSHARP_LIBRARY "SamplSimplSharpLibrary"
 
-#USER_SIMPLSHARP_LIBRARY "SampleSimplSharpLibrary"
 
 DIGITAL_INPUT Test;
 
 
 SampleClass test2;
+OtherSampleClass testSampleClass;
+
 
 push Test
 {
 	print("Enum Test %i",test2.sampleEnum);
+	
+	
 }

@@ -14,14 +14,15 @@ import {
 import { provideClassTokens } from "../helpers/apiParser";
 import { DocumentToken } from "./tokenTypes";
 import { join } from "path";
+import * as fs from "fs";
 
-//   A specific usp might reference a clz.  Many usp might reference the same cls
+//  A specific usp might reference a clz.  Many usp might reference the same clz
 //  a clz will generate an api file. The api file will be used to provide completion items.
-// This service will store every api document items based on the clz file that generated it via the api file.
+//  This service will automatically generate an api on every clz change and generate its document tokens
 //  Document tokens will not be cleared until the service is disposed.
-//  The service will listen to the clz for changes, and it will generate the api file and token when it changes
-
-
+//  The service will also stored the dlls that each usp uses.
+//  The service will provide all tokens from all reference clz per usp document uri.
+//  Token will be generated using the apiParser library that needs an API path to generate document tokens.
 
 export class ApiTokenService implements Disposable {
     //Stores that watchers for a specific parent folder  where the .CLZ libraries are stored
@@ -29,7 +30,7 @@ export class ApiTokenService implements Disposable {
     //Stores tokens for a specific .CLZ Library
     private _apis = new Map<string, DocumentToken[]>();
     //stores the documents that need api tokens.
-    private _documents = new Map<Uri, string[]>();
+    private _documents = new Map<string, string[]>();
     private static _instance: ApiTokenService;
     private selector: DocumentSelector = 'simpl-plus';
     public static getInstance(ctx: ExtensionContext): ApiTokenService {
@@ -58,9 +59,9 @@ export class ApiTokenService implements Disposable {
         this._watchers.clear();
     }
 
-    public getLibraryTokens(document: TextDocument): DocumentToken[] {
+    public getTokens(uri: Uri): DocumentToken[] {
         const documentTokens: DocumentToken[] = [];
-        this._documents.get(document.uri)?.forEach((library) => {
+        this._documents.get(uri.toString())?.forEach((library) => {
             const tokens = this._apis.get(library);
             if (tokens) {
                 documentTokens.push(...tokens);
@@ -70,6 +71,8 @@ export class ApiTokenService implements Disposable {
     }
 
     private async updateOnCloseTextDocument(document: TextDocument): Promise<void> {
+        if (document.languageId !== this.selector.toString()) { return; }
+        this._documents.delete(document.uri.toString());
         console.log("Document closed");
     }
     private async updateOnDidChangeTextDocument(editor: TextDocumentChangeEvent | undefined): Promise<void> {
@@ -104,6 +107,7 @@ export class ApiTokenService implements Disposable {
         const clzDocuments: string[]=[];
         for (const library of libraryMatches) {
             const CLZFullPath = join(documentParentFolder, library[1] + ".clz");
+            if (!fs.existsSync(CLZFullPath)) { continue;}
             clzDocuments.push(CLZFullPath);
             if (!this._apis.has(CLZFullPath)) {
                 // Generate API File from CLZ
@@ -119,7 +123,7 @@ export class ApiTokenService implements Disposable {
                 this._apis.set(CLZFullPath, apiTokens);
             }
         };
-        this._documents.set(document.uri, clzDocuments);
+        this._documents.set(document.uri.toString(), clzDocuments);
     }
     private deleteLibrary(e: Uri) {
         //check if one of the stored CLZ libraries has been deleted
@@ -175,16 +179,6 @@ export class ApiTokenService implements Disposable {
                     });
                 }
             });
-            // // Fallback to sendText if there is no shell integration within 3 seconds of launching
-            // setTimeout(() => {
-            //     if (!apiTerminal.shellIntegration) {
-            //         apiTerminal.sendText('echo "Hello world"');
-            //         // Without shell integration, we can't know when the command has finished or what the
-            //         // exit code was.
-            //     }
-            // }, 3000);
-            // apiTerminal.hide();
-            // apiTerminal.dispose();
         });
     }
 }

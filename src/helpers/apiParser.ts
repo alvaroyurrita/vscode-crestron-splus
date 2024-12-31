@@ -1,4 +1,3 @@
-import * as fsExistsWrapper from './fsReadSyncWrapper';
 import { workspace, Uri, Range, TextDocument, CompletionItemKind} from 'vscode';
 import { DocumentToken } from '../services/tokenTypes';
 
@@ -71,9 +70,39 @@ export async function provideClassTokens(apiFullPath: string): Promise<DocumentT
             internalFunctions: functions,
             internalVariables: variables,
             internalProperties: properties,
-            internalDelegateProperties: delegateProperties
+            internalDelegateProperties: delegateProperties,
+            isExternalLibrary: true
         });
     }
+    const apiEnumMatches = apiDocumentContent.matchAll(/enum\s*([\w]*)\s*{([^}]*)/gm);
+    const apiEnums: DocumentToken[] = [];
+    for (let apiEnum of apiEnumMatches) {
+        const enumStart = apiDocument.positionAt(apiEnum.index + apiEnum[0].indexOf("{") + 1);
+        const enumEnd = apiDocument.positionAt(apiEnum.index + apiEnum[0].length);
+        const enumBodyRange = new Range(enumStart, enumEnd);
+        const enumNameRange = apiDocument.getWordRangeAtPosition(apiDocument.positionAt(apiEnum.index + apiEnum[0].indexOf(apiEnum[1])))
+        const enumMembers: DocumentToken[] = [];
+        const enumMembersMatch = apiEnum[2].match(/(\w*),/gm);
+        for (let enumMember of enumMembersMatch) {
+            const memberNameRange = apiDocument.getWordRangeAtPosition(apiDocument.positionAt(apiEnum.index + apiEnum[0].indexOf(enumMember)));
+            enumMembers.push({
+                name: enumMember,
+                kind: CompletionItemKind.EnumMember,
+                nameRange: memberNameRange,
+                dataType: apiEnum[1]+"."+enumMember
+            });
+        }
+        apiEnums.push({
+            name: apiEnum[1],
+            kind: CompletionItemKind.Enum,
+            nameRange: enumNameRange,
+            dataType: "enum",
+            blockRange: enumBodyRange,
+            internalVariables: enumMembers,
+            isExternalLibrary: true
+        });
+    }
+    apiClasses.push(...apiEnums);
     console.log("API Classes",apiClasses);
     return apiClasses;
 }
@@ -170,9 +199,9 @@ function getVariables(variablesArea: Range, document: TextDocument): DocumentTok
 function getProperties(propertiesArea: Range, document: TextDocument): DocumentToken[] {
     let properties: DocumentToken[] = [];
     const variablesText = document.getText(propertiesArea);
-    const propertyMatches = variablesText.matchAll(/(?:([\w]*)\s*)?([\w]*)\s*([\w\[\]]*)\s*;/gm);
+    const propertyMatches = variablesText.matchAll(/(\w*)?\s*(\w*)\s*(\w*\s*(?:\[,*\])?)\s*;/gm);
     for (let propertyMatch of propertyMatches) {
-        if (propertyMatch[1] !== "") { continue; };
+        if (propertyMatch[1] !== undefined) { continue;};
         const nameRange = document.getWordRangeAtPosition(
             document.positionAt(document.offsetAt(propertiesArea.start)+propertyMatch.index+propertyMatch[0].indexOf(propertyMatch[3]))
         );
@@ -189,17 +218,16 @@ function getProperties(propertiesArea: Range, document: TextDocument): DocumentT
 function getDelegateProperties(delegatePropertiesArea: Range, document: TextDocument): DocumentToken[] {
     let delegateProperties: DocumentToken[] = [];
     const delegatePropertiesText = document.getText(delegatePropertiesArea);
-    const delegatePropertyMatches = delegatePropertiesText.matchAll(/(?:([\w]*)\s*)?([\w]*)\s*([\w\[\]]*)\s*;/gm);
+    const delegatePropertyMatches = delegatePropertiesText.matchAll(/(?:DelegateProperty\s*)(\w*)\s*(\w*\s*(?:\[,*\])?)\s*;/gm);
     for (let delegatePropertyMatch of delegatePropertyMatches) {
-        if (delegatePropertyMatch[1] === "") { continue; };
         const nameRange = document.getWordRangeAtPosition(
-            document.positionAt(document.offsetAt(delegatePropertiesArea.start)+delegatePropertyMatch.index+delegatePropertyMatch[0].indexOf(delegatePropertyMatch[3]))
+            document.positionAt(document.offsetAt(delegatePropertiesArea.start)+delegatePropertyMatch.index+delegatePropertyMatch[0].indexOf(delegatePropertyMatch[2]))
         );
         delegateProperties.push({
-            name: delegatePropertyMatch[3],
+            name: delegatePropertyMatch[2],
             kind: CompletionItemKind.Property,
             nameRange,
-            dataType: delegatePropertyMatch[2]
+            dataType: delegatePropertyMatch[1]
         });
     }
     return delegateProperties;

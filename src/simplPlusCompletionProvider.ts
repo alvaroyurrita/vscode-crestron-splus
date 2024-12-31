@@ -33,7 +33,7 @@ export class SimplPlusCompletionProvider implements CompletionItemProvider {
         context: CompletionContext):
         ProviderResult<CompletionItem[]> {
         const uri = document.uri;
-        const currentBlock = this._tokenService.getBlockStatementTokenAtPosition(uri.toString(), position);
+        const currentBlock = this._tokenService.getBlockStatementTokenAtPosition(uri, position);
         if (currentBlock === undefined) {
             const lineUntilPosition = document.lineAt(position.line).text.slice(0, position.character);
             if (lineUntilPosition.toLowerCase().match(/(push|release|change|event)/)) {
@@ -45,12 +45,13 @@ export class SimplPlusCompletionProvider implements CompletionItemProvider {
                 return socketVariables;
             }
             const completionItems = this.getRootKeywords(uri);
-            return completionItems;
+            const rootVariables = this.getRootVariables(uri);
+            return completionItems.concat(rootVariables);
         }
         switch (currentBlock.kind) {
             case CompletionItemKind.Event:
             case CompletionItemKind.Function:
-                if (this._tokenService.isAtParameterRange(uri.toString(), position)) {
+                if (this._tokenService.isAtParameterRange(uri, position)) {
                     const parameterKeywords = this.getParameterKeywords(uri);
                     return parameterKeywords;
                 }
@@ -75,7 +76,7 @@ export class SimplPlusCompletionProvider implements CompletionItemProvider {
         return new Promise(async resolve => {
             const uri = window.activeTextEditor?.document.uri;
             const itemLabel = typeof item.label === "string" ? item.label : item.label.label;
-            let functionInfo = this._tokenService.getFunctionInfo(uri.toString(), itemLabel);
+            let functionInfo = this._tokenService.getFunctionInfo(uri, itemLabel);
             if (functionInfo === undefined) {
                 const keyword = this._keywordService.getKeyword(itemLabel);
                 if (keyword === undefined || !keyword.hasHelp) { resolve(item); return; }
@@ -104,7 +105,7 @@ export class SimplPlusCompletionProvider implements CompletionItemProvider {
         });
     }
     private getInputVariables(uri: Uri): CompletionItem[] {
-        const documentItems = this._tokenService.getDocumentMembers(uri.toString());
+        const documentItems = this._tokenService.getDocumentMembers(uri);
         if (documentItems === undefined) {
             return [];
         }
@@ -112,7 +113,7 @@ export class SimplPlusCompletionProvider implements CompletionItemProvider {
         return this._tokenService.getCompletionItemsFromDocumentTokens(items);
     }
     private getSocketVariables(uri: Uri): CompletionItem[] {
-        const documentItems = this._tokenService.getDocumentMembers(uri.toString());
+        const documentItems = this._tokenService.getDocumentMembers(uri);
         if (documentItems === undefined) {
             return [];
         }
@@ -120,7 +121,7 @@ export class SimplPlusCompletionProvider implements CompletionItemProvider {
         return this._tokenService.getCompletionItemsFromDocumentTokens(items);
     }
     private getStructureVariables(uri: Uri): CompletionItem[] {
-        const documentItems = this._tokenService.getDocumentMembers(uri.toString());
+        const documentItems = this._tokenService.getDocumentMembers(uri);
         if (documentItems === undefined) {
             return [];
         }
@@ -189,7 +190,7 @@ export class SimplPlusCompletionProvider implements CompletionItemProvider {
         return this._keywordService.getCompletionItemsFromKeywords(keywordDefinitions);
     }
     private getRootVariables(uri: Uri): CompletionItem[] {
-        const documentItems = this._tokenService.getDocumentMembers(uri.toString());
+        const documentItems = this._tokenService.getDocumentMembers(uri);
         if (documentItems === undefined) {
             return [];
         }

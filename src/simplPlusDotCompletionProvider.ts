@@ -26,7 +26,7 @@ export class SimplPlusDotCompletionProvider implements CompletionItemProvider {
         token: CancellationToken,
         context: CompletionContext):
         ProviderResult<CompletionItem[]> {
-        const uri = document.uri.toString();
+        const uri = document.uri;
         const completionItems: CompletionItem[] = [];
         let linePrefix = document.lineAt(position).text.slice(0, position.character);
         const wordWithDotMatch = linePrefix.match(/(?:(?:[_\w][_#$\w]*)*\s*\.\s*)*(?:[_\w][_#$\w]*\s*)*\.$/);//grab any group of words followed by a dot (ie: test.test.  or test.)

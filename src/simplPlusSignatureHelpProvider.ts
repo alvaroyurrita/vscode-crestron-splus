@@ -34,7 +34,7 @@ export class SimplPlusSignatureHelpProvider implements SignatureHelpProvider {
                 return undefined;
             }
             const functionName = match[1];
-            functionToken = this._tokenService.getGlobalDocumentMemberByName(document.uri.toString(), functionName);
+            functionToken = this._tokenService.getGlobalDocumentMemberByName(document.uri, functionName);
             if (!functionToken) {
                 const keywordService = KeywordService.getInstance();
                 const keyword = keywordService.getKeyword(functionName);
@@ -62,8 +62,6 @@ export class SimplPlusSignatureHelpProvider implements SignatureHelpProvider {
             const parameterText = textAtPosition.match(/\(([^)]*)/); // Match the text between the open and close parenthesis
             const activeParameter = parameterText ? parameterText[1].split(",").length - 1 : 0;
             signatureHelp.activeParameter = activeParameter;
-
-
             resolve(signatureHelp);
         });
     }

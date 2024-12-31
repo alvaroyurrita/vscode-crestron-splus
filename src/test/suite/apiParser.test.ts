@@ -1,61 +1,16 @@
 import { provideClassTokens } from "../../helpers/apiParser";
-import * as sinon from 'sinon';
 import * as vscode from 'vscode';
 import * as assert from 'assert';
 
 suite("With api Parser", function () {
-    let openTextDocumentStub: sinon.SinonStub;
 
     test("get classes and tokens", async () => {
-        const apiDocumentContent = `
-namespace SampleSimplSharpLibrary;
-{
-     class SampleClass 
-    {
-        // class delegates
-        delegate SIGNED_LONG_INTEGER_FUNCTION IntSampleDelegate ( SIGNED_LONG_INTEGER intParameter, INTEGER uShortIntegerParameter );
+        const workSpaceDir = vscode.workspace.workspaceFolders?.[0].uri.fsPath;
+        const apiFile = workSpaceDir + "\\apiParserTestFile.api";
 
-        // class events
-        EventHandler SampleComplexEvent ( SampleClass sender, MyEventArgs e );
-
-        // class functions
-        INTEGER_FUNCTION SampleUshortMethod ( INTEGER ushortParameter , SampleStructure clientStructureParam , SampleSubClass clientClassParam );
-
-        // class variables
-        STRING stringSampleField[];
-
-        // class properties
-        DelegateProperty SampleDelegate SampleDelegateProperty;
-        SampleSubClass SampleSampleSubClass;
-    };
-    class MyEventArgs
-    {
-        // class delegates
-
-        // class events
-
-        // class functions
-        SIGNED_LONG_INTEGER_FUNCTION GetHashCode ();
-        STRING_FUNCTION ToString ();
-
-        // class variables
-
-        // class properties
-        SIGNED_LONG_INTEGER EventInt;
-    };
-}
-`;
-        const sampleTextDocument = await vscode.workspace.openTextDocument({ content: apiDocumentContent });
-        openTextDocumentStub = sinon.stub(vscode.workspace, 'openTextDocument');
-        openTextDocumentStub.returns(sampleTextDocument);
-
-        const apiMembers = await provideClassTokens();
-        openTextDocumentStub.restore();
+        const apiMembers = await provideClassTokens(apiFile);
         await vscode.commands.executeCommand('workbench.action.closeAllEditors');
 
-
-        sinon.assert.calledOnce(openTextDocumentStub);
-        sinon.assert.calledWith(openTextDocumentStub, sinon.match(/SampleSimplSharpLibrary\.api$/));
         assert.strictEqual(apiMembers.length, 2);
         assert.strictEqual(apiMembers[0].name, "SampleClass");
         assert.strictEqual(apiMembers[0].kind, vscode.CompletionItemKind.Class);
