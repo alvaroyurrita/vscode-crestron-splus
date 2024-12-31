@@ -34,14 +34,20 @@ export class SimplPlusDotCompletionProvider implements CompletionItemProvider {
         const tokenTree = wordWithDotMatch[0].match(/[_\w][_#$\w]*/g);
         let currentToken = tokenTree.shift();
         //Look for global variables first
-        let currentObject = this._tokenService.getGlobalDocumentMemberByName(uri, currentToken);
+        let currentObject = this._tokenService.getLocalDocumentMemberByName(uri, currentToken, position);
         if (!currentObject) {
+            currentObject = this._tokenService.getGlobalDocumentMemberByName(uri, currentToken);
             //then local variables
-            currentObject = this._tokenService.getLocalDocumentMemberByName(uri, currentToken, position);
             if (!currentObject) { return completionItems; }
+        }
+        if (currentObject.kind === CompletionItemKind.Variable) {
+            // test if object is something other than a variable (ie: a class or enum)
+            let testObject = this._tokenService.getDocumentMemberByDataType(uri, currentObject.dataType);
+            currentObject = testObject ? testObject : currentObject;
         }
         switch (currentObject.kind) {
             case CompletionItemKind.Struct:
+            case CompletionItemKind.Variable:
                 currentToken = tokenTree.shift();
                 while (currentToken) {
                     const property = currentObject.internalVariables.find(v => v.name === currentToken);
@@ -55,6 +61,21 @@ export class SimplPlusDotCompletionProvider implements CompletionItemProvider {
                     return builtInMembers;
                 };
                 return [];
+            case CompletionItemKind.Class:
+                currentToken = tokenTree.shift();
+                while (currentToken) {
+                    const property = currentObject.internalVariables.find(v => v.name === currentToken);
+                    currentObject = this._tokenService.getGlobalDocumentMemberByName(uri, property.dataType);
+                    currentToken = tokenTree.shift();
+                }
+                const classMembers = currentObject.internalDelegateProperties.
+                    concat(currentObject.internalDelegates).
+                    concat(currentObject.internalEvents).
+                    concat(currentObject.internalFunctions).
+                    concat(currentObject.internalProperties).
+                    concat(currentObject.internalVariables);
+                return this._tokenService.getCompletionItemsFromDocumentTokens(classMembers);
+            
             default:
                 return [];
         }

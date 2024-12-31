@@ -16,8 +16,6 @@ push Test
 function test(Integer test)
 {
 	Integer internalVar;
-	
-	
 }
 
 Structure myStructure

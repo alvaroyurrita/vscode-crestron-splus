@@ -4,6 +4,7 @@ import { DocumentTokenService } from "./documentTokenService";
 import { ApiTokenService } from "./apiTokenService";
 
 export class TokenService implements Disposable {
+
     private static _instance: TokenService;
     private _documentTokenService: DocumentTokenService;
     private _apiTokenService: ApiTokenService;
@@ -59,7 +60,9 @@ export class TokenService implements Disposable {
     public getGlobalDocumentMemberByName(uri: Uri, name: string): DocumentToken | undefined {
         const documentMembers = this.getDocumentMembers(uri);
         if (documentMembers === undefined) { return undefined; }
-        const temp  = documentMembers.find(member => member.name === name);
+        const currentDocument = documentMembers.find(member => member.uri === uri.toString());
+        const documentsToSearch = currentDocument.internalVariables.concat(currentDocument.internalStructures);
+        const temp  = documentsToSearch.find(member => member.name === name);
         return temp;
     }
     public getLocalDocumentMemberByName(uri: Uri, name: string, position: Position): DocumentToken | undefined {
@@ -78,6 +81,11 @@ export class TokenService implements Disposable {
         const documentMembers = this.getDocumentMembers(uri);
         if (documentMembers === undefined) { return undefined; }
         return documentMembers.find(member => member.name === tokenLabel && member.kind === CompletionItemKind.Function);
+    }
+    public getDocumentMemberByDataType(uri: Uri, dataType: string): DocumentToken | undefined {
+        const documentMembers = this.getDocumentMembers(uri);
+        if (documentMembers === undefined) { return undefined; }
+        return documentMembers.find(member => member.name === dataType);
     }
     public getCompletionItemsFromDocumentTokens(tokens: DocumentToken[]): CompletionItem[] {
         if (tokens === undefined) { return []; }

@@ -1,3 +1,6 @@
+#USER_SIMPLSHARP_LIBRARY "SampleSimplSharpLibrary"
+
+
 string_input test[3];
 digital_input testdigital;
 analog_input testanalog;
@@ -25,7 +28,7 @@ TCP_CLIENT MyClient[1024];
 TCP_SERVER MyServer[1024];
 UDP_SOCKET MyUDP[1024];
 
-SampleClass mySampleClass;
+SampleClass mySampleClass1;
 
 CEvent myCEvent;
 CMutex myCMutex;
@@ -34,7 +37,10 @@ Integer_Function testFunction(Integer a1, Integer a2)
 {
 	testFunction(a1, a2);
 	File_Info testFileInfo;
+	SampleClass mySampleClass;
 	myStructure3.test8.test5.test1;
+	myStructure3.test8.test5.test2;
+	mySampleClass.
 }
 
 change test

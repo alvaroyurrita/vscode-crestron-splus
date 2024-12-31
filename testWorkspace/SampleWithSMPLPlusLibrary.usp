@@ -2,6 +2,7 @@
 DIGITAL_INPUT Test;
 
 #USER_LIBRARY "SampleLibrary"
+#USER_SIMPLSHARP_LIBRARY "SampleSimplSharpLibrary"
 
 
 STRUCTURE myStruct2 //test
@@ -14,5 +15,6 @@ myStruct testStructure;
 
 push Test
 {
+	SampleClass myLocalClass;
  	print("%i",testStructure.Variable7);
 }

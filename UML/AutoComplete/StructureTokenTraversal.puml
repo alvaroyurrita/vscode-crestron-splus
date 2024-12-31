@@ -21,7 +21,7 @@
 
 @startjson StructureExample
 {
-    "DocumentToken":[
+    "internalStructures":[
     {
         "name": "<back:lightgreen>myStructure1",
         "type": "struct",
@@ -111,7 +111,7 @@
 @startuml
 start
 floating note left
-Token Traversal
+Token Traversal for local structures
 for mystructure3.test8.test5.test1
 autocompletes should be:
 mystructure3. -> test6, test7, test8
@@ -129,6 +129,38 @@ if (currentObject.Type) then (TokenType.Struct)
         :currentObject = getDocumentMembersByName(property.DataType);
         :currentToken = Token.Shift();
     endwhile
+endif
+:getCompletionItemsFromDocument(currentObject);
+
+end
+
+
+@enduml
+
+@startuml
+start
+floating note left
+Token Traversal for external classes
+for myclass.test8.test5.test1
+autocompletes should be:
+myclass. -> test6, test7, test8
+myclass.test8 -> test3, test4, test5
+myclass.test8.test5 -> test1, test2
+
+end note
+:Tokens[] = ;
+:currentToken = Tokens.Shift();
+:currentObject = getDocumentMembersByName(currentToken);
+if (currentObject.Type) then (TokenType.Variable)
+    :currentObject = getDocumentMembersByType(currentObject.DataType);
+    if (currentObject.Type) then (TokenType.Class)
+        :currentToken = Token.Shift();
+        while (currentVariable) is (not null);
+            :property = currentObject.internalVariables.Find(o->o.name == currentToken);
+            :currentObject = getDocumentMembersByName(property.DataType);
+            :currentToken = Token.Shift();
+        endwhile
+    endif
 endif
 :getCompletionItemsFromDocument(currentObject);
 
