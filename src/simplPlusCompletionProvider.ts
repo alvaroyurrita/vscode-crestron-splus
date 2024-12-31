@@ -37,15 +37,15 @@ export class SimplPlusCompletionProvider implements CompletionItemProvider {
         if (currentBlock === undefined) {
             const lineUntilPosition = document.lineAt(position.line).text.slice(0, position.character);
             if (lineUntilPosition.toLowerCase().match(/(push|release|change|event)/)) {
-                const inputVariables = this.getInputVariables(uri);
+                const inputVariables = this.getInternalInputVariables(uri);
                 return inputVariables;
             }
             if (lineUntilPosition.toLowerCase().match(/(socketconnect|socketdisconnect|socketstatus|socketreceive)/)) {
-                const socketVariables = this.getSocketVariables(uri);
+                const socketVariables = this.getInternalSocketVariables(uri);
                 return socketVariables;
             }
             const completionItems = this.getRootKeywords(uri);
-            const rootVariables = this.getRootVariables(uri);
+            const rootVariables = this.getExternalVariable(uri);
             return completionItems.concat(rootVariables);
         }
         switch (currentBlock.kind) {
@@ -55,18 +55,19 @@ export class SimplPlusCompletionProvider implements CompletionItemProvider {
                     const parameterKeywords = this.getParameterKeywords(uri);
                     return parameterKeywords;
                 }
-                const rootVariables = this.getRootVariables(uri);
+                const externalVariables = this.getExternalVariable(uri);
                 let functionKeywords = this.getFunctionKeywords();
+                const internalRootVariables = this.getInternalRootVariables(uri);
                 const functionVariables = this.getFunctionVariables(currentBlock);
                 const lineUntilPosition = document.lineAt(position.line).text.slice(0, position.character);
                 if (lineUntilPosition.match(/[\=\(\[]/)) {
                     functionKeywords = this.getExpressionKeywords();
                 }
-                return functionVariables.concat(rootVariables).concat(functionKeywords);
+                return functionVariables.concat(externalVariables).concat(functionKeywords).concat(internalRootVariables);
             case CompletionItemKind.Struct:
                 const structureKeywords = this.getStructureKeywords();
                 //structures can have other nested structures or classes as structure members;
-                const structureVariables = this.getStructureVariables(uri);
+                const structureVariables = this.getInternalStructureVariables(uri);
                 return structureVariables.concat(structureKeywords);
             default:
                 return this.getRootKeywords(uri);
@@ -104,28 +105,31 @@ export class SimplPlusCompletionProvider implements CompletionItemProvider {
             resolve(item);
         });
     }
-    private getInputVariables(uri: Uri): CompletionItem[] {
+    private getInternalInputVariables(uri: Uri): CompletionItem[] {
         const documentItems = this._tokenService.getDocumentMembers(uri);
         if (documentItems === undefined) {
             return [];
         }
-        const items = documentItems.filter(di => di.kind === CompletionItemKind.Variable && di.dataType.toLowerCase().match(/input/));
+        const thisDocument = documentItems.find(di => di.uri === uri.toString());
+        const items = thisDocument.internalVariables.filter(di => di.dataType.toLowerCase().match(/input/));
         return this._tokenService.getCompletionItemsFromDocumentTokens(items);
     }
-    private getSocketVariables(uri: Uri): CompletionItem[] {
+    private getInternalSocketVariables(uri: Uri): CompletionItem[] {
         const documentItems = this._tokenService.getDocumentMembers(uri);
         if (documentItems === undefined) {
             return [];
         }
-        const items = documentItems.filter(di => di.kind === CompletionItemKind.Variable && di.dataType.toLowerCase().match(/(tcp_client|tcp_server|udp_socket)/));
+        const thisDocument = documentItems.find(di => di.uri === uri.toString());
+        const items = thisDocument.internalVariables.filter(di => di.dataType.toLowerCase().match(/(tcp_client|tcp_server|udp_socket)/));
         return this._tokenService.getCompletionItemsFromDocumentTokens(items);
     }
-    private getStructureVariables(uri: Uri): CompletionItem[] {
+    private getInternalStructureVariables(uri: Uri): CompletionItem[] {
         const documentItems = this._tokenService.getDocumentMembers(uri);
         if (documentItems === undefined) {
             return [];
         }
-        const structureVariables = documentItems.filter(di => di.kind === CompletionItemKind.Struct || di.kind === CompletionItemKind.Class);
+        const thisDocument = documentItems.find(di => di.uri === uri.toString());
+        const structureVariables = thisDocument.internalStructures;
         return this._tokenService.getCompletionItemsFromDocumentTokens(structureVariables);
     }
     private getExpressionKeywords(): CompletionItem[] {
@@ -189,12 +193,33 @@ export class SimplPlusCompletionProvider implements CompletionItemProvider {
         const keywordDefinitions = this._keywordService.getKeywords(rootKeywords);
         return this._keywordService.getCompletionItemsFromKeywords(keywordDefinitions);
     }
-    private getRootVariables(uri: Uri): CompletionItem[] {
+    private getExternalVariable(uri: Uri): CompletionItem[] {
         const documentItems = this._tokenService.getDocumentMembers(uri);
         if (documentItems === undefined) {
             return [];
         }
-        const items = this._tokenService.getCompletionItemsFromDocumentTokens(documentItems);
+        //get all other documents that are not current one
+        const externalDocuments = documentItems.filter(di => di.uri !== uri.toString());
+
+        const items = this._tokenService.getCompletionItemsFromDocumentTokens(externalDocuments);
         return items;
     }
+
+    private getInternalRootVariables(uri: Uri): CompletionItem[] {
+        const documentItems = this._tokenService.getDocumentMembers(uri);
+        if (documentItems === undefined) {
+            return [];
+        }
+        const internalDocument = documentItems.find(di => di.uri === uri.toString());
+        let rootVariables: DocumentToken[] = [];
+        rootVariables.push(...internalDocument.internalVariables);
+        rootVariables.push(...internalDocument.internalConstants);
+        rootVariables.push(...internalDocument.internalFunctions);
+        rootVariables.push(...internalDocument.internalStructures);
+
+        const items = this._tokenService.getCompletionItemsFromDocumentTokens(rootVariables);
+        return items;
+    }
+
+
 }

@@ -1,5 +1,4 @@
-#USER_SIMPLSHARP_LIBRARY "SamplSimplSharpLibrary"
-
+#USER_SIMPLSHARP_LIBRARY "SampleSimplSharpLibrary"
 
 DIGITAL_INPUT Test;
 
@@ -12,5 +11,17 @@ push Test
 {
 	print("Enum Test %i",test2.sampleEnum);
 	
+}
+
+function test(Integer test)
+{
+	Integer internalVar;
 	
+	
+}
+
+Structure myStructure
+{
+
+	Integer test;
 }

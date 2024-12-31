@@ -3,54 +3,14 @@
 #DEFINE_CONSTANT HELLO3 0x03
 #DEFINE_CONSTANT HELLO4 'A'
 
-STRING_INPUT StringInput1[20];//, StringInput2[4][20], _SKIP_, StringInput3[4,2][20];
-BUFFER_INPUT BufferInput1[20];
-DIGITAL_INPUT DigitalInput1, DigitalInput2[4], _SKIP_, DigitalInput3[4,2];
-ANALOG_INPUT AnalogInput1, AnalogInput2[4], _SKIP_, AnalogInput3[4,2];
-STRING_INPUT StringInput2[4][20], _SKIP_, StringInput3[4,2][20];
-BUFFER_INPUT BufferInput2[4][20], _SKIP_, BufferInput3[4,2][20];
-
-STRING_OUTPUT StringOutput1;
-DIGITAL_OUTPUT DigitalOutput1, DigitalOutput2[4], _SKIP_, DigitalOutput3[4,2];
-ANALOG_OUTPUT AnalogOutput1, AnalogOutput2[4], _SKIP_, AnalogOutput3[4,2];
-STRING_OUTPUT StringOutput2[4], _SKIP_, StringOutput3[4,2];
-
-INTEGER_PARAMETER IntegerParameter1, IntegerParameter2[4];
-SIGNED_INTEGER_PARAMETER SignedIntegerParameter1, SignedIntegerParameter2[4];
-LONG_INTEGER_PARAMETER LongIntgerParameter1, LongIntgerParameter2[4];
-SIGNED_LONG_INTEGER_PARAMETER SignedLongIntegerParameter1, SignedLongIntegerParameter2[4];
-STRING_PARAMETER StringParameter1[50], StringParameter2[4][50];
-
-INTEGER Variable#1, _Variable2 [4] , __Variable3 [4] [2] ;
-LONG_INTEGER Variable4, Variable5[4], Variable6[4][2];
-SIGNED_INTEGER Variable7, Variable8[4], Variable9[4][2];
-SIGNED_LONG_INTEGER Variable10[4][2];
-STRING Variable11$[6], Variable11[4][6];
-DYNAMIC STRING DynamicString[10];
-VOLATILE STRING Volati$_#leString[10];
-NONVOLATILE STRING NonVolatileString [10];
-ASCII STRING AsiiString[10];
-UTF16 string Utf16String[10];
-INHERIT STRING InheritString[10];
-STRING InheritString[10][20]; //tes
-
-
-CEvent cEven$_#tClass;
-CMutex cMutexClass;
-
-test test;
-
-STRUCTURE mySruct //test
+STRUCTURE myStruct //test
 {
 	INTEGER Variable#1, _Variable2[4], __Variable3[4][2]; //test
-	INTEGER Variable#1, _Variable2[4], __Variable3[4][2];
 	LONG_INTEGER Variable4, Variable5[4], Variable6[4][2];
 	SIGNED_INTEGER Variable7, V$_#ariable8[4], Variable9[4][2];
 	SIGNED_LONG_INTEGER Variable10[4][2];
 	STRING Variable11$[6], Variable11[4][6];
 };
-
-myStruct test;
 
 
 FUNCTION MyFunction(){
@@ -58,21 +18,16 @@ FUNCTION MyFunction(){
 	STRING Variable11$[6], Variable11[4][6];
 }
 
-INTEGER_FUNCTION MyFunction2(ReadOnlyByRef INTEGER myvar1[], LONG_INTEGER myvar2[], SIGNED_INTEGER myVar3[],  SIGNED_LONG_INTEGER myvar4[], ReadOnlyByRef mySruct myvar5[])
+INTEGER_FUNCTION MyFunction2(ReadOnlyByRef INTEGER myvar1[], LONG_INTEGER myvar2[], SIGNED_INTEGER myVar3[],  SIGNED_LONG_INTEGER myvar4[], ReadOnlyByRef myStruct myvar5[])
 {
 	myStruct test;
-
-	//statements
 }
-LONG_INTEGER_FUNCTION MyFunction3(INTEGER myvar1[][], LONG_INTEGER myvar2[][], SIGNED_INTEGER myVar3[][],  SIGNED_LONG_INTEGER myvar4[][], mySruct myvar5[])
+LONG_INTEGER_FUNCTION MyFunction3(INTEGER myvar1[][], LONG_INTEGER myvar2[][], SIGNED_INTEGER myVar3[][],  SIGNED_LONG_INTEGER myvar4[][], myStruct myvar5[])
 {
-	//statements
 }
 SIGNED_INTEGER_FUNCTION MyFunction4(string myvar1, string myvar2[])
 {
-	STRING Variable13$[6], Variable14[4][6], test, test[5], test, test;
-	object.objectProperty = variableReadWrite;
-	entityNameType  entityNameVariableLocal; //local declaration
+	STRING Variable13$[6], Variable14[4][6];
 	MyFunction4(Variable13$, Variable14);
 }
 SIGNED_LONG_INTEGER_FUNCTION MyFunction5()
@@ -85,46 +40,7 @@ STRING_FUNCTION MyFunction6()
 	STRING Variable13$[6], Variable14[4][6];
 }
 
-SOCKETCONNECT TcpClient
-{
-}
 
 
 
-SOCKETDISCONNECT TcpClient
-{
-	// TODO:  Add code here
-}
-
-
-
-SOCKETRECEIVE TcpClient
-{
-	signed_integer iStatus;
-	STRING siClientTx[10];
-	STRING soClientRx[10];
-	STRING S[300];
-	iStatus = SocketGetSenderIPAddress(UdpSocket, S);
-	iStatus = TcpClient.SocketStatus;
-	soClientRx = TcpClient.SocketRxBuf;
-}
-
-SOCKETSTATUS TcpClient
-{
-	signed_integer iStatus;
-	iStatus = SocketGetStatus();
-}
-
-callback GatherEventHandler MyGatherCallback(GatherEventArgs Args)
-{
-	STRING a[20];
-	SIGNED_INTEGER c;
-	
-	a=Args.RxString;
-	c = Args.Results;
-	RearmGatherAsync(Args.Input);
-}
-
-
-#USER_SIMPLSHARP_LIBRARY "SampleSimplSharpLibrary"
 

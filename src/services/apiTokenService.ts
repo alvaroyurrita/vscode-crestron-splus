@@ -87,9 +87,20 @@ export class ApiTokenService implements Disposable {
     }
 
     private async tokenize(document: TextDocument): Promise<void> {
-        const libraryRegex = /#USER_SIMPLSHARP_LIBRARY "(.*)"/g;
-        const libraries = document.getText().matchAll(libraryRegex);
-        const libraryMatches = Array.from(libraries);
+        let libraryMatches: string [] = [];
+        let inComment = false;
+        //searches through documents for instances of simplsharp libraries while ignoring commented lines
+        for (let line = 0; line < document.lineCount; line++) {
+            const lineText = document.lineAt(line).text;
+            if (lineText.includes("//")) {continue;}
+            if (lineText.includes("/*")) {inComment = true;}
+            if (lineText.includes("*/")) {inComment = false;}
+            if (inComment) {continue;}
+            const libraryMatch = lineText.match(/#USER_SIMPLSHARP_LIBRARY "(.*)"/);
+            if (libraryMatch) {
+                libraryMatches.push(libraryMatch[1]);
+            }
+        }
         if (libraryMatches.length === 0) {
             return;
         }
@@ -106,7 +117,7 @@ export class ApiTokenService implements Disposable {
         //store tokens for each CLZ Library
         const clzDocuments: string[]=[];
         for (const library of libraryMatches) {
-            const CLZFullPath = join(documentParentFolder, library[1] + ".clz");
+            const CLZFullPath = join(documentParentFolder, library + ".clz");
             if (!fs.existsSync(CLZFullPath)) { continue;}
             clzDocuments.push(CLZFullPath);
             if (!this._apis.has(CLZFullPath)) {
@@ -118,7 +129,7 @@ export class ApiTokenService implements Disposable {
                     console.error(error);
                 }
                 //generate API Tokens
-                const apiFile = join(documentParentFolder, "SPLsWork", library[1] + ".api");
+                const apiFile = join(documentParentFolder, "SPlsWork", library + ".api");
                 const apiTokens = await provideClassTokens(apiFile);
                 this._apis.set(CLZFullPath, apiTokens);
             }
@@ -147,7 +158,7 @@ export class ApiTokenService implements Disposable {
             console.error(error);
         }
         // and store them
-        const apiFile = join(documentParentFolder, "SPLsWork", library + ".api");
+        const apiFile = join(documentParentFolder, "SPlsWork", library + ".api");
         const apiTokens = await provideClassTokens(apiFile);
         this._apis.set(CLZPathToCheck, apiTokens);
     }

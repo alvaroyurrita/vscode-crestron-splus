@@ -8,16 +8,13 @@ import {
     Position,
     Range,
     CompletionItemKind,
-    CompletionItem,
-    CompletionItemLabel,
-    SnippetString,
     Disposable,
     Uri
 } from "vscode";
 import TextmateLanguageService, { TextmateToken } from "vscode-textmate-languageservice";
 import { DocumentToken } from "./tokenTypes";
 export class DocumentTokenService implements Disposable {
-    private _documents = new Map<string, DocumentToken[]>();
+    private _documents = new Map<string, DocumentToken>();
     private static _instance: DocumentTokenService;
     private selector: DocumentSelector = 'simpl-plus';
     private _textmateService: TextmateLanguageService;
@@ -27,11 +24,13 @@ export class DocumentTokenService implements Disposable {
         }
         return DocumentTokenService._instance;
     }
-
     public dispose() {
         this._documents.clear();
     }
-
+    public getTokens(uri: Uri): DocumentToken {
+        const documentTokens: DocumentToken[] = [];
+        return this._documents.get(uri.toString());
+    }
     private constructor(ctx: ExtensionContext) {
         this._textmateService = new TextmateLanguageService(this.selector.toString(), ctx);
         const onOpenTextDocument_event = workspace.onDidOpenTextDocument((document) => this.updateOnOpenTextDocument(document));
@@ -48,6 +47,7 @@ export class DocumentTokenService implements Disposable {
         );
     }
     private async updateOnCloseTextDocument(document: TextDocument): Promise<void> {
+        console.log("Document closed", document.fileName);
         if (document.languageId !== this.selector.toString()) { return; }
         this._documents.delete(document.uri.toString());
     }
@@ -58,6 +58,7 @@ export class DocumentTokenService implements Disposable {
         await this.tokenize(document);
     }
     private async updateOnOpenTextDocument(document: TextDocument): Promise<void> {
+        console.log("Document Open", document.fileName);
         if (document.languageId !== this.selector.toString()) { return; }
         await this.tokenize(document);
     }
@@ -67,21 +68,23 @@ export class DocumentTokenService implements Disposable {
         const textmateTokenService = await this._textmateService.initTokenService();
         const tokens = await textmateTokenService.fetch(document);
 
-        const structures = this.getGlobalStructures(tokens);
-        const constants = this.getGlobalConstants(tokens);
-        const variables = this.getGlobalVariables(tokens);
-        const functions = this.getGlobalFunctions(tokens);
-        const events = this.getGlobalEvents(tokens);
+        const theDocument: DocumentToken =
+        {
+            name: document.fileName.slice(document.fileName.lastIndexOf("\\") + 1, document.fileName.lastIndexOf(".")),
+            kind: CompletionItemKind.Class,
+            nameRange: new Range(new Position(0, 0), new Position(0, 0)),
+            blockRange: new Range(new Position(0, 0), new Position(document.lineCount, 0)),
+            dataType: "class",
+            internalStructures: this.getGlobalStructures(tokens),
+            internalConstants: this.getGlobalConstants(tokens),
+            internalVariables: this.getGlobalVariables(tokens),
+            internalFunctions: this.getGlobalFunctions(tokens),
+            internalEvents: this.getGlobalEvents(tokens),
+            uri: document.uri.toString(),
+        };
 
-        const documentMembers: DocumentToken[] = structures.
-            concat(constants).
-            concat(variables).
-            concat(functions).
-            concat(events);
-
-        this._documents.set(document.uri.toString(), documentMembers);
+        this._documents.set(document.uri.toString(), theDocument);
     }
-
     private getGlobalVariables(tokens: TextmateToken[]): DocumentToken[] {
         return tokens.filter(token => token.scopes.includes("entity.name.variable.usp")
             && !(token.scopes.includes("meta.block.structure.usp")
@@ -100,7 +103,6 @@ export class DocumentTokenService implements Disposable {
                     return variable;
                 });
     }
-
     private getGlobalConstants(tokens: TextmateToken[]): DocumentToken[] {
         return tokens.filter(token => token.scopes.includes("entity.name.constant.usp")).map(token => {
             const constantNameRange = new Range(
@@ -132,12 +134,6 @@ export class DocumentTokenService implements Disposable {
             return constant;
         });
     }
-
-    public getTokens(uri: Uri): DocumentToken[] {
-        const documentTokens: DocumentToken[] = [];
-        return this._documents.get(uri.toString());
-    }
-
     private getGlobalFunctions(tokens: TextmateToken[]): DocumentToken[] {
         return tokens.filter(token => token.scopes.includes("entity.name.function.usp")).map(token => {
             const functionType = this.getType(token, tokens);
@@ -214,7 +210,6 @@ export class DocumentTokenService implements Disposable {
             return fun;
         });
     }
-
     private getGlobalStructures(tokens: TextmateToken[]): DocumentToken[] {
         return tokens.filter(token => token.scopes.includes("entity.name.type.structure.usp")).map(token => {
             const structureNameRange = new Range(
@@ -255,7 +250,6 @@ export class DocumentTokenService implements Disposable {
             return struct;
         });
     }
-
     private getGlobalEvents(tokens: TextmateToken[]): DocumentToken[] {
         return tokens.filter(token => token.scopes.includes("entity.name.variable.event.usp")).map(token => {
             const eventType = this.getType(token, tokens);
@@ -297,7 +291,6 @@ export class DocumentTokenService implements Disposable {
             return event;
         });
     }
-
     private getType(token: TextmateToken, tokens: TextmateToken[]): string {
         let tokenIndex = tokens.indexOf(token);
         if (tokenIndex < 0) { return ""; }
@@ -306,7 +299,6 @@ export class DocumentTokenService implements Disposable {
         } while (tokenIndex >= 0 && !(tokens[tokenIndex].type.includes("keyword.type") || tokens[tokenIndex].type.includes("entity.name.type")));
         return tokens[tokenIndex].text;
     }
-
     private getBlockRangeTokens(tokens: TextmateToken[], token: TextmateToken, scopeName: string): TextmateToken[] {
         let functionTokenBegin = tokens.indexOf(token);
         do {
@@ -321,6 +313,4 @@ export class DocumentTokenService implements Disposable {
         } while (functionTokenEnd < tokens.length);
         return tokens.slice(functionTokenBegin, functionTokenEnd);
     }
-    
-
 }

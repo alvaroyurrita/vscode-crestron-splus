@@ -71,7 +71,7 @@ export async function provideClassTokens(apiFullPath: string): Promise<DocumentT
             internalVariables: variables,
             internalProperties: properties,
             internalDelegateProperties: delegateProperties,
-            isExternalLibrary: true
+            uri: apiDocument.uri.toString()
         });
     }
     const apiEnumMatches = apiDocumentContent.matchAll(/enum\s*([\w]*)\s*{([^}]*)/gm);
@@ -99,12 +99,12 @@ export async function provideClassTokens(apiFullPath: string): Promise<DocumentT
             dataType: "enum",
             blockRange: enumBodyRange,
             internalVariables: enumMembers,
-            isExternalLibrary: true
+            uri: apiDocument.uri.toString()
         });
     }
-    apiClasses.push(...apiEnums);
-    console.log("API Classes",apiClasses);
-    return apiClasses;
+    const apiElements = apiClasses.concat(apiEnums);
+    console.log("API Classes",apiElements);
+    return apiElements;
 }
 
 

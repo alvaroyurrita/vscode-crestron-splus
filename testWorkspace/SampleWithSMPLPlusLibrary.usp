@@ -1,0 +1,18 @@
+
+DIGITAL_INPUT Test;
+
+#USER_LIBRARY "SampleLibrary"
+
+
+STRUCTURE myStruct2 //test
+{
+	INTEGER Variable;
+};
+                                         
+myStruct testStructure;
+
+
+push Test
+{
+ 	print("%i",testStructure.Variable7);
+}
