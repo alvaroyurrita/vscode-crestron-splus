@@ -132,12 +132,13 @@ export class SimplPlusTasks implements Disposable {
                 const simpPlusApiGeneratorPath = path.join(extensionPath, "ApiGenerator", "SimplPlusApiGenerator.exe");
 
                 if (fsExistsWrapper.existsSyncWrapper(libraryClzDir)) {
-                    let buildCommand = `\"${simpPlusApiGeneratorPath}" \"${libraryClzDir}\" \"${simplDirectory}\"`;
+                    // let buildCommand = `\"${simpPlusApiGeneratorPath}" \"${libraryClzDir}\" \"${simplDirectory}\"`;
+                    let buildCommand = `\code \"${libraryApiPath}\"`;
 
                     const taskProperties: TaskArguments = {
-                        name: `Generate API file for ${library}`,
+                        name: `Open API file for ${library}`,
                         scope: TaskScope.Workspace,
-                        source: 'Crestron S+',
+                        source: 'SIMPL+',
                         taskDefinition: { type: "shell" },
                         execution: new ShellExecution(`\"${buildCommand}\"`, { executable: 'C:\\Windows\\System32\\cmd.exe', shellArgs: ['/C'] }),
                         problemMatchers: [],
@@ -148,25 +149,6 @@ export class SimplPlusTasks implements Disposable {
                     let task = this.TaskCreator(taskProperties);
                     tasks.push(task);
                 }
-                // const a = commands.executeCommand('vscode.open',libraryApiPath);
-                // if (fsExistsWrapper.existsSyncWrapper(libraryApiPath)) {
-                //     let buildCommand = `\"${simplDirectory}\" \"${libraryApiPath}\"`;
-
-                //     const taskProperties: TaskArguments = {
-                //         name: `Open API File for ${library}`,
-                //         scope: TaskScope.Workspace,
-                //         source: 'Crestron S+',
-                //         taskDefinition: { type: "shell" },
-                //         execution: new ShellExecution(`\"${buildCommand}\"`, { executable: 'C:\\Windows\\System32\\cmd.exe', shellArgs: ['/C'] }),
-                //         problemMatchers: ["$SIMPL+"],
-                //         group: TaskGroup.Build,
-                //         presentationOptions: { panel: TaskPanelKind.Shared, focus: true, clear: true }
-                //     };
-
-                //     let task = this.TaskCreator(taskProperties);
-                //     tasks.push(task);
-                // }
-
             };
         }
 
