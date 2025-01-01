@@ -82,14 +82,14 @@ export async function provideClassTokens(apiFullPath: string): Promise<DocumentT
         const enumBodyRange = new Range(enumStart, enumEnd);
         const enumNameRange = apiDocument.getWordRangeAtPosition(apiDocument.positionAt(apiEnum.index + apiEnum[0].indexOf(apiEnum[1])))
         const enumMembers: DocumentToken[] = [];
-        const enumMembersMatch = apiEnum[2].match(/(\w*),/gm);
+        const enumMembersMatch = apiEnum[2].matchAll(/(\w*),/gm);
         for (let enumMember of enumMembersMatch) {
-            const memberNameRange = apiDocument.getWordRangeAtPosition(apiDocument.positionAt(apiEnum.index + apiEnum[0].indexOf(enumMember)));
+            const memberNameRange = apiDocument.getWordRangeAtPosition(apiDocument.positionAt(apiEnum.index + apiEnum[0].indexOf(enumMember[1])));
             enumMembers.push({
-                name: enumMember,
+                name: enumMember[1],
                 kind: CompletionItemKind.EnumMember,
                 nameRange: memberNameRange,
-                dataType: apiEnum[1]+"."+enumMember
+                dataType: apiEnum[1]+"."+enumMember[1]
             });
         }
         apiEnums.push({

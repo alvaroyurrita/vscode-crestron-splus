@@ -47,7 +47,6 @@ export class SimplPlusDotCompletionProvider implements CompletionItemProvider {
         }
         switch (currentObject.kind) {
             case CompletionItemKind.Struct:
-            case CompletionItemKind.Variable:
                 currentToken = tokenTree.shift();
                 while (currentToken) {
                     const property = currentObject.internalVariables.find(v => v.name === currentToken);
@@ -75,7 +74,8 @@ export class SimplPlusDotCompletionProvider implements CompletionItemProvider {
                     concat(currentObject.internalProperties).
                     concat(currentObject.internalVariables);
                 return this._tokenService.getCompletionItemsFromDocumentTokens(classMembers);
-            
+            case CompletionItemKind.Enum:
+                return this._tokenService.getCompletionItemsFromDocumentTokens(currentObject.internalVariables);
             default:
                 return [];
         }

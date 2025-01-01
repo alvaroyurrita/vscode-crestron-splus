@@ -61,7 +61,10 @@ export class TokenService implements Disposable {
         const documentMembers = this.getDocumentMembers(uri);
         if (documentMembers === undefined) { return undefined; }
         const currentDocument = documentMembers.find(member => member.uri === uri.toString());
-        const documentsToSearch = currentDocument.internalVariables.concat(currentDocument.internalStructures);
+        const externalDocuments = documentMembers.filter(member => member.uri !== uri.toString());
+        const documentsToSearch = currentDocument.internalVariables.
+            concat(currentDocument.internalStructures).
+            concat(externalDocuments);
         const temp  = documentsToSearch.find(member => member.name === name);
         return temp;
     }

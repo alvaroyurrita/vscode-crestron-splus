@@ -129,36 +129,18 @@ export class SimplPlusTasks implements Disposable {
                 const simplDirectory = workspace.getConfiguration("simpl-plus").simplDirectory;
                 const extensionPath = extensions.getExtension("sentry07.simpl-plus")?.extensionPath;
                 if (extensionPath === undefined) { return emptyTasks; }
-                // const simpPlusApiGeneratorPath = path.join(extensionPath, "ApiGenerator", "SimplPlusApiGenerator.exe");
+                const simpPlusApiGeneratorPath = path.join(extensionPath, "ApiGenerator", "SimplPlusApiGenerator.exe");
 
-                // if (fsExistsWrapper.existsSyncWrapper(libraryClzDir)) {
-                //     let buildCommand = `\"${simpPlusApiGeneratorPath}" \"${libraryClzDir}\" \"${simplDirectory}\"`;
-
-                //     const taskProperties: TaskArguments = {
-                //         name: `Generate API file for ${library}`,
-                //         scope: TaskScope.Workspace,
-                //         source: 'Crestron S+',
-                //         taskDefinition: { type: "shell" },
-                //         execution: new ShellExecution(`\"${buildCommand}\"`, { executable: 'C:\\Windows\\System32\\cmd.exe', shellArgs: ['/C'] }),
-                //         problemMatchers: [],
-                //         group: TaskGroup.Build,
-                //         presentationOptions: { panel: TaskPanelKind.Shared, focus: true, clear: true }
-                //     };
-
-                //     let task = this.TaskCreator(taskProperties);
-                //     tasks.push(task);
-                // }
-                const a = commands.executeCommand('vscode.open',libraryApiPath);
-                if (fsExistsWrapper.existsSyncWrapper(libraryApiPath)) {
-                    let buildCommand = `\"${simplDirectory}\" \"${libraryApiPath}\"`;
+                if (fsExistsWrapper.existsSyncWrapper(libraryClzDir)) {
+                    let buildCommand = `\"${simpPlusApiGeneratorPath}" \"${libraryClzDir}\" \"${simplDirectory}\"`;
 
                     const taskProperties: TaskArguments = {
-                        name: `Open API File for ${library}`,
+                        name: `Generate API file for ${library}`,
                         scope: TaskScope.Workspace,
                         source: 'Crestron S+',
                         taskDefinition: { type: "shell" },
                         execution: new ShellExecution(`\"${buildCommand}\"`, { executable: 'C:\\Windows\\System32\\cmd.exe', shellArgs: ['/C'] }),
-                        problemMatchers: ["$SIMPL+"],
+                        problemMatchers: [],
                         group: TaskGroup.Build,
                         presentationOptions: { panel: TaskPanelKind.Shared, focus: true, clear: true }
                     };
@@ -166,6 +148,24 @@ export class SimplPlusTasks implements Disposable {
                     let task = this.TaskCreator(taskProperties);
                     tasks.push(task);
                 }
+                // const a = commands.executeCommand('vscode.open',libraryApiPath);
+                // if (fsExistsWrapper.existsSyncWrapper(libraryApiPath)) {
+                //     let buildCommand = `\"${simplDirectory}\" \"${libraryApiPath}\"`;
+
+                //     const taskProperties: TaskArguments = {
+                //         name: `Open API File for ${library}`,
+                //         scope: TaskScope.Workspace,
+                //         source: 'Crestron S+',
+                //         taskDefinition: { type: "shell" },
+                //         execution: new ShellExecution(`\"${buildCommand}\"`, { executable: 'C:\\Windows\\System32\\cmd.exe', shellArgs: ['/C'] }),
+                //         problemMatchers: ["$SIMPL+"],
+                //         group: TaskGroup.Build,
+                //         presentationOptions: { panel: TaskPanelKind.Shared, focus: true, clear: true }
+                //     };
+
+                //     let task = this.TaskCreator(taskProperties);
+                //     tasks.push(task);
+                // }
 
             };
         }
