@@ -21,6 +21,7 @@ export class TokenService implements Disposable {
         const parametersText = value.documentation.toString().match(/\(([^)]*)/); // Match the text between the open and close parenthesis
         parametersText[1].split(",").forEach(p => {
             const parameter = p.trim().split(" ");
+            if (parameter.length < 2) { return; }
             parameters.push({
                 name: parameter[1].trim(),
                 dataType: parameter[0].trim(),
