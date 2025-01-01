@@ -1,4 +1,4 @@
-import { ExtensionContext, Disposable, Uri, Position, CompletionItemKind, CompletionItem, SnippetString, CompletionItemLabel, TextDocument } from "vscode";
+import { ExtensionContext, Disposable, Uri, Position, CompletionItemKind, CompletionItem, SnippetString, CompletionItemLabel, TextDocument, Range } from "vscode";
 import { DocumentToken } from "./tokenTypes";
 import { DocumentTokenService } from "./documentTokenService";
 import { ApiTokenService } from "./apiTokenService";
@@ -8,6 +8,36 @@ export class TokenService implements Disposable {
     private static _instance: TokenService;
     private _documentTokenService: DocumentTokenService;
     private _apiTokenService: ApiTokenService;
+
+    private _lastToken: DocumentToken | undefined;
+    public get lastToken(): DocumentToken | undefined{
+        return this._lastToken;
+    }
+    public set lastToken(value: CompletionItem) {
+        if (value.kind !== CompletionItemKind.Function) { this._lastToken = undefined; return; }
+        let parameters: DocumentToken[] = [];
+        const label = value.label as unknown as CompletionItemLabel;
+
+        const parametersText = value.documentation.toString().match(/\(([^)]*)/); // Match the text between the open and close parenthesis
+        parametersText[1].split(",").forEach(p => {
+            const parameter = p.trim().split(" ");
+            parameters.push({
+                name: parameter[1].trim(),
+                dataType: parameter[0].trim(),
+                nameRange: new Range(new Position(0, 0), new Position(0, 0)),
+                kind: CompletionItemKind.Variable,
+            });
+        });
+        let functionToken: DocumentToken =
+        {
+            name: label.label,
+            kind: value.kind,
+            nameRange: new Range(new Position(0, 0), new Position(0, 0)),
+            dataType: label.description,
+            parameters,
+        };
+        this._lastToken = functionToken;
+    }
 
     public static getInstance(ctx: ExtensionContext): TokenService {
         if (!TokenService._instance && ctx) {
@@ -65,7 +95,7 @@ export class TokenService implements Disposable {
         const documentsToSearch = currentDocument.internalVariables.
             concat(currentDocument.internalStructures).
             concat(externalDocuments);
-        const temp  = documentsToSearch.find(member => member.name === name);
+        const temp = documentsToSearch.find(member => member.name === name);
         return temp;
     }
     public getLocalDocumentMemberByName(uri: Uri, name: string, position: Position): DocumentToken | undefined {

@@ -8,6 +8,9 @@ import {
     SignatureHelpContext,
     SignatureInformation,
     ParameterInformation,
+    Range,
+    CompletionItemLabel,
+    CompletionItemKind,
 } from "vscode";
 import { TokenService } from "./services/tokenService";
 import { DocumentToken } from "./services/tokenTypes";
@@ -34,7 +37,10 @@ export class SimplPlusSignatureHelpProvider implements SignatureHelpProvider {
                 return undefined;
             }
             const functionName = match[1];
-            functionToken = this._tokenService.getGlobalDocumentMemberByName(document.uri, functionName);
+            const lastCompletionItem = this._tokenService.lastToken;
+            if (lastCompletionItem && lastCompletionItem.name === functionName) {
+                functionToken = lastCompletionItem;
+            }
             if (!functionToken) {
                 const keywordService = KeywordService.getInstance();
                 const keyword = keywordService.getKeyword(functionName);

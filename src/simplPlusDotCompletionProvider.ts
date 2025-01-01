@@ -80,5 +80,11 @@ export class SimplPlusDotCompletionProvider implements CompletionItemProvider {
                 return [];
         }
     }
+    public resolveCompletionItem(item: CompletionItem, token: CancellationToken): ProviderResult<CompletionItem> {
+        return new Promise(async resolve => {
+            this._tokenService.lastToken = item;
+            resolve(item);
+        });
+    }
 
 };

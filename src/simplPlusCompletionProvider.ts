@@ -75,6 +75,7 @@ export class SimplPlusCompletionProvider implements CompletionItemProvider {
     }
     public resolveCompletionItem(item: CompletionItem, token: CancellationToken): ProviderResult<CompletionItem> {
         return new Promise(async resolve => {
+            this._tokenService.lastToken = item;
             const uri = window.activeTextEditor?.document.uri;
             const itemLabel = typeof item.label === "string" ? item.label : item.label.label;
             let functionInfo = this._tokenService.getFunctionInfo(uri, itemLabel);
