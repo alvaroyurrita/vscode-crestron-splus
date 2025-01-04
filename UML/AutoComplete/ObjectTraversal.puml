@@ -1,0 +1,69 @@
+@startuml ObjectTraversal
+
+start
+note left
+    # Object Traversal
+
+    Return Object Type of last object in a chained syntax for autocomplete or syntax helper to consume
+
+    Given
+    * Object1.
+    * Object1.Field1.
+    * Object1.Field1.Field2.
+
+    Where object 1 could be a class, structure, enum or any other object or instance of an object that produces a child,
+    and Field 1 is any other object or instance of an object that also produces a child. after (. or closing parenths ) propose members of last field data type.
+
+    * struct1.struct2.
+    ** struct1Instance -> struct1Type.struct2Instance -> struct2Type
+    * class1.class2.property.
+    *** class1Instance -> class1Type.class2Instance -> class2Type.property -> nothing
+    * enum.
+    ** enumType:EnumMembers (notice there is no autocomplete of a enumInstance)
+    * class1.struct1.struct2.
+    ** class1Instance -> class1Type.struct1Instance -> struct1Instance -> struct1Type.struct2Instance -> struct2Type
+    * class1.function().class.
+    ** struct1Instance -> classInstance.function -> functionReturnType.classInstance -> classType
+    * class1.function().
+    ** struct1Instance -> classInstance.function -> functionReturnType
+    * class1.function(
+    ** struct1Instance -> classInstance.function -> function
+
+    pseudoCode:
+
+    extract keywords (disregard parenthesis or square brackets) connected by dots
+    find first word on global objects (document internal members (aka, variable names), external c# classes (aka, c# class data type)
+    (note that c# classes and structs both show up as classes), external enums (aka C$ enum data type), simpl+ library members, aka variable names).
+    if there are no more chained words proposes all children of the found object
+
+    if there is another word, find that word on the children of the found object and get dataType,
+    Find in globalObjects that dataType,
+
+    with current word in chain. Find word in current object, if no more words. return current object
+    ** If not found . stop and propose nothing.
+    ** if found object is function, get function return type.  Go to next word with function return type
+    ** Everything else go to next word with found object
+
+end note
+:Tokens[] = ;
+:CurrentObject = rootObjects
+:currentObject = getDocumentMembersByName(currentToken);
+:currentToken = Tokens.Shift();
+while (currentToken) is (not null)
+    :CurrentObject = find currentToken in CurrentObject member names;
+    if (currentObject) then (undefined)
+        :return nothing;
+        stop
+    endif
+    :currentToken = Token.Shift();
+endwhile
+
+if (currentObject===function && lastCharacter=(  ) then (true)
+    :currentObject = functionReturn;
+endif
+:return currentObject;
+
+end
+
+
+@enduml

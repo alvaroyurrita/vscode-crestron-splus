@@ -4,202 +4,255 @@ import * as fsWrapper from '../../helpers/fsExistsSyncWrapper';
 import { removeWorkspaceCustomSettings, OpenAndShowSPlusDocument, delay } from '../testFunctions';
 import * as vscode from 'vscode';
 import { TokenService } from '../../services/tokenService';
+import { DocumentTokenService } from '../../services/documentTokenService';
+import { ApiTokenService } from '../../services/apiTokenService';
+import { DocumentToken } from '../../services/tokenTypes';
+import { isUndefined } from 'util';
 
 
-suite("testing tokenization", function () {
-    suiteSetup(async function () {
+let mockExtensionContext = {
+    subscriptions: [],
+    workspaceState: {} as vscode.Memento,
+    extensionPath: '',
+    asAbsolutePath: (relativePath: string) => '',
+    storagePath: '',
+    globalStoragePath: '',
+    logPath: '',
+    extensionUri: vscode.Uri.parse(''),
+    extensionMode: vscode.ExtensionMode.Test,
+    secrets: {} as vscode.SecretStorage,
+    globalState: undefined,
+    environmentVariableCollection: undefined,
+    storageUri: vscode.Uri.parse(''),
+    globalStorageUri: vscode.Uri.parse(''),
+    logUri: vscode.Uri.parse(''),
+    extension: undefined,
+    languageModelAccessInformation: undefined
+};
+let _documentTokenServiceStub: sinon.SinonStubbedInstance<DocumentTokenService>;
+let _apiTokenServiceStub: sinon.SinonStubbedInstance<ApiTokenService>;
+
+suite("testing getting DocumentMembers", function () {
+
+    setup(async function () {
         await removeWorkspaceCustomSettings();
+        _documentTokenServiceStub = sinon.stub(DocumentTokenService.getInstance(mockExtensionContext));
+        _apiTokenServiceStub = sinon.stub(ApiTokenService.getInstance(mockExtensionContext));
     });
 
-    suiteTeardown(async function () {
+    teardown(async function () {
         await removeWorkspaceCustomSettings();
-
+        sinon.restore();
     });
-    test("It should have a constant", async () => {
-        await OpenAndShowSPlusDocument("#DEFINE_CONSTANT MYCONSTANT 32");
-        await delay(500);
-        const mockExtensionContext = (global as any).testExtensionContext;
+    test("Return Document Token", function () {
+        const documentToken: DocumentToken = {
+            name: "MyDocument",
+            dataType: "MyDataType",
+            kind: vscode.CompletionItemKind.Class,
+            nameRange: new vscode.Range(new vscode.Position(0, 0), new vscode.Position(0, 0)),
+            uri: "MyTestDocument"
+        }
         const tokenService = TokenService.getInstance(mockExtensionContext);
-        const documentMembers = tokenService.getDocumentMembers(vscode.window.activeTextEditor?.document.uri);
-        assert.strictEqual(documentMembers?.length, 1);
-        assert.strictEqual(documentMembers[0].name, "MYCONSTANT");
-        assert.strictEqual(documentMembers[0].kind, vscode.CompletionItemKind.Constant);
-        assert.strictEqual(documentMembers[0].dataType, "integer");
-        assert.strictEqual(documentMembers[0].nameRange.start.line, 0);
-        assert.strictEqual(documentMembers[0].nameRange.start.character, 17);
-        assert.strictEqual(documentMembers[0].nameRange.end.line, 0);
-        assert.strictEqual(documentMembers[0].nameRange.end.character, 27);
-    });
-    test("It should have a global variable with a built in type", async () => {
-        await OpenAndShowSPlusDocument("BUFFER_INPUT BufferInput1[20];");
-        await delay(500);
-        const mockExtensionContext = (global as any).testExtensionContext;
-        const tokenService = TokenService.getInstance(mockExtensionContext);
-        const documentMembers = tokenService.getDocumentMembers(vscode.window.activeTextEditor?.document.uri);
-        assert.strictEqual(documentMembers?.length, 1);
-        assert.strictEqual(documentMembers[0].name, "BufferInput1");
-        assert.strictEqual(documentMembers[0].kind, vscode.CompletionItemKind.Variable);
-        assert.strictEqual(documentMembers[0].dataType, "BUFFER_INPUT");
-        assert.strictEqual(documentMembers[0].nameRange.start.line, 0);
-        assert.strictEqual(documentMembers[0].nameRange.start.character, 13);
-        assert.strictEqual(documentMembers[0].nameRange.end.line, 0);
-        assert.strictEqual(documentMembers[0].nameRange.end.character, 25);
-    });
-    test("It should have a global variable with a custom type", async () => {
-        await OpenAndShowSPlusDocument("myType myVariableOfType;");
-        await delay(500);
-        const mockExtensionContext = (global as any).testExtensionContext;
-        const tokenService = TokenService.getInstance(mockExtensionContext);
-        const documentMembers = tokenService.getDocumentMembers(vscode.window.activeTextEditor?.document.uri);
-        assert.strictEqual(documentMembers?.length, 1);
-        assert.strictEqual(documentMembers[0].name, "myVariableOfType");
-        assert.strictEqual(documentMembers[0].kind, vscode.CompletionItemKind.Variable);
-        assert.strictEqual(documentMembers[0].dataType, "myType");
-        assert.strictEqual(documentMembers[0].nameRange.start.line, 0);
-        assert.strictEqual(documentMembers[0].nameRange.start.character, 7);
-        assert.strictEqual(documentMembers[0].nameRange.end.line, 0);
-        assert.strictEqual(documentMembers[0].nameRange.end.character, 23);
-    });
-    test("It should have a structure with an inside variable", async () => {
-        await OpenAndShowSPlusDocument("STRUCTURE testStructure\n{\nBUFFER_INPUT BufferInput1[20];\n};");
-        await delay(500);
-        const mockExtensionContext = (global as any).testExtensionContext;
-        const tokenService = TokenService.getInstance(mockExtensionContext);
-        const documentMembers = tokenService.getDocumentMembers(vscode.window.activeTextEditor?.document.uri);
-        assert.strictEqual(documentMembers?.length, 1);
-        assert.strictEqual(documentMembers[0].name, "testStructure");
-        assert.strictEqual(documentMembers[0].kind, vscode.CompletionItemKind.Struct);
-        assert.strictEqual(documentMembers[0].dataType, "testStructure");
-        assert.strictEqual(documentMembers[0].nameRange.start.line, 0);
-        assert.strictEqual(documentMembers[0].nameRange.start.character, 10);
-        assert.strictEqual(documentMembers[0].nameRange.end.line, 0);
-        assert.strictEqual(documentMembers[0].nameRange.end.character, 23);
-        assert.strictEqual(documentMembers[0].blockRange.start.line, 1);
-        assert.strictEqual(documentMembers[0].blockRange.start.character, 0);
-        assert.strictEqual(documentMembers[0].blockRange.end.line, 3);
-        assert.strictEqual(documentMembers[0].blockRange.end.character, 1);
+        const uri = vscode.Uri.parse("MyTestDocument");
+        _documentTokenServiceStub.getTokens.withArgs(uri).returns(documentToken);
 
-        assert.strictEqual(documentMembers[0].internalVariables.length, 1);
-        assert.strictEqual(documentMembers[0].internalVariables[0].name, "BufferInput1");
-        assert.strictEqual(documentMembers[0].internalVariables[0].kind, vscode.CompletionItemKind.Variable);
-        assert.strictEqual(documentMembers[0].internalVariables[0].dataType, "BUFFER_INPUT");
-        assert.strictEqual(documentMembers[0].internalVariables[0].nameRange.start.line, 2);
-        assert.strictEqual(documentMembers[0].internalVariables[0].nameRange.start.character, 13);
-        assert.strictEqual(documentMembers[0].internalVariables[0].nameRange.end.line, 2);
-        assert.strictEqual(documentMembers[0].internalVariables[0].nameRange.end.character, 25);
+        const result = tokenService.getDocumentMembers(uri);
+        assert.strictEqual(result.length, 1);
+        assert.strictEqual(result[0].name, "MyDocument");
     });
-    test("It should have a function with an inside variable and one parameter", async () => {
-        await OpenAndShowSPlusDocument("INTEGER_FUNCTION testFunction(integer testParam)\n{\nBUFFER_INPUT BufferInput1[20];\n};");
-        await delay(500);
-        const mockExtensionContext = (global as any).testExtensionContext;
+    test("Return API Document Token", function () {
+        const documentToken: DocumentToken = {
+            name: "MyDocument",
+            dataType: "MyDataType",
+            kind: vscode.CompletionItemKind.Class,
+            nameRange: new vscode.Range(new vscode.Position(0, 0), new vscode.Position(0, 0)),
+            uri: "MyTestDocument"
+        }
         const tokenService = TokenService.getInstance(mockExtensionContext);
-        const documentMembers = tokenService.getDocumentMembers(vscode.window.activeTextEditor?.document.uri);
-        assert.strictEqual(documentMembers?.length, 1);
-        assert.strictEqual(documentMembers[0].name, "testFunction");
-        assert.strictEqual(documentMembers[0].kind, vscode.CompletionItemKind.Function);
-        assert.strictEqual(documentMembers[0].dataType, "INTEGER_FUNCTION");
-        assert.strictEqual(documentMembers[0].nameRange.start.line, 0);
-        assert.strictEqual(documentMembers[0].nameRange.start.character, 17);
-        assert.strictEqual(documentMembers[0].nameRange.end.line, 0);
-        assert.strictEqual(documentMembers[0].nameRange.end.character, 29);
-        assert.strictEqual(documentMembers[0].blockRange.start.line, 1);
-        assert.strictEqual(documentMembers[0].blockRange.start.character, 0);
-        assert.strictEqual(documentMembers[0].blockRange.end.line, 3);
-        assert.strictEqual(documentMembers[0].blockRange.end.character, 1);
-        assert.strictEqual(documentMembers[0].parameterRange.start.line, 0);
-        assert.strictEqual(documentMembers[0].parameterRange.start.character, 29);
-        assert.strictEqual(documentMembers[0].parameterRange.end.line, 0);
-        assert.strictEqual(documentMembers[0].parameterRange.end.character, 48);
+        const uri = vscode.Uri.parse("MyTestDocument");
+        _apiTokenServiceStub.getTokens.withArgs(uri).returns([documentToken]);
 
-        assert.strictEqual(documentMembers[0].parameters.length, 1);
-        assert.strictEqual(documentMembers[0].parameters[0].name, "testParam");
-        assert.strictEqual(documentMembers[0].parameters[0].kind, vscode.CompletionItemKind.TypeParameter);
-        assert.strictEqual(documentMembers[0].parameters[0].dataType, "integer");
-        assert.strictEqual(documentMembers[0].parameters[0].nameRange.start.line, 0);
-        assert.strictEqual(documentMembers[0].parameters[0].nameRange.start.character, 38);
-        assert.strictEqual(documentMembers[0].parameters[0].nameRange.end.line, 0);
-        assert.strictEqual(documentMembers[0].parameters[0].nameRange.end.character, 47);
-
-        assert.strictEqual(documentMembers[0].internalVariables.length, 1);
-        assert.strictEqual(documentMembers[0].internalVariables[0].name, "BufferInput1");
-        assert.strictEqual(documentMembers[0].internalVariables[0].kind, vscode.CompletionItemKind.Variable);
-        assert.strictEqual(documentMembers[0].internalVariables[0].dataType, "BUFFER_INPUT");
-        assert.strictEqual(documentMembers[0].internalVariables[0].nameRange.start.line, 2);
-        assert.strictEqual(documentMembers[0].internalVariables[0].nameRange.start.character, 13);
-        assert.strictEqual(documentMembers[0].internalVariables[0].nameRange.end.line, 2);
-        assert.strictEqual(documentMembers[0].internalVariables[0].nameRange.end.character, 25);
+        const result = tokenService.getDocumentMembers(uri);
+        assert.strictEqual(result.length, 1);
+        assert.strictEqual(result[0].name, "MyDocument");
     });
-
-    test("test that position is inside parameters", async () => {
-        await OpenAndShowSPlusDocument("INTEGER_FUNCTION testFunction(integer testParam)\n{\nBUFFER_INPUT BufferInput1[20];\n};");
-        await delay(500);
-        const mockExtensionContext = (global as any).testExtensionContext;
+    test("Return nothing with wrong URI", function () {
+        const documentToken: DocumentToken = {
+            name: "MyDocument",
+            dataType: "MyDataType",
+            kind: vscode.CompletionItemKind.Class,
+            nameRange: new vscode.Range(new vscode.Position(0, 0), new vscode.Position(0, 0)),
+            uri: "MyTestDocument"
+        }
         const tokenService = TokenService.getInstance(mockExtensionContext);
-        const position = new vscode.Position(0, 32);
-        const isInsideParameter = tokenService.isAtParameterRange(vscode.window.activeTextEditor?.document.uri, position);
-        assert.ok(isInsideParameter);
-    });
+        const uri = vscode.Uri.parse("MyTestDocument");
+        const uri2 = vscode.Uri.parse("MyTestDocument2");
+        _documentTokenServiceStub.getTokens.withArgs(uri2).returns(documentToken);
+        _apiTokenServiceStub.getTokens.withArgs(uri2).returns([documentToken]);
 
-    test("test that position is not inside parameters", async () => {
-        await OpenAndShowSPlusDocument("INTEGER_FUNCTION testFunction(integer testParam)\n{\nBUFFER_INPUT BufferInput1[20];\n};");
-        await delay(500);
-        const mockExtensionContext = (global as any).testExtensionContext;
-        const tokenService = TokenService.getInstance(mockExtensionContext);
-        const position = new vscode.Position(2, 2);
-        const isInsideParameter = tokenService.isAtParameterRange(vscode.window.activeTextEditor?.document.uri, position);
-        assert.ok(!isInsideParameter);
-    });
-
-    
-    test("It should have an event with an inside variable", async () => {
-        await OpenAndShowSPlusDocument("push DigitalInput1\n{\nBUFFER_INPUT BufferInput1[20];\n};");
-        await delay(500);
-        const mockExtensionContext = (global as any).testExtensionContext;
-        const tokenService = TokenService.getInstance(mockExtensionContext);
-        const documentMembers = tokenService.getDocumentMembers(vscode.window.activeTextEditor?.document.uri);
-        assert.strictEqual(documentMembers?.length, 1);
-        assert.strictEqual(documentMembers[0].name, "DigitalInput1");
-        assert.strictEqual(documentMembers[0].kind, vscode.CompletionItemKind.Event);
-        assert.strictEqual(documentMembers[0].dataType, "push");
-        assert.strictEqual(documentMembers[0].nameRange.start.line, 0);
-        assert.strictEqual(documentMembers[0].nameRange.start.character, 5);
-        assert.strictEqual(documentMembers[0].nameRange.end.line, 0);
-        assert.strictEqual(documentMembers[0].nameRange.end.character, 18);
-        assert.strictEqual(documentMembers[0].blockRange.start.line, 1);
-        assert.strictEqual(documentMembers[0].blockRange.start.character, 0);
-        assert.strictEqual(documentMembers[0].blockRange.end.line, 3);
-        assert.strictEqual(documentMembers[0].blockRange.end.character, 1);
-
-        assert.strictEqual(documentMembers[0].internalVariables.length, 1);
-        assert.strictEqual(documentMembers[0].internalVariables[0].name, "BufferInput1");
-        assert.strictEqual(documentMembers[0].internalVariables[0].kind, vscode.CompletionItemKind.Variable);
-        assert.strictEqual(documentMembers[0].internalVariables[0].dataType, "BUFFER_INPUT");
-        assert.strictEqual(documentMembers[0].internalVariables[0].nameRange.start.line, 2);
-        assert.strictEqual(documentMembers[0].internalVariables[0].nameRange.start.character, 13);
-        assert.strictEqual(documentMembers[0].internalVariables[0].nameRange.end.line, 2);
-        assert.strictEqual(documentMembers[0].internalVariables[0].nameRange.end.character, 25);
+        const result = tokenService.getDocumentMembers(uri);
+        assert.strictEqual(result.length, 0);
     });
 });
 
-suite("with a position", function () {
-    test("not inside a block, it should return undefined", async () => {
-        await OpenAndShowSPlusDocument("push DigitalInput1\n{\nBUFFER_INPUT BufferInput1[20];\n};");
-        await delay(500);
-        const mockExtensionContext = (global as any).testExtensionContext;
-        const tokenService = TokenService.getInstance(mockExtensionContext);
-        const uri = vscode.window.activeTextEditor?.document.uri;
-        const position = new vscode.Position(0, 0);
-        const token = tokenService.getBlockStatementTokenAtPosition(uri, position);
-        assert.strictEqual(token, undefined);
+suite("testing getting object at position", function () {
+    setup(async function () {
+        await removeWorkspaceCustomSettings();
+        _documentTokenServiceStub = sinon.stub(DocumentTokenService.getInstance(mockExtensionContext));
+        _apiTokenServiceStub = sinon.stub(ApiTokenService.getInstance(mockExtensionContext));
     });
-    test("inside a block, should return top most token", async () => {
-        await OpenAndShowSPlusDocument("push DigitalInput1\n{\nBUFFER_INPUT BufferInput1[20];\n};");
-        await delay(500);
-        const mockExtensionContext = (global as any).testExtensionContext;
+
+    teardown(async function () {
+        await removeWorkspaceCustomSettings();
+        sinon.restore();
+    });
+    test("Return undefined with position not inside any function, event or structure", function () {
+        const uri = vscode.Uri.parse("MyTestDocument");
+        const documentToken: DocumentToken = {
+            name: "MyDocument",
+            dataType: "MyDataType",
+            kind: vscode.CompletionItemKind.Class,
+            nameRange: new vscode.Range(new vscode.Position(0, 0), new vscode.Position(5, 0)),
+            uri: uri.toString()
+        }
         const tokenService = TokenService.getInstance(mockExtensionContext);
-        const uri = vscode.window.activeTextEditor?.document.uri;
-        const position = new vscode.Position(2, 5);
-        const token = tokenService.getBlockStatementTokenAtPosition(uri, position);
-        assert.strictEqual(token.name, "DigitalInput1");
+        _documentTokenServiceStub.getTokens.withArgs(uri).returns(documentToken);
+
+        const result = tokenService.getObjectAtPosition(uri, new vscode.Position(3, 0));
+        assert.strictEqual(result, undefined);
+    });
+    test("Return structure object with position inside", function () {
+        const uri = vscode.Uri.parse("MyTestDocument");
+        const struct: DocumentToken = {
+            name: "structure1",
+            dataType: "structure",
+            kind: vscode.CompletionItemKind.Struct,
+            nameRange: new vscode.Range(new vscode.Position(2, 0), new vscode.Position(2, 5)),
+            blockRange: new vscode.Range(new vscode.Position(2, 0), new vscode.Position(5, 4)),
+        }
+        const documentToken: DocumentToken = {
+            name: "MyDocument",
+            dataType: "MyDataType",
+            kind: vscode.CompletionItemKind.Class,
+            nameRange: new vscode.Range(new vscode.Position(0, 0), new vscode.Position(0, 5)),
+            blockRange: new vscode.Range(new vscode.Position(0, 0), new vscode.Position(5, 0)),
+            uri: uri.toString(),
+            internalStructures: [
+                struct
+            ]
+        };
+        const tokenService = TokenService.getInstance(mockExtensionContext);
+        _documentTokenServiceStub.getTokens.withArgs(uri).returns(documentToken);
+
+        const result = tokenService.getObjectAtPosition(uri, new vscode.Position(3, 0));
+        assert.strictEqual(result, struct);
+    });
+
+    test("Return event object with position inside", function () {
+        const uri = vscode.Uri.parse("MyTestDocument");
+        const event: DocumentToken = {
+            name: "event1",
+            dataType: "event",
+            kind: vscode.CompletionItemKind.Event,
+            nameRange: new vscode.Range(new vscode.Position(2, 0), new vscode.Position(2, 5)),
+            blockRange: new vscode.Range(new vscode.Position(2, 0), new vscode.Position(5, 4)),
+        }
+        const documentToken: DocumentToken = {
+            name: "MyDocument",
+            dataType: "MyDataType",
+            kind: vscode.CompletionItemKind.Class,
+            nameRange: new vscode.Range(new vscode.Position(0, 0), new vscode.Position(0, 5)),
+            blockRange: new vscode.Range(new vscode.Position(0, 0), new vscode.Position(5, 0)),
+            uri: uri.toString(),
+            internalEvents: [
+                event
+            ]
+        };
+
+        const tokenService = TokenService.getInstance(mockExtensionContext);
+        _documentTokenServiceStub.getTokens.withArgs(uri).returns(documentToken);
+
+        const result = tokenService.getObjectAtPosition(uri, new vscode.Position(3, 0));
+        assert.strictEqual(result, event);
+    });
+    test("Return function object with position inside parameters, and confirms it is inside it", function () {
+        const uri = vscode.Uri.parse("MyTestDocument");
+        const func: DocumentToken = {
+            name: "func1",
+            dataType: "function",
+            kind: vscode.CompletionItemKind.Function,
+            nameRange: new vscode.Range(new vscode.Position(2, 0), new vscode.Position(2, 5)),
+            blockRange: new vscode.Range(new vscode.Position(2, 0), new vscode.Position(5, 4)),
+            parameterRange: new vscode.Range(new vscode.Position(2, 10), new vscode.Position(2, 20)),
+        }
+        const documentToken: DocumentToken = {
+            name: "MyDocument",
+            dataType: "MyDataType",
+            kind: vscode.CompletionItemKind.Class,
+            nameRange: new vscode.Range(new vscode.Position(0, 0), new vscode.Position(0, 5)),
+            blockRange: new vscode.Range(new vscode.Position(0, 0), new vscode.Position(5, 0)),
+            uri: uri.toString(),
+            internalFunctions: [
+                func
+            ]
+        };
+
+        const tokenService = TokenService.getInstance(mockExtensionContext);
+        _documentTokenServiceStub.getTokens.withArgs(uri).returns(documentToken);
+
+        const pos = new vscode.Position(2, 15);
+        const result = tokenService.getObjectAtPosition(uri, pos);
+        const isAtParameterRange = tokenService.isAtParameterRange(uri, pos);
+        assert.strictEqual(result, func);
+        assert.strictEqual(isAtParameterRange,true);
+    });
+    test("Return function object with position inside, and confirms it is outside parameters", function () {
+        const uri = vscode.Uri.parse("MyTestDocument");
+        const func: DocumentToken = {
+            name: "function1",
+            dataType: "function",
+            kind: vscode.CompletionItemKind.Function,
+            nameRange: new vscode.Range(new vscode.Position(2, 0), new vscode.Position(2, 5)),
+            blockRange: new vscode.Range(new vscode.Position(2, 0), new vscode.Position(5, 4)),
+        }
+        const documentToken: DocumentToken = {
+            name: "MyDocument",
+            dataType: "MyDataType",
+            kind: vscode.CompletionItemKind.Class,
+            nameRange: new vscode.Range(new vscode.Position(0, 0), new vscode.Position(0, 5)),
+            blockRange: new vscode.Range(new vscode.Position(0, 0), new vscode.Position(5, 0)),
+            uri: uri.toString(),
+            internalFunctions: [
+                func
+            ]
+        };
+
+        const tokenService = TokenService.getInstance(mockExtensionContext);
+        _documentTokenServiceStub.getTokens.withArgs(uri).returns(documentToken);
+
+        const pos = new vscode.Position(2, 15);
+        const result = tokenService.getObjectAtPosition(uri, pos);
+        const isAtParameterRange = tokenService.isAtParameterRange(uri, pos);
+        assert.strictEqual(result, func);
+        assert.strictEqual(isAtParameterRange,false);
+    });
+    test("Return false for an object without formulas", function () {
+        const uri = vscode.Uri.parse("MyTestDocument");
+        const documentToken: DocumentToken = {
+            name: "MyDocument",
+            dataType: "MyDataType",
+            kind: vscode.CompletionItemKind.Class,
+            nameRange: new vscode.Range(new vscode.Position(0, 0), new vscode.Position(0, 5)),
+            blockRange: new vscode.Range(new vscode.Position(0, 0), new vscode.Position(5, 0)),
+            uri: uri.toString(),
+
+        };
+
+        const tokenService = TokenService.getInstance(mockExtensionContext);
+        _documentTokenServiceStub.getTokens.withArgs(uri).returns(documentToken);
+
+        const pos = new vscode.Position(2, 15);
+        const isAtParameterRange = tokenService.isAtParameterRange(uri, pos);
+        assert.strictEqual(isAtParameterRange,false);
     });
 });

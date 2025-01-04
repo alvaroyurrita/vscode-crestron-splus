@@ -9,7 +9,7 @@ import {
     TextDocumentChangeEvent,
     FileSystemWatcher,
     extensions,
-    RelativePattern
+    RelativePattern,
 } from "vscode";
 import { provideClassTokens } from "../helpers/apiParser";
 import { DocumentToken } from "./tokenTypes";
@@ -50,7 +50,7 @@ export class ApiTokenService implements Disposable {
             onCloseTextDocument_event,
         );
         const document = window.activeTextEditor?.document;
-        if (document.languageId === this.selector.toString()) { this.tokenize(document); }
+        if (document !== undefined && document.languageId === this.selector.toString()) { this.tokenize(document); }
 
     }
     public dispose() {
@@ -73,7 +73,7 @@ export class ApiTokenService implements Disposable {
     private async updateOnCloseTextDocument(document: TextDocument): Promise<void> {
         if (document.languageId !== this.selector.toString()) { return; }
         this._documents.delete(document.uri.toString());
-        console.log("Document closed");
+        console.log("API Document closed");
     }
     private async updateOnDidChangeTextDocument(editor: TextDocumentChangeEvent | undefined): Promise<void> {
         if (editor === undefined) { return; }
@@ -87,15 +87,15 @@ export class ApiTokenService implements Disposable {
     }
 
     private async tokenize(document: TextDocument): Promise<void> {
-        let libraryMatches: string [] = [];
+        let libraryMatches: string[] = [];
         let inComment = false;
         //searches through documents for instances of simplsharp libraries while ignoring commented lines
         for (let line = 0; line < document.lineCount; line++) {
             const lineText = document.lineAt(line).text;
-            if (lineText.includes("//")) {continue;}
-            if (lineText.includes("/*")) {inComment = true;}
-            if (lineText.includes("*/")) {inComment = false;}
-            if (inComment) {continue;}
+            if (lineText.includes("//")) { continue; }
+            if (lineText.includes("/*")) { inComment = true; }
+            if (lineText.includes("*/")) { inComment = false; }
+            if (inComment) { continue; }
             const libraryMatch = lineText.match(/#USER_SIMPLSHARP_LIBRARY "(.*)"/);
             if (libraryMatch) {
                 libraryMatches.push(libraryMatch[1]);
@@ -115,10 +115,10 @@ export class ApiTokenService implements Disposable {
             this._watchers.set(documentParentFolder, fsWatcher);
         }
         //store tokens for each CLZ Library
-        const clzDocuments: string[]=[];
+        const clzDocuments: string[] = [];
         for (const library of libraryMatches) {
             const CLZFullPath = join(documentParentFolder, library + ".clz");
-            if (!fs.existsSync(CLZFullPath)) { continue;}
+            if (!fs.existsSync(CLZFullPath)) { continue; }
             clzDocuments.push(CLZFullPath);
             if (!this._apis.has(CLZFullPath)) {
                 // Generate API File from CLZ
@@ -146,21 +146,21 @@ export class ApiTokenService implements Disposable {
     private async updateLibrary(e: Uri) {
         //check if one of the stored CLZ libraries has been updated or created
         const library = e.fsPath.slice(e.fsPath.lastIndexOf("\\") + 1, e.fsPath.lastIndexOf("."));
-        const CLZPathToCheck = e.fsPath.slice(0, e.fsPath.lastIndexOf(".")) + ".clz";
+        const CLZPath = e.fsPath.slice(0, e.fsPath.lastIndexOf(".")) + ".clz";
         const documentParentFolder = e.fsPath.slice(0, e.fsPath.lastIndexOf("\\"));
-        if (!this._apis.has(CLZPathToCheck)) { return; }
+        if (!this._apis.has(CLZPath)) { return; }
         //if it has, generate API Tokens
         // Generate API File from CLZ
         try {
-            await this.runApiGenerator(CLZPathToCheck);
+            await this.runApiGenerator(CLZPath);
         }
         catch (error) {
-            console.error(error);
+            console.error("Error during API Generation", error);
         }
         // and store them
         const apiFile = join(documentParentFolder, "SPlsWork", library + ".api");
         const apiTokens = await provideClassTokens(apiFile);
-        this._apis.set(CLZPathToCheck, apiTokens);
+        this._apis.set(CLZPath, apiTokens);
     }
 
     private async runApiGenerator(CLZLibraryPath: string): Promise<void> {
@@ -174,19 +174,25 @@ export class ApiTokenService implements Disposable {
 
             // Execute a command in a terminal immediately after being created
             const apiTerminal = window.createTerminal();
+            let isBuilding = false;
             window.onDidChangeTerminalShellIntegration(async ({ terminal, shellIntegration }) => {
-                if (terminal === apiTerminal) {
+                if (terminal === apiTerminal && !isBuilding) {
+                    //prevents from executing the command for every change on the terminal
+                    isBuilding = true;
                     const execution = shellIntegration.executeCommand(buildCommand);
                     window.onDidEndTerminalShellExecution(event => {
-                        if (event.execution === execution) {
-                            if (event.exitCode === 0) {
-                                resolve();
-                            } else {
-                                reject(new Error(`Build failed with exit code ${event.exitCode}`));
+                        if (event.terminal === apiTerminal) {
+                            if (event.execution === execution) {
+                                if (event.exitCode === 0) {
+                                    resolve();
+                                } else {
+                                    reject(new Error(`Build failed with exit code ${event.exitCode}`));
+                                }
                             }
+                            apiTerminal.hide();
+                            apiTerminal.dispose();
+                            isBuilding = false;
                         }
-                        apiTerminal.hide();
-                        apiTerminal.dispose();
                     });
                 }
             });

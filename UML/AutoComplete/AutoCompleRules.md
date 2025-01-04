@@ -118,8 +118,9 @@ internalVariables: enumMembers
         * Don't Show SIMPL+ Library Constants
         * Don't Show SIMPL+ Library Structures
         * Don't Show SIMPL+ Library Functions
-    * User Defined Classes From the SIMPL# APIs
-    * User Defined Enums From the SIMPL# APIs
+    * SIMPL# API
+        * Classes
+        * Enums
 
 * After user press space after the following Keyword Groups: 
     * Variable Storage Modifiers
@@ -134,6 +135,14 @@ internalVariables: enumMembers
     * After a Parenthesis or a Comma
         * Parameter Keyword modifier (and then Parameter Keywords after space)
         * Keyword Type
+    * If function is RegisterDelegate provide
+        * first Parameter: All APIs Static Classes, All Program Instance Classes
+        * Second Parameter: All Static Class, or Instance Class, Variables filtered by delegateProperty modifier
+        * Third Parameter: nothing (eventual todo: provide functions with the same signature as the second parameter, or provide squigly line to create a placeholder)
+    * If function is RegisterEvent
+        * first Parameter: All APIs Static Classes, All Program Instance Classes
+        * Second Parameter: All Static Class, or Instance Class, events filtered by eventhandler modifier
+        * Third Parameter: nothing (eventual todo: provide functions with the same signature as the second parameter, or provide squigly line to create a placeholder)
 
 ## When Inside a Structure Block
 * Variable Storage Modifiers (and then Variable Types after space)

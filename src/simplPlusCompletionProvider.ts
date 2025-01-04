@@ -33,7 +33,7 @@ export class SimplPlusCompletionProvider implements CompletionItemProvider {
         context: CompletionContext):
         ProviderResult<CompletionItem[]> {
         const uri = document.uri;
-        const currentBlock = this._tokenService.getBlockStatementTokenAtPosition(uri, position);
+        const currentBlock = this._tokenService.getObjectAtPosition(uri, position);
         if (currentBlock === undefined) {
             const lineUntilPosition = document.lineAt(position.line).text.slice(0, position.character);
             if (lineUntilPosition.toLowerCase().match(/(push|release|change|event)/)) {
@@ -75,7 +75,6 @@ export class SimplPlusCompletionProvider implements CompletionItemProvider {
     }
     public resolveCompletionItem(item: CompletionItem, token: CancellationToken): ProviderResult<CompletionItem> {
         return new Promise(async resolve => {
-            this._tokenService.lastToken = item;
             const uri = window.activeTextEditor?.document.uri;
             const itemLabel = typeof item.label === "string" ? item.label : item.label.label;
             let functionInfo = this._tokenService.getFunctionInfo(uri, itemLabel);

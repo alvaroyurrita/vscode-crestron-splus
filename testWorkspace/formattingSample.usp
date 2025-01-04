@@ -569,7 +569,7 @@ eventhandler test (class myclass, myargs myargs){
 	test
 }
 
-callback GatherEventHandler MyGatherCallback(GatherEventArgs Args)
+callback SIGNED_INTEGER_FUNCTION MyGatherCallback(GatherEventArgs Args)
 {
 	STRING a[20];
 	SIGNED_INTEGER c;

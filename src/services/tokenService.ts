@@ -2,43 +2,13 @@ import { ExtensionContext, Disposable, Uri, Position, CompletionItemKind, Comple
 import { DocumentToken } from "./tokenTypes";
 import { DocumentTokenService } from "./documentTokenService";
 import { ApiTokenService } from "./apiTokenService";
+import { cpuUsage } from "process";
 
 export class TokenService implements Disposable {
 
     private static _instance: TokenService;
     private _documentTokenService: DocumentTokenService;
     private _apiTokenService: ApiTokenService;
-
-    private _lastToken: DocumentToken | undefined;
-    public get lastToken(): DocumentToken | undefined{
-        return this._lastToken;
-    }
-    public set lastToken(value: CompletionItem) {
-        if (value.kind !== CompletionItemKind.Function) { this._lastToken = undefined; return; }
-        let parameters: DocumentToken[] = [];
-        const label = value.label as unknown as CompletionItemLabel;
-
-        const parametersText = value.documentation.toString().match(/\(([^)]*)/); // Match the text between the open and close parenthesis
-        parametersText[1].split(",").forEach(p => {
-            const parameter = p.trim().split(" ");
-            if (parameter.length < 2) { return; }
-            parameters.push({
-                name: parameter[1].trim(),
-                dataType: parameter[0].trim(),
-                nameRange: new Range(new Position(0, 0), new Position(0, 0)),
-                kind: CompletionItemKind.Variable,
-            });
-        });
-        let functionToken: DocumentToken =
-        {
-            name: label.label,
-            kind: value.kind,
-            nameRange: new Range(new Position(0, 0), new Position(0, 0)),
-            dataType: label.description,
-            parameters,
-        };
-        this._lastToken = functionToken;
-    }
 
     public static getInstance(ctx: ExtensionContext): TokenService {
         if (!TokenService._instance && ctx) {
@@ -58,36 +28,83 @@ export class TokenService implements Disposable {
         const tokens: DocumentToken[] = [];
         const documentToken = this._documentTokenService.getTokens(uri);
         const apiTokens = this._apiTokenService.getTokens(uri);
-        tokens.push(documentToken);
-        tokens.push(...apiTokens);
+        if (documentToken !== undefined) { tokens.push(documentToken); }
+        if (apiTokens !== undefined && apiTokens.length > 0) { tokens.push(...apiTokens); }
         return tokens;
     }
-    public getBlockStatementTokenAtPosition(uri: Uri, position: Position): DocumentToken | undefined {
+
+    //returns the object (structure, event or function, or parameter range) that a position is inside of.
+    // used to figure out what members to display during autocomplete
+    public getObjectAtPosition(uri: Uri, position: Position): DocumentToken | undefined {
         const documentMembers = this.getDocumentMembers(uri);
         if (documentMembers === undefined) { return undefined; }
         let documentToken: DocumentToken | undefined;
         //get the block statement from document members from only the original file
         const document = documentMembers.find(member => member.uri === uri.toString());
         if (document === undefined) { return undefined; }
-        documentToken = document.internalEvents.find(member => member.blockRange?.contains(position) ?? false);
+        documentToken = document.internalEvents?.find(member => member.blockRange?.contains(position) ?? false);
         if (documentToken === undefined) {
-            documentToken = document.internalFunctions.find(member => member.blockRange?.contains(position) ?? false);
+            documentToken = document.internalFunctions?.find(member => member.blockRange?.contains(position) ?? false);
         }
         if (documentToken === undefined) {
-            documentToken = document.internalStructures.find(member => member.blockRange?.contains(position) ?? false);
+            documentToken = document.internalStructures?.find(member => member.blockRange?.contains(position) ?? false);
         }
         //if not found in block range, check parameter range
         if (documentToken === undefined) {
-            documentToken = document.internalFunctions.
+            documentToken = document.internalFunctions?.
                 find(member => member.parameterRange?.contains(position) ?? false);
         }
         return documentToken;
     }
-    public getDocumentMemberAtPosition(uri: Uri, position: Position): DocumentToken | undefined {
-        const documentMembers = this.getDocumentMembers(uri);
-        if (documentMembers === undefined) { return undefined; }
-        return documentMembers.find(member => member.nameRange.contains(position));
+    //Returns the member of object tree.  Matches as long as it is a full member (ends in . or ( or [))
+    //Use for function param auto complete ( ( ) or for next class member autocompletion (.)
+    public getDocumentMemberAtPosition(document: TextDocument, position: Position): DocumentToken | undefined {
+        const uri = document.uri;
+        const offsetPosition = document.offsetAt(position);
+        let textUntilPosition = document.getText().slice(0, offsetPosition);
+        // let textUntilPosition = document.lineAt(position).text.slice(0, position.character);
+        const wordWithDotMatch = textUntilPosition.match(/((?:(?:[_\w][_#$\w]*)\s*\.\s*)*(?:[_\w][_#$\w]*)\s*)[\.\(\[]$/);//grab any group of words followed by a dot or a Opening Param at the end of the string (ie: test.test.  or test.test(  )
+        if (!wordWithDotMatch) { undefined; }
+        const tokenTree = wordWithDotMatch[1].match(/[_\w][_#$\w]*/gm);
+        let currentToken = tokenTree.shift();
+        //Look for global variables first
+        let currentObject: DocumentToken;
+        currentObject = this.getLocalDocumentMemberByName(uri, currentToken, position);
+        if (!currentObject) {
+            currentObject = this.getGlobalDocumentMemberByName(uri, currentToken);
+            //then local variables
+            if (!currentObject) { return undefined; }
+        }
+        if (currentObject.kind === CompletionItemKind.Variable) {
+            // test if object is something other than a variable (ie: a class or enum)
+            let testObject = this.getDocumentMemberByDataType(uri, currentObject.dataType);
+            currentObject = testObject ? testObject : currentObject;
+        }
+        console.log("Object at base tree: ", currentObject);
+        switch (currentObject.kind) {
+            case CompletionItemKind.Struct:
+            case CompletionItemKind.Class:
+                {
+                    currentToken = tokenTree.shift();
+                    while (currentToken) {
+                        const allClassObjects = this.getObjectInternalMembers(currentObject);
+                        if (allClassObjects === undefined) { return undefined; };
+                        currentObject = allClassObjects.find(v => v.name === currentToken);
+                        if (currentObject === undefined) { return undefined; };
+                        const nextObject = this.getDocumentMemberByDataType(uri, currentObject.dataType);
+                        if (nextObject === undefined) { return currentObject; }
+                        else { currentObject === nextObject };
+                        currentToken = tokenTree.shift();
+                    }
+                    console.log("Class member at end of base tree : ", currentObject);
+                    return currentObject;
+                }
+            default:
+                console.log("Other member at end of base tree (should be same as base tree) : ", currentObject);
+                return currentObject;
+        }
     }
+
     public getGlobalDocumentMemberByName(uri: Uri, name: string): DocumentToken | undefined {
         const documentMembers = this.getDocumentMembers(uri);
         if (documentMembers === undefined) { return undefined; }
@@ -100,15 +117,17 @@ export class TokenService implements Disposable {
         return temp;
     }
     public getLocalDocumentMemberByName(uri: Uri, name: string, position: Position): DocumentToken | undefined {
-        const blockMember = this.getBlockStatementTokenAtPosition(uri, position);
+        const blockMember = this.getObjectAtPosition(uri, position);
         if (blockMember === undefined) { return undefined; }
         return blockMember.internalVariables.find(member => member.name === name);
     }
+
+    //asserts that a particular position is inside the parameter range of an object that has a function inside
     public isAtParameterRange(uri: Uri, position: Position): boolean {
         const documentMembers = this.getDocumentMembers(uri);
         if (documentMembers === undefined) { return false; }
         const document = documentMembers.find(member => member.uri === uri.toString());
-        const documentMember = document.internalFunctions.find(member => member.parameterRange?.contains(position) ?? false);
+        const documentMember = document.internalFunctions?.find(member => member.parameterRange?.contains(position) ?? false);
         return documentMember !== undefined;
     }
     public getFunctionInfo(uri: Uri, tokenLabel: string): DocumentToken | undefined {
@@ -119,8 +138,28 @@ export class TokenService implements Disposable {
     public getDocumentMemberByDataType(uri: Uri, dataType: string): DocumentToken | undefined {
         const documentMembers = this.getDocumentMembers(uri);
         if (documentMembers === undefined) { return undefined; }
-        return documentMembers.find(member => member.name === dataType);
+        const currentDocument = documentMembers.find(member => member.uri === uri.toString());
+        const externalDocuments = documentMembers.filter(member => member.uri !== uri.toString());
+        const documentsToSearch = currentDocument.internalVariables.
+            concat(currentDocument.internalStructures).
+            concat(externalDocuments);
+        return documentsToSearch.find(member => member.name === dataType);
     }
+
+    private getObjectInternalMembers(token: DocumentToken): DocumentToken[] {
+        let internalMembers: DocumentToken[] = [];
+        if (token === undefined) { return internalMembers; };
+        if (token.internalConstants !== undefined) { internalMembers.push(...token.internalConstants); }
+        if (token.internalDelegateProperties !== undefined) { internalMembers.push(...token.internalDelegateProperties); }
+        if (token.internalDelegates !== undefined) { internalMembers.push(...token.internalDelegates); }
+        if (token.internalEvents !== undefined) { internalMembers.push(...token.internalEvents); }
+        if (token.internalFunctions !== undefined) { internalMembers.push(...token.internalFunctions); }
+        if (token.internalProperties !== undefined) { internalMembers.push(...token.internalProperties); }
+        if (token.internalStructures !== undefined) { internalMembers.push(...token.internalStructures); }
+        if (token.internalVariables !== undefined) { internalMembers.push(...token.internalVariables); }
+        return internalMembers;
+    }
+
     public getCompletionItemsFromDocumentTokens(tokens: DocumentToken[]): CompletionItem[] {
         if (tokens === undefined) { return []; }
         const items: CompletionItem[] = tokens.map(t => {

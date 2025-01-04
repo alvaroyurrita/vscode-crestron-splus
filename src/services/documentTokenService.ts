@@ -27,8 +27,9 @@ export class DocumentTokenService implements Disposable {
     public dispose() {
         this._documents.clear();
     }
-    public getTokens(uri: Uri): DocumentToken {
-        const documentTokens: DocumentToken[] = [];
+    public getTokens(uri: Uri): DocumentToken | undefined {
+        const token = this._documents.get(uri.toString());
+        if (token === undefined) {return undefined;}
         return this._documents.get(uri.toString());
     }
     private constructor(ctx: ExtensionContext) {
@@ -38,7 +39,7 @@ export class DocumentTokenService implements Disposable {
         const onCloseTextDocument_event = workspace.onDidCloseTextDocument((document) => this.updateOnCloseTextDocument(document));
 
         const document = window.activeTextEditor?.document;
-        if (document.languageId === this.selector.toString()) { this.tokenize(document); }
+        if (document !== undefined && document.languageId === this.selector.toString()) { this.tokenize(document); }
 
         ctx.subscriptions.push(
             onOpenTextDocument_event,
@@ -56,6 +57,8 @@ export class DocumentTokenService implements Disposable {
         const document = editor.document;
         if (document.languageId !== this.selector.toString()) { return; }
         await this.tokenize(document);
+        const currentPosition = window.activeTextEditor?.selection.active;
+        // console.log(currentPosition);
     }
     private async updateOnOpenTextDocument(document: TextDocument): Promise<void> {
         console.log("Document Open", document.fileName);
