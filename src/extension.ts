@@ -10,15 +10,15 @@ import {
 } from "vscode";
 
 import { SimplPlusFormattingProvider } from './simplPlusFormattingProvider';
-import { SimplPlusHoverProvider } from "./simplPlusHoverProvider";
+// import { SimplPlusHoverProvider } from "./simplPlusHoverProvider.temp";
 import { SimplPlusTasks, } from './simplPlusTasks';
 import { SimplPlusStatusBar } from "./simplPlusStatusBar";
 import { insertCategory } from "./simplPlusCategories";
-import { SimplPlusCompletionProvider } from "./simplPlusCompletionProvider";
-import { SimplPlusDotCompletionProvider } from "./simplPlusDotCompletionProvider";
+// import { SimplPlusCompletionProvider } from "./simplPlusCompletionProvider.temp";
+// import { SimplPlusDotCompletionProvider } from "./simplPlusDotCompletionProvider.temp";
 import { KeywordService } from "./services/keywordService";
-import { SimplPlusSignatureHelpProvider } from "./simplPlusSignatureHelpProvider";
-import { TokenService } from "./services/tokenService";
+// import { SimplPlusSignatureHelpProvider } from "./simplPlusSignatureHelpProvider.temp";
+// import { TokenService } from "./services/tokenService.temp";
 
 
 // Creates a terminal, calls the command, then closes the terminal
@@ -61,7 +61,7 @@ export async function activate(context: ExtensionContext) {
     // const textDocument = window.activeTextEditor!.document;
     // const tokens = await textmateTokenService.fetch(textDocument);
 
-    const tokenService = TokenService.getInstance(context);
+    // const tokenService = TokenService.getInstance(context);
 
     const keywordService = KeywordService.getInstance();
     const simplPlusStatusBar =SimplPlusStatusBar.getInstance(context);
@@ -91,33 +91,33 @@ export async function activate(context: ExtensionContext) {
     let thisFormatProvider = new SimplPlusFormattingProvider();
     const formatProvider = languages.registerDocumentFormattingEditProvider({ language: 'simpl-plus' }, thisFormatProvider);
 
-    let thisHoverProvider = new SimplPlusHoverProvider();
-    const hoverProvider = languages.registerHoverProvider({ language: 'simpl-plus' }, thisHoverProvider);
+    // let thisHoverProvider = new SimplPlusHoverProvider();
+    // const hoverProvider = languages.registerHoverProvider({ language: 'simpl-plus' }, thisHoverProvider);
 
-    let thisCompletionProvider = new SimplPlusCompletionProvider(keywordService, tokenService);
-    const completionProvider = languages.registerCompletionItemProvider({ language: 'simpl-plus' }, thisCompletionProvider);
+    // let thisCompletionProvider = new SimplPlusCompletionProvider(keywordService, tokenService);
+    // const completionProvider = languages.registerCompletionItemProvider({ language: 'simpl-plus' }, thisCompletionProvider);
 
-    let thisDotCompletionProvider = new SimplPlusDotCompletionProvider(keywordService, tokenService);
-    const dotCompletionProvider = languages.registerCompletionItemProvider({ language: 'simpl-plus' }, thisDotCompletionProvider, '.');
+    // let thisDotCompletionProvider = new SimplPlusDotCompletionProvider(keywordService, tokenService);
+    // const dotCompletionProvider = languages.registerCompletionItemProvider({ language: 'simpl-plus' }, thisDotCompletionProvider, '.');
 
-    let thisSignatureHelpProvider = new SimplPlusSignatureHelpProvider(tokenService);
-    const signatureHelpProvider = languages.registerSignatureHelpProvider({ language: 'simpl-plus' }, thisSignatureHelpProvider, '(', ',');
+    // let thisSignatureHelpProvider = new SimplPlusSignatureHelpProvider(tokenService);
+    // const signatureHelpProvider = languages.registerSignatureHelpProvider({ language: 'simpl-plus' }, thisSignatureHelpProvider, '(', ',');
 
     // let thisTextmateCompletionProvider = new TextMateCompletionProvider(tokenService);
     // const textMateCompletionProvider = languages.registerCompletionItemProvider({ language: 'simpl-plus' }, thisTextmateCompletionProvider);
 
     context.subscriptions.push(
         formatProvider,
-        hoverProvider,
+        // hoverProvider,
         localHelp_command,
         webHelp_command,
         build_command,
         showCategories_command,
         simplPlusTasks,
-        completionProvider,
-        dotCompletionProvider,
-        signatureHelpProvider,
-        tokenService
+        // completionProvider,
+        // dotCompletionProvider,
+        // signatureHelpProvider,
+        // tokenService
         // textMateCompletionProvider
       );
 }

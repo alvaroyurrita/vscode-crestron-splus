@@ -1,7 +1,7 @@
 import { ExtensionContext, Disposable, Uri, Position, CompletionItemKind, CompletionItem, SnippetString, CompletionItemLabel, TextDocument, Range } from "vscode";
-import { DocumentToken } from "./tokenTypes";
-import { DocumentTokenService } from "./documentTokenService";
-import { ApiTokenService } from "./apiTokenService";
+import { SimplObject } from "./simplObject";
+import { DocumentTokenService } from "./documentTokenService.temp";
+import { ApiTokenService } from "./apiTokenService.temp";
 import { cpuUsage } from "process";
 
 export class TokenService implements Disposable {
@@ -24,8 +24,8 @@ export class TokenService implements Disposable {
         this._documentTokenService.dispose();
         this._apiTokenService.dispose();
     }
-    public getDocumentMembers(uri: Uri): DocumentToken[] | undefined {
-        const tokens: DocumentToken[] = [];
+    public getDocumentMembers(uri: Uri): SimplObject[] | undefined {
+        const tokens: SimplObject[] = [];
         const documentToken = this._documentTokenService.getTokens(uri);
         const apiTokens = this._apiTokenService.getTokens(uri);
         if (documentToken !== undefined) { tokens.push(documentToken); }
@@ -35,10 +35,10 @@ export class TokenService implements Disposable {
 
     //returns the object (structure, event or function, or parameter range) that a position is inside of.
     // used to figure out what members to display during autocomplete
-    public getObjectAtPosition(uri: Uri, position: Position): DocumentToken | undefined {
+    public getObjectAtPosition(uri: Uri, position: Position): SimplObject | undefined {
         const documentMembers = this.getDocumentMembers(uri);
         if (documentMembers === undefined) { return undefined; }
-        let documentToken: DocumentToken | undefined;
+        let documentToken: SimplObject | undefined;
         //get the block statement from document members from only the original file
         const document = documentMembers.find(member => member.uri === uri.toString());
         if (document === undefined) { return undefined; }
@@ -58,7 +58,7 @@ export class TokenService implements Disposable {
     }
     //Returns the member of object tree.  Matches as long as it is a full member (ends in . or ( or [))
     //Use for function param auto complete ( ( ) or for next class member autocompletion (.)
-    public getDocumentMemberAtPosition(document: TextDocument, position: Position): DocumentToken | undefined {
+    public getDocumentMemberAtPosition(document: TextDocument, position: Position): SimplObject | undefined {
         const uri = document.uri;
         const offsetPosition = document.offsetAt(position);
         let textUntilPosition = document.getText().slice(0, offsetPosition);
@@ -68,7 +68,7 @@ export class TokenService implements Disposable {
         const tokenTree = wordWithDotMatch[1].match(/[_\w][_#$\w]*/gm);
         let currentToken = tokenTree.shift();
         //Look for global variables first
-        let currentObject: DocumentToken;
+        let currentObject: SimplObject;
         currentObject = this.getLocalDocumentMemberByName(uri, currentToken, position);
         if (!currentObject) {
             currentObject = this.getGlobalDocumentMemberByName(uri, currentToken);
@@ -105,7 +105,7 @@ export class TokenService implements Disposable {
         }
     }
 
-    public getGlobalDocumentMemberByName(uri: Uri, name: string): DocumentToken | undefined {
+    public getGlobalDocumentMemberByName(uri: Uri, name: string): SimplObject | undefined {
         const documentMembers = this.getDocumentMembers(uri);
         if (documentMembers === undefined) { return undefined; }
         const currentDocument = documentMembers.find(member => member.uri === uri.toString());
@@ -116,7 +116,7 @@ export class TokenService implements Disposable {
         const temp = documentsToSearch.find(member => member.name === name);
         return temp;
     }
-    public getLocalDocumentMemberByName(uri: Uri, name: string, position: Position): DocumentToken | undefined {
+    public getLocalDocumentMemberByName(uri: Uri, name: string, position: Position): SimplObject | undefined {
         const blockMember = this.getObjectAtPosition(uri, position);
         if (blockMember === undefined) { return undefined; }
         return blockMember.internalVariables.find(member => member.name === name);
@@ -130,12 +130,12 @@ export class TokenService implements Disposable {
         const documentMember = document.internalFunctions?.find(member => member.parameterRange?.contains(position) ?? false);
         return documentMember !== undefined;
     }
-    public getFunctionInfo(uri: Uri, tokenLabel: string): DocumentToken | undefined {
+    public getFunctionInfo(uri: Uri, tokenLabel: string): SimplObject | undefined {
         const documentMembers = this.getDocumentMembers(uri);
         if (documentMembers === undefined) { return undefined; }
         return documentMembers.find(member => member.name === tokenLabel && member.kind === CompletionItemKind.Function);
     }
-    public getDocumentMemberByDataType(uri: Uri, dataType: string): DocumentToken | undefined {
+    public getDocumentMemberByDataType(uri: Uri, dataType: string): SimplObject | undefined {
         const documentMembers = this.getDocumentMembers(uri);
         if (documentMembers === undefined) { return undefined; }
         const currentDocument = documentMembers.find(member => member.uri === uri.toString());
@@ -146,8 +146,8 @@ export class TokenService implements Disposable {
         return documentsToSearch.find(member => member.name === dataType);
     }
 
-    private getObjectInternalMembers(token: DocumentToken): DocumentToken[] {
-        let internalMembers: DocumentToken[] = [];
+    private getObjectInternalMembers(token: SimplObject): SimplObject[] {
+        let internalMembers: SimplObject[] = [];
         if (token === undefined) { return internalMembers; };
         if (token.internalConstants !== undefined) { internalMembers.push(...token.internalConstants); }
         if (token.internalDelegateProperties !== undefined) { internalMembers.push(...token.internalDelegateProperties); }
@@ -160,7 +160,7 @@ export class TokenService implements Disposable {
         return internalMembers;
     }
 
-    public getCompletionItemsFromDocumentTokens(tokens: DocumentToken[]): CompletionItem[] {
+    public getCompletionItemsFromDocumentTokens(tokens: SimplObject[]): CompletionItem[] {
         if (tokens === undefined) { return []; }
         const items: CompletionItem[] = tokens.map(t => {
             let itemLabel: CompletionItemLabel = {

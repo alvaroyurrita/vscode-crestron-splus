@@ -12,10 +12,10 @@ import {
     window,
     CompletionItemLabel,
 } from "vscode";
-import { SimplPlusKeywordHelpService } from "./services/simplPlusKeywordHelpService";
+import { SimplPlusKeywordHelpService } from "./services/simplPlusKeywordHelpService.temp";
 import { KeywordService, KeywordType } from "./services/keywordService";
-import { TokenService } from "./services/tokenService";
-import { DocumentToken } from "./services/tokenTypes";
+import { TokenService } from "./services/tokenService.temp";
+import { SimplObject } from "./services/simplObject";
 
 export class SimplPlusCompletionProvider implements CompletionItemProvider {
     private _keywordService: KeywordService;
@@ -170,7 +170,7 @@ export class SimplPlusCompletionProvider implements CompletionItemProvider {
         const keywordDefinitions = this._keywordService.getKeywords(functionKeyword);
         return this._keywordService.getCompletionItemsFromKeywords(keywordDefinitions);
     }
-    private getFunctionVariables(functionToken: DocumentToken): CompletionItem[] {
+    private getFunctionVariables(functionToken: SimplObject): CompletionItem[] {
         const functionVariables = this._tokenService.getCompletionItemsFromDocumentTokens(functionToken.internalVariables);
         const functionParameters = this._tokenService.getCompletionItemsFromDocumentTokens(functionToken.parameters);
         return functionVariables.concat(functionParameters);
@@ -211,7 +211,7 @@ export class SimplPlusCompletionProvider implements CompletionItemProvider {
             return [];
         }
         const internalDocument = documentItems.find(di => di.uri === uri.toString());
-        let rootVariables: DocumentToken[] = [];
+        let rootVariables: SimplObject[] = [];
         rootVariables.push(...internalDocument.internalVariables);
         rootVariables.push(...internalDocument.internalConstants);
         rootVariables.push(...internalDocument.internalFunctions);

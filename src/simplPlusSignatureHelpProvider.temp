@@ -12,10 +12,10 @@ import {
     CompletionItemLabel,
     CompletionItemKind,
 } from "vscode";
-import { TokenService } from "./services/tokenService";
-import { DocumentToken } from "./services/tokenTypes";
+import { TokenService } from "./services/tokenService.temp";
+import { SimplObject } from "./services/simplObject";
 import { KeywordService } from "./services/keywordService";
-import { SimplPlusKeywordHelpService } from "./services/simplPlusKeywordHelpService";
+import { SimplPlusKeywordHelpService } from "./services/simplPlusKeywordHelpService.temp";
 
 export class SimplPlusSignatureHelpProvider implements SignatureHelpProvider {
     private _tokenService: TokenService;
@@ -30,7 +30,7 @@ export class SimplPlusSignatureHelpProvider implements SignatureHelpProvider {
     ): ProviderResult<SignatureHelp> {
         return new Promise(async resolve => {
             const currentCharacter = position.character;
-            let functionToken: DocumentToken | undefined = undefined;
+            let functionToken: SimplObject | undefined = undefined;
             const textAtPosition = document.lineAt(position.line).text.slice(0, currentCharacter);
             const match = textAtPosition.match(/([\w][\#\$\w]*)\s*\(/);  // Match a keyword followed by an open parenthesis
             if (match === null) {

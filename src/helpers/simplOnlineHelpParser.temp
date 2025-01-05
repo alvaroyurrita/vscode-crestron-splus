@@ -1,5 +1,5 @@
 import { ExtensionContext } from "vscode";
-import { SimplPlusKeywordHelpService } from "../services/simplPlusKeywordHelpService";
+import { SimplPlusKeywordHelpService } from "../services/simplPlusKeywordHelpService.temp";
 import * as fs from "fs";
 
 //to be used only once, or when information in the keywords.csv file changes or when information in help.crestron.com/SIMPL+ changes

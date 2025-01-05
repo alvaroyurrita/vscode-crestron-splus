@@ -9,7 +9,7 @@ import {
     CompletionItemKind,
 } from "vscode";
 import { KeywordService } from "./services/keywordService";
-import { TokenService } from "./services/tokenService";
+import { TokenService } from "./services/tokenService.temp";
 
 export class SimplPlusDotCompletionProvider implements CompletionItemProvider {
     private _keywordService: KeywordService;

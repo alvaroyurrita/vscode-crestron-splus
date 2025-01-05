@@ -12,9 +12,9 @@ import {
     Uri
 } from "vscode";
 import TextmateLanguageService, { TextmateToken } from "vscode-textmate-languageservice";
-import { DocumentToken } from "./tokenTypes";
+import { SimplObject } from "./simplObject";
 export class DocumentTokenService implements Disposable {
-    private _documents = new Map<string, DocumentToken>();
+    private _documents = new Map<string, SimplObject>();
     private static _instance: DocumentTokenService;
     private selector: DocumentSelector = 'simpl-plus';
     private _textmateService: TextmateLanguageService;
@@ -27,7 +27,7 @@ export class DocumentTokenService implements Disposable {
     public dispose() {
         this._documents.clear();
     }
-    public getTokens(uri: Uri): DocumentToken | undefined {
+    public getTokens(uri: Uri): SimplObject | undefined {
         const token = this._documents.get(uri.toString());
         if (token === undefined) {return undefined;}
         return this._documents.get(uri.toString());
@@ -71,7 +71,7 @@ export class DocumentTokenService implements Disposable {
         const textmateTokenService = await this._textmateService.initTokenService();
         const tokens = await textmateTokenService.fetch(document);
 
-        const theDocument: DocumentToken =
+        const theDocument: SimplObject =
         {
             name: document.fileName.slice(document.fileName.lastIndexOf("\\") + 1, document.fileName.lastIndexOf(".")),
             kind: CompletionItemKind.Class,
@@ -88,7 +88,7 @@ export class DocumentTokenService implements Disposable {
 
         this._documents.set(document.uri.toString(), theDocument);
     }
-    private getGlobalVariables(tokens: TextmateToken[]): DocumentToken[] {
+    private getGlobalVariables(tokens: TextmateToken[]): SimplObject[] {
         return tokens.filter(token => token.scopes.includes("entity.name.variable.usp")
             && !(token.scopes.includes("meta.block.structure.usp")
                 || token.scopes.includes("meta.block.usp"))).map(token => {
@@ -97,7 +97,7 @@ export class DocumentTokenService implements Disposable {
                         new Position(token.line, token.startIndex),
                         new Position(token.line, token.startIndex + token.text.length)
                     );
-                    const variable: DocumentToken = {
+                    const variable: SimplObject = {
                         name: token.text,
                         kind: CompletionItemKind.Variable,
                         nameRange: variableNameRange,
@@ -106,7 +106,7 @@ export class DocumentTokenService implements Disposable {
                     return variable;
                 });
     }
-    private getGlobalConstants(tokens: TextmateToken[]): DocumentToken[] {
+    private getGlobalConstants(tokens: TextmateToken[]): SimplObject[] {
         return tokens.filter(token => token.scopes.includes("entity.name.constant.usp")).map(token => {
             const constantNameRange = new Range(
                 new Position(token.line, token.startIndex),
@@ -128,7 +128,7 @@ export class DocumentTokenService implements Disposable {
                         break;
                 }
             }
-            const constant: DocumentToken = {
+            const constant: SimplObject = {
                 name: token.text,
                 kind: CompletionItemKind.Constant,
                 nameRange: constantNameRange,
@@ -137,7 +137,7 @@ export class DocumentTokenService implements Disposable {
             return constant;
         });
     }
-    private getGlobalFunctions(tokens: TextmateToken[]): DocumentToken[] {
+    private getGlobalFunctions(tokens: TextmateToken[]): SimplObject[] {
         return tokens.filter(token => token.scopes.includes("entity.name.function.usp")).map(token => {
             const functionType = this.getType(token, tokens);
             const functionNameRange = new Range(
@@ -147,7 +147,7 @@ export class DocumentTokenService implements Disposable {
             //look for function block statement range
             const functionTokens = this.getBlockRangeTokens(tokens, token, "meta.block.usp");
             let functionBlockRange: Range;
-            let functionVariables: DocumentToken[] = [];
+            let functionVariables: SimplObject[] = [];
             if (functionTokens.length !== 0) {
                 functionBlockRange = new Range(
                     new Position(functionTokens[0].line, functionTokens[0].startIndex),
@@ -163,7 +163,7 @@ export class DocumentTokenService implements Disposable {
                             new Position(token.line, token.startIndex),
                             new Position(token.line, token.startIndex + token.text.length)
                         );
-                        const variable: DocumentToken = {
+                        const variable: SimplObject = {
                             name: token.text,
                             kind: CompletionItemKind.Variable,
                             nameRange: variableNameRange,
@@ -174,7 +174,7 @@ export class DocumentTokenService implements Disposable {
             }
             //grab all tokens inside the parenthesized parameter list
             const parameterTokens = this.getBlockRangeTokens(tokens, token, "meta.parenthesized.parameter-list.usp");
-            let functionParameters: DocumentToken[] = [];
+            let functionParameters: SimplObject[] = [];
             let parameterBlockRange: Range;
             if (parameterTokens.length !== 0) {
                 parameterBlockRange = new Range(
@@ -191,7 +191,7 @@ export class DocumentTokenService implements Disposable {
                             new Position(token.line, token.startIndex),
                             new Position(token.line, token.startIndex + token.text.length)
                         );
-                        const variable: DocumentToken = {
+                        const variable: SimplObject = {
                             name: token.text,
                             kind: CompletionItemKind.TypeParameter,
                             nameRange: parameterNameRange,
@@ -200,7 +200,7 @@ export class DocumentTokenService implements Disposable {
                         return variable;
                     });
             }
-            const fun: DocumentToken = {
+            const fun: SimplObject = {
                 name: token.text,
                 kind: CompletionItemKind.Function,
                 nameRange: functionNameRange,
@@ -213,7 +213,7 @@ export class DocumentTokenService implements Disposable {
             return fun;
         });
     }
-    private getGlobalStructures(tokens: TextmateToken[]): DocumentToken[] {
+    private getGlobalStructures(tokens: TextmateToken[]): SimplObject[] {
         return tokens.filter(token => token.scopes.includes("entity.name.type.structure.usp")).map(token => {
             const structureNameRange = new Range(
                 new Position(token.line, token.startIndex),
@@ -234,7 +234,7 @@ export class DocumentTokenService implements Disposable {
                         new Position(token.line, token.startIndex),
                         new Position(token.line, token.startIndex + token.text.length)
                     );
-                    const variable: DocumentToken = {
+                    const variable: SimplObject = {
                         name: token.text,
                         kind: CompletionItemKind.Variable,
                         nameRange: variableNameRange,
@@ -242,7 +242,7 @@ export class DocumentTokenService implements Disposable {
                     };
                     return variable;
                 });
-            const struct: DocumentToken = {
+            const struct: SimplObject = {
                 name: token.text,
                 kind: CompletionItemKind.Struct,
                 nameRange: structureNameRange,
@@ -253,7 +253,7 @@ export class DocumentTokenService implements Disposable {
             return struct;
         });
     }
-    private getGlobalEvents(tokens: TextmateToken[]): DocumentToken[] {
+    private getGlobalEvents(tokens: TextmateToken[]): SimplObject[] {
         return tokens.filter(token => token.scopes.includes("entity.name.variable.event.usp")).map(token => {
             const eventType = this.getType(token, tokens);
             const eventNameRange = new Range(
@@ -275,7 +275,7 @@ export class DocumentTokenService implements Disposable {
                         new Position(token.line, token.startIndex),
                         new Position(token.line, token.startIndex + token.text.length)
                     );
-                    const variable: DocumentToken = {
+                    const variable: SimplObject = {
                         name: token.text,
                         kind: CompletionItemKind.Variable,
                         nameRange: variableNameRange,
@@ -283,7 +283,7 @@ export class DocumentTokenService implements Disposable {
                     };
                     return variable;
                 });
-            const event: DocumentToken = {
+            const event: SimplObject = {
                 name: token.text,
                 kind: CompletionItemKind.Event,
                 nameRange: eventNameRange,

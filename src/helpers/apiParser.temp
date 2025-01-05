@@ -1,25 +1,25 @@
 import { workspace, Uri, Range, TextDocument, CompletionItemKind } from 'vscode';
-import { DocumentToken } from '../services/tokenTypes';
+import { SimplObject } from '../services/simplObject';
 
 
-export async function provideClassTokens(apiFullPath: string): Promise<DocumentToken[]> {
+export async function provideClassTokens(apiFullPath: string): Promise<SimplObject[]> {
 
     //@ts-ignore
     const apiDocument = await workspace.openTextDocument(apiFullPath);
     const apiDocumentContent = apiDocument.getText();
     const apiClassesMatches = apiDocumentContent.matchAll(/class\s*([\w]*)\s*{([^}]*)/gm);
-    const apiClasses: DocumentToken[] = [];
+    const apiClasses: SimplObject[] = [];
     for (let apiClass of apiClassesMatches) {
         const classStart = apiDocument.positionAt(apiClass.index + apiClass[0].indexOf("{") + 1);
         const classEnd = apiDocument.positionAt(apiClass.index + apiClass[0].length);
         const classBodyRange = new Range(classStart, classEnd);
         const classNameRange = apiDocument.getWordRangeAtPosition(apiDocument.positionAt(apiClass.index + apiClass[0].indexOf(apiClass[1])));
-        let delegates: DocumentToken[] = [];
-        let events: DocumentToken[] = [];
-        let functions: DocumentToken[] = [];
-        let properties: DocumentToken[] = [];
-        let variables: DocumentToken[] = [];
-        let delegateProperties: DocumentToken[] = [];
+        let delegates: SimplObject[] = [];
+        let events: SimplObject[] = [];
+        let functions: SimplObject[] = [];
+        let properties: SimplObject[] = [];
+        let variables: SimplObject[] = [];
+        let delegateProperties: SimplObject[] = [];
         const delegatesArea = apiClass[2].match(/class delegates([^\/]*)/m);
         if (delegatesArea && delegatesArea[1]) {
             const delegatesStart = apiDocument.positionAt(apiDocument.offsetAt(classStart) + delegatesArea.index);
@@ -75,13 +75,13 @@ export async function provideClassTokens(apiFullPath: string): Promise<DocumentT
         });
     }
     const apiEnumMatches = apiDocumentContent.matchAll(/enum\s*([\w]*)\s*{([^}]*)/gm);
-    const apiEnums: DocumentToken[] = [];
+    const apiEnums: SimplObject[] = [];
     for (let apiEnum of apiEnumMatches) {
         const enumStart = apiDocument.positionAt(apiEnum.index + apiEnum[0].indexOf("{") + 1);
         const enumEnd = apiDocument.positionAt(apiEnum.index + apiEnum[0].length);
         const enumBodyRange = new Range(enumStart, enumEnd);
         const enumNameRange = apiDocument.getWordRangeAtPosition(apiDocument.positionAt(apiEnum.index + apiEnum[0].indexOf(apiEnum[1])));
-        const enumMembers: DocumentToken[] = [];
+        const enumMembers: SimplObject[] = [];
         const enumMembersMatch = apiEnum[2].matchAll(/(\w*),/gm);
         for (let enumMember of enumMembersMatch) {
             const memberNameRange = apiDocument.getWordRangeAtPosition(apiDocument.positionAt(apiEnum.index + apiEnum[0].indexOf(enumMember[1])));
@@ -108,8 +108,8 @@ export async function provideClassTokens(apiFullPath: string): Promise<DocumentT
 
 
 
-function getDelegates(delegatesArea: Range, document: TextDocument): DocumentToken[] {
-    let delegates: DocumentToken[] = [];
+function getDelegates(delegatesArea: Range, document: TextDocument): SimplObject[] {
+    let delegates: SimplObject[] = [];
     const delegatesText = document.getText(delegatesArea);
     const delegateMatches = delegatesText.matchAll(/delegate\s*([\w]*)\s*([\w]*)\s*\((.*)\)/gm);
     for (let delegateMatch of delegateMatches) {
@@ -131,8 +131,8 @@ function getDelegates(delegatesArea: Range, document: TextDocument): DocumentTok
     return delegates;
 }
 
-function getEvents(eventsArea: Range, document: TextDocument): DocumentToken[] {
-    let events: DocumentToken[] = [];
+function getEvents(eventsArea: Range, document: TextDocument): SimplObject[] {
+    let events: SimplObject[] = [];
     const eventsText = document.getText(eventsArea);
     const eventMatches = eventsText.matchAll(/EventHandler\s*([\w]*)\s*\((.*)\)/gm);
     for (let eventMatch of eventMatches) {
@@ -154,8 +154,8 @@ function getEvents(eventsArea: Range, document: TextDocument): DocumentToken[] {
     return events;
 }
 
-function getFunctions(functionsArea: Range, document: TextDocument): DocumentToken[] {
-    let functions: DocumentToken[] = [];
+function getFunctions(functionsArea: Range, document: TextDocument): SimplObject[] {
+    let functions: SimplObject[] = [];
     const functionsText = document.getText(functionsArea);
     const functionMatches = functionsText.matchAll(/([\w]*)\s*([\w]*)\s*\((.*)\)/gm);
     for (let functionMatch of functionMatches) {
@@ -177,8 +177,8 @@ function getFunctions(functionsArea: Range, document: TextDocument): DocumentTok
     return functions;
 }
 
-function getVariables(variablesArea: Range, document: TextDocument): DocumentToken[] {
-    let variables: DocumentToken[] = [];
+function getVariables(variablesArea: Range, document: TextDocument): SimplObject[] {
+    let variables: SimplObject[] = [];
     const variablesText = document.getText(variablesArea);
     const variablesMatches = variablesText.matchAll(/([\w]*)\s*([\w]*)\s*(?:\[,*\])?;/gm);
     for (let variableMatch of variablesMatches) {
@@ -195,8 +195,8 @@ function getVariables(variablesArea: Range, document: TextDocument): DocumentTok
     return variables;
 }
 
-function getProperties(propertiesArea: Range, document: TextDocument): DocumentToken[] {
-    let properties: DocumentToken[] = [];
+function getProperties(propertiesArea: Range, document: TextDocument): SimplObject[] {
+    let properties: SimplObject[] = [];
     const variablesText = document.getText(propertiesArea);
     const propertyMatches = variablesText.matchAll(/(\w*)?\s*(\w*)\s*(\w*\s*(?:\[,*\])?)\s*;/gm);
     for (let propertyMatch of propertyMatches) {
@@ -214,8 +214,8 @@ function getProperties(propertiesArea: Range, document: TextDocument): DocumentT
     return properties;
 }
 
-function getDelegateProperties(delegatePropertiesArea: Range, document: TextDocument): DocumentToken[] {
-    let delegateProperties: DocumentToken[] = [];
+function getDelegateProperties(delegatePropertiesArea: Range, document: TextDocument): SimplObject[] {
+    let delegateProperties: SimplObject[] = [];
     const delegatePropertiesText = document.getText(delegatePropertiesArea);
     const delegatePropertyMatches = delegatePropertiesText.matchAll(/(?:DelegateProperty\s*)(\w*)\s*(\w*\s*(?:\[,*\])?)\s*;/gm);
     for (let delegatePropertyMatch of delegatePropertyMatches) {
@@ -232,8 +232,8 @@ function getDelegateProperties(delegatePropertiesArea: Range, document: TextDocu
     return delegateProperties;
 }
 
-function getParameters(parameterArea: Range, document: TextDocument): DocumentToken[] {
-    let parameters: DocumentToken[] = [];
+function getParameters(parameterArea: Range, document: TextDocument): SimplObject[] {
+    let parameters: SimplObject[] = [];
     const parametersText = document.getText(parameterArea);
 
     const parameterMatches = parametersText.matchAll(/(?<=[\,\(])\s*([\w]*)?\s*([\w]*)\s*([\w]*)\s*(?=[\,\)])/gm);

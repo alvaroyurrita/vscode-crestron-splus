@@ -11,8 +11,8 @@ import {
     extensions,
     RelativePattern,
 } from "vscode";
-import { provideClassTokens } from "../helpers/apiParser";
-import { DocumentToken } from "./tokenTypes";
+import { provideClassTokens } from "../helpers/apiParser.temp";
+import { SimplObject } from "./simplObject";
 import { join } from "path";
 import * as fs from "fs";
 
@@ -28,7 +28,7 @@ export class ApiTokenService implements Disposable {
     //Stores that watchers for a specific parent folder  where the .CLZ libraries are stored
     private _watchers = new Map<string, FileSystemWatcher>();
     //Stores tokens for a specific .CLZ Library
-    private _apis = new Map<string, DocumentToken[]>();
+    private _apis = new Map<string, SimplObject[]>();
     //stores the documents that need api tokens.
     private _documents = new Map<string, string[]>();
     private static _instance: ApiTokenService;
@@ -59,8 +59,8 @@ export class ApiTokenService implements Disposable {
         this._watchers.clear();
     }
 
-    public getTokens(uri: Uri): DocumentToken[] {
-        const documentTokens: DocumentToken[] = [];
+    public getTokens(uri: Uri): SimplObject[] {
+        const documentTokens: SimplObject[] = [];
         this._documents.get(uri.toString())?.forEach((library) => {
             const tokens = this._apis.get(library);
             if (tokens) {
