@@ -12,7 +12,7 @@ note left
     * Object1.Field1.Field2.
 
     Where object 1 could be a class, structure, enum or any other object or instance of an object that produces a child,
-    and Field 1 is any other object or instance of an object that also produces a child. after (. or closing parenths ) propose members of last field data type.
+    and Field 1 is any other object or instance of an object that also produces a child. after (. or closing parenthesis ) propose members of last field data type.
 
     * struct1.struct2.
     ** struct1Instance -> struct1Type.struct2Instance -> struct2Type
@@ -32,12 +32,11 @@ note left
     pseudoCode:
 
     extract keywords (disregard parenthesis or square brackets) connected by dots
-    find first word on global objects (document internal members (aka, variable names), external c# classes (aka, c# class data type)
-    (note that c# classes and structs both show up as classes), external enums (aka C$ enum data type), simpl+ library members, aka variable names).
+    find first word on global objects (program members (i.e., variable names), external c# classes (i.e., c# class data type), 
+    (note that c# classes and structs both show up as classes), external enums (i.e. C$ enum data type), simpl+ library members (i.e. variable names)).
     if there are no more chained words proposes all children of the found object
 
-    if there is another word, find that word on the children of the found object and get dataType,
-    Find in globalObjects that dataType,
+    if there is another word, find that word on the previously found object,
 
     with current word in chain. Find word in current object, if no more words. return current object
     ** If not found . stop and propose nothing.
@@ -46,21 +45,12 @@ note left
 
 end note
 :Tokens[] = ;
-:CurrentObject = rootObjects
-:currentObject = getDocumentMembersByName(currentToken);
+:currentObject = getProjectObjects();
 :currentToken = Tokens.Shift();
-while (currentToken) is (not null)
-    :CurrentObject = find currentToken in CurrentObject member names;
-    if (currentObject) then (undefined)
-        :return nothing;
-        stop
-    endif
-    :currentToken = Token.Shift();
-endwhile
-
-if (currentObject===function && lastCharacter=(  ) then (true)
-    :currentObject = functionReturn;
-endif
+repeat 
+:CurrentObject = currentObject.find(co=>co.name===currentToken);
+:currentToken = Tokens.Shift();
+repeat while (currentToken) is (not null) not (null)
 :return currentObject;
 
 end

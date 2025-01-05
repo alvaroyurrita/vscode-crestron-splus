@@ -10,15 +10,15 @@ import {
 } from "vscode";
 
 import { SimplPlusFormattingProvider } from './simplPlusFormattingProvider';
-// import { SimplPlusHoverProvider } from "./simplPlusHoverProvider.temp";
+import { SimplPlusHoverProvider } from "./simplPlusHoverProvider";
 import { SimplPlusTasks, } from './simplPlusTasks';
 import { SimplPlusStatusBar } from "./simplPlusStatusBar";
 import { insertCategory } from "./simplPlusCategories";
-// import { SimplPlusCompletionProvider } from "./simplPlusCompletionProvider.temp";
-// import { SimplPlusDotCompletionProvider } from "./simplPlusDotCompletionProvider.temp";
+import { SimplPlusCompletionProvider } from "./simplPlusCompletionProvider";
+import { SimplPlusDotCompletionProvider } from "./simplPlusDotCompletionProvider";
 import { KeywordService } from "./services/keywordService";
-// import { SimplPlusSignatureHelpProvider } from "./simplPlusSignatureHelpProvider.temp";
-// import { TokenService } from "./services/tokenService.temp";
+import { SimplPlusSignatureHelpProvider } from "./simplPlusSignatureHelpProvider";
+import { SimplPlusProjectObjectService } from "./services/simplPlusProjectObjectService";
 
 
 // Creates a terminal, calls the command, then closes the terminal
@@ -38,22 +38,22 @@ export async function activate(context: ExtensionContext) {
     // }
 
     const selector: DocumentSelector = 'simpl-plus';
-	// const textmateService = new TextmateLanguageService(selector, context);
+    // const textmateService = new TextmateLanguageService(selector, context);
 
     //https://code.visualstudio.com/docs/editor/codebasics#_folding
-	// const foldingRangeProvider = await textmateService.createFoldingRangeProvider();
+    // const foldingRangeProvider = await textmateService.createFoldingRangeProvider();
     //https://code.visualstudio.com/docs/editor/editingevolved#_go-to-symbol (Activate with Ctrl+Shift+O)
-	// const documentSymbolProvider = await textmateService.createDocumentSymbolProvider();
+    // const documentSymbolProvider = await textmateService.createDocumentSymbolProvider();
     //https://code.visualstudio.com/docs/editor/editingevolved#_open-symbol-by-name (Activate with Ctrl+T)
-	// const workspaceSymbolProvider = await textmateService.createWorkspaceSymbolProvider();
+    // const workspaceSymbolProvider = await textmateService.createWorkspaceSymbolProvider();
     ///https://code.visualstudio.com/api/references/vscode-api#DefinitionProvider (Activate with F12)
-	// const definitionProvider = await textmateService.createDefinitionProvider();
+    // const definitionProvider = await textmateService.createDefinitionProvider();
 
     //
-	// context.subscriptions.push(languages.registerDocumentSymbolProvider(selector, documentSymbolProvider));
-	// context.subscriptions.push(languages.registerFoldingRangeProvider(selector, foldingRangeProvider));
-	// context.subscriptions.push(languages.registerWorkspaceSymbolProvider(workspaceSymbolProvider));
-	// context.subscriptions.push(languages.registerDefinitionProvider(selector, definitionProvider));
+    // context.subscriptions.push(languages.registerDocumentSymbolProvider(selector, documentSymbolProvider));
+    // context.subscriptions.push(languages.registerFoldingRangeProvider(selector, foldingRangeProvider));
+    // context.subscriptions.push(languages.registerWorkspaceSymbolProvider(workspaceSymbolProvider));
+    // context.subscriptions.push(languages.registerDefinitionProvider(selector, definitionProvider));
 
 
     // const textmateService = new TextmateLanguageService(selector, context);
@@ -61,10 +61,10 @@ export async function activate(context: ExtensionContext) {
     // const textDocument = window.activeTextEditor!.document;
     // const tokens = await textmateTokenService.fetch(textDocument);
 
-    // const tokenService = TokenService.getInstance(context);
-
+    const projectObjectService = SimplPlusProjectObjectService.getInstance(context);
     const keywordService = KeywordService.getInstance();
-    const simplPlusStatusBar =SimplPlusStatusBar.getInstance(context);
+
+    const simplPlusStatusBar = SimplPlusStatusBar.getInstance(context);
     const simplPlusTasks = SimplPlusTasks.getInstance(context);
 
     let localHelp_command = commands.registerCommand("simpl-plus.localHelp", () => {
@@ -91,35 +91,35 @@ export async function activate(context: ExtensionContext) {
     let thisFormatProvider = new SimplPlusFormattingProvider();
     const formatProvider = languages.registerDocumentFormattingEditProvider({ language: 'simpl-plus' }, thisFormatProvider);
 
-    // let thisHoverProvider = new SimplPlusHoverProvider();
-    // const hoverProvider = languages.registerHoverProvider({ language: 'simpl-plus' }, thisHoverProvider);
+    let thisHoverProvider = new SimplPlusHoverProvider();
+    const hoverProvider = languages.registerHoverProvider({ language: 'simpl-plus' }, thisHoverProvider);
 
-    // let thisCompletionProvider = new SimplPlusCompletionProvider(keywordService, tokenService);
-    // const completionProvider = languages.registerCompletionItemProvider({ language: 'simpl-plus' }, thisCompletionProvider);
+    let thisCompletionProvider = new SimplPlusCompletionProvider(keywordService, projectObjectService);
+    const completionProvider = languages.registerCompletionItemProvider({ language: 'simpl-plus' }, thisCompletionProvider);
 
-    // let thisDotCompletionProvider = new SimplPlusDotCompletionProvider(keywordService, tokenService);
-    // const dotCompletionProvider = languages.registerCompletionItemProvider({ language: 'simpl-plus' }, thisDotCompletionProvider, '.');
+    let thisDotCompletionProvider = new SimplPlusDotCompletionProvider(keywordService, projectObjectService);
+    const dotCompletionProvider = languages.registerCompletionItemProvider({ language: 'simpl-plus' }, thisDotCompletionProvider, '.');
 
-    // let thisSignatureHelpProvider = new SimplPlusSignatureHelpProvider(tokenService);
-    // const signatureHelpProvider = languages.registerSignatureHelpProvider({ language: 'simpl-plus' }, thisSignatureHelpProvider, '(', ',');
+    let thisSignatureHelpProvider = new SimplPlusSignatureHelpProvider(projectObjectService);
+    const signatureHelpProvider = languages.registerSignatureHelpProvider({ language: 'simpl-plus' }, thisSignatureHelpProvider, '(', ',');
 
     // let thisTextmateCompletionProvider = new TextMateCompletionProvider(tokenService);
     // const textMateCompletionProvider = languages.registerCompletionItemProvider({ language: 'simpl-plus' }, thisTextmateCompletionProvider);
 
     context.subscriptions.push(
         formatProvider,
-        // hoverProvider,
+        hoverProvider,
         localHelp_command,
         webHelp_command,
         build_command,
         showCategories_command,
         simplPlusTasks,
-        // completionProvider,
-        // dotCompletionProvider,
-        // signatureHelpProvider,
-        // tokenService
+        completionProvider,
+        dotCompletionProvider,
+        signatureHelpProvider,
+        projectObjectService
         // textMateCompletionProvider
-      );
+    );
 }
 
 

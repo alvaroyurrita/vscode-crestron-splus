@@ -12,14 +12,14 @@ import {
     CompletionItemLabel,
     CompletionItemKind,
 } from "vscode";
-import { TokenService } from "./services/tokenService.temp";
-import { SimplObject } from "./services/simplObject";
+import { SimplPlusProjectObjectService } from "./services/simplPlusProjectObjectService";
+import { SimplPlusObject } from "./base/simplPlusObject";
 import { KeywordService } from "./services/keywordService";
-import { SimplPlusKeywordHelpService } from "./services/simplPlusKeywordHelpService.temp";
+import { SimplPlusKeywordHelpService } from "./services/simplPlusKeywordHelpService";
 
 export class SimplPlusSignatureHelpProvider implements SignatureHelpProvider {
-    private _tokenService: TokenService;
-    constructor(tokenService: TokenService) {
+    private _tokenService: SimplPlusProjectObjectService;
+    constructor(tokenService: SimplPlusProjectObjectService) {
         this._tokenService = tokenService;
     }
     provideSignatureHelp(
@@ -30,14 +30,14 @@ export class SimplPlusSignatureHelpProvider implements SignatureHelpProvider {
     ): ProviderResult<SignatureHelp> {
         return new Promise(async resolve => {
             const currentCharacter = position.character;
-            let functionToken: SimplObject | undefined = undefined;
+            let functionToken: SimplPlusObject | undefined = undefined;
             const textAtPosition = document.lineAt(position.line).text.slice(0, currentCharacter);
             const match = textAtPosition.match(/([\w][\#\$\w]*)\s*\(/);  // Match a keyword followed by an open parenthesis
             if (match === null) {
                 return undefined;
             }
             const functionName = match[1];
-            const lastCompletionItem = this._tokenService.getDocumentMemberAtPosition(document,position);
+            const lastCompletionItem = this._tokenService.getObjectAtPosition(document,position);
             if (lastCompletionItem && lastCompletionItem.name === functionName) {
                 functionToken = lastCompletionItem;
             }
@@ -54,8 +54,9 @@ export class SimplPlusSignatureHelpProvider implements SignatureHelpProvider {
             const signatureHelp = new SignatureHelp();
             let functionText = `${functionToken.dataType} ${functionToken.name}(`;
             const parameters: ParameterInformation[] = [];
-            if (functionToken.parameters.length > 0) {
-                functionText += functionToken.parameters.map(p => {
+            const functionParams = functionToken.children.filter(ch=>ch.kind===CompletionItemKind.TypeParameter);
+            if (functionParams.length > 0) {
+                functionText += functionParams.map(p => {
                     parameters.push(new ParameterInformation(p.name));
                     return `${p.dataType} ${p.name}`;
                 }).join(", ");

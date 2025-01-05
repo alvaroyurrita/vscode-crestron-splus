@@ -22,6 +22,7 @@ Structure myStructure3{
 	Integer test6;
 	Long_Integer test7;
 	myStructure2 test8;
+	
 }
 
 TCP_CLIENT MyClient[1024];
@@ -40,7 +41,7 @@ Integer_Function testFunction(Integer a1, Integer a2)
 	SampleClass mySampleClass;
 	myStructure3.test8.test5.test1;
 	myStructure3.test8.test5.test2;
-	mySampleClass1.
+	testFu
 }
 
 change test

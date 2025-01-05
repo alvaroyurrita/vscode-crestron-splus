@@ -1,13 +1,13 @@
 import { CompletionItemKind, Position, Range, TextDocument } from "vscode";
-import { SimplObject } from "../base/simplObject";
+import { SimplPlusObject } from "../base/simplPlusObject";
 import TextmateLanguageService, { TextmateToken } from "vscode-textmate-languageservice";
 
 const selector: string = 'simpl-plus';
 let programName: string = "";
 let programUri: string = "";
 
-
-export async function SimplParser(document: TextDocument | undefined): Promise<SimplObject[]> {
+//parses an usp or usl fle to create SimplObject hierarchy per variables, functions, structures, events and constants
+export async function SimplPlusParser(document: TextDocument | undefined): Promise<SimplPlusObject[]> {
     if (document === undefined) { return; }
     if (document.languageId !== selector) { return; }
     const textmateService = new TextmateLanguageService(selector);
@@ -17,7 +17,7 @@ export async function SimplParser(document: TextDocument | undefined): Promise<S
     programName = fileName.slice(fileName.lastIndexOf("\\"), fileName.lastIndexOf("."));
     programUri = document.uri.toString();
 
-    const theDocument: SimplObject[] =
+    const theDocument: SimplPlusObject[] =
         [
             ...getGlobalStructures(tokens),
             ...getGlobalConstants(tokens),
@@ -27,7 +27,7 @@ export async function SimplParser(document: TextDocument | undefined): Promise<S
         ];
     return theDocument;
 }
-function getGlobalVariables(tokens: TextmateToken[]): SimplObject[] {
+function getGlobalVariables(tokens: TextmateToken[]): SimplPlusObject[] {
     return tokens.filter(token => token.scopes.includes("entity.name.variable.usp")
         && !(token.scopes.includes("meta.block.structure.usp")
             || token.scopes.includes("meta.block.usp"))).map(token => {
@@ -36,7 +36,7 @@ function getGlobalVariables(tokens: TextmateToken[]): SimplObject[] {
                     new Position(token.line, token.startIndex),
                     new Position(token.line, token.startIndex + token.text.length)
                 );
-                const variable: SimplObject = {
+                const variable: SimplPlusObject = {
                     name: token.text,
                     kind: CompletionItemKind.Variable,
                     nameRange: variableNameRange,
@@ -48,7 +48,7 @@ function getGlobalVariables(tokens: TextmateToken[]): SimplObject[] {
                 return variable;
             });
 }
-function getGlobalConstants(tokens: TextmateToken[]): SimplObject[] {
+function getGlobalConstants(tokens: TextmateToken[]): SimplPlusObject[] {
     return tokens.filter(token => token.scopes.includes("entity.name.constant.usp")).map(token => {
         const constantNameRange = new Range(
             new Position(token.line, token.startIndex),
@@ -70,7 +70,7 @@ function getGlobalConstants(tokens: TextmateToken[]): SimplObject[] {
                     break;
             }
         }
-        const constant: SimplObject = {
+        const constant: SimplPlusObject = {
             name: token.text,
             kind: CompletionItemKind.Constant,
             nameRange: constantNameRange,
@@ -82,7 +82,7 @@ function getGlobalConstants(tokens: TextmateToken[]): SimplObject[] {
         return constant;
     });
 }
-function getGlobalFunctions(tokens: TextmateToken[]): SimplObject[] {
+function getGlobalFunctions(tokens: TextmateToken[]): SimplPlusObject[] {
     return tokens.filter(token => token.scopes.includes("entity.name.function.usp")).map(token => {
         const functionInfo = getType(token, tokens);
         const functionNameRange = new Range(
@@ -92,8 +92,8 @@ function getGlobalFunctions(tokens: TextmateToken[]): SimplObject[] {
         //look for function block statement range
         const functionTokens = getBlockRangeTokens(tokens, token, "meta.block.usp");
         let functionBlockRange: Range;
-        let functionVariables: SimplObject[] = [];
-        const fun: SimplObject = {
+        let functionVariables: SimplPlusObject[] = [];
+        const fun: SimplPlusObject = {
             name: token.text,
             kind: CompletionItemKind.Function,
             nameRange: functionNameRange,
@@ -119,7 +119,7 @@ function getGlobalFunctions(tokens: TextmateToken[]): SimplObject[] {
                         new Position(token.line, token.startIndex),
                         new Position(token.line, token.startIndex + token.text.length)
                     );
-                    const variable: SimplObject = {
+                    const variable: SimplPlusObject = {
                         name: token.text,
                         kind: CompletionItemKind.Variable,
                         nameRange: variableNameRange,
@@ -134,7 +134,7 @@ function getGlobalFunctions(tokens: TextmateToken[]): SimplObject[] {
         }
         //grab all tokens inside the parenthesized parameter list
         const parameterTokens = getBlockRangeTokens(tokens, token, "meta.parenthesized.parameter-list.usp");
-        let functionParameters: SimplObject[] = [];
+        let functionParameters: SimplPlusObject[] = [];
         let parameterBlockRange: Range;
         if (parameterTokens.length !== 0) {
             parameterBlockRange = new Range(
@@ -151,7 +151,7 @@ function getGlobalFunctions(tokens: TextmateToken[]): SimplObject[] {
                         new Position(token.line, token.startIndex),
                         new Position(token.line, token.startIndex + token.text.length)
                     );
-                    const parameter: SimplObject = {
+                    const parameter: SimplPlusObject = {
                         name: token.text,
                         kind: CompletionItemKind.TypeParameter,
                         nameRange: parameterNameRange,
@@ -169,13 +169,13 @@ function getGlobalFunctions(tokens: TextmateToken[]): SimplObject[] {
         return fun;
     });
 }
-function getGlobalStructures(tokens: TextmateToken[]): SimplObject[] {
+function getGlobalStructures(tokens: TextmateToken[]): SimplPlusObject[] {
     return tokens.filter(token => token.scopes.includes("entity.name.type.structure.usp")).map(token => {
         const structureNameRange = new Range(
             new Position(token.line, token.startIndex),
             new Position(token.line, token.startIndex + token.text.length)
         );
-        const struct: SimplObject = {
+        const struct: SimplPlusObject = {
             name: token.text,
             kind: CompletionItemKind.Struct,
             nameRange: structureNameRange,
@@ -186,7 +186,7 @@ function getGlobalStructures(tokens: TextmateToken[]): SimplObject[] {
         };
         //look for structure block statement range
         const structureTokens = getBlockRangeTokens(tokens, token, "meta.block.structure.usp");
-        let structureVariables: SimplObject[] = [];
+        let structureVariables: SimplPlusObject[] = [];
         //check for structure with empty elements
         if (structureTokens.length !== 0) {
             const structureBlockRange = new Range(
@@ -203,7 +203,7 @@ function getGlobalStructures(tokens: TextmateToken[]): SimplObject[] {
                         new Position(token.line, token.startIndex),
                         new Position(token.line, token.startIndex + token.text.length)
                     );
-                    const variable: SimplObject = {
+                    const variable: SimplPlusObject = {
                         name: token.text,
                         kind: CompletionItemKind.Variable,
                         nameRange: variableNameRange,
@@ -220,7 +220,7 @@ function getGlobalStructures(tokens: TextmateToken[]): SimplObject[] {
         return struct;
     });
 }
-function getGlobalEvents(tokens: TextmateToken[]): SimplObject[] {
+function getGlobalEvents(tokens: TextmateToken[]): SimplPlusObject[] {
     return tokens.filter(token => token.scopes.includes("entity.name.variable.event.usp")).map(token => {
         const eventTypeInfo = getType(token, tokens);
         const eventNameRange = new Range(
@@ -233,7 +233,7 @@ function getGlobalEvents(tokens: TextmateToken[]): SimplObject[] {
             new Position(eventTokens[0].line, eventTokens[0].startIndex),
             new Position(eventTokens[eventTokens.length - 1].line, eventTokens[eventTokens.length - 1].startIndex + eventTokens[eventTokens.length - 1].text.length)
         );
-        const event: SimplObject = {
+        const event: SimplPlusObject = {
             name: token.text,
             kind: CompletionItemKind.Event,
             nameRange: eventNameRange,
@@ -252,7 +252,7 @@ function getGlobalEvents(tokens: TextmateToken[]): SimplObject[] {
                     new Position(token.line, token.startIndex),
                     new Position(token.line, token.startIndex + token.text.length)
                 );
-                const variable: SimplObject = {
+                const variable: SimplPlusObject = {
                     name: token.text,
                     kind: CompletionItemKind.Variable,
                     nameRange: variableNameRange,

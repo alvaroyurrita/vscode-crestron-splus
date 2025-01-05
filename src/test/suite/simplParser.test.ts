@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import { removeWorkspaceCustomSettings, OpenAndShowSPlusDocument, delay } from '../testFunctions';
 import * as vscode from 'vscode';
-import { SimplParser } from '../../helpers/simplParser';
+import { SimplPlusParser } from '../../helpers/simplPlusParser';
 
 
 suite("testing document tokenization", function () {
@@ -17,7 +17,7 @@ suite("testing document tokenization", function () {
         await OpenAndShowSPlusDocument("#DEFINE_CONSTANT MYCONSTANT 32");
         const document = vscode.window.activeTextEditor.document;
         const documentName = document.uri.toString();
-        const documentMembers = await SimplParser(vscode.window.activeTextEditor.document);
+        const documentMembers = await SimplPlusParser(vscode.window.activeTextEditor.document);
         assert.strictEqual(documentMembers.length, 1);
         assert.strictEqual(documentMembers[0].name, "MYCONSTANT");
         assert.strictEqual(documentMembers[0].kind, vscode.CompletionItemKind.Constant);
@@ -34,7 +34,7 @@ suite("testing document tokenization", function () {
         await OpenAndShowSPlusDocument("BUFFER_INPUT BufferInput1[20];");
         const document = vscode.window.activeTextEditor.document;
         const documentName = document.uri.toString();
-        const documentMembers = await SimplParser(vscode.window.activeTextEditor.document);
+        const documentMembers = await SimplPlusParser(vscode.window.activeTextEditor.document);
         assert.strictEqual(documentMembers.length, 1);
         assert.strictEqual(documentMembers[0].name, "BufferInput1");
         assert.strictEqual(documentMembers[0].kind, vscode.CompletionItemKind.Variable);
@@ -51,7 +51,7 @@ suite("testing document tokenization", function () {
         await OpenAndShowSPlusDocument("ANALOG_OUTPUT AnalogOutput1[20];");
         const document = vscode.window.activeTextEditor.document;
         const documentName = document.uri.toString();
-        const documentMembers = await SimplParser(vscode.window.activeTextEditor.document);
+        const documentMembers = await SimplPlusParser(vscode.window.activeTextEditor.document);
         assert.strictEqual(documentMembers.length, 1);
         assert.strictEqual(documentMembers[0].name, "AnalogOutput1");
         assert.strictEqual(documentMembers[0].kind, vscode.CompletionItemKind.Variable);
@@ -68,7 +68,7 @@ suite("testing document tokenization", function () {
         await OpenAndShowSPlusDocument("INTEGER_PARAMETER IntegerParameter;");
         const document = vscode.window.activeTextEditor.document;
         const documentName = document.uri.toString();
-        const documentMembers = await SimplParser(vscode.window.activeTextEditor.document);
+        const documentMembers = await SimplPlusParser(vscode.window.activeTextEditor.document);
         assert.strictEqual(documentMembers.length, 1);
         assert.strictEqual(documentMembers[0].name, "IntegerParameter");
         assert.strictEqual(documentMembers[0].kind, vscode.CompletionItemKind.Variable);
@@ -86,7 +86,7 @@ suite("testing document tokenization", function () {
         await OpenAndShowSPlusDocument("myType myVariableOfType;");
         const document = vscode.window.activeTextEditor.document;
         const documentName = document.uri.toString();
-        const documentMembers = await SimplParser(vscode.window.activeTextEditor.document);
+        const documentMembers = await SimplPlusParser(vscode.window.activeTextEditor.document);
         assert.strictEqual(documentMembers.length, 1);
         assert.strictEqual(documentMembers[0].name, "myVariableOfType");
         assert.strictEqual(documentMembers[0].kind, vscode.CompletionItemKind.Variable);
@@ -103,7 +103,7 @@ suite("testing document tokenization", function () {
         await OpenAndShowSPlusDocument("CMutex myVariableOfType;");
         const document = vscode.window.activeTextEditor.document;
         const documentName = document.uri.toString();
-        const documentMembers = await SimplParser(vscode.window.activeTextEditor.document);
+        const documentMembers = await SimplPlusParser(vscode.window.activeTextEditor.document);
         assert.strictEqual(documentMembers.length, 1);
         assert.strictEqual(documentMembers[0].name, "myVariableOfType");
         assert.strictEqual(documentMembers[0].kind, vscode.CompletionItemKind.Variable);
@@ -120,7 +120,7 @@ suite("testing document tokenization", function () {
         await OpenAndShowSPlusDocument("INHERIT myType myVariableOfType;");
         const document = vscode.window.activeTextEditor.document;
         const documentName = document.uri.toString();
-        const documentMembers = await SimplParser(vscode.window.activeTextEditor.document);
+        const documentMembers = await SimplPlusParser(vscode.window.activeTextEditor.document);
         assert.strictEqual(documentMembers.length, 1);
         assert.strictEqual(documentMembers[0].name, "myVariableOfType");
         assert.strictEqual(documentMembers[0].kind, vscode.CompletionItemKind.Variable);
@@ -137,7 +137,7 @@ suite("testing document tokenization", function () {
         await OpenAndShowSPlusDocument("STRUCTURE testStructure\n{\nstring STRING1[20];\n};");
         const document = vscode.window.activeTextEditor.document;
         const documentName = document.uri.toString();
-        const documentMembers = await SimplParser(vscode.window.activeTextEditor.document);
+        const documentMembers = await SimplPlusParser(vscode.window.activeTextEditor.document);
         assert.strictEqual(documentMembers.length, 1);
         assert.strictEqual(documentMembers[0].name, "testStructure");
         assert.strictEqual(documentMembers[0].kind, vscode.CompletionItemKind.Struct);
@@ -169,7 +169,7 @@ suite("testing document tokenization", function () {
         await OpenAndShowSPlusDocument("INTEGER_FUNCTION testFunction(integer testParam)\n{\nstring STRING1[20];\n};");
         const document = vscode.window.activeTextEditor.document;
         const documentName = document.uri.toString();
-        const documentMembers = await SimplParser(vscode.window.activeTextEditor.document);
+        const documentMembers = await SimplPlusParser(vscode.window.activeTextEditor.document);
         assert.strictEqual(documentMembers.length, 1);
         assert.strictEqual(documentMembers[0].name, "testFunction");
         assert.strictEqual(documentMembers[0].kind, vscode.CompletionItemKind.Function);
@@ -217,7 +217,7 @@ suite("testing document tokenization", function () {
         await OpenAndShowSPlusDocument("callback INTEGER_FUNCTION testFunction()\n{\n};");
         const document = vscode.window.activeTextEditor.document;
         const documentName = document.uri.toString();
-        const documentMembers = await SimplParser(vscode.window.activeTextEditor.document);
+        const documentMembers = await SimplPlusParser(vscode.window.activeTextEditor.document);
         assert.strictEqual(documentMembers.length, 1);
         assert.strictEqual(documentMembers[0].name, "testFunction");
         assert.strictEqual(documentMembers[0].kind, vscode.CompletionItemKind.Function);
@@ -239,7 +239,7 @@ suite("testing document tokenization", function () {
         await OpenAndShowSPlusDocument("FUNCTION testFunction()\n{\n};");
         const document = vscode.window.activeTextEditor.document;
         const documentName = document.uri.toString();
-        const documentMembers = await SimplParser(vscode.window.activeTextEditor.document);
+        const documentMembers = await SimplPlusParser(vscode.window.activeTextEditor.document);
         assert.strictEqual(documentMembers.length, 1);
         assert.strictEqual(documentMembers[0].name, "testFunction");
         assert.strictEqual(documentMembers[0].kind, vscode.CompletionItemKind.Function);
@@ -261,7 +261,7 @@ suite("testing document tokenization", function () {
         await OpenAndShowSPlusDocument("eventHandler testFunction()\n{\n};");
         const document = vscode.window.activeTextEditor.document;
         const documentName = document.uri.toString();
-        const documentMembers = await SimplParser(vscode.window.activeTextEditor.document);
+        const documentMembers = await SimplPlusParser(vscode.window.activeTextEditor.document);
         assert.strictEqual(documentMembers.length, 1);
         assert.strictEqual(documentMembers[0].name, "testFunction");
         assert.strictEqual(documentMembers[0].kind, vscode.CompletionItemKind.Function);
@@ -304,7 +304,7 @@ suite("testing document tokenization", function () {
         await OpenAndShowSPlusDocument("push DigitalInput1\n{\nstring STRING1[20];\n};");
         const document = vscode.window.activeTextEditor.document;
         const documentName = document.uri.toString();
-        const documentMembers = await SimplParser(vscode.window.activeTextEditor.document);
+        const documentMembers = await SimplPlusParser(vscode.window.activeTextEditor.document);
         assert.strictEqual(documentMembers.length, 1);
         assert.strictEqual(documentMembers[0].name, "DigitalInput1");
         assert.strictEqual(documentMembers[0].kind, vscode.CompletionItemKind.Event);
@@ -337,7 +337,7 @@ suite("testing document tokenization", function () {
         await OpenAndShowSPlusDocument("socketStatus DigitalInput1\n{\n};");
         const document = vscode.window.activeTextEditor.document;
         const documentName = document.uri.toString();
-        const documentMembers = await SimplParser(vscode.window.activeTextEditor.document);
+        const documentMembers = await SimplPlusParser(vscode.window.activeTextEditor.document);
         assert.strictEqual(documentMembers.length, 1);
         assert.strictEqual(documentMembers[0].name, "DigitalInput1");
         assert.strictEqual(documentMembers[0].kind, vscode.CompletionItemKind.Event);
@@ -360,7 +360,7 @@ suite("testing document tokenization", function () {
         await OpenAndShowSPlusDocument("push DigitalInput1, DigitalInput2\nchange DigitalInput3\n{\n};");
         const document = vscode.window.activeTextEditor.document;
         const documentName = document.uri.toString();
-        const documentMembers = await SimplParser(vscode.window.activeTextEditor.document);
+        const documentMembers = await SimplPlusParser(vscode.window.activeTextEditor.document);
         assert.strictEqual(documentMembers.length, 3);
         assert.strictEqual(documentMembers[0].name, "DigitalInput1");
         assert.strictEqual(documentMembers[0].kind, vscode.CompletionItemKind.Event);

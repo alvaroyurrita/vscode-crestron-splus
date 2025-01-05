@@ -1,24 +1,25 @@
 import { workspace, Range, TextDocument, CompletionItemKind } from 'vscode';
-import { SimplObject } from '../base/simplObject';
+import { SimplPlusObject } from '../base/simplPlusObject';
 
-export async function ApiParser(apiFullPath: string): Promise<SimplObject[]> {
+//parses an API fle to create SimplObject hierarchy per class and enum
+export async function ApiParser(apiFullPath: string): Promise<SimplPlusObject[]> {
 
     //@ts-ignore
     const apiDocument = await workspace.openTextDocument(apiFullPath);
     const apiDocumentContent = apiDocument.getText();
     const apiClassesMatches = apiDocumentContent.matchAll(/class\s*([\w]*)\s*{([^}]*)/gm);
-    const apiClasses: SimplObject[] = [];
+    const apiClasses: SimplPlusObject[] = [];
     for (let apiClass of apiClassesMatches) {
         const classStart = apiDocument.positionAt(apiClass.index + apiClass[0].indexOf("{") + 1);
         const classEnd = apiDocument.positionAt(apiClass.index + apiClass[0].length);
         const classBodyRange = new Range(classStart, classEnd);
         const classNameRange = apiDocument.getWordRangeAtPosition(apiDocument.positionAt(apiClass.index + apiClass[0].indexOf(apiClass[1]))) ?? classBodyRange;
-        let delegates: SimplObject[] = [];
-        let events: SimplObject[] = [];
-        let functions: SimplObject[] = [];
-        let properties: SimplObject[] = [];
-        let variables: SimplObject[] = [];
-        let delegateProperties: SimplObject[] = [];
+        let delegates: SimplPlusObject[] = [];
+        let events: SimplPlusObject[] = [];
+        let functions: SimplPlusObject[] = [];
+        let properties: SimplPlusObject[] = [];
+        let variables: SimplPlusObject[] = [];
+        let delegateProperties: SimplPlusObject[] = [];
         const delegatesArea = apiClass[2].match(/class delegates([^\/]*)/m);
         if (delegatesArea && delegatesArea.index && delegatesArea[1]) {
             const delegatesStart = apiDocument.positionAt(apiDocument.offsetAt(classStart) + delegatesArea.index);
@@ -35,7 +36,7 @@ export async function ApiParser(apiFullPath: string): Promise<SimplObject[]> {
         }
         const functionsArea = apiClass[2].match(/class functions([^\/]*)/m);
         if (functionsArea && functionsArea.index && functionsArea[1]) {
-            const delegatesStart = apiDocument.positionAt(apiDocument.offsetAt(classStart) + functionsArea.index)
+            const delegatesStart = apiDocument.positionAt(apiDocument.offsetAt(classStart) + functionsArea.index);
             const delegatesEnd = apiDocument.positionAt(apiDocument.offsetAt(classStart) + functionsArea.index + functionsArea[0].length);
             const delegatesRange = new Range(delegatesStart, delegatesEnd);
             functions = getFunctions(delegatesRange, apiDocument);
@@ -56,14 +57,14 @@ export async function ApiParser(apiFullPath: string): Promise<SimplObject[]> {
             const propertiesRange = new Range(propertiesStart, propertiesEnd);
             properties = getProperties(propertiesRange, apiDocument);
         }
-        const children: SimplObject[] = [
+        const children: SimplPlusObject[] = [
             ...events,
             ...delegates,
             ...functions,
             ...variables,
             ...properties
         ];
-        const apiClassObject: SimplObject = {
+        const apiClassObject: SimplPlusObject = {
             name: apiClass[1],
             kind: CompletionItemKind.Class,
             nameRange: classNameRange,
@@ -77,14 +78,14 @@ export async function ApiParser(apiFullPath: string): Promise<SimplObject[]> {
         apiClasses.push(apiClassObject);
     }
     const apiEnumMatches = apiDocumentContent.matchAll(/enum\s*([\w]*)\s*{([^}]*)/gm);
-    const apiEnums: SimplObject[] = [];
+    const apiEnums: SimplPlusObject[] = [];
     for (let apiEnum of apiEnumMatches) {
         const enumStart = apiDocument.positionAt(apiEnum.index + apiEnum[0].indexOf("{") + 1);
         const enumEnd = apiDocument.positionAt(apiEnum.index + apiEnum[0].length);
         const enumBodyRange = new Range(enumStart, enumEnd);
         const enumNameRange = apiDocument.getWordRangeAtPosition(apiDocument.positionAt(apiEnum.index + apiEnum[0].indexOf(apiEnum[1]))) ?? enumBodyRange;
-        const enumMembers: SimplObject[] = [];
-        const enumObject: SimplObject = {
+        const enumMembers: SimplPlusObject[] = [];
+        const enumObject: SimplPlusObject = {
             name: apiEnum[1],
             kind: CompletionItemKind.Enum,
             nameRange: enumNameRange,
@@ -93,7 +94,7 @@ export async function ApiParser(apiFullPath: string): Promise<SimplObject[]> {
             children: enumMembers,
             uri: apiDocument.uri.toString(),
             dataTypeModifier: ""
-        }
+        };
         const enumMembersMatch = apiEnum[2].matchAll(/(\w*),/gm);
         for (let enumMember of enumMembersMatch) {
             const memberNameRange = apiDocument.getWordRangeAtPosition(apiDocument.positionAt(apiEnum.index + apiEnum[0].indexOf(enumMember[1]))) ?? enumBodyRange;
@@ -115,8 +116,8 @@ export async function ApiParser(apiFullPath: string): Promise<SimplObject[]> {
     return apiElements;
 }
 
-function getDelegates(delegatesArea: Range, document: TextDocument): SimplObject[] {
-    let delegates: SimplObject[] = [];
+function getDelegates(delegatesArea: Range, document: TextDocument): SimplPlusObject[] {
+    let delegates: SimplPlusObject[] = [];
     const delegatesText = document.getText(delegatesArea);
     const delegateMatches = delegatesText.matchAll(/delegate\s*([\w]*)\s*([\w]*)\s*\((.*)\)/gm);
     for (let delegateMatch of delegateMatches) {
@@ -127,7 +128,7 @@ function getDelegates(delegatesArea: Range, document: TextDocument): SimplObject
         const parametersEnd = document.positionAt(document.offsetAt(delegatesArea.start) + delegateMatch.index + delegateMatch[0].indexOf(")") + 1);
         const parametersRange = new Range(parameterStart, parametersEnd);
         const parameters = getParameters(parametersRange, document);
-        const delegate: SimplObject ={
+        const delegate: SimplPlusObject ={
             name: delegateMatch[2],
             kind: CompletionItemKind.Class,
             nameRange,
@@ -142,8 +143,8 @@ function getDelegates(delegatesArea: Range, document: TextDocument): SimplObject
     return delegates;
 }
 
-function getEvents(eventsArea: Range, document: TextDocument): SimplObject[] {
-    let events: SimplObject[] = [];
+function getEvents(eventsArea: Range, document: TextDocument): SimplPlusObject[] {
+    let events: SimplPlusObject[] = [];
     const eventsText = document.getText(eventsArea);
     const eventMatches = eventsText.matchAll(/EventHandler\s*([\w]*)\s*\((.*)\)/gm);
     for (let eventMatch of eventMatches) {
@@ -154,7 +155,7 @@ function getEvents(eventsArea: Range, document: TextDocument): SimplObject[] {
         const parametersEnd = document.positionAt(document.offsetAt(eventsArea.start) + eventMatch.index + eventMatch[0].indexOf(")") + 1);
         const parametersRange = new Range(parameterStart, parametersEnd);
         const parameters = getParameters(parametersRange, document);
-        const event: SimplObject ={
+        const event: SimplPlusObject ={
             name: eventMatch[1],
             kind: CompletionItemKind.Event,
             nameRange,
@@ -169,8 +170,8 @@ function getEvents(eventsArea: Range, document: TextDocument): SimplObject[] {
     return events;
 }
 
-function getFunctions(functionsArea: Range, document: TextDocument): SimplObject[] {
-    let functions: SimplObject[] = [];
+function getFunctions(functionsArea: Range, document: TextDocument): SimplPlusObject[] {
+    let functions: SimplPlusObject[] = [];
     const functionsText = document.getText(functionsArea);
     const functionMatches = functionsText.matchAll(/([\w]*)\s*([\w]*)\s*\((.*)\)/gm);
     for (let functionMatch of functionMatches) {
@@ -181,7 +182,7 @@ function getFunctions(functionsArea: Range, document: TextDocument): SimplObject
         const parametersEnd = document.positionAt(document.offsetAt(functionsArea.start) + functionMatch.index + functionMatch[0].indexOf(")") + 1);
         const parametersRange = new Range(parameterStart, parametersEnd);
         const parameters = getParameters(parametersRange, document);
-        const func: SimplObject ={
+        const func: SimplPlusObject ={
             name: functionMatch[2],
             kind: CompletionItemKind.Function,
             nameRange,
@@ -189,15 +190,15 @@ function getFunctions(functionsArea: Range, document: TextDocument): SimplObject
             dataType: functionMatch[1],
             dataTypeModifier: "",
             uri: document.uri.toString(),
-        }
+        };
         parameters.forEach(p=>p.parent=func);
         functions.push(func);
     }
     return functions;
 }
 
-function getVariables(variablesArea: Range, document: TextDocument): SimplObject[] {
-    let variables: SimplObject[] = [];
+function getVariables(variablesArea: Range, document: TextDocument): SimplPlusObject[] {
+    let variables: SimplPlusObject[] = [];
     const variablesText = document.getText(variablesArea);
     const variablesMatches = variablesText.matchAll(/([\w]*)\s*([\w]*)\s*(?:\[,*\])?;/gm);
     for (let variableMatch of variablesMatches) {
@@ -217,8 +218,8 @@ function getVariables(variablesArea: Range, document: TextDocument): SimplObject
     return variables;
 }
 
-function getProperties(propertiesArea: Range, document: TextDocument): SimplObject[] {
-    let properties: SimplObject[] = [];
+function getProperties(propertiesArea: Range, document: TextDocument): SimplPlusObject[] {
+    let properties: SimplPlusObject[] = [];
     const variablesText = document.getText(propertiesArea);
     const propertyMatches = variablesText.matchAll(/(\w*)?\s*(\w*)\s*(\w*\s*(?:\[,*\])?)\s*;/gm);
     for (let propertyMatch of propertyMatches) {
@@ -246,8 +247,8 @@ function getProperties(propertiesArea: Range, document: TextDocument): SimplObje
 
 
 
-function getParameters(parameterArea: Range, document: TextDocument): SimplObject[] {
-    let parameters: SimplObject[] = [];
+function getParameters(parameterArea: Range, document: TextDocument): SimplPlusObject[] {
+    let parameters: SimplPlusObject[] = [];
     const parametersText = document.getText(parameterArea);
 
     const parameterMatches = parametersText.matchAll(/(?<=[\,\(])\s*([\w]*)?\s*([\w]*)\s*([\w]*)\s*(?=[\,\)])/gm);

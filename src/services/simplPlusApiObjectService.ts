@@ -11,8 +11,8 @@ import {
     extensions,
     RelativePattern,
 } from "vscode";
-import { provideClassTokens } from "../helpers/apiParser.temp";
-import { SimplObject } from "./simplObject";
+import { ApiParser } from "../helpers/apiParser";
+import { SimplPlusObject } from "../base/simplPlusObject";
 import { join } from "path";
 import * as fs from "fs";
 
@@ -24,20 +24,20 @@ import * as fs from "fs";
 //  The service will provide all tokens from all reference clz per usp document uri.
 //  Token will be generated using the apiParser library that needs an API path to generate document tokens.
 
-export class ApiTokenService implements Disposable {
+export class simplPlusApiObjectService implements Disposable {
     //Stores that watchers for a specific parent folder  where the .CLZ libraries are stored
     private _watchers = new Map<string, FileSystemWatcher>();
     //Stores tokens for a specific .CLZ Library
-    private _apis = new Map<string, SimplObject[]>();
+    private _apis = new Map<string, SimplPlusObject[]>();
     //stores the documents that need api tokens.
     private _documents = new Map<string, string[]>();
-    private static _instance: ApiTokenService;
+    private static _instance: simplPlusApiObjectService;
     private selector: DocumentSelector = 'simpl-plus';
-    public static getInstance(ctx: ExtensionContext): ApiTokenService {
-        if (!ApiTokenService._instance) {
-            ApiTokenService._instance = new ApiTokenService(ctx);
+    public static getInstance(ctx: ExtensionContext): simplPlusApiObjectService {
+        if (!simplPlusApiObjectService._instance) {
+            simplPlusApiObjectService._instance = new simplPlusApiObjectService(ctx);
         }
-        return ApiTokenService._instance;
+        return simplPlusApiObjectService._instance;
     }
 
     private constructor(ctx: ExtensionContext) {
@@ -59,8 +59,8 @@ export class ApiTokenService implements Disposable {
         this._watchers.clear();
     }
 
-    public getTokens(uri: Uri): SimplObject[] {
-        const documentTokens: SimplObject[] = [];
+    public getObjects(uri: Uri): SimplPlusObject[] {
+        const documentTokens: SimplPlusObject[] = [];
         this._documents.get(uri.toString())?.forEach((library) => {
             const tokens = this._apis.get(library);
             if (tokens) {
@@ -130,7 +130,7 @@ export class ApiTokenService implements Disposable {
                 }
                 //generate API Tokens
                 const apiFile = join(documentParentFolder, "SPlsWork", library + ".api");
-                const apiTokens = await provideClassTokens(apiFile);
+                const apiTokens = await ApiParser(apiFile);
                 this._apis.set(CLZFullPath, apiTokens);
             }
         };
@@ -159,7 +159,7 @@ export class ApiTokenService implements Disposable {
         }
         // and store them
         const apiFile = join(documentParentFolder, "SPlsWork", library + ".api");
-        const apiTokens = await provideClassTokens(apiFile);
+        const apiTokens = await ApiParser(apiFile);
         this._apis.set(CLZPath, apiTokens);
     }
 

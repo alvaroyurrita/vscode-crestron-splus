@@ -1,11 +1,11 @@
 import { ApiParser } from "../../helpers/apiParser";
 import * as vscode from 'vscode';
 import * as assert from 'assert';
-import { SimplObject } from "../../base/simplObject";
+import { SimplPlusObject } from "../../base/simplPlusObject";
 
 suite("With api Parser", function () {
-    let apiMembers: SimplObject[];
-    const uri = "file:///c%3A/ExtensionDevelopment/SimplPlusExtension/vscode-crestron-splus/testWorkspace/apiParserTestFile.api"
+    let apiMembers: SimplPlusObject[];
+    const uri = "file:///c%3A/ExtensionDevelopment/SimplPlusExtension/vscode-crestron-splus/testWorkspace/apiParserTestFile.api";
     suiteSetup(async function (){
         const workSpaceDir = vscode.workspace.workspaceFolders?.[0].uri.fsPath;
         const apiFile = workSpaceDir + "\\apiParserTestFile.api";

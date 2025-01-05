@@ -12,18 +12,18 @@ import {
     window,
     CompletionItemLabel,
 } from "vscode";
-import { SimplPlusKeywordHelpService } from "./services/simplPlusKeywordHelpService.temp";
+import { SimplPlusKeywordHelpService } from "./services/simplPlusKeywordHelpService";
 import { KeywordService, KeywordType } from "./services/keywordService";
-import { TokenService } from "./services/tokenService.temp";
-import { SimplObject } from "./services/simplObject";
+import { SimplPlusProjectObjectService } from "./services/simplPlusProjectObjectService";
+import { SimplPlusObject } from "./base/simplPlusObject";
 
 export class SimplPlusCompletionProvider implements CompletionItemProvider {
     private _keywordService: KeywordService;
-    private _tokenService: TokenService;
+    private _projectObjectService: SimplPlusProjectObjectService;
 
-    constructor(keywordService: KeywordService, tokenService: TokenService) {
+    constructor(keywordService: KeywordService, projectObjectService: SimplPlusProjectObjectService) {
         this._keywordService = keywordService;
-        this._tokenService = tokenService;
+        this._projectObjectService = projectObjectService;
     }
 
     public provideCompletionItems(
@@ -33,7 +33,7 @@ export class SimplPlusCompletionProvider implements CompletionItemProvider {
         context: CompletionContext):
         ProviderResult<CompletionItem[]> {
         const uri = document.uri;
-        const currentBlock = this._tokenService.getObjectAtPosition(uri, position);
+        const currentBlock = this._projectObjectService.getProgramObjectAtPosition(uri, position);
         if (currentBlock === undefined) {
             const lineUntilPosition = document.lineAt(position.line).text.slice(0, position.character);
             if (lineUntilPosition.toLowerCase().match(/(push|release|change|event)/)) {
@@ -45,25 +45,24 @@ export class SimplPlusCompletionProvider implements CompletionItemProvider {
                 return socketVariables;
             }
             const completionItems = this.getRootKeywords(uri);
-            const rootVariables = this.getExternalVariable(uri);
+            const rootVariables = this.getProjectRootObjects(uri);
             return completionItems.concat(rootVariables);
         }
         switch (currentBlock.kind) {
             case CompletionItemKind.Event:
             case CompletionItemKind.Function:
-                if (this._tokenService.isAtParameterRange(uri, position)) {
+                if (this._projectObjectService.isPositionAtFunctionParameter(currentBlock, position)) {
                     const parameterKeywords = this.getParameterKeywords(uri);
                     return parameterKeywords;
                 }
-                const externalVariables = this.getExternalVariable(uri);
                 let functionKeywords = this.getFunctionKeywords();
-                const internalRootVariables = this.getInternalRootVariables(uri);
+                const projectRootObjects = this.getProjectRootObjects(uri);
                 const functionVariables = this.getFunctionVariables(currentBlock);
                 const lineUntilPosition = document.lineAt(position.line).text.slice(0, position.character);
                 if (lineUntilPosition.match(/[\=\(\[]/)) {
                     functionKeywords = this.getExpressionKeywords();
                 }
-                return functionVariables.concat(externalVariables).concat(functionKeywords).concat(internalRootVariables);
+                return functionVariables.concat(functionKeywords).concat(projectRootObjects);
             case CompletionItemKind.Struct:
                 const structureKeywords = this.getStructureKeywords();
                 //structures can have other nested structures or classes as structure members;
@@ -77,7 +76,7 @@ export class SimplPlusCompletionProvider implements CompletionItemProvider {
         return new Promise(async resolve => {
             const uri = window.activeTextEditor?.document.uri;
             const itemLabel = typeof item.label === "string" ? item.label : item.label.label;
-            let functionInfo = this._tokenService.getFunctionInfo(uri, itemLabel);
+            let functionInfo = this._projectObjectService.getFunctionInfo(uri, itemLabel);
             if (functionInfo === undefined) {
                 const keyword = this._keywordService.getKeyword(itemLabel);
                 if (keyword === undefined || !keyword.hasHelp) { resolve(item); return; }
@@ -92,8 +91,9 @@ export class SimplPlusCompletionProvider implements CompletionItemProvider {
             }
             else {
                 let functionDocs = `${functionInfo.dataType} ${functionInfo.name}(`;
-                if (functionInfo.parameters.length > 0) {
-                    functionDocs += functionInfo.parameters.map(p => `${p.dataType} ${p.name}`).join(", ");
+                const functionParams = functionInfo.children.filter(ch=>ch.kind===CompletionItemKind.TypeParameter);
+                if (functionParams.length > 0) {
+                    functionDocs += functionParams.map(p => `${p.dataType} ${p.name}`).join(", ");
                 }
                 functionDocs += ")";
                 const functionLabel: CompletionItemLabel = {
@@ -106,31 +106,30 @@ export class SimplPlusCompletionProvider implements CompletionItemProvider {
         });
     }
     private getInternalInputVariables(uri: Uri): CompletionItem[] {
-        const documentItems = this._tokenService.getDocumentMembers(uri);
+        const documentItems = this._projectObjectService.getProjectObjects(uri);
         if (documentItems === undefined) {
             return [];
         }
-        const thisDocument = documentItems.find(di => di.uri === uri.toString());
-        const items = thisDocument.internalVariables.filter(di => di.dataType.toLowerCase().match(/input/));
-        return this._tokenService.getCompletionItemsFromDocumentTokens(items);
+        const thisDocument = documentItems.filter(di => di.uri === uri.toString() && di.kind===CompletionItemKind.Variable);
+        const items = thisDocument.filter(di => di.dataType.toLowerCase().match(/input/));
+        return this._projectObjectService.getCompletionItemsFromObjects(items);
     }
     private getInternalSocketVariables(uri: Uri): CompletionItem[] {
-        const documentItems = this._tokenService.getDocumentMembers(uri);
+        const documentItems = this._projectObjectService.getProjectObjects(uri);
         if (documentItems === undefined) {
             return [];
         }
-        const thisDocument = documentItems.find(di => di.uri === uri.toString());
-        const items = thisDocument.internalVariables.filter(di => di.dataType.toLowerCase().match(/(tcp_client|tcp_server|udp_socket)/));
-        return this._tokenService.getCompletionItemsFromDocumentTokens(items);
+        const thisDocument = documentItems.filter(di => di.uri === uri.toString() && di.kind===CompletionItemKind.Variable);
+        const items = thisDocument.filter(di => di.dataType.toLowerCase().match(/(tcp_client|tcp_server|udp_socket)/));
+        return this._projectObjectService.getCompletionItemsFromObjects(items);
     }
     private getInternalStructureVariables(uri: Uri): CompletionItem[] {
-        const documentItems = this._tokenService.getDocumentMembers(uri);
+        const documentItems = this._projectObjectService.getProjectObjects(uri);
         if (documentItems === undefined) {
             return [];
         }
-        const thisDocument = documentItems.find(di => di.uri === uri.toString());
-        const structureVariables = thisDocument.internalStructures;
-        return this._tokenService.getCompletionItemsFromDocumentTokens(structureVariables);
+        const structureVariables = documentItems.filter(di => di.uri === uri.toString() && di.kind===CompletionItemKind.Struct);
+        return this._projectObjectService.getCompletionItemsFromObjects(structureVariables);
     }
     private getExpressionKeywords(): CompletionItem[] {
         const functionKeyword: KeywordType[] = [
@@ -170,10 +169,10 @@ export class SimplPlusCompletionProvider implements CompletionItemProvider {
         const keywordDefinitions = this._keywordService.getKeywords(functionKeyword);
         return this._keywordService.getCompletionItemsFromKeywords(keywordDefinitions);
     }
-    private getFunctionVariables(functionToken: SimplObject): CompletionItem[] {
-        const functionVariables = this._tokenService.getCompletionItemsFromDocumentTokens(functionToken.internalVariables);
-        const functionParameters = this._tokenService.getCompletionItemsFromDocumentTokens(functionToken.parameters);
-        return functionVariables.concat(functionParameters);
+
+    //provides function variables and parameters
+    private getFunctionVariables(functionToken: SimplPlusObject): CompletionItem[] {
+        return this._projectObjectService.getCompletionItemsFromObjects(functionToken.children);
     }
     private getRootKeywords(uri: Uri): CompletionItem[] {
         const rootKeywords: KeywordType[] = [
@@ -193,33 +192,12 @@ export class SimplPlusCompletionProvider implements CompletionItemProvider {
         const keywordDefinitions = this._keywordService.getKeywords(rootKeywords);
         return this._keywordService.getCompletionItemsFromKeywords(keywordDefinitions);
     }
-    private getExternalVariable(uri: Uri): CompletionItem[] {
-        const documentItems = this._tokenService.getDocumentMembers(uri);
+    private getProjectRootObjects(uri: Uri): CompletionItem[] {
+        const documentItems = this._projectObjectService.getProjectObjects(uri);
         if (documentItems === undefined) {
             return [];
         }
-        //get all other documents that are not current one
-        const externalDocuments = documentItems.filter(di => di.uri !== uri.toString());
-
-        const items = this._tokenService.getCompletionItemsFromDocumentTokens(externalDocuments);
+        const items = this._projectObjectService.getCompletionItemsFromObjects(documentItems);
         return items;
     }
-
-    private getInternalRootVariables(uri: Uri): CompletionItem[] {
-        const documentItems = this._tokenService.getDocumentMembers(uri);
-        if (documentItems === undefined) {
-            return [];
-        }
-        const internalDocument = documentItems.find(di => di.uri === uri.toString());
-        let rootVariables: SimplObject[] = [];
-        rootVariables.push(...internalDocument.internalVariables);
-        rootVariables.push(...internalDocument.internalConstants);
-        rootVariables.push(...internalDocument.internalFunctions);
-        rootVariables.push(...internalDocument.internalStructures);
-
-        const items = this._tokenService.getCompletionItemsFromDocumentTokens(rootVariables);
-        return items;
-    }
-
-
 }

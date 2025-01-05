@@ -1,7 +1,7 @@
 import { Range, CompletionItemKind } from "vscode";
 
 
-export type SimplObject = {
+export type SimplPlusObject = {
     name: string;
     kind: CompletionItemKind;
     nameRange: Range;
@@ -9,6 +9,6 @@ export type SimplObject = {
     dataTypeModifier: string;
     uri: string;
     blockRange?: Range;
-    parent?: SimplObject;
-    children: SimplObject[];
+    parent?: SimplPlusObject;
+    children: SimplPlusObject[];
 }

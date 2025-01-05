@@ -1,6 +1,6 @@
 import { MarkdownString, CompletionItemKind } from 'vscode';
 import * as https from 'https';
-import { SimplObject } from '../base/simplObject';
+import { SimplPlusObject } from '../base/simplPlusObject';
 const { convert } = require('html-to-text');
 
 export class SimplPlusKeywordHelpService {
@@ -78,10 +78,10 @@ export class SimplPlusKeywordHelpService {
         }
     }
 
-    public GetFunctionInfoFromHelp(itemLabel: string, helpMarkDownString: MarkdownString): SimplObject {
+    public GetFunctionInfoFromHelp(itemLabel: string, helpMarkDownString: MarkdownString): SimplPlusObject {
         itemLabel = itemLabel.trim();
         const helpContentString = convert(helpMarkDownString.value, { wordwrap: false }) as string;
-        const functionToken: SimplObject = {
+        const functionToken: SimplPlusObject = {
             name: itemLabel,
             kind: CompletionItemKind.Function,
             nameRange: null,
