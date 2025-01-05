@@ -1,8 +1,7 @@
-import { workspace, Uri, Range, TextDocument, CompletionItemKind } from 'vscode';
+import { workspace, Range, TextDocument, CompletionItemKind } from 'vscode';
 import { SimplObject } from '../services/simplObject';
 
-
-export async function provideClassTokens(apiFullPath: string): Promise<SimplObject[]> {
+export async function ApiParser(apiFullPath: string): Promise<SimplObject[]> {
 
     //@ts-ignore
     const apiDocument = await workspace.openTextDocument(apiFullPath);
@@ -13,7 +12,7 @@ export async function provideClassTokens(apiFullPath: string): Promise<SimplObje
         const classStart = apiDocument.positionAt(apiClass.index + apiClass[0].indexOf("{") + 1);
         const classEnd = apiDocument.positionAt(apiClass.index + apiClass[0].length);
         const classBodyRange = new Range(classStart, classEnd);
-        const classNameRange = apiDocument.getWordRangeAtPosition(apiDocument.positionAt(apiClass.index + apiClass[0].indexOf(apiClass[1])));
+        const classNameRange = apiDocument.getWordRangeAtPosition(apiDocument.positionAt(apiClass.index + apiClass[0].indexOf(apiClass[1]))) ?? classBodyRange;
         let delegates: SimplObject[] = [];
         let events: SimplObject[] = [];
         let functions: SimplObject[] = [];
@@ -21,21 +20,21 @@ export async function provideClassTokens(apiFullPath: string): Promise<SimplObje
         let variables: SimplObject[] = [];
         let delegateProperties: SimplObject[] = [];
         const delegatesArea = apiClass[2].match(/class delegates([^\/]*)/m);
-        if (delegatesArea && delegatesArea[1]) {
+        if (delegatesArea && delegatesArea.index && delegatesArea[1]) {
             const delegatesStart = apiDocument.positionAt(apiDocument.offsetAt(classStart) + delegatesArea.index);
             const delegatesEnd = apiDocument.positionAt(apiDocument.offsetAt(classStart) + delegatesArea.index + delegatesArea[0].length);
             const delegatesRange = new Range(delegatesStart, delegatesEnd);
             delegates = getDelegates(delegatesRange, apiDocument);
         }
         const eventsArea = apiClass[2].match(/class events([^\/]*)/m);
-        if (eventsArea && eventsArea[1]) {
+        if (eventsArea && eventsArea.index && eventsArea[1]) {
             const eventsStart = apiDocument.positionAt(apiDocument.offsetAt(classStart) + eventsArea.index);
             const eventsEnd = apiDocument.positionAt(apiDocument.offsetAt(classStart) + eventsArea.index + eventsArea[0].length);
             const eventsRange = new Range(eventsStart, eventsEnd);
             events = getEvents(eventsRange, apiDocument);
         }
         const functionsArea = apiClass[2].match(/class functions([^\/]*)/m);
-        if (functionsArea && functionsArea[1]) {
+        if (functionsArea && functionsArea.index && functionsArea[1]) {
             const delegatesStart = apiDocument.positionAt(apiDocument.offsetAt(classStart) + functionsArea.index)
             const delegatesEnd = apiDocument.positionAt(apiDocument.offsetAt(classStart) + functionsArea.index + functionsArea[0].length);
             const delegatesRange = new Range(delegatesStart, delegatesEnd);
@@ -43,7 +42,7 @@ export async function provideClassTokens(apiFullPath: string): Promise<SimplObje
         }
 
         const variablesArea = apiClass[2].match(/class variables([^\/]*)/m);
-        if (variablesArea && variablesArea[1]) {
+        if (variablesArea && variablesArea.index && variablesArea[1]) {
             const variablesStart = apiDocument.positionAt(apiDocument.offsetAt(classStart) + variablesArea.index);
             const variablesEnd = apiDocument.positionAt(apiDocument.offsetAt(classStart) + variablesArea.index + variablesArea[0].length);
             const variablesRange = new Range(variablesStart, variablesEnd);
@@ -51,28 +50,31 @@ export async function provideClassTokens(apiFullPath: string): Promise<SimplObje
         }
 
         const propertiesArea = apiClass[2].match(/class properties([^\}]*)/m);
-        if (propertiesArea && propertiesArea[1]) {
+        if (propertiesArea && propertiesArea.index && propertiesArea[1]) {
             const propertiesStart = apiDocument.positionAt(apiDocument.offsetAt(classStart) + propertiesArea.index);
             const propertiesEnd = apiDocument.positionAt(apiDocument.offsetAt(classStart) + propertiesArea.index + propertiesArea[0].length);
             const propertiesRange = new Range(propertiesStart, propertiesEnd);
             properties = getProperties(propertiesRange, apiDocument);
-            delegateProperties = getDelegateProperties(propertiesRange, apiDocument);
         }
-
-        apiClasses.push({
+        const children: SimplObject[] = [
+            ...events,
+            ...delegates,
+            ...functions,
+            ...variables,
+            ...properties
+        ];
+        const apiClassObject: SimplObject = {
             name: apiClass[1],
             kind: CompletionItemKind.Class,
             nameRange: classNameRange,
             dataType: "class",
             blockRange: classBodyRange,
-            internalDelegates: delegates,
-            internalEvents: events,
-            internalFunctions: functions,
-            internalVariables: variables,
-            internalProperties: properties,
-            internalDelegateProperties: delegateProperties,
-            uri: apiDocument.uri.toString()
-        });
+            children,
+            uri: apiDocument.uri.toString(),
+            dataTypeModifier: ""
+        };
+        apiClassObject.children.forEach(c => c.parent = apiClassObject );
+        apiClasses.push(apiClassObject);
     }
     const apiEnumMatches = apiDocumentContent.matchAll(/enum\s*([\w]*)\s*{([^}]*)/gm);
     const apiEnums: SimplObject[] = [];
@@ -80,33 +82,38 @@ export async function provideClassTokens(apiFullPath: string): Promise<SimplObje
         const enumStart = apiDocument.positionAt(apiEnum.index + apiEnum[0].indexOf("{") + 1);
         const enumEnd = apiDocument.positionAt(apiEnum.index + apiEnum[0].length);
         const enumBodyRange = new Range(enumStart, enumEnd);
-        const enumNameRange = apiDocument.getWordRangeAtPosition(apiDocument.positionAt(apiEnum.index + apiEnum[0].indexOf(apiEnum[1])));
+        const enumNameRange = apiDocument.getWordRangeAtPosition(apiDocument.positionAt(apiEnum.index + apiEnum[0].indexOf(apiEnum[1]))) ?? enumBodyRange;
         const enumMembers: SimplObject[] = [];
-        const enumMembersMatch = apiEnum[2].matchAll(/(\w*),/gm);
-        for (let enumMember of enumMembersMatch) {
-            const memberNameRange = apiDocument.getWordRangeAtPosition(apiDocument.positionAt(apiEnum.index + apiEnum[0].indexOf(enumMember[1])));
-            enumMembers.push({
-                name: enumMember[1],
-                kind: CompletionItemKind.EnumMember,
-                nameRange: memberNameRange,
-                dataType: apiEnum[1] + "." + enumMember[1]
-            });
-        }
-        apiEnums.push({
+        const enumObject: SimplObject = {
             name: apiEnum[1],
             kind: CompletionItemKind.Enum,
             nameRange: enumNameRange,
             dataType: "enum",
             blockRange: enumBodyRange,
-            internalVariables: enumMembers,
-            uri: apiDocument.uri.toString()
-        });
+            children: enumMembers,
+            uri: apiDocument.uri.toString(),
+            dataTypeModifier: ""
+        }
+        const enumMembersMatch = apiEnum[2].matchAll(/(\w*),/gm);
+        for (let enumMember of enumMembersMatch) {
+            const memberNameRange = apiDocument.getWordRangeAtPosition(apiDocument.positionAt(apiEnum.index + apiEnum[0].indexOf(enumMember[1]))) ?? enumBodyRange;
+            enumMembers.push({
+                name: enumMember[1],
+                kind: CompletionItemKind.EnumMember,
+                nameRange: memberNameRange,
+                dataType: apiEnum[1] + "." + enumMember[1],
+                dataTypeModifier: "",
+                children: [],
+                uri: apiDocument.uri.toString(),
+                parent: enumObject
+            });
+        }
+        enumObject.children = enumMembers;
+        apiEnums.push(enumObject);
     }
     const apiElements = apiClasses.concat(apiEnums);
     return apiElements;
 }
-
-
 
 function getDelegates(delegatesArea: Range, document: TextDocument): SimplObject[] {
     let delegates: SimplObject[] = [];
@@ -115,18 +122,22 @@ function getDelegates(delegatesArea: Range, document: TextDocument): SimplObject
     for (let delegateMatch of delegateMatches) {
         const nameRange = document.getWordRangeAtPosition(
             document.positionAt(document.offsetAt(delegatesArea.start) + delegateMatch.index + delegateMatch[0].indexOf(delegateMatch[2]))
-        );
+        ) ?? delegatesArea;
         const parameterStart = document.positionAt(document.offsetAt(delegatesArea.start) + delegateMatch.index + delegateMatch[0].indexOf("("));
         const parametersEnd = document.positionAt(document.offsetAt(delegatesArea.start) + delegateMatch.index + delegateMatch[0].indexOf(")") + 1);
         const parametersRange = new Range(parameterStart, parametersEnd);
         const parameters = getParameters(parametersRange, document);
-        delegates.push({
+        const delegate: SimplObject ={
             name: delegateMatch[2],
-            kind: CompletionItemKind.Method,
+            kind: CompletionItemKind.Class,
             nameRange,
             dataType: delegateMatch[1],
-            parameters
-        });
+            children: parameters,
+            dataTypeModifier: "delegate",
+            uri: document.uri.toString()
+        };
+        parameters.forEach(p=>p.parent=delegate);
+        delegates.push(delegate);
     }
     return delegates;
 }
@@ -138,18 +149,22 @@ function getEvents(eventsArea: Range, document: TextDocument): SimplObject[] {
     for (let eventMatch of eventMatches) {
         const nameRange = document.getWordRangeAtPosition(
             document.positionAt(document.offsetAt(eventsArea.start) + eventMatch.index + eventMatch[0].indexOf(eventMatch[1]))
-        );
+        ) ?? eventsArea;
         const parameterStart = document.positionAt(document.offsetAt(eventsArea.start) + eventMatch.index + eventMatch[0].indexOf("("));
         const parametersEnd = document.positionAt(document.offsetAt(eventsArea.start) + eventMatch.index + eventMatch[0].indexOf(")") + 1);
         const parametersRange = new Range(parameterStart, parametersEnd);
         const parameters = getParameters(parametersRange, document);
-        events.push({
+        const event: SimplObject ={
             name: eventMatch[1],
             kind: CompletionItemKind.Event,
             nameRange,
-            parameters,
-            dataType: "EventHandler"
-        });
+            children: parameters,
+            dataTypeModifier: "EventHandler",
+            dataType: "void",
+            uri: document.uri.toString()
+        };
+        parameters.forEach(p=>p.parent=event);
+        events.push(event);
     }
     return events;
 }
@@ -161,18 +176,22 @@ function getFunctions(functionsArea: Range, document: TextDocument): SimplObject
     for (let functionMatch of functionMatches) {
         const nameRange = document.getWordRangeAtPosition(
             document.positionAt(document.offsetAt(functionsArea.start) + functionMatch.index + functionMatch[0].indexOf(functionMatch[2]))
-        );
+        ) ?? functionsArea;
         const parameterStart = document.positionAt(document.offsetAt(functionsArea.start) + functionMatch.index + functionMatch[0].indexOf("("));
         const parametersEnd = document.positionAt(document.offsetAt(functionsArea.start) + functionMatch.index + functionMatch[0].indexOf(")") + 1);
         const parametersRange = new Range(parameterStart, parametersEnd);
         const parameters = getParameters(parametersRange, document);
-        functions.push({
+        const func: SimplObject ={
             name: functionMatch[2],
             kind: CompletionItemKind.Function,
             nameRange,
-            parameters,
-            dataType: functionMatch[1]
-        });
+            children: parameters,
+            dataType: functionMatch[1],
+            dataTypeModifier: "",
+            uri: document.uri.toString(),
+        }
+        parameters.forEach(p=>p.parent=func);
+        functions.push(func);
     }
     return functions;
 }
@@ -184,12 +203,15 @@ function getVariables(variablesArea: Range, document: TextDocument): SimplObject
     for (let variableMatch of variablesMatches) {
         const nameRange = document.getWordRangeAtPosition(
             document.positionAt(document.offsetAt(variablesArea.start) + variableMatch.index + variableMatch[0].indexOf(variableMatch[2]))
-        );
+        ) ?? variablesArea;
         variables.push({
             name: variableMatch[2],
             kind: CompletionItemKind.Variable,
             nameRange,
-            dataType: variableMatch[1]
+            dataType: variableMatch[1],
+            children: [],
+            dataTypeModifier: "",
+            uri: document.uri.toString(),
         });
     }
     return variables;
@@ -200,37 +222,29 @@ function getProperties(propertiesArea: Range, document: TextDocument): SimplObje
     const variablesText = document.getText(propertiesArea);
     const propertyMatches = variablesText.matchAll(/(\w*)?\s*(\w*)\s*(\w*\s*(?:\[,*\])?)\s*;/gm);
     for (let propertyMatch of propertyMatches) {
-        if (propertyMatch[1] !== undefined) { continue; };
+        let dataTypeModifier = propertyMatch[1];
+        let dataType = propertyMatch[2];
+        let name = propertyMatch[3];
+        if (propertyMatch[1] === undefined) {
+            dataTypeModifier = "";
+        };
         const nameRange = document.getWordRangeAtPosition(
-            document.positionAt(document.offsetAt(propertiesArea.start) + propertyMatch.index + propertyMatch[0].indexOf(propertyMatch[3]))
-        );
+            document.positionAt(document.offsetAt(propertiesArea.start) + propertyMatch.index + propertyMatch[0].indexOf(name))
+        ) ?? propertiesArea;
         properties.push({
-            name: propertyMatch[3],
+            name,
             kind: CompletionItemKind.Property,
             nameRange,
-            dataType: propertyMatch[2]
+            dataType,
+            dataTypeModifier,
+            children: [],
+            uri: document.uri.toString(),
         });
     }
     return properties;
 }
 
-function getDelegateProperties(delegatePropertiesArea: Range, document: TextDocument): SimplObject[] {
-    let delegateProperties: SimplObject[] = [];
-    const delegatePropertiesText = document.getText(delegatePropertiesArea);
-    const delegatePropertyMatches = delegatePropertiesText.matchAll(/(?:DelegateProperty\s*)(\w*)\s*(\w*\s*(?:\[,*\])?)\s*;/gm);
-    for (let delegatePropertyMatch of delegatePropertyMatches) {
-        const nameRange = document.getWordRangeAtPosition(
-            document.positionAt(document.offsetAt(delegatePropertiesArea.start) + delegatePropertyMatch.index + delegatePropertyMatch[0].indexOf(delegatePropertyMatch[2]))
-        );
-        delegateProperties.push({
-            name: delegatePropertyMatch[2],
-            kind: CompletionItemKind.Property,
-            nameRange,
-            dataType: delegatePropertyMatch[1]
-        });
-    }
-    return delegateProperties;
-}
+
 
 function getParameters(parameterArea: Range, document: TextDocument): SimplObject[] {
     let parameters: SimplObject[] = [];
@@ -238,16 +252,20 @@ function getParameters(parameterArea: Range, document: TextDocument): SimplObjec
 
     const parameterMatches = parametersText.matchAll(/(?<=[\,\(])\s*([\w]*)?\s*([\w]*)\s*([\w]*)\s*(?=[\,\)])/gm);
     for (let parameterMatch of parameterMatches) {
-        if (parameterMatch[0].trim() === "") {continue;}
+        if (parameterMatch[0].trim() === "") { continue; }
         let typeIndex = (parameterMatch[3] === "") ? 1 : 2;
         const nameRange = document.getWordRangeAtPosition(
             document.positionAt(document.offsetAt(parameterArea.start) + parameterMatch.index + parameterMatch[0].indexOf(parameterMatch[typeIndex + 1]))
-        );
+        ) ?? parameterArea;
         parameters.push({
             name: parameterMatch[typeIndex + 1].trim(),
-            kind: CompletionItemKind.Variable,
+            kind: CompletionItemKind.TypeParameter,
             dataType: parameterMatch[typeIndex].trim(),
-            nameRange,
+            blockRange: parameterArea,
+            children: [],
+            dataTypeModifier: "",
+            uri: document.uri.toString(),
+            nameRange: nameRange
         });
     }
     return parameters;

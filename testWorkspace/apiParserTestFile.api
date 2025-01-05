@@ -19,19 +19,10 @@ namespace SampleSimplSharpLibrary;
         DelegateProperty SampleDelegate SampleDelegateProperty;
         SampleSubClass SampleSampleSubClass;
     };
-    class MyEventArgs
+    enum SampleEnum
     {
-        // class delegates
-
-        // class events
-
-        // class functions
-        SIGNED_LONG_INTEGER_FUNCTION GetHashCode ();
-        STRING_FUNCTION ToString ();
-
-        // class variables
-
-        // class properties
-        SIGNED_LONG_INTEGER EventInt;
+        SampleEnumValue1,
+        SampleEnumValue2,
+        SampleEnumValue3,
     };
 }
