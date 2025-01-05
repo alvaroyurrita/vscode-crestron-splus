@@ -10,7 +10,7 @@ import {
     TextEditor
 } from 'vscode';
 import { SimplPlusActiveDocuments } from "./simplPlusActiveDocuments";
-import { BuildType } from './build-type';
+import { BuildType } from './base/build-type';
 
 export class SimplPlusStatusBar {
     private _statusBar: StatusBarItem;

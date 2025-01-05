@@ -1,5 +1,5 @@
 import { CompletionItemKind, Position, Range, TextDocument } from "vscode";
-import { SimplObject } from "../services/simplObject";
+import { SimplObject } from "../base/simplObject";
 import TextmateLanguageService, { TextmateToken } from "vscode-textmate-languageservice";
 
 const selector: string = 'simpl-plus';

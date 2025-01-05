@@ -1,7 +1,7 @@
 import { ApiParser } from "../../helpers/apiParser";
 import * as vscode from 'vscode';
 import * as assert from 'assert';
-import { SimplObject } from "../../services/simplObject";
+import { SimplObject } from "../../base/simplObject";
 
 suite("With api Parser", function () {
     let apiMembers: SimplObject[];

@@ -19,7 +19,7 @@ import {
 import path from "path";
 import * as fsExistsWrapper from './helpers/fsExistsSyncWrapper';
 import { getCompilerPath, getFileName } from "./helpers/helperFunctions";
-import { BuildType } from "./build-type";
+import { BuildType } from "./base/build-type";
 
 export class SimplPlusTasks implements Disposable {
     private static _instance: SimplPlusTasks;

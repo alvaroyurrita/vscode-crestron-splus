@@ -1,5 +1,5 @@
 import { workspace, Range, TextDocument, CompletionItemKind } from 'vscode';
-import { SimplObject } from '../services/simplObject';
+import { SimplObject } from '../base/simplObject';
 
 export async function ApiParser(apiFullPath: string): Promise<SimplObject[]> {
 

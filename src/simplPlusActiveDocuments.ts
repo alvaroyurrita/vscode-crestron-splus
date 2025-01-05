@@ -1,5 +1,5 @@
 import path from "path";
-import { BuildType } from "./build-type";
+import { BuildType } from "./base/build-type";
 import { existsSyncWrapper } from "./helpers/fsExistsSyncWrapper";
 import { readFileSyncWrapper } from "./helpers/fsReadSyncWrapper";
 import { workspace, TextDocument, Uri , Disposable } from 'vscode';

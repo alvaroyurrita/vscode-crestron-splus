@@ -1,6 +1,6 @@
 import { MarkdownString, CompletionItemKind } from 'vscode';
 import * as https from 'https';
-import { SimplObject } from './simplObject';
+import { SimplObject } from '../base/simplObject';
 const { convert } = require('html-to-text');
 
 export class SimplPlusKeywordHelpService {
@@ -86,7 +86,9 @@ export class SimplPlusKeywordHelpService {
             kind: CompletionItemKind.Function,
             nameRange: null,
             dataType: "",
-            parameters: [],
+            children: [],
+            dataTypeModifier: "",
+            uri: ""
         };
         const syntaxString = helpContentString.replace(/\n/g, "").match(/Syntax:\s*(.*)\s*Description/i);
         if (syntaxString && syntaxString[1]) {
@@ -102,11 +104,14 @@ export class SimplPlusKeywordHelpService {
                 parameters.forEach((parameter, index, parameters) => {
                     const parameterName = parameter.match(/(\w+)\W(\w+).*/); //Grabs parameter type and name
                     if (parameterName && parameterName[1] && parameterName[2]) {
-                        functionToken.parameters.push({
+                        functionToken.children.push({
                             name: parameterName[2],
                             dataType: parameterName[1],
                             nameRange: null,
                             kind: CompletionItemKind.TypeParameter,
+                            children:[],
+                            dataTypeModifier:"",
+                            uri:""
                         });
                     }
                 });

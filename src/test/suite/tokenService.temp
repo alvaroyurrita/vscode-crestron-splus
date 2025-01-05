@@ -6,7 +6,7 @@ import * as vscode from 'vscode';
 import { TokenService } from '../../services/tokenService.temp';
 import { DocumentTokenService } from '../../services/documentTokenService.temp';
 import { ApiTokenService } from '../../services/apiTokenService.temp';
-import { SimplObject } from '../../services/simplObject';
+import { SimplObject } from '../../base/simplObject';
 import { isUndefined } from 'util';
 
 
