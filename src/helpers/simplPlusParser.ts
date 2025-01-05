@@ -27,6 +27,7 @@ export async function SimplPlusParser(document: TextDocument | undefined): Promi
         ];
     return theDocument;
 }
+
 function getGlobalVariables(tokens: TextmateToken[]): SimplPlusObject[] {
     return tokens.filter(token => token.scopes.includes("entity.name.variable.usp")
         && !(token.scopes.includes("meta.block.structure.usp")

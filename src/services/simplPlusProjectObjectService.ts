@@ -13,6 +13,7 @@ import {
 import { SimplPlusObject } from "../base/simplPlusObject";
 import { SimplPlusProgramObjectService } from "./simplPlusProgramObjectService";
 import { simplPlusApiObjectService } from "./simplPlusApiObjectService";
+import * as helperFunctions from "../helpers/helperFunctions";
 
 export class SimplPlusProjectObjectService implements Disposable {
 
@@ -47,29 +48,58 @@ export class SimplPlusProjectObjectService implements Disposable {
     //returns the object (structure, event or function, or parameter range) that a position is inside of.
     // used to figure out what members to display during autocomplete
     public getProgramObjectAtPosition(uri: Uri, position: Position): SimplPlusObject | undefined {
-        return this._programObjectService.getObjectAtPosition(uri,position);
+        return this._programObjectService.getObjectAtPosition(uri, position);
     }
-    isPositionAtFunctionParameter(functionObject: SimplPlusObject, position: Position) : boolean {
-        return functionObject.children.some(ch=>ch.kind===CompletionItemKind.TypeParameter && (ch.blockRange?.contains(position)??false));
+    isPositionAtFunctionParameter(functionObject: SimplPlusObject, position: Position): boolean {
+        return functionObject.children.some(ch => ch.kind === CompletionItemKind.TypeParameter && (ch.blockRange?.contains(position) ?? false));
     }
-    //Returns the member of object tree.  Matches as long as it is a full member (ends in . or ( or [))
+    //Returns the member of object/method chain.  Matches as long as it is a full member (ends in .)
     //Use for function param auto complete ( ( ) or for next class member autocompletion (.)
     public getObjectAtPosition(document: TextDocument, position: Position): SimplPlusObject | undefined {
         const uri = document.uri;
         const offsetPosition = document.offsetAt(position);
         let textUntilPosition = document.getText().slice(0, offsetPosition);
-        // let textUntilPosition = document.lineAt(position).text.slice(0, position.character);
-        const wordWithDotMatch = textUntilPosition.match(/((?:(?:[_\w][_#$\w]*)\s*\.\s*)*(?:[_\w][_#$\w]*)\s*)[\.\(\[]$/);//grab any group of words followed by a dot or a Opening Param at the end of the string (ie: test.test.  or test.test(  )
-        if (!wordWithDotMatch) { return undefined; }
-        const tokenTree = wordWithDotMatch[1].match(/[_\w][_#$\w]*/gm);
-        let currentToken = tokenTree.shift();
+        const objectChain = helperFunctions.objectChain(textUntilPosition);
+        if (objectChain === undefined) { return undefined; }
         let currentObject: SimplPlusObject;
         let projectObjects = this.getProjectObjects(uri);
-        currentObject = projectObjects.find(co=>co.name===currentToken);
-        currentToken = tokenTree.shift();
-        while (currentToken !== undefined){
-            currentObject = currentObject.children.find(ch=>ch.name===currentToken);
-            currentToken = tokenTree.shift();
+
+        //find first word in root objects
+        let currentToken = objectChain.shift();
+        let foundVar = projectObjects.find(co => co.name === currentToken);
+        currentObject = this.getRootObjectByName(uri, foundVar.dataType);
+        currentToken = objectChain.shift();
+
+        //then for subsequent words in the found object children
+        while (currentToken !== undefined) {
+            let foundVar = currentObject.children.find(ch => ch.name === currentToken);
+            currentObject = this.getRootObjectByName(uri, foundVar.dataType);
+            currentToken = objectChain.shift();
+        }
+        return currentObject;
+    }
+
+    //Returns the function of and object chain.  Matches as long as it is a full member (ends ( ))
+    //Use for function param auto complete ( ( ) or for next class member autocompletion (.)
+    public getFunctionAtPosition(document: TextDocument, position: Position): SimplPlusObject | undefined {
+        const uri = document.uri;
+        const offsetPosition = document.offsetAt(position);
+        let textUntilPosition = document.getText().slice(0, offsetPosition);
+        let textUntilParen = textUntilPosition.slice(0, textUntilPosition.lastIndexOf("(") + 1); //disregard attributes
+        const objectChain = helperFunctions.objectChain(textUntilParen);
+        if (objectChain === undefined) { return undefined; }
+        let projectObjects = this.getProjectObjects(uri);
+
+        //find first word in root objects
+        let currentToken = objectChain.shift();
+        let currentObject = projectObjects.find(co => co.name === currentToken);
+        currentToken = objectChain.shift();
+
+        //then for subsequent words in the found object children
+        while (currentToken !== undefined) {
+            const nextObject = this.getRootObjectByName(uri, currentObject.dataType);
+            currentObject = nextObject.children.find(ch => ch.name === currentToken);
+            currentToken = objectChain.shift();
         }
         return currentObject;
     }
@@ -103,7 +133,7 @@ export class SimplPlusProjectObjectService implements Disposable {
             const item = new CompletionItem(itemLabel, o.kind);
             if (o.kind === CompletionItemKind.Function) {
                 documentation = `${o.dataType} ${o.name}(`;
-                const functionParameters = o.children.filter(c=>c.kind===CompletionItemKind.TypeParameter);
+                const functionParameters = o.children.filter(c => c.kind === CompletionItemKind.TypeParameter);
                 if (functionParameters.length > 0) {
                     documentation += functionParameters.map(p => `${p.dataType} ${p.name}`).join(", ");
                 }

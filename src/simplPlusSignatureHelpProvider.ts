@@ -37,7 +37,7 @@ export class SimplPlusSignatureHelpProvider implements SignatureHelpProvider {
                 return undefined;
             }
             const functionName = match[1];
-            const lastCompletionItem = this._tokenService.getObjectAtPosition(document,position);
+            const lastCompletionItem = this._tokenService.getFunctionAtPosition(document,position);
             if (lastCompletionItem && lastCompletionItem.name === functionName) {
                 functionToken = lastCompletionItem;
             }

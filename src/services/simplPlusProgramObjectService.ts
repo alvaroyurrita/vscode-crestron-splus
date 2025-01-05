@@ -13,6 +13,7 @@ import {
 import { SimplPlusObject } from "../base/simplPlusObject";
 import { SimplPlusParser } from "../helpers/simplPlusParser";
 export class SimplPlusProgramObjectService implements Disposable {
+
     private _documents = new Map<string, SimplPlusObject[]>();
     private static _instance: SimplPlusProgramObjectService;
     private selector: DocumentSelector = 'simpl-plus';
@@ -39,6 +40,7 @@ export class SimplPlusProgramObjectService implements Disposable {
         }
         return object;
     }
+
     private constructor(ctx: ExtensionContext) {
         const onOpenTextDocument_event = workspace.onDidOpenTextDocument((document) => this.updateOnOpenTextDocument(document));
         const onDidChangeTextDocument_event = workspace.onDidChangeTextDocument((editor) => this.updateOnDidChangeTextDocument(editor));

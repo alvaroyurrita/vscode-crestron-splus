@@ -27,7 +27,7 @@ export class SimplPlusDotCompletionProvider implements CompletionItemProvider {
         context: CompletionContext):
         ProviderResult<CompletionItem[]> {
         const uri = document.uri;
-        const completionItems: CompletionItem[] = [];
+        let completionItems: CompletionItem[] = [];
         const currentObject = this._projectObjectService.getObjectAtPosition(document, position);
         if (currentObject === undefined) { return completionItems; }
         switch (currentObject.kind) {
@@ -42,5 +42,4 @@ export class SimplPlusDotCompletionProvider implements CompletionItemProvider {
                 return [];
         }
     }
-
-};
+}
