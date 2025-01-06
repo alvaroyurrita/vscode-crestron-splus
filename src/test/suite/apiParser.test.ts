@@ -117,7 +117,7 @@ suite("With api Parser", function () {
     });
     test("test class function", async () => {
         const parent = apiMembers[0];
-        assert.strictEqual(apiMembers[0].children[2].dataType, "INTEGER_FUNCTION");
+        assert.strictEqual(apiMembers[0].children[2].dataType, "INTEGER");
         assert.strictEqual(apiMembers[0].children[2].name, "SampleUshortMethod");
         assert.strictEqual(apiMembers[0].children[2].kind, vscode.CompletionItemKind.Function);
         assert.strictEqual(apiMembers[0].children[2].dataTypeModifier, "");

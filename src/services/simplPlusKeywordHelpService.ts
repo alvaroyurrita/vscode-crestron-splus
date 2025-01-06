@@ -109,9 +109,9 @@ export class SimplPlusKeywordHelpService {
                             dataType: parameterName[1],
                             nameRange: null,
                             kind: CompletionItemKind.TypeParameter,
-                            children:[],
-                            dataTypeModifier:"",
-                            uri:""
+                            children: [],
+                            dataTypeModifier: "",
+                            uri: ""
                         });
                     }
                 });

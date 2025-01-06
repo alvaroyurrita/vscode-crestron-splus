@@ -4,32 +4,32 @@ import * as fsExistsWrapper from '../helpers/fsExistsSyncWrapper';
 import path from "path";
 
 
-export type KeywordType =
-    "classBuiltIn" |
-    "constant" |
-    "declaration" |
-    "event-handler" |
-    "eventType" |
-    "function" |
-    "functionType" |
-    "inputType" |
-    "parameterModifier" |
-    "variableModifier" |
-    "functionModifier" |
-    "outputType" |
-    "parameterType" |
-    "statement" |
-    "structureBuiltIn" |
-    "type" |
-    "variable" |
-    "variableType" |
-    "voidFunction";
+// export type KeywordType =
+//     "classBuiltIn" |
+//     "constant" |
+//     "declaration" |
+//     "event-handler" |
+//     "eventType" |
+//     "function" |
+//     "functionType" |
+//     "inputType" |
+//     "parameterModifier" |
+//     "variableModifier" |
+//     "functionModifier" |
+//     "outputType" |
+//     "parameterType" |
+//     "statement" |
+//     "structureBuiltIn" |
+//     "type" |
+//     "variable" |
+//     "variableType" |
+//     "voidFunction";
 
 
 export type Keyword = {
     name: string,
     kind: CompletionItemKind,
-    type: KeywordType,
+    type: string,
     hasHelp: boolean
 }
 
@@ -55,15 +55,20 @@ export class KeywordService {
             const definition = {
                 name: elements[0].trim(),
                 kind: CompletionItemKind[elements[1].trim()],
-                type: elements[2].trim() as KeywordType,
+                type: elements[2].trim(),
                 hasHelp: elements[3].trim() === "true"
             };
             this._keywordDefinitions.push(definition);
         }
     }
-    public getKeywords(types: KeywordType[]): Keyword[] {
+    public getKeywordsByType(types: string[]): Keyword[] {
         return this._keywordDefinitions.filter(kd => types.includes(kd.type));
     }
+
+    public getKeywordsByKind(kind: CompletionItemKind): Keyword[] {
+        return this._keywordDefinitions.filter(kd => kd.kind === kind);
+    }
+
 
     public getKeyword(name: string): Keyword | undefined {
         return this._keywordDefinitions.find(kd => kd.name.toLowerCase() === name.toLowerCase());
@@ -71,9 +76,13 @@ export class KeywordService {
 
     public getCompletionItemsFromKeywords(keywords: Keyword[]): CompletionItem[] {
         const items: CompletionItem[] = keywords.map(kd => {
+            let description = `BuiltIn: ${kd.type.toString()}`;
+            if (kd.kind === CompletionItemKind.Keyword) {
+                description = `Keyword: ${kd.type.toString()}`;
+            };
             let itemLabel: CompletionItemLabel = {
                 label: kd.name,
-                description: kd.type.toString()
+                description: description
             };
             const item = new CompletionItem(itemLabel, kd.kind);
             if (kd.kind === CompletionItemKind.Function) {

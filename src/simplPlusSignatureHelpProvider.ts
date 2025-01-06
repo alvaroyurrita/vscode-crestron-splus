@@ -29,12 +29,13 @@ export class SimplPlusSignatureHelpProvider implements SignatureHelpProvider {
         context: SignatureHelpContext
     ): ProviderResult<SignatureHelp> {
         return new Promise(async resolve => {
-            const currentCharacter = position.character;
+            const currentCharacter =position.character;
             let functionToken: SimplPlusObject | undefined = undefined;
             const textAtPosition = document.lineAt(position.line).text.slice(0, currentCharacter);
-            const match = textAtPosition.match(/([\w][\#\$\w]*)\s*\(/);  // Match a keyword followed by an open parenthesis
+            const match = textAtPosition.match(/([\w][\#\$\w]*)\s*\(([^\)]*)(?!\))$/);  // Match a keyword followed by an open parenthesis as long as there is no closing parenthesis
+            console.log(match);
             if (match === null) {
-                return undefined;
+                return resolve(undefined);
             }
             const functionName = match[1];
             const lastCompletionItem = this._tokenService.getFunctionAtPosition(document,position);

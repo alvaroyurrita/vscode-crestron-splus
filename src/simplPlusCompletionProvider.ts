@@ -13,7 +13,7 @@ import {
     CompletionItemLabel,
 } from "vscode";
 import { SimplPlusKeywordHelpService } from "./services/simplPlusKeywordHelpService";
-import { KeywordService, KeywordType } from "./services/keywordService";
+import { KeywordService } from "./services/keywordService";
 import { SimplPlusProjectObjectService } from "./services/simplPlusProjectObjectService";
 import { SimplPlusObject } from "./base/simplPlusObject";
 
@@ -76,7 +76,7 @@ export class SimplPlusCompletionProvider implements CompletionItemProvider {
         return new Promise(async resolve => {
             const uri = window.activeTextEditor?.document.uri;
             const itemLabel = typeof item.label === "string" ? item.label : item.label.label;
-            let functionInfo = this._projectObjectService.getFunctionInfo(uri, itemLabel);
+            let functionInfo =this._projectObjectService.getFunctionInfo(uri, itemLabel);
             if (functionInfo === undefined) {
                 const keyword = this._keywordService.getKeyword(itemLabel);
                 if (keyword === undefined || !keyword.hasHelp) { resolve(item); return; }
@@ -84,7 +84,7 @@ export class SimplPlusCompletionProvider implements CompletionItemProvider {
                 const helpContent = await helpDefinitions.GetSimplHelp(itemLabel);
                 if (helpContent !== undefined) {
                     item.documentation = helpContent;
-                    if (keyword.type === "function" || keyword.type === "voidFunction") {
+                    if (keyword.kind === CompletionItemKind.Function) {
                         functionInfo = helpDefinitions.GetFunctionInfoFromHelp(itemLabel, helpContent);
                     }
                 }
@@ -132,41 +132,43 @@ export class SimplPlusCompletionProvider implements CompletionItemProvider {
         return this._projectObjectService.getCompletionItemsFromObjects(structureVariables);
     }
     private getExpressionKeywords(): CompletionItem[] {
-        const functionKeyword: KeywordType[] = [
-            "function",
+        const functionKeyword: string[] = [
             "variable",
             "constant",
             "statement",
         ];
-        const keywordDefinitions = this._keywordService.getKeywords(functionKeyword);
-        return this._keywordService.getCompletionItemsFromKeywords(keywordDefinitions);
+        const keywordDefinitions = this._keywordService.getKeywordsByType(functionKeyword);
+        let functionDefinitions = this._keywordService.getKeywordsByKind(CompletionItemKind.Function);
+        functionDefinitions = functionDefinitions.filter(f=>f.type!=="void");
+        return this._keywordService.getCompletionItemsFromKeywords(keywordDefinitions.concat(functionDefinitions));
     }
     private getParameterKeywords(uri: Uri): CompletionItem[] {
-        const functionKeyword: KeywordType[] = [
+        const functionKeyword: string[] = [
             "parameterModifier",
             "variableType",
         ];
-        const keywordDefinitions = this._keywordService.getKeywords(functionKeyword);
+        const keywordDefinitions = this._keywordService.getKeywordsByType(functionKeyword);
         return this._keywordService.getCompletionItemsFromKeywords(keywordDefinitions);
     }
     private getFunctionKeywords(): CompletionItem[] {
-        const functionKeyword: KeywordType[] = [
+        const functionKeyword: string[] = [
             "variableModifier",
             "variableType",
-            "voidFunction",
             "variable",
             "statement",
             "constant"
         ];
-        const keywordDefinitions = this._keywordService.getKeywords(functionKeyword);
-        return this._keywordService.getCompletionItemsFromKeywords(keywordDefinitions);
+        const keywordDefinitions = this._keywordService.getKeywordsByType(functionKeyword);
+        let functionDefinitions = this._keywordService.getKeywordsByKind(CompletionItemKind.Function);
+        functionDefinitions = functionDefinitions.filter(f=>f.type==="void");
+        return this._keywordService.getCompletionItemsFromKeywords(keywordDefinitions.concat(functionDefinitions));
     }
     private getStructureKeywords(): CompletionItem[] {
-        const functionKeyword: KeywordType[] = [
+        const functionKeyword: string[] = [
             "variableModifier",
             "variableType",
         ];
-        const keywordDefinitions = this._keywordService.getKeywords(functionKeyword);
+        const keywordDefinitions = this._keywordService.getKeywordsByType(functionKeyword);
         return this._keywordService.getCompletionItemsFromKeywords(keywordDefinitions);
     }
 
@@ -175,7 +177,7 @@ export class SimplPlusCompletionProvider implements CompletionItemProvider {
         return this._projectObjectService.getCompletionItemsFromObjects(functionToken.children);
     }
     private getRootKeywords(uri: Uri): CompletionItem[] {
-        const rootKeywords: KeywordType[] = [
+        const rootKeywords: string[] = [
             "inputType",
             "outputType",
             "parameterType",
@@ -189,7 +191,7 @@ export class SimplPlusCompletionProvider implements CompletionItemProvider {
             "classBuiltIn",
             "declaration",
         ];
-        const keywordDefinitions = this._keywordService.getKeywords(rootKeywords);
+        const keywordDefinitions = this._keywordService.getKeywordsByType(rootKeywords);
         return this._keywordService.getCompletionItemsFromKeywords(keywordDefinitions);
     }
     private getProjectRootObjects(uri: Uri): CompletionItem[] {

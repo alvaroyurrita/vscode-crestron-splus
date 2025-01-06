@@ -19,6 +19,7 @@ import { SimplPlusDotCompletionProvider } from "./simplPlusDotCompletionProvider
 import { KeywordService } from "./services/keywordService";
 import { SimplPlusSignatureHelpProvider } from "./simplPlusSignatureHelpProvider";
 import { SimplPlusProjectObjectService } from "./services/simplPlusProjectObjectService";
+import { parseSimplPlusFunctionReturnFromOnlineHelp } from "./helpers/simplPlusOnlineHelpParser";
 
 
 // Creates a terminal, calls the command, then closes the terminal
@@ -36,6 +37,7 @@ export async function activate(context: ExtensionContext) {
     //     let fileFolder = fileName.slice(0, fileName.lastIndexOf("/") + 1);
     //     commands.executeCommand("vscode.openFolder", Uri.parse(fileFolder));
     // }
+
 
     const selector: DocumentSelector = 'simpl-plus';
     // const textmateService = new TextmateLanguageService(selector, context);

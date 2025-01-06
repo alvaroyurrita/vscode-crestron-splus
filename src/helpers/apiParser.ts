@@ -182,12 +182,17 @@ function getFunctions(functionsArea: Range, document: TextDocument): SimplPlusOb
         const parametersEnd = document.positionAt(document.offsetAt(functionsArea.start) + functionMatch.index + functionMatch[0].indexOf(")") + 1);
         const parametersRange = new Range(parameterStart, parametersEnd);
         const parameters = getParameters(parametersRange, document);
+        let type = functionMatch[1];
+        const functionTypeMatch = type.match(/(?:(LONG_INTEGER|INTEGER|SIGNED_INTEGER|SIGNED_LONG_INTEGER|STRING)_)?FUNCTION/i);
+        if (functionTypeMatch) {
+            type = !functionTypeMatch[1] ? "void" : functionTypeMatch[1];
+        }
         const func: SimplPlusObject ={
             name: functionMatch[2],
             kind: CompletionItemKind.Function,
             nameRange,
             children: parameters,
-            dataType: functionMatch[1],
+            dataType: type,
             dataTypeModifier: "",
             uri: document.uri.toString(),
         };

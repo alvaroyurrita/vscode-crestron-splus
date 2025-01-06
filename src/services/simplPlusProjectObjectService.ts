@@ -8,7 +8,8 @@ import {
     SnippetString,
     CompletionItemLabel,
     TextDocument,
-    Range
+    Range,
+    MarkdownString
 } from "vscode";
 import { SimplPlusObject } from "../base/simplPlusObject";
 import { SimplPlusProgramObjectService } from "./simplPlusProgramObjectService";
@@ -132,12 +133,13 @@ export class SimplPlusProjectObjectService implements Disposable {
             let documentation: string = "";
             const item = new CompletionItem(itemLabel, o.kind);
             if (o.kind === CompletionItemKind.Function) {
-                documentation = `${o.dataType} ${o.name}(`;
+                 documentation += "```csharp\n";
+                documentation += `${o.dataType} ${o.name}(`;
                 const functionParameters = o.children.filter(c => c.kind === CompletionItemKind.TypeParameter);
                 if (functionParameters.length > 0) {
                     documentation += functionParameters.map(p => `${p.dataType} ${p.name}`).join(", ");
                 }
-                documentation += ")";
+                documentation += ")\n```";
                 const snippetString = new SnippetString();
                 snippetString.appendText(o.name);
                 snippetString.appendText("(");
@@ -157,7 +159,7 @@ export class SimplPlusProjectObjectService implements Disposable {
                     title: "triggerSignatureHelp",
                 };
             }
-            item.documentation = documentation;
+            item.documentation = new MarkdownString(documentation);
             return item;
         });
         return items;
