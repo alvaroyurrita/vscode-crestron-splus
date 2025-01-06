@@ -14,6 +14,7 @@ import {
 import { SimplPlusObject } from "../base/simplPlusObject";
 import { SimplPlusProgramObjectService } from "./simplPlusProgramObjectService";
 import { simplPlusApiObjectService } from "./simplPlusApiObjectService";
+import { simpPlusLibraryObjectService } from "./simpPlusLibraryObjectService";
 import * as helperFunctions from "../helpers/helperFunctions";
 
 export class SimplPlusProjectObjectService implements Disposable {
@@ -22,6 +23,7 @@ export class SimplPlusProjectObjectService implements Disposable {
     private static _instance: SimplPlusProjectObjectService;
     private _programObjectService: SimplPlusProgramObjectService;
     private _apiObjectService: simplPlusApiObjectService;
+    private _libraryObjectService: simpPlusLibraryObjectService;
 
     public static getInstance(ctx: ExtensionContext): SimplPlusProjectObjectService {
         if (!SimplPlusProjectObjectService._instance && ctx) {
@@ -32,6 +34,8 @@ export class SimplPlusProjectObjectService implements Disposable {
     private constructor(ctx: ExtensionContext) {
         this._programObjectService = SimplPlusProgramObjectService.getInstance(ctx);
         this._apiObjectService = simplPlusApiObjectService.getInstance(ctx);
+        this._libraryObjectService = simpPlusLibraryObjectService.getInstance(ctx);
+
     }
     public dispose() {
         this._programObjectService.dispose();
@@ -41,8 +45,10 @@ export class SimplPlusProjectObjectService implements Disposable {
         const projectObjects: SimplPlusObject[] = [];
         const programObjects = this._programObjectService.getObjects(uri);
         const apiObjects = this._apiObjectService.getObjects(uri);
+        const libraryObjects = this._libraryObjectService.getObjects(uri);
         if (programObjects !== undefined) { projectObjects.push(...programObjects); }
         if (apiObjects !== undefined && apiObjects.length > 0) { projectObjects.push(...apiObjects); }
+        if (libraryObjects !== undefined) { projectObjects.push(...libraryObjects); };
         return projectObjects;
     }
 
@@ -133,7 +139,7 @@ export class SimplPlusProjectObjectService implements Disposable {
             let documentation: string = "";
             const item = new CompletionItem(itemLabel, o.kind);
             if (o.kind === CompletionItemKind.Function) {
-                 documentation += "```csharp\n";
+                documentation += "```csharp\n";
                 documentation += `${o.dataType} ${o.name}(`;
                 const functionParameters = o.children.filter(c => c.kind === CompletionItemKind.TypeParameter);
                 if (functionParameters.length > 0) {

@@ -29,8 +29,8 @@ export class simplPlusApiObjectService implements Disposable {
     private _watchers = new Map<string, FileSystemWatcher>();
     //Stores tokens for a specific .CLZ Library
     private _apis = new Map<string, SimplPlusObject[]>();
-    //stores the documents that need api tokens.
-    private _documents = new Map<string, string[]>();
+    //stores the api paths that need tokens on a specific program.
+    private _programs = new Map<string, string[]>();
     private static _instance: simplPlusApiObjectService;
     private selector: DocumentSelector = 'simpl-plus';
     public static getInstance(ctx: ExtensionContext): simplPlusApiObjectService {
@@ -61,7 +61,7 @@ export class simplPlusApiObjectService implements Disposable {
 
     public getObjects(uri: Uri): SimplPlusObject[] {
         const documentTokens: SimplPlusObject[] = [];
-        this._documents.get(uri.toString())?.forEach((library) => {
+        this._programs.get(uri.toString())?.forEach((library) => {
             const tokens = this._apis.get(library);
             if (tokens) {
                 documentTokens.push(...tokens);
@@ -72,7 +72,7 @@ export class simplPlusApiObjectService implements Disposable {
 
     private async updateOnCloseTextDocument(document: TextDocument): Promise<void> {
         if (document.languageId !== this.selector.toString()) { return; }
-        this._documents.delete(document.uri.toString());
+        this._programs.delete(document.uri.toString());
         console.log("API Document closed");
     }
     private async updateOnDidChangeTextDocument(editor: TextDocumentChangeEvent | undefined): Promise<void> {
@@ -134,7 +134,7 @@ export class simplPlusApiObjectService implements Disposable {
                 this._apis.set(CLZFullPath, apiTokens);
             }
         };
-        this._documents.set(document.uri.toString(), clzDocuments);
+        this._programs.set(document.uri.toString(), clzDocuments);
     }
     private deleteLibrary(e: Uri) {
         //check if one of the stored CLZ libraries has been deleted
