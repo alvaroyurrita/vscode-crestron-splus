@@ -65,8 +65,12 @@ export class KeywordService {
         return this._keywordDefinitions.filter(kd => types.includes(kd.type));
     }
 
-    public getKeywordsByKind(kind: CompletionItemKind): Keyword[] {
-        return this._keywordDefinitions.filter(kd => kd.kind === kind);
+    public getKeywordsByKind(kinds: CompletionItemKind[]): Keyword[] {
+        let keywords: Keyword[] = [];
+        for (const kind of kinds) {
+            keywords = keywords.concat(this._keywordDefinitions.filter(kd => kd.kind === kind));
+        }
+        return keywords;
     }
 
 

@@ -63,6 +63,8 @@ function getGlobalConstants(tokens: TextmateToken[]): SimplPlusObject[] {
                 case "constant.numeric.decimal.usp":
                 case "constant.numeric.hex.usp":
                 case "constant.numeric.character.usp":
+                case "constant.character.usp":
+                case "constant.numeric.other.prefix.hex.usp":
                     dataType = "integer";
                     break;
                 case "string.quoted.double.usp":

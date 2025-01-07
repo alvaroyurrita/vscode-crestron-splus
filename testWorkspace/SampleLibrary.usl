@@ -3,6 +3,7 @@
 #DEFINE_CONSTANT HELLO3 0x03
 #DEFINE_CONSTANT HELLO4 'A'
 
+
 STRUCTURE myStruct //test
 {
 	INTEGER Variable#1, _Variable2[4], __Variable3[4][2]; //test

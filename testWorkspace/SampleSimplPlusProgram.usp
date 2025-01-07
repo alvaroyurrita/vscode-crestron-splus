@@ -1,3 +1,4 @@
+#USER_LIBRARY "SampleLibrary"
 #USER_SIMPLSHARP_LIBRARY "SampleSimplSharpLibrary"
 
 DIGITAL_INPUT Test;
@@ -10,6 +11,7 @@ OtherSampleClass testSampleClass;
 push Test
 {
 	print("Enum Test %i",test2.sampleEnum);
+	a = MyFunction4(myvar1, myvar2)
 	
 }
 

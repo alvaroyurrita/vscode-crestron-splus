@@ -9,7 +9,8 @@ import {
     CompletionItemLabel,
     TextDocument,
     Range,
-    MarkdownString
+    MarkdownString,
+    window
 } from "vscode";
 import { SimplPlusObject } from "../base/simplPlusObject";
 import { SimplPlusProgramObjectService } from "./simplPlusProgramObjectService";
@@ -52,6 +53,15 @@ export class SimplPlusProjectObjectService implements Disposable {
         return projectObjects;
     }
 
+    public getProjectObjectByKind(uri: Uri, kinds: CompletionItemKind[]): SimplPlusObject[] {
+        let objects: SimplPlusObject[] = [];
+        const projectObjects = this.getProjectObjects(uri);
+        for (const kind of kinds) {
+            objects = objects.concat(projectObjects.filter(kd => kd.kind === kind));
+        }
+        return objects;
+    }
+
     //returns the object (structure, event or function, or parameter range) that a position is inside of.
     // used to figure out what members to display during autocomplete
     public getProgramObjectAtPosition(uri: Uri, position: Position): SimplPlusObject | undefined {
@@ -60,8 +70,8 @@ export class SimplPlusProjectObjectService implements Disposable {
     isPositionAtFunctionParameter(functionObject: SimplPlusObject, position: Position): boolean {
         return functionObject.children.some(ch => ch.kind === CompletionItemKind.TypeParameter && (ch.blockRange?.contains(position) ?? false));
     }
-    //Returns the member of object/method chain.  Matches as long as it is a full member (ends in .)
-    //Use for function param auto complete ( ( ) or for next class member autocompletion (.)
+    //Returns the member of object chain.  Matches as long as it is a full member (ends in .)
+    //Used for next class member autocompletion (.)
     public getObjectAtPosition(document: TextDocument, position: Position): SimplPlusObject | undefined {
         const uri = document.uri;
         const offsetPosition = document.offsetAt(position);
@@ -69,25 +79,27 @@ export class SimplPlusProjectObjectService implements Disposable {
         const objectChain = helperFunctions.objectChain(textUntilPosition);
         if (objectChain === undefined) { return undefined; }
         let currentObject: SimplPlusObject;
-        let projectObjects = this.getProjectObjects(uri);
-
-        //find first word in root objects
-        let currentToken = objectChain.shift();
-        let foundVar = projectObjects.find(co => co.name === currentToken);
-        currentObject = this.getRootObjectByName(uri, foundVar.dataType);
-        currentToken = objectChain.shift();
-
-        //then for subsequent words in the found object children
-        while (currentToken !== undefined) {
-            let foundVar = currentObject.children.find(ch => ch.name === currentToken);
-            currentObject = this.getRootObjectByName(uri, foundVar.dataType);
+        const currentPosition = this.getProgramObjectAtPosition(uri, position);
+        //only return object chain if inside a function or event
+        if (currentPosition !== undefined && (currentPosition.kind === CompletionItemKind.Function || currentPosition.kind === CompletionItemKind.Event)) {
+            let projectObjects = this.getProjectObjects(uri);
+            let instances = projectObjects;
+            let currentToken: string | undefined;
             currentToken = objectChain.shift();
+            do {
+                const instance = instances.find(co => co.name === currentToken);
+                currentObject = projectObjects.find(po => po.name === instance.dataType);
+                if (!currentObject || !(currentObject.children)) { break; }
+                instances = currentObject.children;
+                currentToken = objectChain.shift();
+            } while (currentToken !== undefined);
+            return currentObject;
         }
-        return currentObject;
+        return undefined;
     }
 
-    //Returns the function of and object chain.  Matches as long as it is a full member (ends ( ))
-    //Use for function param auto complete ( ( ) or for next class member autocompletion (.)
+    //Returns the function of and object chain that ends in a method.  Matches as long as it is a full member (ends ( ))
+    //Used for function param auto complete ( ( ) 
     public getFunctionAtPosition(document: TextDocument, position: Position): SimplPlusObject | undefined {
         const uri = document.uri;
         const offsetPosition = document.offsetAt(position);
@@ -95,20 +107,25 @@ export class SimplPlusProjectObjectService implements Disposable {
         let textUntilParen = textUntilPosition.slice(0, textUntilPosition.lastIndexOf("(") + 1); //disregard attributes
         const objectChain = helperFunctions.objectChain(textUntilParen);
         if (objectChain === undefined) { return undefined; }
-        let projectObjects = this.getProjectObjects(uri);
+        const currentPosition = this.getProgramObjectAtPosition(uri, position);
+        //only return object chain if inside a function or event
+        if (currentPosition !== undefined && (currentPosition.kind === CompletionItemKind.Function || currentPosition.kind === CompletionItemKind.Event)) {
+            let projectObjects = this.getProjectObjects(uri);
 
-        //find first word in root objects
-        let currentToken = objectChain.shift();
-        let currentObject = projectObjects.find(co => co.name === currentToken);
-        currentToken = objectChain.shift();
-
-        //then for subsequent words in the found object children
-        while (currentToken !== undefined) {
-            const nextObject = this.getRootObjectByName(uri, currentObject.dataType);
-            currentObject = nextObject.children.find(ch => ch.name === currentToken);
+            //find first word in root objects
+            let currentToken = objectChain.shift();
+            let currentObject = projectObjects.find(co => co.name === currentToken);
             currentToken = objectChain.shift();
+
+            //then for subsequent words in the found object children
+            while (currentToken !== undefined) {
+                const instance = projectObjects.find(po => po.name === currentObject.dataType);
+                currentObject = instance.children.find(ch => ch.name === currentToken);
+                currentToken = objectChain.shift();
+            }
+            return currentObject;
         }
-        return currentObject;
+        return undefined;
     }
 
     public getRootObjectByName(uri: Uri, name: string): SimplPlusObject | undefined {
@@ -130,11 +147,20 @@ export class SimplPlusProjectObjectService implements Disposable {
 
 
     public getCompletionItemsFromObjects(objects: SimplPlusObject[]): CompletionItem[] {
+        const activeDocUri = window.activeTextEditor?.document.uri.toString();
         if (objects === undefined) { return []; }
         const items: CompletionItem[] = objects.map(o => {
+            let descriptionPrefix = "";
+            if (o.uri !== activeDocUri) {
+                const currentObjectUri = o.uri ?? "";
+                if (currentObjectUri !== "") {
+                    const currentObjectName = currentObjectUri.slice(currentObjectUri.lastIndexOf("/") + 1, currentObjectUri.lastIndexOf("."));
+                    descriptionPrefix = `${currentObjectName}: `;
+                }
+            }
             let itemLabel: CompletionItemLabel = {
                 label: o.name,
-                description: o.dataType.toString()
+                description: descriptionPrefix + o.dataType.toString()
             };
             let documentation: string = "";
             const item = new CompletionItem(itemLabel, o.kind);

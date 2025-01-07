@@ -56,13 +56,14 @@ export class SimplPlusCompletionProvider implements CompletionItemProvider {
                     return parameterKeywords;
                 }
                 let functionKeywords = this.getFunctionKeywords();
-                const projectRootObjects = this.getProjectRootObjects(uri);
+                let functionObjects = this.getProjectFunctionObjects(uri);
                 const functionVariables = this.getFunctionVariables(currentBlock);
                 const lineUntilPosition = document.lineAt(position.line).text.slice(0, position.character);
                 if (lineUntilPosition.match(/[\=\(\[]/)) {
                     functionKeywords = this.getExpressionKeywords();
+                    functionObjects = this.getProjectExpressionObjects(uri);
                 }
-                return functionVariables.concat(functionKeywords).concat(projectRootObjects);
+                return functionVariables.concat(functionKeywords).concat(functionObjects);
             case CompletionItemKind.Struct:
                 const structureKeywords = this.getStructureKeywords();
                 //structures can have other nested structures or classes as structure members;
@@ -76,7 +77,7 @@ export class SimplPlusCompletionProvider implements CompletionItemProvider {
         return new Promise(async resolve => {
             const uri = window.activeTextEditor?.document.uri;
             const itemLabel = typeof item.label === "string" ? item.label : item.label.label;
-            let functionInfo =this._projectObjectService.getFunctionInfo(uri, itemLabel);
+            let functionInfo = this._projectObjectService.getFunctionInfo(uri, itemLabel);
             if (functionInfo === undefined) {
                 const keyword = this._keywordService.getKeyword(itemLabel);
                 if (keyword === undefined || !keyword.hasHelp) { resolve(item); return; }
@@ -91,7 +92,7 @@ export class SimplPlusCompletionProvider implements CompletionItemProvider {
             }
             else {
                 let functionDocs = `${functionInfo.dataType} ${functionInfo.name}(`;
-                const functionParams = functionInfo.children.filter(ch=>ch.kind===CompletionItemKind.TypeParameter);
+                const functionParams = functionInfo.children.filter(ch => ch.kind === CompletionItemKind.TypeParameter);
                 if (functionParams.length > 0) {
                     functionDocs += functionParams.map(p => `${p.dataType} ${p.name}`).join(", ");
                 }
@@ -110,7 +111,7 @@ export class SimplPlusCompletionProvider implements CompletionItemProvider {
         if (documentItems === undefined) {
             return [];
         }
-        const thisDocument = documentItems.filter(di => di.uri === uri.toString() && di.kind===CompletionItemKind.Variable);
+        const thisDocument = documentItems.filter(di => di.uri === uri.toString() && di.kind === CompletionItemKind.Variable);
         const items = thisDocument.filter(di => di.dataType.toLowerCase().match(/input/));
         return this._projectObjectService.getCompletionItemsFromObjects(items);
     }
@@ -119,7 +120,7 @@ export class SimplPlusCompletionProvider implements CompletionItemProvider {
         if (documentItems === undefined) {
             return [];
         }
-        const thisDocument = documentItems.filter(di => di.uri === uri.toString() && di.kind===CompletionItemKind.Variable);
+        const thisDocument = documentItems.filter(di => di.uri === uri.toString() && di.kind === CompletionItemKind.Variable);
         const items = thisDocument.filter(di => di.dataType.toLowerCase().match(/(tcp_client|tcp_server|udp_socket)/));
         return this._projectObjectService.getCompletionItemsFromObjects(items);
     }
@@ -128,47 +129,58 @@ export class SimplPlusCompletionProvider implements CompletionItemProvider {
         if (documentItems === undefined) {
             return [];
         }
-        const structureVariables = documentItems.filter(di => di.uri === uri.toString() && di.kind===CompletionItemKind.Struct);
-        return this._projectObjectService.getCompletionItemsFromObjects(structureVariables);
+        //provide only with user structure and class objects
+        const programStructures = documentItems.filter(di => (di.kind === CompletionItemKind.Struct || di.kind === CompletionItemKind.Class));
+        return this._projectObjectService.getCompletionItemsFromObjects(programStructures);
     }
     private getExpressionKeywords(): CompletionItem[] {
-        const functionKeyword: string[] = [
-            "variable",
-            "constant",
-            "statement",
+        const functionKeywords: string[] = [
+            "Statement",
         ];
-        const keywordDefinitions = this._keywordService.getKeywordsByType(functionKeyword);
-        let functionDefinitions = this._keywordService.getKeywordsByKind(CompletionItemKind.Function);
-        functionDefinitions = functionDefinitions.filter(f=>f.type!=="void");
+        const keywordDefinitions = this._keywordService.getKeywordsByType(functionKeywords);
+        const functionKinds: CompletionItemKind[] = [
+            CompletionItemKind.Function,
+            CompletionItemKind.Variable,
+            CompletionItemKind.Constant,
+        ];
+        let functionDefinitions = this._keywordService.getKeywordsByKind(functionKinds);
+        functionDefinitions = functionDefinitions.filter(f => f.type !== "void");
         return this._keywordService.getCompletionItemsFromKeywords(keywordDefinitions.concat(functionDefinitions));
     }
     private getParameterKeywords(uri: Uri): CompletionItem[] {
         const functionKeyword: string[] = [
-            "parameterModifier",
-            "variableType",
+            "Modifier",
+            "Variable Declaration",
         ];
         const keywordDefinitions = this._keywordService.getKeywordsByType(functionKeyword);
         return this._keywordService.getCompletionItemsFromKeywords(keywordDefinitions);
     }
     private getFunctionKeywords(): CompletionItem[] {
-        const functionKeyword: string[] = [
-            "variableModifier",
-            "variableType",
-            "variable",
-            "statement",
-            "constant"
+        const functionKeywords: string[] = [
+            "Modifier",
+            "Variable Declaration",
+            "Global Declaration",
+            "Statement",
         ];
-        const keywordDefinitions = this._keywordService.getKeywordsByType(functionKeyword);
-        let functionDefinitions = this._keywordService.getKeywordsByKind(CompletionItemKind.Function);
-        functionDefinitions = functionDefinitions.filter(f=>f.type==="void");
+        const keywordDefinitions = this._keywordService.getKeywordsByType(functionKeywords);
+        const functionKinds: CompletionItemKind[] = [
+            CompletionItemKind.Function,
+            CompletionItemKind.Event,
+            CompletionItemKind.Struct,
+            CompletionItemKind.Class,
+            CompletionItemKind.Variable,
+        ];
+        let functionDefinitions = this._keywordService.getKeywordsByKind(functionKinds);
+        functionDefinitions = functionDefinitions.filter(f => f.type === "void");
         return this._keywordService.getCompletionItemsFromKeywords(keywordDefinitions.concat(functionDefinitions));
     }
     private getStructureKeywords(): CompletionItem[] {
-        const functionKeyword: string[] = [
-            "variableModifier",
-            "variableType",
+        const structureKeyword: string[] = [
+            "Modifier",
+            "Variable Declaration",
         ];
-        const keywordDefinitions = this._keywordService.getKeywordsByType(functionKeyword);
+
+        const keywordDefinitions = this._keywordService.getKeywordsByType(structureKeyword);
         return this._keywordService.getCompletionItemsFromKeywords(keywordDefinitions);
     }
 
@@ -178,28 +190,63 @@ export class SimplPlusCompletionProvider implements CompletionItemProvider {
     }
     private getRootKeywords(uri: Uri): CompletionItem[] {
         const rootKeywords: string[] = [
-            "inputType",
-            "outputType",
-            "parameterType",
-            "functionModifier",
-            "variableModifier",
-            "variableType",
-            "structureBuiltIn",
-            "functionType",
-            "eventType",
-            "event-handler",
-            "classBuiltIn",
-            "declaration",
+            "Class",
+            "Declaration",
+            "Global Declaration",
+            "Input Declaration",
+            "Output Declaration",
+            "Parameter Declaration",
+            "Function Declaration",
+            "Variable Declaration",
+            "Modifier",
+            "Structure",
         ];
         const keywordDefinitions = this._keywordService.getKeywordsByType(rootKeywords);
         return this._keywordService.getCompletionItemsFromKeywords(keywordDefinitions);
     }
     private getProjectRootObjects(uri: Uri): CompletionItem[] {
-        const documentItems = this._projectObjectService.getProjectObjects(uri);
+        const functionKinds: CompletionItemKind[] = [
+            CompletionItemKind.Struct,
+            CompletionItemKind.Class,
+        ];
+
+        const documentItems = this._projectObjectService.getProjectObjectByKind(uri, functionKinds);
         if (documentItems === undefined) {
             return [];
         }
         const items = this._projectObjectService.getCompletionItemsFromObjects(documentItems);
         return items;
     }
+
+    private getProjectFunctionObjects(uri: Uri): CompletionItem[] {
+        let documentItems = this._projectObjectService.getProjectObjects(uri);
+        if (documentItems === undefined) {
+            return [];
+        }
+        documentItems = documentItems.filter(di => {
+            if (di.kind === CompletionItemKind.Constant) { return false; }
+            if (di.kind !== CompletionItemKind.Function) {
+                return true;
+            }
+            return di.dataType.toLowerCase() === "void";
+        });
+        const items = this._projectObjectService.getCompletionItemsFromObjects(documentItems);
+        return items;
+    }
+
+    private getProjectExpressionObjects(uri: Uri): CompletionItem[] {
+        let documentItems = this._projectObjectService.getProjectObjects(uri);
+        if (documentItems === undefined) {
+            return [];
+        }
+        documentItems = documentItems.filter(di => {
+            if (di.kind !== CompletionItemKind.Function) {
+                return true;
+            }
+            return di.dataType.toLowerCase() !== "void";
+        });
+        const items = this._projectObjectService.getCompletionItemsFromObjects(documentItems);
+        return items;
+    }
+
 }

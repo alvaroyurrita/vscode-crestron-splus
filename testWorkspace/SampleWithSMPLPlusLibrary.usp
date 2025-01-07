@@ -30,7 +30,7 @@ push Test
 	SampleClass myLocalClass;
  	print("%i",testStructure.Variable7);
 	 testStructure.structureVar2.structureVar1.Variable;
-	 
+	 myClass.sampleSubClassSampleField.SambleSubFunction
 
 }
 

@@ -73,7 +73,7 @@ export class simplPlusApiObjectService implements Disposable {
     private async updateOnCloseTextDocument(document: TextDocument): Promise<void> {
         if (document.languageId !== this.selector.toString()) { return; }
         this._programs.delete(document.uri.toString());
-        console.log("API Document closed");
+        console.log("Document closed", document.uri.toString());
     }
     private async updateOnDidChangeTextDocument(editor: TextDocumentChangeEvent | undefined): Promise<void> {
         if (editor === undefined) { return; }
@@ -109,10 +109,10 @@ export class simplPlusApiObjectService implements Disposable {
         if (!this._watchers.has(documentParentFolder)) {
             const clzWatcherPath = new RelativePattern(documentParentFolder, '*.clz');
             const fsWatcher = workspace.createFileSystemWatcher(clzWatcherPath);
+            this._watchers.set(documentParentFolder, fsWatcher);
             fsWatcher.onDidChange((e) => { this.updateLibrary(e); });
             fsWatcher.onDidCreate((e) => { this.updateLibrary(e); });
             fsWatcher.onDidDelete((e) => { this.deleteLibrary(e); });
-            this._watchers.set(documentParentFolder, fsWatcher);
         }
         //store tokens for each CLZ Library
         const clzDocuments: string[] = [];
@@ -121,8 +121,12 @@ export class simplPlusApiObjectService implements Disposable {
             if (!fs.existsSync(CLZFullPath)) { continue; }
             clzDocuments.push(CLZFullPath);
             if (!this._apis.has(CLZFullPath)) {
+                //immediately store empty array to prevent multiple API generation
+                let apiTokens : SimplPlusObject[] = [];
+                this._apis.set(CLZFullPath, apiTokens);
                 // Generate API File from CLZ
                 try {
+                    console.log("Generating API for", CLZFullPath);
                     await this.runApiGenerator(CLZFullPath);
                 }
                 catch (error) {
@@ -130,7 +134,7 @@ export class simplPlusApiObjectService implements Disposable {
                 }
                 //generate API Tokens
                 const apiFile = join(documentParentFolder, "SPlsWork", library + ".api");
-                const apiTokens = await ApiParser(apiFile);
+                apiTokens = await ApiParser(apiFile);
                 this._apis.set(CLZFullPath, apiTokens);
             }
         };
@@ -152,6 +156,7 @@ export class simplPlusApiObjectService implements Disposable {
         //if it has, generate API Tokens
         // Generate API File from CLZ
         try {
+            console.log("Updating API for", CLZPath);
             await this.runApiGenerator(CLZPath);
         }
         catch (error) {
@@ -186,7 +191,7 @@ export class simplPlusApiObjectService implements Disposable {
                                 if (event.exitCode === 0) {
                                     resolve();
                                 } else {
-                                    reject(new Error(`Build failed with exit code ${event.exitCode}`));
+                                    reject(new Error(`API Build failed with exit code ${event.exitCode}`));
                                 }
                             }
                             apiTerminal.hide();
