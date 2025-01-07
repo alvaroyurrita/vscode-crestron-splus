@@ -19,8 +19,7 @@ import { SimplPlusDotCompletionProvider } from "./simplPlusDotCompletionProvider
 import { KeywordService } from "./services/keywordService";
 import { SimplPlusSignatureHelpProvider } from "./simplPlusSignatureHelpProvider";
 import { SimplPlusProjectObjectService } from "./services/simplPlusProjectObjectService";
-import { parseSimplPlusFunctionReturnFromOnlineHelp } from "./helpers/simplPlusOnlineHelpParser";
-
+import { SimplPlusQuoteCompletionProvider } from "./simplPlusQuoteCompletionProvider";
 
 // Creates a terminal, calls the command, then closes the terminal
 function callShellCommand(shellCommand: string): void {
@@ -102,6 +101,10 @@ export async function activate(context: ExtensionContext) {
     let thisDotCompletionProvider = new SimplPlusDotCompletionProvider(keywordService, projectObjectService);
     const dotCompletionProvider = languages.registerCompletionItemProvider({ language: 'simpl-plus' }, thisDotCompletionProvider, '.');
 
+    let thisQuoteCompletionProvider = new SimplPlusQuoteCompletionProvider();
+    const quoteCompletionProvider = languages.registerCompletionItemProvider({ language: 'simpl-plus' }, thisQuoteCompletionProvider, '"');
+
+
     let thisSignatureHelpProvider = new SimplPlusSignatureHelpProvider(projectObjectService);
     const signatureHelpProvider = languages.registerSignatureHelpProvider({ language: 'simpl-plus' }, thisSignatureHelpProvider, '(', ',');
 
@@ -118,6 +121,7 @@ export async function activate(context: ExtensionContext) {
         simplPlusTasks,
         completionProvider,
         dotCompletionProvider,
+        quoteCompletionProvider,
         signatureHelpProvider,
         projectObjectService
         // textMateCompletionProvider
