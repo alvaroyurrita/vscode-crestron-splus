@@ -73,6 +73,7 @@ export class KeywordService {
         return keywords;
     }
 
+    public getAllKeywords(): Keyword[] {return this._keywordDefinitions;}
 
     public getKeyword(name: string): Keyword | undefined {
         return this._keywordDefinitions.find(kd => kd.name.toLowerCase() === name.toLowerCase());

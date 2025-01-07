@@ -7,12 +7,21 @@ import {
     CancellationToken,
     DocumentRangeFormattingEditProvider,
     DocumentFormattingEditProvider,
+    workspace,
+    extensions,
+    CompletionItem,
+    CompletionItemKind,
 } from "vscode";
+import * as fs from "fs";
+import path from "path";
+import { KeywordService } from "./services/keywordService";
 
 export interface RangeFormattingOptions {
     rangeStart: number;
     rangeEnd: number;
 }
+
+
 
 export class SimplPlusFormattingProvider
     implements
@@ -77,8 +86,8 @@ export class SimplPlusFormattingProvider
             startingComment = 0;
             endingComment = 0;
             let thisLine = docLines[line];
-            let thisLineTrimmed = docLines[line].trimLeft();
-            let thisLineClean = docLines[line].trimLeft().replace(reDeCom1, "").replace(reDeCom2, "");      // Remove any single line comments and fully enclosed multiline comments
+            let thisLineTrimmed = docLines[line].trimStart();
+            let thisLineClean = docLines[line].trimStart().replace(reDeCom1, "").replace(reDeCom2, "");      // Remove any single line comments and fully enclosed multiline comments
 
             if (reDeCom3.test(thisLineClean) && inComment > 0) {        // If a multiline comment closes on this line, decrease our comment level
                 inComment = inComment - 1;
@@ -155,6 +164,7 @@ export class SimplPlusFormattingProvider
             }
         };
 
+        outputText = this.changeCase(outputText);
         return outputText;
     }
 
@@ -166,5 +176,46 @@ export class SimplPlusFormattingProvider
             }
         }
         return count;
+    }
+
+    private changeCase(document: string): string {
+        const formatSetting = workspace.getConfiguration("simpl-plus").autoFormatKeywordCase;
+        if (formatSetting === "Unchanged") { return document; }
+        const extensionPath = extensions.getExtension("sentry07.simpl-plus")?.extensionPath;
+        if (extensionPath === undefined) { return; }
+        const keywordDefinitionsPath = path.join(extensionPath, "src", "keywords.csv");
+        if (!fs.existsSync(keywordDefinitionsPath)) { return; };
+        const keywordService = KeywordService.getInstance();
+        const keywords = keywordService.getAllKeywords();
+
+        const words = document.matchAll(/[a-zA-Z1-9#_]+/g);
+        for (const word of words) {
+            const keyword = keywords.find(it => it.name.toLowerCase() === word[0].toLowerCase() );
+            if (keyword === undefined) { continue; }
+            if (keyword.kind !== CompletionItemKind.Constant) {
+                switch (formatSetting) {
+                    case "UPPERCASE":
+                        document = this.replaceAt(document, word.index, keyword.name.toUpperCase());
+                        break;
+                    case "lowercase":
+                        document = this.replaceAt(document, word.index, keyword.name.toLowerCase());
+                        break;
+                    case "PascalCase":
+                        document = this.replaceAt(document, word.index, keyword.name);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            if (keyword.kind === CompletionItemKind.Constant) {
+                document = this.replaceAt(document, word.index, keyword.name);
+            }
+        }
+        return document;
+    }
+
+    private replaceAt(original: string, index: number, replacement: string): string {
+        if (index < 0 || index + replacement.length >= original.length) { return original; }
+        return original.substring(0, index) + replacement + original.substring(index + replacement.length);
     }
 }

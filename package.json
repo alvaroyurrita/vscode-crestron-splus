@@ -69,6 +69,18 @@
             "type": "boolean",
             "default": true,
             "description": "Default Build Target to Series 4 for new or unknown SIMPL+ files"
+          },
+          "simpl-plus.autoFormatKeywordCase": {
+            "type": "string",
+            "enum": ["lowercase", "UPPERCASE", "PascalCase", "Unchanged"],
+            "markdownEnumDescriptions": [
+              "Format Keywords to all lowercase/lower_case",
+              "Format Keywords to all UPPERCASE/UPPER_CASE",
+              "Format Keywords to all PascalCase/Pascal_Case",
+              "Leave Keywords unchanged"
+            ],
+            "default": "Unchanged",
+            "description": "When performing autoformat, change built-in keywords, statements, etc to selected case "
           }
         }
       }
