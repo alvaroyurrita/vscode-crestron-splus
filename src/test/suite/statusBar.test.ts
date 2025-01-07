@@ -2,8 +2,8 @@ import sinon from "sinon";
 import { window, TextDocument, Uri, workspace } from 'vscode';
 import { delay, OpenAndShowSPlusDocument, removeWorkspaceCustomSettings } from "../testFunctions";
 import assert from "assert";
-import * as fsExistsWrapper from '../../fsExistsSyncWrapper';
-import * as fsFileReadWrapper from '../../fsReadSyncWrapper';
+import * as fsExistsWrapper from '../../helpers/fsExistsSyncWrapper';
+import * as fsFileReadWrapper from '../../helpers/fsReadSyncWrapper';
 
 suite("Status Bar ", () => {
     let mockDocument: TextDocument;

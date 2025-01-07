@@ -114,7 +114,7 @@ repository:
     patterns:
       - include: "#punctuation-comma"
       - match: "@?[_[:alpha:]][_[:alnum:]]*"
-        name: entity.name.variable.enum-member.cs
+        name: entity.name.variable.enum-member.api
   class-members:
     patterns:
       - include: "#delegate-declaration"
@@ -230,11 +230,11 @@ repository:
     begin: (\()
     beginCaptures:
       '0':
-        name: punctuation.parenthesis.open.usp
+        name: punctuation.parenthesis.open.api
     end: (\))
     endCaptures:
       '0':
-        name: punctuation.parenthesis.close.usp
+        name: punctuation.parenthesis.close.api
     patterns:
     - include: "#comment"
     - include: "#parameter"
@@ -249,28 +249,28 @@ repository:
           )
     beginCaptures:
       "1":
-        name: storage.modifier.$1.usp
+        name: storage.modifier.$1.api
       '2':
         patterns:
           - include: "#type"
       '3':
-        name: entity.name.variable.parameter.usp
+        name: entity.name.variable.parameter.api
     end: |-
       (?ix)
         (?=[\,\)])  #stop pattern before theres a comma or closing parenthesis without grabbing any characters
     patterns:
       - match: ([\_[:alpha:]][_[:alnum:]]*)
-        name: entity.name.variable.parameter.usp
+        name: entity.name.variable.parameter.api
       - include: "#type-array-suffix"
   type-array-suffix:
     begin: "\\["
     beginCaptures:
       '0':
-        name: punctuation.squarebracket.open.usp
+        name: punctuation.squarebracket.open.api
     end: "\\]"
     endCaptures:
       '0':
-        name: punctuation.squarebracket.close.usp
+        name: punctuation.squarebracket.close.api
     patterns:
     - include: "#numeric-literal"
     - include: "#punctuation-comma"
@@ -321,73 +321,73 @@ repository:
                 ([0-9a-fA-F](?:[0-9a-fA-F])*)$ #capture rest of hex digits
             captures:
               '1':
-                name: constant.numeric.other.prefix.hex.usp
+                name: constant.numeric.other.prefix.hex.api
               '2':
-                name: constant.numeric.hex.usp
+                name: constant.numeric.hex.api
           - match: |-
               (?x)
                 (?=[0-9])(?!0[xX]) #ensure it starts with a digit, but not wit a 0x or 0X
                 ([0-9d](?:[0-9d])*)$ #capture rest of decimal digits and d (for parameter properties decimal value)
             captures:
               '1':
-                name: constant.numeric.decimal.usp
+                name: constant.numeric.decimal.api
           - match: |-
               (?ix)
                 (?=[0-9a-f])(?!0[xX]) #ensure it starts with a hex digit, but not wit a 0x or 0X
                 ([0-9a-fh](?:[0-9a-fh])*)$ #capture rest of hex digits and h (for parameter properties decimal value)hex value)
             captures:
               '1':
-                name: constant.numeric.hex.usp
+                name: constant.numeric.hex.api
           - match: |-
               (?x)
                 (?=[0-9])(?!0[xX]) #ensure it starts with a digit, but not wit a 0x or 0X
                 ([0-9%](?:[0-9%])*)$ #capture rest of decimal digits and % (for parameter properties percentage value)
             captures:
               '1':
-                name: constant.numeric.percentage.usp
+                name: constant.numeric.percentage.api
           - match: |-
               (?x)
                 (?=[0-9])(?!0[xX]) #ensure it starts with a digit, but not wit a 0x or 0X
                 ([0-9s](?:[0-9s])*)$ #capture rest of decimal digits and s (for parameter properties seconds value)
             captures:
               '1':
-                name: constant.numeric.seconds.usp
+                name: constant.numeric.seconds.api
           - match: |-
               (?x)
                 (?=[0-9])(?!0[xX]) #ensure it starts with a digit, but not wit a 0x or 0X
                 ([0-9t](?:[0-9t])*)$ #capture rest of decimal digits and t (for parameter properties ticks value)
             captures:
               '1':
-                name: constant.numeric.ticks.usp
+                name: constant.numeric.ticks.api
           - match: (?:(?:[0-9a-zA-Z_]|_)|(?<=[eE])[+-]|\.\d)+ # invalidate anything that did not match hex of decimal
-            name: invalid.illegal.constant.numeric.usp
+            name: invalid.illegal.constant.numeric.api
   char-literal:
-    name: string.quoted.single.usp
+    name: string.quoted.single.api
     begin: \'
     beginCaptures:
       '0':
-        name: punctuation.definition.char.begin.usp
+        name: punctuation.definition.char.begin.api
     end: (\')|((?:[^\n])$) #end with a single quote or anything but newline
     endCaptures:
       '1':
-        name: punctuation.definition.char.end.usp
+        name: punctuation.definition.char.end.api
       '2':
-        name: invalid.illegal.newline.usp
+        name: invalid.illegal.newline.api
     patterns:
     - match: ([0-9a-zA-Z]{2,})
-      name: invalid.illegal.char.usp
+      name: invalid.illegal.char.api
   string-literal:
-    name: string.quoted.double.usp
+    name: string.quoted.double.api
     begin: \"
     beginCaptures:
       '0':
-        name: punctuation.definition.string.begin.usp
+        name: punctuation.definition.string.begin.api
     end: (")|((?:[^\n])$)
     endCaptures:
       '1':
-        name: punctuation.definition.string.end.usp
+        name: punctuation.definition.string.end.api
       '2':
-        name: invalid.illegal.newline.usp
+        name: invalid.illegal.newline.api
     patterns:
     - include: "#string-character-escape"
   string-character-escape:
@@ -426,7 +426,7 @@ repository:
                     ){1}
                   ) #Print Formatters %[[pad]width]specifier
                 )
-            name: constant.character.escape.usp
+            name: constant.character.escape.api
           - match: |- #backslash character escape
               (?x)
                  (\\
@@ -446,27 +446,27 @@ repository:
                    )
                  ) |
                  (\\\\) #double backslash
-            name: constant.character.escape.usp
+            name: constant.character.escape.api
           - match: .* #invalidate anything that did not match the above
-            name: invalid.illegal.character.escape.usp
+            name: invalid.illegal.character.escape.api
 
   punctuation-comma:
     match: \,
-    name: punctuation.comma.usp
+    name: punctuation.comma.api
   punctuation-semicolon:
     match: \;
-    name: punctuation.terminator.usp
+    name: punctuation.terminator.api
 
 #Comment
   comment:
     patterns:
       - include: "#comment-single-line"
   comment-single-line:
-    name: comment.line.double-slash.usp
+    name: comment.line.double-slash.api
     begin: (^\s+)?(\/\/).*$
     while: ^(\s*)(\/\/).*$
     captures:
       "1":
-        name: punctuation.whitespace.comment.leading.usp
+        name: punctuation.whitespace.comment.leading.api
       "2":
-        name: punctuation.definition.comment.usp
+        name: punctuation.definition.comment.api

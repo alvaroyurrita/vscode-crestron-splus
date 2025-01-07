@@ -28,7 +28,7 @@ parameter-declaration
 variable-declaration
 ----
 |= storage.modifier.{name below} |= keyword.type.{name below} |= entity.name.variable | array |= punctuation.comma |= punctuation.terminator.variable |
-| optional:\n VOLATILE\n NONVOLATILE\n DYNAMIC \n ASCII\n UTF16\n INHERIT\n DELEGATEPROPERTY | INTEGER\n SIGNED_INTEGER\n LONG_INTEGER\n SIGNED_LONG_INTEGER\n STRING\n SIMPLSHARPSTRING|  \n  name | \n  [count] [size]  |= \n   ,|=  \n     ; |
+| optional:\n VOLATILE\n NONVOLATILE\n DYNAMIC \n ASCII\n UTF16\n INHERIT\n DELEGATEPROPERTY | INTEGER\n SIGNED_INTEGER\n LONG_INTEGER\n SIGNED_LONG_INTEGER\n STRING|  \n  name | \n  [count] [size]  |= \n   ,|=  \n     ; |
 ----
 built in classes
 |= keyword.type.{name below} |= entity.name.variable | array |= punctuation.terminator.variable |
@@ -54,7 +54,7 @@ structure-declaration
 function-declaration
 ----
 |= keyword.type.{name below} |= entity.name.function | parameters | contents |
-| FUNCTION\n INTEGER_FUNCTION\n SIGNED_INTEGER_FUNCTION\n LONG_INTEGER_FUNCTION\n SIGNED_LONG_INTEGER_FUNCTION\n STRING_FUNCTION \n SIMPLSHARPSTRING_FUNCTION  |  \n  name | \n  parenthesized-parameter-list | \n  {..statements..}  |
+| FUNCTION\n INTEGER_FUNCTION\n SIGNED_INTEGER_FUNCTION\n LONG_INTEGER_FUNCTION\n SIGNED_LONG_INTEGER_FUNCTION\n STRING_FUNCTION |  \n  name | \n  parenthesized-parameter-list | \n  {..statements..}  |
 ----
 eventhandler:
 |= keyword.type.{name below} |= entity.name.function | parameters | contents |
@@ -62,7 +62,7 @@ eventhandler:
 ----
 callbacks:
 |= storage.modifier.callback |= keyword.type.{name below} |= entity.name.function | parameters | contents |
-| \n CALLBACK  | FUNCTION\n INTEGER_FUNCTION\n SIGNED_INTEGER_FUNCTION\n LONG_INTEGER_FUNCTION\n SIGNED_LONG_INTEGER_FUNCTION\n STRING_FUNCTION \n SIMPLSHARPSTRING_FUNCTION | \n  name | \n  parenthesized-parameter-list  | \n  {..statements..}  |;
+| \n CALLBACK  | FUNCTION\n INTEGER_FUNCTION\n SIGNED_INTEGER_FUNCTION\n LONG_INTEGER_FUNCTION\n SIGNED_LONG_INTEGER_FUNCTION\n STRING_FUNCTION \n GatherEventHandler | \n  name | \n  parenthesized-parameter-list  | \n  {..statements..}  |;
 
 **:== Events
 event-declaration
@@ -76,9 +76,9 @@ event-declaration
 parenthesized-parameter-list
 ----
 |= keyword.modifier.{name below} |= keyword.type.{name below}  |= entity.name.variable.parameter | array |
-| optional:\n ByVal\n ByRef\n ReadOnlyRef | INTEGER\n SIGNED_INTEGER\n LONG_INTEGER\n SIGNED_LONG_INTEGER\n EVENTARGS |  \n  name | \n  [] []  |
+| optional:\n ByVal\n ByRef\n ReadOnlyRef | INTEGER\n SIGNED_INTEGER\n LONG_INTEGER\n SIGNED_LONG_INTEGER\n EVENTARGS |  \n  name | \n  [   ]   |
 
 |= keyword.modifier.{name below} |= entity.name.type |= entity.name.variable.parameter | array |
-| optional:\n ByVal\n ByRef\n ReadOnlyRef | \n used defined object |  \n  name | \n  []  |;
+| optional:\n ByVal\n ByRef\n ReadOnlyRef | \n used defined object |  \n  name | \n  [   ]  |;
 
 @endmindmap

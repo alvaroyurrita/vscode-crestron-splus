@@ -41,7 +41,6 @@ suite('Execution', function () {
         await vscode.commands.executeCommand('simpl-plus.localHelp');
         await delay(500);
         assert.ok(fakeTerminalCreator.args[0][0].toString().includes("simpl-plus"));
-        console.log(fakeTerminalCreator.args[0].length);
         assert.ok(typeof fakeTerminalCreator.args !== undefined &&
             fakeTerminalCreator.args[0] !== undefined &&
             fakeTerminalCreator.args[0].length > 1 &&

@@ -1,0 +1,143 @@
+#USER_SIMPLSHARP_LIBRARY "SampleSimplSharpLibrary"
+
+
+string_input test[3];
+digital_input testdigital;
+analog_input testanalog;
+
+Integer var;
+
+Structure myStructure1{
+	Integer test1;
+	Long_Integer test2;
+}
+
+Structure myStructure2{
+	Integer test3;
+	Long_Integer test4;
+	myStructure1 test5;
+}
+
+Structure myStructure3{
+	Integer test6;
+	Long_Integer test7;
+	myStructure2 test8;
+	
+}
+
+TCP_CLIENT MyClient[1024];
+TCP_SERVER MyServer[1024];
+UDP_SOCKET MyUDP[1024];
+
+SampleClass mySampleClass1;
+
+CEvent myCEvent;
+CMutex myCMutex;
+
+Integer_Function testFunction(Integer a1, Integer a2)
+{
+	testFunction(a1, a2);
+	File_Info testFileInfo;
+	SampleClass mySampleClass;
+	myStructure3.test8.test5.test1;
+	myStructure3.test8.test5.test2;
+	testFu
+}
+
+change test
+{
+	
+}
+Integer_Function testFunction(Integer a1, Integer a2)
+{
+	testFunction(a1, a2);
+	File_Info testFileInfo;
+	SampleClass mySampleClass;
+	myStructure3.test8.test5.test1;
+	myStructure3.test8.test5.test2;
+	mySampleClass1.
+}
+
+change test
+{
+	
+}
+
+Integer_Function testFunction(Integer a1, Integer a2)
+{
+	testFunction(a1, a2);
+	File_Info testFileInfo;
+	SampleClass mySampleClass;
+	myStructure3.test8.test5.test1;
+	myStructure3.test8.test5.test2;
+	mySampleClass1.
+}
+
+change test
+{
+	
+}
+
+Integer_Function testFunction(Integer a1, Integer a2)
+{
+	testFunction(a1, a2);
+	File_Info testFileInfo;
+	SampleClass mySampleClass;
+	myStructure3.test8.test5.test1;
+	myStructure3.test8.test5.test2;
+	mySampleClass1.
+}
+
+change test
+{
+	
+}
+
+Integer_Function testFunction(Integer a1, Integer a2)
+{
+	testFunction(a1, a2);
+	File_Info testFileInfo;
+	SampleClass mySampleClass;
+	myStructure3.test8.test5.test1;
+	myStructure3.test8.test5.test2;
+	mySampleClass1.
+}
+
+change test
+{
+	
+}
+
+Integer_Function testFunction(Integer a1, Integer a2)
+{
+	testFunction(a1, a2);
+	File_Info testFileInfo;
+	SampleClass mySampleClass;
+	myStructure3.test8.test5.test1;
+	myStructure3.test8.test5.test2;
+	mySampleClass1.
+}
+
+change test
+{
+	
+}
+
+Integer_Function testFunction(Integer a1, Integer a2)
+{
+	testFunction(a1, a2);
+	File_Info testFileInfo;
+	SampleClass mySampleClass;
+	myStructure3.test8.test5.test1;
+	myStructure3.test8.test5.test2;
+	myStructure3.
+	test8.
+}
+
+change test
+{
+	
+}
+
+
+

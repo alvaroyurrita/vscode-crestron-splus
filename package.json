@@ -32,7 +32,7 @@
       {
         "command": "simpl-plus.build",
         "title": "SIMPL+: Build SIMPL+ Project"
-      }      ,
+      },
       {
         "command": "simpl-plus.insertCategory",
         "title": "SIMPL+: Insert #CATEGORY..."
@@ -97,7 +97,7 @@
       },
       {
         "command": "simpl-plus.build",
-        "key": "F12",
+        "key": "shift+F12",
         "when": "resourceLangId == simpl-plus"
       }
     ],
@@ -251,6 +251,7 @@
     "publisherDisplayName": "Eric Walters"
   },
   "dependencies": {
-    "axios": "^1.7.7"
+    "html-to-text": "^9.0.5",
+    "vscode-textmate-languageservice": "^4.0.0"
   }
 }

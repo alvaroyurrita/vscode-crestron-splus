@@ -14,11 +14,12 @@ import {
     TaskDefinition,
     WorkspaceFolder,
     TaskPresentationOptions,
+    commands,
 } from "vscode";
 import path from "path";
-import * as fsExistsWrapper from './fsExistsSyncWrapper';
-import { getCompilerPath, getFileName } from "./helperFunctions";
-import { BuildType } from "./build-type";
+import * as fsExistsWrapper from './helpers/fsExistsSyncWrapper';
+import { getCompilerPath, getFileName } from "./helpers/helperFunctions";
+import { BuildType } from "./base/build-type";
 
 export class SimplPlusTasks implements Disposable {
     private static _instance: SimplPlusTasks;
@@ -87,7 +88,7 @@ export class SimplPlusTasks implements Disposable {
         }
         catch (err) {
             let channel = this.getOutputChannel();
-            console.log(err);
+            console.log("Error while calculating Simpl Plus Tasks",err);
 
             if (err instanceof Error) {
                 channel.appendLine(err.message);
@@ -124,18 +125,20 @@ export class SimplPlusTasks implements Disposable {
                 const fileNamePath = path.parse(activeDocument.uri.fsPath);
                 const thisFileDir = fileNamePath.dir;
                 const libraryClzDir = path.join(thisFileDir, `${library}.clz`);
+                const libraryApiPath = path.join(thisFileDir, "SPlsWork", `${library}.api`);
                 const simplDirectory = workspace.getConfiguration("simpl-plus").simplDirectory;
                 const extensionPath = extensions.getExtension("sentry07.simpl-plus")?.extensionPath;
                 if (extensionPath === undefined) { return emptyTasks; }
                 const simpPlusApiGeneratorPath = path.join(extensionPath, "ApiGenerator", "SimplPlusApiGenerator.exe");
 
                 if (fsExistsWrapper.existsSyncWrapper(libraryClzDir)) {
-                    let buildCommand = `\"${simpPlusApiGeneratorPath}" \"${libraryClzDir}\" \"${simplDirectory}\"`;
+                    // let buildCommand = `\"${simpPlusApiGeneratorPath}" \"${libraryClzDir}\" \"${simplDirectory}\"`;
+                    let buildCommand = `\code \"${libraryApiPath}\"`;
 
                     const taskProperties: TaskArguments = {
-                        name: `Generate API file for ${library}`,
+                        name: `Open API file for ${library}`,
                         scope: TaskScope.Workspace,
-                        source: 'Crestron S+',
+                        source: 'SIMPL+',
                         taskDefinition: { type: "shell" },
                         execution: new ShellExecution(`\"${buildCommand}\"`, { executable: 'C:\\Windows\\System32\\cmd.exe', shellArgs: ['/C'] }),
                         problemMatchers: [],
@@ -259,12 +262,14 @@ export class SimplPlusTasks implements Disposable {
 
 
     private TaskCreator(taskProperties: TaskArguments): Task {
-        const task = new Task(taskProperties.taskDefinition,
+        const task = new Task(
+            taskProperties.taskDefinition,
             taskProperties.scope,
             taskProperties.name,
             taskProperties.source,
             taskProperties.execution,
-            taskProperties.problemMatchers);
+            taskProperties.problemMatchers
+        );
         task.group = taskProperties.group;
         task.presentationOptions = taskProperties.presentationOptions;
         return task;

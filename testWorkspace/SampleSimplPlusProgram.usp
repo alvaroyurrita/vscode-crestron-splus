@@ -1,7 +1,27 @@
-digital_input test;
+#USER_LIBRARY "SampleLibrary"
+#USER_SIMPLSHARP_LIBRARY "SampleSimplSharpLibrary"
 
-//#USER_SIMPLSHARP_LIBRARY  "SampleSimplSharpLibrary";
+DIGITAL_INPUT Test;
 
 
-//SampleClass TestClass;
+SampleClass test2;
+OtherSampleClass testSampleClass;
 
+
+push Test
+{
+	print("Enum Test %i",test2.sampleEnum);
+	a = MyFunction4(myvar1, myvar2)
+	
+}
+
+function test(Integer test)
+{
+	Integer internalVar;
+}
+
+Structure myStructure
+{
+
+	Integer test;
+}

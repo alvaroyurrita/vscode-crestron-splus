@@ -1,7 +1,7 @@
 import path from "path";
-import { BuildType } from "./build-type";
-import { existsSyncWrapper } from "./fsExistsSyncWrapper";
-import { readFileSyncWrapper } from "./fsReadSyncWrapper";
+import { BuildType } from "./base/build-type";
+import { existsSyncWrapper } from "./helpers/fsExistsSyncWrapper";
+import { readFileSyncWrapper } from "./helpers/fsReadSyncWrapper";
 import { workspace, TextDocument, Uri , Disposable } from 'vscode';
 
 class SimplPlusDocumentBuildTargets {
