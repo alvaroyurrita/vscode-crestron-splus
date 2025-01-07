@@ -33,7 +33,6 @@ export class SimplPlusSignatureHelpProvider implements SignatureHelpProvider {
             let functionToken: SimplPlusObject | undefined = undefined;
             const textAtPosition = document.lineAt(position.line).text.slice(0, currentCharacter);
             const match = textAtPosition.match(/([\w][\#\$\w]*)\s*\(([^\)]*)(?!\))$/);  // Match a keyword followed by an open parenthesis as long as there is no closing parenthesis
-            console.log(match);
             if (match === null) {
                 return resolve(undefined);
             }

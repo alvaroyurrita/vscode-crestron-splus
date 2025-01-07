@@ -56,7 +56,6 @@ export class SimplPlusProgramObjectService implements Disposable {
         );
     }
     private async updateOnCloseTextDocument(document: TextDocument): Promise<void> {
-        console.log("Document closed", document.fileName);
         if (document.languageId !== this.selector.toString()) { return; }
         this._documents.delete(document.uri.toString());
     }
@@ -66,10 +65,8 @@ export class SimplPlusProgramObjectService implements Disposable {
         if (document.languageId !== this.selector.toString()) { return; }
         await this.tokenize(document);
         const currentPosition = window.activeTextEditor?.selection.active;
-        // console.log(currentPosition);
     }
     private async updateOnOpenTextDocument(document: TextDocument): Promise<void> {
-        console.log("Document Open", document.fileName);
         if (document.languageId !== this.selector.toString()) { return; }
         await this.tokenize(document);
     }

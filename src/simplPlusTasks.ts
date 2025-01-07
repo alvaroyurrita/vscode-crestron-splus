@@ -82,13 +82,12 @@ export class SimplPlusTasks implements Disposable {
         }
 
         try {
-            result = result.concat(...this.simplPlusIncludeLibraryTasks());
             result = result.concat(...this.simplPlusCompileTasks());
             return result;
         }
         catch (err) {
             let channel = this.getOutputChannel();
-            console.log("Error while calculating Simpl Plus Tasks",err);
+            console.error("Error while calculating Simpl Plus Tasks", err);
 
             if (err instanceof Error) {
                 channel.appendLine(err.message);
@@ -106,53 +105,6 @@ export class SimplPlusTasks implements Disposable {
             this._channel = window.createOutputChannel("SIMPL+ Compile");
         }
         return this._channel;
-    }
-
-    private simplPlusIncludeLibraryTasks(): Task[] {
-        let tasks: Task[] = [];
-        let activeEditor = window.activeTextEditor;
-        let activeDocument = activeEditor?.document;
-        let emptyTasks: Task[] = [];
-
-        if (activeDocument === undefined) { return emptyTasks; }
-        let sSharpLibRegEx = /(?:#(?:USER|CRESTRON)_SIMPLSHARP_LIBRARY)\s*\"(?<libraryName>[\w\.\-]*)\"/gmi;
-
-        let sSharpLibraryMatches = activeDocument.getText().matchAll(sSharpLibRegEx);
-
-        if (!!sSharpLibraryMatches) {
-            for (const match of sSharpLibraryMatches) {
-                const library = match.groups?.libraryName;
-                const fileNamePath = path.parse(activeDocument.uri.fsPath);
-                const thisFileDir = fileNamePath.dir;
-                const libraryClzDir = path.join(thisFileDir, `${library}.clz`);
-                const libraryApiPath = path.join(thisFileDir, "SPlsWork", `${library}.api`);
-                const simplDirectory = workspace.getConfiguration("simpl-plus").simplDirectory;
-                const extensionPath = extensions.getExtension("sentry07.simpl-plus")?.extensionPath;
-                if (extensionPath === undefined) { return emptyTasks; }
-                const simpPlusApiGeneratorPath = path.join(extensionPath, "ApiGenerator", "SimplPlusApiGenerator.exe");
-
-                if (fsExistsWrapper.existsSyncWrapper(libraryClzDir)) {
-                    // let buildCommand = `\"${simpPlusApiGeneratorPath}" \"${libraryClzDir}\" \"${simplDirectory}\"`;
-                    let buildCommand = `\code \"${libraryApiPath}\"`;
-
-                    const taskProperties: TaskArguments = {
-                        name: `Open API file for ${library}`,
-                        scope: TaskScope.Workspace,
-                        source: 'SIMPL+',
-                        taskDefinition: { type: "shell" },
-                        execution: new ShellExecution(`\"${buildCommand}\"`, { executable: 'C:\\Windows\\System32\\cmd.exe', shellArgs: ['/C'] }),
-                        problemMatchers: [],
-                        group: TaskGroup.Build,
-                        presentationOptions: { panel: TaskPanelKind.Shared, focus: true, clear: true }
-                    };
-
-                    let task = this.TaskCreator(taskProperties);
-                    tasks.push(task);
-                }
-            };
-        }
-
-        return tasks;
     }
 
     private simplPlusCompileTasks(): Task[] {

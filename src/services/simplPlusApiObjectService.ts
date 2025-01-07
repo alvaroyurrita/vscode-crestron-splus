@@ -70,10 +70,29 @@ export class simplPlusApiObjectService implements Disposable {
         return documentTokens;
     }
 
+    public async openLibraries(uri: Uri): Promise<void> {
+        const librariesToOpen = this._programs.get(uri.toString());
+        if (librariesToOpen === undefined) { return; }
+        librariesToOpen.forEach(async (library) => {
+            const workSpaceFolder = library.slice(0, library.lastIndexOf("\\"));
+            const libraryName = library.slice(library.lastIndexOf("\\") + 1, library.lastIndexOf("."));
+            const CLZFullPath = join(workSpaceFolder, "SPlsWork", libraryName + ".api");
+            if (!fs.existsSync(CLZFullPath)) { return; }
+            const doc = await workspace.openTextDocument(CLZFullPath);
+            await window.showTextDocument(doc);
+        });
+
+    }
+
+    public hasLibraries(uri: Uri): boolean {
+        const apis = this._programs.get(uri.toString())?.length ?? 0;
+        return apis > 0;
+    }
+
     private async updateOnCloseTextDocument(document: TextDocument): Promise<void> {
         if (document.languageId !== this.selector.toString()) { return; }
-        this._programs.delete(document.uri.toString());
-        console.log("Document closed", document.uri.toString());
+        const documentUri = document.uri.toString();
+        this._programs.delete(documentUri);
     }
     private async updateOnDidChangeTextDocument(editor: TextDocumentChangeEvent | undefined): Promise<void> {
         if (editor === undefined) { return; }
@@ -81,6 +100,7 @@ export class simplPlusApiObjectService implements Disposable {
         if (document.languageId !== this.selector.toString()) { return; }
         await this.tokenize(document);
     }
+
     private async updateOnOpenTextDocument(document: TextDocument): Promise<void> {
         if (document.languageId !== this.selector.toString()) { return; }
         await this.tokenize(document);
@@ -122,11 +142,10 @@ export class simplPlusApiObjectService implements Disposable {
             clzDocuments.push(CLZFullPath);
             if (!this._apis.has(CLZFullPath)) {
                 //immediately store empty array to prevent multiple API generation
-                let apiTokens : SimplPlusObject[] = [];
+                let apiTokens: SimplPlusObject[] = [];
                 this._apis.set(CLZFullPath, apiTokens);
                 // Generate API File from CLZ
                 try {
-                    console.log("Generating API for", CLZFullPath);
                     await this.runApiGenerator(CLZFullPath);
                 }
                 catch (error) {
@@ -156,7 +175,6 @@ export class simplPlusApiObjectService implements Disposable {
         //if it has, generate API Tokens
         // Generate API File from CLZ
         try {
-            console.log("Updating API for", CLZPath);
             await this.runApiGenerator(CLZPath);
         }
         catch (error) {
@@ -173,7 +191,7 @@ export class simplPlusApiObjectService implements Disposable {
             const simplDirectory = workspace.getConfiguration("simpl-plus").simplDirectory;
             const extensionPath = extensions.getExtension("sentry07.simpl-plus")?.extensionPath;
             if (extensionPath === undefined) { resolve(); }
-            const simpPlusApiGeneratorPath = join(extensionPath, "ApiGenerator", "SimplPlusApiGenerator.exe");
+            const simpPlusApiGeneratorPath = join(extensionPath, "src", "ApiGenerator", "SimplPlusApiGenerator.exe");
 
             let buildCommand = `.\"${simpPlusApiGeneratorPath}\" \"${CLZLibraryPath}\" \"${simplDirectory}\"`;
 

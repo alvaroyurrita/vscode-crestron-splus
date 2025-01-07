@@ -89,6 +89,16 @@ export async function activate(context: ExtensionContext) {
         }
     });
 
+    let openApis_command = commands.registerCommand("simpl-plus.openApis", async () => {
+        const currentProjectUri = window.activeTextEditor.document.uri;
+        await projectObjectService.openApis(currentProjectUri);
+    });
+
+    let openLibraries_command = commands.registerCommand("simpl-plus.openLibraries", async () => {
+        const currentProjectUri = window.activeTextEditor.document.uri;
+        await projectObjectService.openLibraries(currentProjectUri);
+    });
+
     let thisFormatProvider = new SimplPlusFormattingProvider();
     const formatProvider = languages.registerDocumentFormattingEditProvider({ language: 'simpl-plus' }, thisFormatProvider);
 
@@ -111,9 +121,16 @@ export async function activate(context: ExtensionContext) {
     // let thisTextmateCompletionProvider = new TextMateCompletionProvider(tokenService);
     // const textMateCompletionProvider = languages.registerCompletionItemProvider({ language: 'simpl-plus' }, thisTextmateCompletionProvider);
 
+    window.onDidChangeActiveTextEditor((e) => {
+        updateContextMenu(e.document.uri, projectObjectService);
+    });
+    updateContextMenu(window.activeTextEditor?.document.uri, projectObjectService);
+
     context.subscriptions.push(
         formatProvider,
         hoverProvider,
+        openApis_command,
+        openLibraries_command,
         localHelp_command,
         webHelp_command,
         build_command,
@@ -126,6 +143,11 @@ export async function activate(context: ExtensionContext) {
         projectObjectService
         // textMateCompletionProvider
     );
+}
+
+function updateContextMenu(uri: Uri, project: SimplPlusProjectObjectService): void {
+    commands.executeCommand("setContext", "simpl-plus:hasApis", project.hasApis(uri));
+    commands.executeCommand("setContext", "simpl-plus:hasLibraries", project.hasLibraries(uri));
 }
 
 

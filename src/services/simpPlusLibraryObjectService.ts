@@ -63,10 +63,24 @@ export class simpPlusLibraryObjectService implements Disposable {
         return documentTokens;
     }
 
+    public async openLibraries(uri: Uri): Promise<void> {
+        const librariesToOpen = this._programs.get(uri.toString());
+        if (librariesToOpen === undefined) { return; }
+        librariesToOpen.forEach(async (library) => {
+            if (!fs.existsSync(library)) { return; }
+            const doc = await workspace.openTextDocument(library);
+            await window.showTextDocument(doc);
+        });
+    }
+
+    public hasLibraries(uri: Uri): boolean {
+        const apis = this._programs.get(uri.toString())?.length ?? 0;
+        return apis > 0;
+    }
+
     private async updateOnCloseTextDocument(document: TextDocument): Promise<void> {
         if (document.languageId !== this.selector.toString()) { return; }
         this._programs.delete(document.uri.toString());
-        console.log("API Document closed");
     }
     private async updateOnDidChangeTextDocument(editor: TextDocumentChangeEvent | undefined): Promise<void> {
         if (editor === undefined) { return; }
@@ -78,13 +92,12 @@ export class simpPlusLibraryObjectService implements Disposable {
         if (document.languageId !== this.selector.toString()) { return; }
         await this.tokenize(document);
     }
-
     private deleteLibrary(e: Uri) {
         //check if one of the stored USL libraries has been deleted
-        const CLZPathToCheck = e.fsPath.slice(0, e.fsPath.lastIndexOf(".")) + ".clz";
-        if (!this._libraries.has(CLZPathToCheck)) { return; }
+        const UslPathToCheck = e.fsPath.slice(0, e.fsPath.lastIndexOf(".")) + ".usl";
+        if (!this._libraries.has(UslPathToCheck)) { return; }
         //if it has, remove tokens
-        this._libraries.delete(CLZPathToCheck);
+        this._libraries.delete(UslPathToCheck);
     }
     private async updateLibrary(e: Uri) {
         //check if one of the stored USL libraries has been updated or created

@@ -36,6 +36,14 @@
       {
         "command": "simpl-plus.insertCategory",
         "title": "SIMPL+: Insert #CATEGORY..."
+      },
+      {
+        "command": "simpl-plus.openApis",
+        "title": "SIMPL+: Open all project related API files"
+      },
+      {
+        "command": "simpl-plus.openLibraries",
+        "title": "SIMPL+: Open all project related library files"
       }
     ],
     "configuration": [
@@ -68,19 +76,34 @@
     "menus": {
       "editor/context": [
         {
-          "command": "simpl-plus.localHelp",
+          "command": "simpl-plus.build",
           "group": "navigation@1",
           "when": "resourceLangId == simpl-plus"
         },
         {
-          "command": "simpl-plus.webHelp",
+          "command": "simpl-plus.localHelp",
           "group": "navigation@2",
           "when": "resourceLangId == simpl-plus"
         },
         {
-          "command": "simpl-plus.insertCategory",
+          "command": "simpl-plus.webHelp",
           "group": "navigation@3",
           "when": "resourceLangId == simpl-plus"
+        },
+        {
+          "command": "simpl-plus.insertCategory",
+          "group": "navigation@4",
+          "when": "resourceLangId == simpl-plus"
+        },
+        {
+          "command": "simpl-plus.openApis",
+          "group": "navigation@5",
+          "when": "resourceLangId == simpl-plus && simpl-plus:hasApis"
+        },
+        {
+          "command": "simpl-plus.openLibraries",
+          "group": "navigation@6",
+          "when": "resourceLangId == simpl-plus && simpl-plus:hasLibraries"
         }
       ]
     },
@@ -97,7 +120,7 @@
       },
       {
         "command": "simpl-plus.build",
-        "key": "shift+F12",
+        "key": "F12",
         "when": "resourceLangId == simpl-plus"
       }
     ],

@@ -62,6 +62,22 @@ export class SimplPlusProjectObjectService implements Disposable {
         return objects;
     }
 
+    public async openApis(uri: Uri): Promise<void> {
+        await this._apiObjectService.openLibraries(uri);
+    }
+
+    public async openLibraries(uri: Uri): Promise<void> {
+        await this._libraryObjectService.openLibraries(uri);
+    }
+
+    public hasApis(uri: Uri): boolean {
+        return this._apiObjectService.hasLibraries(uri);
+    }
+
+    public hasLibraries(uri: Uri): boolean {
+        return this._libraryObjectService.hasLibraries(uri);
+    }
+
     //returns the object (structure, event or function, or parameter range) that a position is inside of.
     // used to figure out what members to display during autocomplete
     public getProgramObjectAtPosition(uri: Uri, position: Position): SimplPlusObject | undefined {
