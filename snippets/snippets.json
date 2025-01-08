@@ -405,7 +405,7 @@
             "\tCase (${2:VALUE}):{",
             "\t\t${3://code here}",
             "\t}",
-            "\t(${0://type CASE to add a new case statement}",
+            "\t${0://type CASE to add a new case statement}",
             "\tDefault:{",
             "\t\t",
             "\t}",

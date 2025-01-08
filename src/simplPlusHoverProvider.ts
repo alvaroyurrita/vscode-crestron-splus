@@ -1,4 +1,4 @@
-import { HoverProvider, Hover, TextDocument, CancellationToken, Position } from 'vscode';
+import { HoverProvider, Hover, TextDocument, CancellationToken, Position, window } from 'vscode';
 import { SimplPlusKeywordHelpService } from './services/simplPlusKeywordHelpService';
 
 export class SimplPlusHoverProvider implements HoverProvider {
@@ -16,7 +16,7 @@ export class SimplPlusHoverProvider implements HoverProvider {
             if (helpContent === undefined) { return undefined; }
             return new Hover(helpContent);
         } catch (error) {
-            console.error(`Failed to fetch help content for ${word}:`, error);
+            window.showErrorMessage(`Failed to fetch help content for ${word}: ${error}`);
         }
 
         return undefined;

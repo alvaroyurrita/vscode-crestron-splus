@@ -10,6 +10,8 @@ import {
     FileSystemWatcher,
     extensions,
     RelativePattern,
+    Event,
+    EventEmitter
 } from "vscode";
 import { ApiParser } from "../helpers/apiParser";
 import { SimplPlusObject } from "../base/simplPlusObject";
@@ -39,6 +41,8 @@ export class simplPlusApiObjectService implements Disposable {
         }
         return simplPlusApiObjectService._instance;
     }
+    private onApiListUpdatedEventEmitter = new EventEmitter<void>();
+    public onApiListUpdated: Event<void> = this.onApiListUpdatedEventEmitter.event;
 
     private constructor(ctx: ExtensionContext) {
         const onOpenTextDocument_event = workspace.onDidOpenTextDocument((document) => this.updateOnOpenTextDocument(document));
@@ -51,7 +55,6 @@ export class simplPlusApiObjectService implements Disposable {
         );
         const document = window.activeTextEditor?.document;
         if (document !== undefined && document.languageId === this.selector.toString()) { this.tokenize(document); }
-
     }
     public dispose() {
         this._apis.clear();
@@ -60,6 +63,7 @@ export class simplPlusApiObjectService implements Disposable {
     }
 
     public getObjects(uri: Uri): SimplPlusObject[] {
+        if (uri === undefined) { return []; }
         const documentTokens: SimplPlusObject[] = [];
         this._programs.get(uri.toString())?.forEach((library) => {
             const tokens = this._apis.get(library);
@@ -71,6 +75,7 @@ export class simplPlusApiObjectService implements Disposable {
     }
 
     public async openLibraries(uri: Uri): Promise<void> {
+        if (uri === undefined) { return; }
         const librariesToOpen = this._programs.get(uri.toString());
         if (librariesToOpen === undefined) { return; }
         librariesToOpen.forEach(async (library) => {
@@ -85,6 +90,7 @@ export class simplPlusApiObjectService implements Disposable {
     }
 
     public hasLibraries(uri: Uri): boolean {
+        if (uri === undefined) { return false; }
         const apis = this._programs.get(uri.toString())?.length ?? 0;
         return apis > 0;
     }
@@ -93,6 +99,7 @@ export class simplPlusApiObjectService implements Disposable {
         if (document.languageId !== this.selector.toString()) { return; }
         const documentUri = document.uri.toString();
         this._programs.delete(documentUri);
+        this.onApiListUpdatedEventEmitter.fire();
     }
     private async updateOnDidChangeTextDocument(editor: TextDocumentChangeEvent | undefined): Promise<void> {
         if (editor === undefined) { return; }
@@ -116,7 +123,7 @@ export class simplPlusApiObjectService implements Disposable {
             if (lineText.includes("/*")) { inComment = true; }
             if (lineText.includes("*/")) { inComment = false; }
             if (inComment) { continue; }
-            const libraryMatch = lineText.match(/#USER_SIMPLSHARP_LIBRARY "(.*)"/);
+            const libraryMatch = lineText.match(/#USER_SIMPLSHARP_LIBRARY "(.*)"/i);
             if (libraryMatch) {
                 libraryMatches.push(libraryMatch[1]);
             }
@@ -138,9 +145,10 @@ export class simplPlusApiObjectService implements Disposable {
         const clzDocuments: string[] = [];
         for (const library of libraryMatches) {
             const CLZFullPath = join(documentParentFolder, library + ".clz");
+            const apiFullPath = join(documentParentFolder, "SPlsWork", library + ".api");
             if (!fs.existsSync(CLZFullPath)) { continue; }
             clzDocuments.push(CLZFullPath);
-            if (!this._apis.has(CLZFullPath)) {
+            if (!this._apis.has(CLZFullPath) || !fs.existsSync(apiFullPath)) {
                 //immediately store empty array to prevent multiple API generation
                 let apiTokens: SimplPlusObject[] = [];
                 this._apis.set(CLZFullPath, apiTokens);
@@ -149,28 +157,32 @@ export class simplPlusApiObjectService implements Disposable {
                     await this.runApiGenerator(CLZFullPath);
                 }
                 catch (error) {
-                    console.error(error);
+                    await window.showErrorMessage(error);
                 }
                 //generate API Tokens
                 const apiFile = join(documentParentFolder, "SPlsWork", library + ".api");
                 apiTokens = await ApiParser(apiFile);
+                if (apiTokens === undefined || apiTokens.length === 0) { continue; }
                 this._apis.set(CLZFullPath, apiTokens);
             }
         };
         this._programs.set(document.uri.toString(), clzDocuments);
+        this.onApiListUpdatedEventEmitter.fire();
     }
-    private deleteLibrary(e: Uri) {
+    private deleteLibrary(uri: Uri) {
+        if (uri === undefined) { return; }
         //check if one of the stored CLZ libraries has been deleted
-        const CLZPathToCheck = e.fsPath.slice(0, e.fsPath.lastIndexOf(".")) + ".clz";
+        const CLZPathToCheck = uri.fsPath.slice(0, uri.fsPath.lastIndexOf(".")) + ".clz";
         if (!this._apis.has(CLZPathToCheck)) { return; }
         //if it has, remove tokens
         this._apis.delete(CLZPathToCheck);
     }
-    private async updateLibrary(e: Uri) {
+    private async updateLibrary(uri: Uri) {
+        if (uri === undefined) { return; }
         //check if one of the stored CLZ libraries has been updated or created
-        const library = e.fsPath.slice(e.fsPath.lastIndexOf("\\") + 1, e.fsPath.lastIndexOf("."));
-        const CLZPath = e.fsPath.slice(0, e.fsPath.lastIndexOf(".")) + ".clz";
-        const documentParentFolder = e.fsPath.slice(0, e.fsPath.lastIndexOf("\\"));
+        const library = uri.fsPath.slice(uri.fsPath.lastIndexOf("\\") + 1, uri.fsPath.lastIndexOf("."));
+        const CLZPath = uri.fsPath.slice(0, uri.fsPath.lastIndexOf(".")) + ".clz";
+        const documentParentFolder = uri.fsPath.slice(0, uri.fsPath.lastIndexOf("\\"));
         if (!this._apis.has(CLZPath)) { return; }
         //if it has, generate API Tokens
         // Generate API File from CLZ
@@ -178,7 +190,7 @@ export class simplPlusApiObjectService implements Disposable {
             await this.runApiGenerator(CLZPath);
         }
         catch (error) {
-            console.error("Error during API Generation", error);
+            await window.showErrorMessage(error);
         }
         // and store them
         const apiFile = join(documentParentFolder, "SPlsWork", library + ".api");
@@ -189,6 +201,7 @@ export class simplPlusApiObjectService implements Disposable {
     private async runApiGenerator(CLZLibraryPath: string): Promise<void> {
         return new Promise((resolve, reject) => {
             const simplDirectory = workspace.getConfiguration("simpl-plus").simplDirectory;
+            if (!fs.existsSync(simplDirectory)) { reject("SIMPL+ Extension Directory not found. Check configuration"); return; }
             const extensionPath = extensions.getExtension("sentry07.simpl-plus")?.extensionPath;
             if (extensionPath === undefined) { resolve(); }
             const simpPlusApiGeneratorPath = join(extensionPath, "src", "ApiGenerator", "SimplPlusApiGenerator.exe");
@@ -209,7 +222,7 @@ export class simplPlusApiObjectService implements Disposable {
                                 if (event.exitCode === 0) {
                                     resolve();
                                 } else {
-                                    reject(new Error(`API Build failed with exit code ${event.exitCode}`));
+                                    reject(`API Build failed with exit code ${event.exitCode}`);
                                 }
                             }
                             apiTerminal.hide();

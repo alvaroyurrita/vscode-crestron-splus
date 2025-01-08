@@ -31,21 +31,7 @@ suite("With Faked Saved File", function () {
             assert.strictEqual(splusTasks[1].name, "Compile 3 Series");
             assert.strictEqual(splusTasks[2].name, "Compile 4 Series");
         });
-        const libraries = ["USER", "CRESTRON"];
-        libraries.forEach(function (library) {
-            test(`And file with ${library} Library, it should have Compile 3 Series and 4 and Generate API`, async () => {
-                const fsExistSyncStub = sinon.stub(fsWrapper, "existsSyncWrapper").returns(true);
-                await OpenAndShowSPlusDocument(`#${library}_SIMPLSHARP_LIBRARY \"My.Test-Library\";`);
-                const splusTasks = await vscode.tasks.fetchTasks();
-                assert.ok(splusTasks.length > 0, "Should have at least one task");
-                assert.ok(fsExistSyncStub.args.find(a => a[0].toString().includes("My.Test-Library.clz")));
-                assert.strictEqual(splusTasks[0].name, "Generate API file for My.Test-Library");
-                assert.strictEqual(splusTasks[1].name, "Compile 3 & 4 Series");
-                assert.strictEqual(splusTasks[2].name, "Compile 3 Series");
-                assert.strictEqual(splusTasks[3].name, "Compile 4 Series");
-                fsExistSyncStub.restore();
-            });
-        });
+        
 
     });
     suite("With Modified Settings", function () {

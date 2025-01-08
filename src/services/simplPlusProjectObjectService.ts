@@ -10,7 +10,9 @@ import {
     TextDocument,
     Range,
     MarkdownString,
-    window
+    window,
+    EventEmitter,
+    Event,
 } from "vscode";
 import { SimplPlusObject } from "../base/simplPlusObject";
 import { SimplPlusProgramObjectService } from "./simplPlusProgramObjectService";
@@ -26,6 +28,9 @@ export class SimplPlusProjectObjectService implements Disposable {
     private _apiObjectService: simplPlusApiObjectService;
     private _libraryObjectService: simpPlusLibraryObjectService;
 
+    private onLibrariesUpdatedEventEmitter = new EventEmitter<void>();
+    public onLibrariesUpdated: Event<void> = this.onLibrariesUpdatedEventEmitter.event;
+
     public static getInstance(ctx: ExtensionContext): SimplPlusProjectObjectService {
         if (!SimplPlusProjectObjectService._instance && ctx) {
             SimplPlusProjectObjectService._instance = new SimplPlusProjectObjectService(ctx);
@@ -37,12 +42,20 @@ export class SimplPlusProjectObjectService implements Disposable {
         this._apiObjectService = simplPlusApiObjectService.getInstance(ctx);
         this._libraryObjectService = simpPlusLibraryObjectService.getInstance(ctx);
 
+        this._apiObjectService.onApiListUpdated(() => {
+            this.onLibrariesUpdatedEventEmitter.fire();
+        });
+        this._libraryObjectService.onLibraryListUpdated(() => {
+            this.onLibrariesUpdatedEventEmitter.fire();
+        });
+
     }
     public dispose() {
         this._programObjectService.dispose();
         this._apiObjectService.dispose();
     }
     public getProjectObjects(uri: Uri): SimplPlusObject[] | undefined {
+        if (uri === undefined) { return undefined; }
         const projectObjects: SimplPlusObject[] = [];
         const programObjects = this._programObjectService.getObjects(uri);
         const apiObjects = this._apiObjectService.getObjects(uri);
@@ -54,6 +67,7 @@ export class SimplPlusProjectObjectService implements Disposable {
     }
 
     public getProjectObjectByKind(uri: Uri, kinds: CompletionItemKind[]): SimplPlusObject[] {
+        if (uri === undefined) { return []; }
         let objects: SimplPlusObject[] = [];
         const projectObjects = this.getProjectObjects(uri);
         for (const kind of kinds) {

@@ -39,12 +39,14 @@ class SimplPlusDocumentBuildTargets {
     }
 
     private isUshFileExists(filePath: Uri): boolean {
+        if (filePath === undefined) { return false; }
         const docPath = path.parse(filePath.fsPath);
         const ushFilePath = path.join(docPath.dir, docPath.name + ".ush");
         return existsSyncWrapper(ushFilePath);
     }
 
     private getBuildTargetsFromUshFile(filePath: Uri): BuildType {
+        if (filePath === undefined) { return; }
         const docPath = path.parse(filePath.fsPath);
         const ushFilePath = path.join(docPath.dir, docPath.name + ".ush");
         const ushContent = readFileSyncWrapper(ushFilePath);

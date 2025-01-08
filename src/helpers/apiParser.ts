@@ -1,9 +1,10 @@
 import { workspace, Range, TextDocument, CompletionItemKind } from 'vscode';
 import { SimplPlusObject } from '../base/simplPlusObject';
+import * as fs from 'fs';
 
 //parses an API fle to create SimplObject hierarchy per class and enum
 export async function ApiParser(apiFullPath: string): Promise<SimplPlusObject[]> {
-
+    if (!fs.existsSync(apiFullPath)) {return;}
     //@ts-ignore
     const apiDocument = await workspace.openTextDocument(apiFullPath);
     const apiDocumentContent = apiDocument.getText();

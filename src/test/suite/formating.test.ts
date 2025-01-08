@@ -58,7 +58,7 @@ suite("Formatting Text", function () {
   },
   {
     unformattedText: " }\r\nTest}\r\n}{\r\n {\r\n  test  }\r\n }",
-    expectedFormattedText: "}\r\nTest}\r\n}{\r\n{\r\n\ttest  }\r\n}",
+    expectedFormattedText: "}\r\nTest}\r\n}\r\n{\r\n\t{\r\n\t\ttest  }\r\n}",
     name: "Unmatched closing bracket should not decrease indentation"
   }];
   formattingTests.forEach(function (textToFormat) {

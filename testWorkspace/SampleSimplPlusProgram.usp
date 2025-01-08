@@ -1,23 +1,20 @@
-#USER_LIBRARY "SampleLibrary"
-#USER_SIMPLSHARP_LIBRARY "SampleSimplSharpLibrary"
-
-DIGITAL_INPUT Test;
-
-
-SampleClass test2;
-
-
-push Test
-{
+function testFunction(integer test) {
 	
+	Switch (EXPRESSION) 	{		case (VALUE): 		{			Switch (EXPRESSION)
+			{				case (VALUE):
+				{
+					somefunction 	{	}
+				}
+				default:
+				{	{}			}
+			}
+		}
+		default: 
+		{		}
+	}
 }
 
-function testFunction(Integer test)
+structure myStructure 
 {
-	Integer internalVar;
-}
-
-Structure myStructure
-{
-	Integer test;
+	integer test;
 };
