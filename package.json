@@ -50,11 +50,16 @@
       {
         "title": "SIMPL+",
         "properties": {
-          "simpl-plus.simplDirectory": {
+          "simpl-plus.SIMPL+.simplDirectory": {
             "type": "string",
             "default": "C:\\Program Files (x86)\\Crestron\\Simpl",
             "description": "Location of the Crestron SIMPL Directory."
-          },
+          }
+        }
+      },
+      {
+        "title": "Compilation",
+        "properties": {
           "simpl-plus.enable2series": {
             "type": "boolean",
             "default": false,
@@ -69,10 +74,20 @@
             "type": "boolean",
             "default": true,
             "description": "Default Build Target to Series 4 for new or unknown SIMPL+ files"
-          },
-          "simpl-plus.autoFormatKeywordCase": {
+          }
+        }
+      },
+      {
+        "title": "Formatting",
+        "properties": {
+          "simpl-plus.keywordCase": {
             "type": "string",
-            "enum": ["lowercase", "UPPERCASE", "PascalCase", "Unchanged"],
+            "enum": [
+              "lowercase",
+              "UPPERCASE",
+              "PascalCase",
+              "Unchanged"
+            ],
             "markdownEnumDescriptions": [
               "Format Keywords to all lowercase/lower_case",
               "Format Keywords to all UPPERCASE/UPPER_CASE",
@@ -80,7 +95,12 @@
               "Leave Keywords unchanged"
             ],
             "default": "Unchanged",
-            "description": "When performing autoformat, change built-in keywords, statements, etc to selected case "
+            "description": "When performing autoformat, change built-in keywords, statements, etc to selected case"
+          },
+          "simpl-plus.braceLine": {
+            "type": "boolean",
+            "default": false,
+            "description": "If enable it will add a new line before every opening curly bracket.  If not, it will move it to the end of the previous line"
           }
         }
       }

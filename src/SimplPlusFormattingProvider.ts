@@ -15,6 +15,7 @@ import {
 import * as fs from "fs";
 import path from "path";
 import { KeywordService } from "./services/keywordService";
+const os = require('os');
 
 export interface RangeFormattingOptions {
     rangeStart: number;
@@ -50,59 +51,152 @@ export class SimplPlusFormattingProvider
         return this.provideEdits(document);
     }
 
-    async provideEdits(document: TextDocument, _options?: RangeFormattingOptions): Promise<TextEdit[]> {
-        let outputText = this.formatText(document.getText());
+    private async provideEdits(document: TextDocument, _options?: RangeFormattingOptions): Promise<TextEdit[]> {
+        let outputText = this.formatNewLines(document.getText());
+        outputText = this.indentText(outputText);
         return [new TextEdit(
             this.fullDocumentRange(document),
             outputText)];
     }
 
-    fullDocumentRange(document: TextDocument): Range {
+    private fullDocumentRange(document: TextDocument): Range {
         const lastLineId = document.lineCount - 1;
         return new Range(0, 0, lastLineId, document.lineAt(lastLineId).text.length);
     }
 
-    formatText(docText: string): string {
+    private formatNewLines(docText: string): string {
+        let endOfLineCharacter = os.EOL;                                     // whether to add the suffix or not
+
+        const addLine: boolean = workspace.getConfiguration("simpl-plus").braceLine;
+        let docLines = docText.split(/\r?\n/);                      // Split into lines
+        let openBracketDoc: string[] = [];
+        let closeBracketDoc: string[] = [];
+        docLines.forEach((line, index) => {
+            const bracketQty = line.split("{").length - 1;
+            let currentLineChunk = line;
+            let modifiedLines: string[] = [];
+            for (let i = 0; i < bracketQty; i++) {
+                const textBeforeBracket = currentLineChunk.substring(0, currentLineChunk.indexOf("{")).trimStart();
+                if (addLine) { //curly bracket in new line
+                    if (textBeforeBracket.length > 0) { //if there is text before bracket add  text and move { to new line
+                        modifiedLines.push(textBeforeBracket);
+                        modifiedLines.push("{");
+                    }
+                    else {
+                        modifiedLines.push("{");  //if the bracket by itself already, just add it.
+                    }
+                }
+                else { //curly bracket at the end of the line
+                    if (textBeforeBracket.length > 0) { //if there is text before bracket add a new line after bracket
+                        modifiedLines.push(textBeforeBracket.trimEnd() + " {");
+                    }
+                    else { //if there is no text before bracket, move bracket to the line before
+                        if (modifiedLines.length > 0) {
+                            const lastLine = modifiedLines[modifiedLines.length - 1];
+                            if (lastLine[lastLine.length - 1] === "{") { // if the last line already has a bracket, put it in a new line
+                                modifiedLines.push("{");
+                            }
+                            else {  //if the last line does not have a bracket, add the bracket to the previous line
+                                modifiedLines[modifiedLines.length - 1] = modifiedLines[modifiedLines.length - 1].trimEnd() + " {";
+                            }
+                        }
+                        else if (openBracketDoc.length > 0) {
+                            const lastLine = openBracketDoc[openBracketDoc.length - 1];
+                            if (lastLine[lastLine.length - 1] === "{") { // if the last line already has a bracket, put it in a new line
+                                modifiedLines.push("{");
+                            }
+                            else {  //if the last line does not have a bracket, add the bracket to the previous line
+                                openBracketDoc[openBracketDoc.length - 1] = openBracketDoc[openBracketDoc.length - 1].trimEnd() + " {";
+                            }
+                        }
+                    }
+                }
+                currentLineChunk = currentLineChunk.substring(currentLineChunk.indexOf("{") + 1);
+            }
+            if (currentLineChunk.trim().length > 0) {  //add reminder of text if there is any
+                modifiedLines.push(currentLineChunk);
+            }
+            if (modifiedLines.length > 0) { //add modified lines
+                openBracketDoc.push(...modifiedLines);
+            }
+            if (line.trim().length === 0) { //re-add original line if line was empty
+                openBracketDoc.push("");
+            }
+        });
+        openBracketDoc.forEach((line, index) => {
+            const bracketQty = line.split("}").length - 1;
+            let currentLineChunk = line;
+            let modifiedLines: string[] = [];
+            for (let i = 0; i < bracketQty; i++) {
+                const textBeforeBracket = currentLineChunk.substring(0, currentLineChunk.indexOf("}"));
+                if (textBeforeBracket.length < currentLineChunk.length) {
+                    let endSequence = "}";
+                    const textAfterBracket = currentLineChunk.substring(1).trim(); //catch for closing brackets followed by semicolon
+                    if (textAfterBracket === ";") {
+                        endSequence = "};";
+                        currentLineChunk = textAfterBracket.substring(1);
+                    }
+                    modifiedLines.push(textBeforeBracket + endSequence);
+                }
+                currentLineChunk = currentLineChunk.substring(currentLineChunk.indexOf("}") + 1);
+            }
+            if (currentLineChunk.trim().length > 0) {
+                modifiedLines.push(currentLineChunk);
+            }
+            if (modifiedLines.length > 0) {
+                closeBracketDoc.push(...modifiedLines);
+            }
+            if (line.trim().length === 0) {
+                closeBracketDoc.push("");
+            }
+        });
+        const finalDoc = closeBracketDoc.join(endOfLineCharacter);
+        console.log(finalDoc);
+        return finalDoc;
+    }
+
+    // trims the beginning of all lines and then inserts tabs as necessary depending on curly brackets
+    private indentText(docText: string): string {
         // Set up variables for grabbing and replacing the text
-        let outputText = "";
-        let indentLevel = 0;                                        // Current line indent level (number of tabs)
-        let inComment = 0;                                          // If we're in a comment and what level
-        let inSignalList = 0;                                       // If we're in a list of signals
-        let startingComment = 0;                                    // Check if this line starts a comment
-        let endingComment = 0;                                      // Check if this line ends a comment
-        let startingSignalList = 0;
+        let outputText: string = "";
+        let indentLevel: number = 0;                                        // Current line indent level (number of tabs)
+        let commentLevel: number = 0;                                          // If we're in a comment and what level
+        let inSignalList: boolean = false;                                       // If we're in a list of signals
+        let isCommentStart: boolean = false;                                    // Check if this line starts a comment
+        let isCommentEnd: boolean = false;                                      // Check if this line ends a comment
+        let isSignalListStart: boolean = false;
         let docLines = docText.split(/\r?\n/);                      // Split into lines
 
-        let lineSuffix = '\r';                                      // whether to add the suffix or not
+        let endOfLineCharacter = os.EOL;                                     // whether to add the suffix or not
 
         // Comment weeders
-        let reDeCom1 = /(\/\/.*)/gm;                                // Single line comment
-        let reDeCom2 = /((?:\(\*|\/\*).*(?:\*\)|\*\/))/gm;          // Fully enclosed multiline comment
-        let reDeCom3 = /(.*(?:\*\)|\*\/))/gm;                       // Closing multiline comment
-        let reDeCom4 = /((?:\(\*|\/\*).*)/gm;                       // Opening multiline comment
-        let reString = /'[^']*'/gm;
+        let singleLineCommentRegex: RegExp = /(\/\/.*)/gm;                                // Single line comment
+        let oneLineMultilineComment: RegExp = /((?:\/\*).*(?:\*\/))/gm;               // Fully enclosed multiline comment
+        let closingMultiLineComment: RegExp = /(.*(?:\*\/))/gm;                       // Closing multiline comment
+        let openingMultiLineComment: RegExp = /((?:\/\*).*)/gm;                       // Opening multiline comment
+        let reString: RegExp = /'[^']*'/gm;                            // single quote string literal
 
         for (var line = 0; line < docLines.length; line++) {
-            startingComment = 0;
-            endingComment = 0;
+            isCommentStart = false;
+            isCommentEnd = false;
             let thisLine = docLines[line];
             let thisLineTrimmed = docLines[line].trimStart();
-            let thisLineClean = docLines[line].trimStart().replace(reDeCom1, "").replace(reDeCom2, "");      // Remove any single line comments and fully enclosed multiline comments
+            let thisLineClean = docLines[line].trimStart().replace(singleLineCommentRegex, "").replace(oneLineMultilineComment, "");      // Remove any single line comments and fully enclosed multiline comments
 
-            if (reDeCom3.test(thisLineClean) && inComment > 0) {        // If a multiline comment closes on this line, decrease our comment level
-                inComment = inComment - 1;
-                if (inComment === 0) {
-                    endingComment = 1;
+            if (closingMultiLineComment.test(thisLineClean) && commentLevel > 0) {        // If a multiline comment closes on this line, decrease our comment level
+                commentLevel = commentLevel - 1;
+                if (commentLevel === 0) {
+                    isCommentEnd = true;
                 }
             }
-            if (reDeCom4.test(thisLineClean)) {                         // If a multiline comment opens on this line, increase our comment level
-                if (inComment === 0) {
-                    startingComment = 1;                                // If this line starts a multiline comment, it still needs to be checked
+            if (openingMultiLineComment.test(thisLineClean)) {                         // If a multiline comment opens on this line, increase our comment level
+                if (commentLevel === 0) {
+                    isCommentStart = true;                                // If this line starts a multiline comment, it still needs to be checked
                 }
-                inComment = inComment + 1;
+                ++commentLevel;
             }
 
-            thisLineClean = thisLineClean.replace(reDeCom3, "").replace(reDeCom4, "");            // Remove any code that we think is inside multiline comments
+            thisLineClean = thisLineClean.replace(closingMultiLineComment, "").replace(openingMultiLineComment, "");            // Remove any code that we think is inside multiline comments
             thisLineClean = thisLineClean.replace(reString, "");                                  // Remove any string literals from the line so we don't get false positives
             let brOpen = this.countChars(thisLineClean, '{') - this.countChars(thisLineClean, '}');         // Check the delta for squiggly brackets
             let sqOpen = this.countChars(thisLineClean, '[') - this.countChars(thisLineClean, ']');         // Check the delta for square brackets
@@ -118,49 +212,49 @@ export class SimplPlusFormattingProvider
                 thisLineClean.toLowerCase().includes("analog_output") ||
                 thisLineClean.toLowerCase().includes("string_output")
             ) && !thisLineClean.includes(";")) {
-                inSignalList = 1;
-                startingSignalList = 1;
+                inSignalList = true;
+                isSignalListStart = true;
             }
 
             if (line === docLines.length - 1) {
-                lineSuffix = '';
+                endOfLineCharacter = '';
             }
 
             // Indent Increase Rules
-            if (inSignalList === 1) {
-                if (startingSignalList === 1) {
-                    outputText = outputText + thisLineTrimmed + lineSuffix;
-                    startingSignalList = 0;
+            if (inSignalList) {
+                if (isSignalListStart) {
+                    outputText = outputText + thisLineTrimmed + endOfLineCharacter;
+                    isSignalListStart = false;
                 }
                 else {
-                    outputText = outputText + ('\t'.repeat(4)) + thisLineTrimmed + lineSuffix;
+                    outputText = outputText + ('\t'.repeat(4)) + thisLineTrimmed + endOfLineCharacter;
                     if (thisLineTrimmed.includes(";")) {
-                        inSignalList = 0;
+                        inSignalList = false;
                     }
                 }
             }
             // If we're in a multiline comment, just leave the line alone unless it's the start of a ML comment
-            else if ((inComment > 0 && !startingComment) || (!inComment && endingComment)) {
-                outputText = outputText + thisLine + lineSuffix;
+            else if ((commentLevel > 0 && !isCommentStart) || (!commentLevel && isCommentEnd)) {
+                outputText = outputText + thisLine + endOfLineCharacter;
             }
             // If we're increasing indent delta because of this line, the add it, then increase indent
             else if (indentDelta > 0) {
-                outputText = outputText + ('\t'.repeat(indentLevel)) + thisLineTrimmed + lineSuffix;
+                outputText = outputText + ('\t'.repeat(indentLevel)) + thisLineTrimmed + endOfLineCharacter;
                 indentLevel = (indentLevel + indentDelta >= 0) ? (indentLevel + indentDelta) : 0;
             }
             // If we're decreasing delta, and the line starts with the character that is decreasing it, then decrease first, and then add this line
             else if (indentDelta < 0 && (thisLineClean[0] === '}' || thisLineClean[0] === ']' || thisLineClean[0] === ')')) {
                 indentLevel = (indentLevel + indentDelta >= 0) ? (indentLevel + indentDelta) : 0;
-                outputText = outputText + ('\t'.repeat(indentLevel)) + thisLineTrimmed + lineSuffix;
+                outputText = outputText + ('\t'.repeat(indentLevel)) + thisLineTrimmed + endOfLineCharacter;
             }
             // If we're decreasing delta but the first character isn't the cause, then we're still inside the block
             else if (indentDelta < 0) {
-                outputText = outputText + ('\t'.repeat(indentLevel)) + thisLineTrimmed + lineSuffix;
+                outputText = outputText + ('\t'.repeat(indentLevel)) + thisLineTrimmed + endOfLineCharacter;
                 indentLevel = (indentLevel + indentDelta >= 0) ? (indentLevel + indentDelta) : 0;
             }
             // indentDelta === 0; do nothing except add the line with the indent
             else {
-                outputText = outputText + ('\t'.repeat(indentLevel)) + thisLineTrimmed + lineSuffix;
+                outputText = outputText + ('\t'.repeat(indentLevel)) + thisLineTrimmed + endOfLineCharacter;
             }
         };
 
@@ -168,7 +262,7 @@ export class SimplPlusFormattingProvider
         return outputText;
     }
 
-    countChars(haystack: string, needle: string): number {
+    private countChars(haystack: string, needle: string): number {
         let count = 0;
         for (var i = 0; i < haystack.length; i++) {
             if (haystack[i] === needle) {
@@ -179,7 +273,7 @@ export class SimplPlusFormattingProvider
     }
 
     private changeCase(document: string): string {
-        const formatSetting = workspace.getConfiguration("simpl-plus").autoFormatKeywordCase;
+        const formatSetting = workspace.getConfiguration("simpl-plus").keywordCase;
         if (formatSetting === "Unchanged") { return document; }
         const extensionPath = extensions.getExtension("sentry07.simpl-plus")?.extensionPath;
         if (extensionPath === undefined) { return; }
@@ -190,7 +284,7 @@ export class SimplPlusFormattingProvider
 
         const words = document.matchAll(/[a-zA-Z1-9#_]+/g);
         for (const word of words) {
-            const keyword = keywords.find(it => it.name.toLowerCase() === word[0].toLowerCase() );
+            const keyword = keywords.find(it => it.name.toLowerCase() === word[0].toLowerCase());
             if (keyword === undefined) { continue; }
             if (keyword.kind !== CompletionItemKind.Constant) {
                 switch (formatSetting) {

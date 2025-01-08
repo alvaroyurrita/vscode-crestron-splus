@@ -30,37 +30,7 @@ function callShellCommand(shellCommand: string): void {
 
 
 export async function activate(context: ExtensionContext) {
-
-    // if (workspace.workspaceFolders === undefined) {
-    //     let fileName = window?.activeTextEditor?.document.uri.path;
-    //     let fileFolder = fileName.slice(0, fileName.lastIndexOf("/") + 1);
-    //     commands.executeCommand("vscode.openFolder", Uri.parse(fileFolder));
-    // }
-
-
     const selector: DocumentSelector = 'simpl-plus';
-    // const textmateService = new TextmateLanguageService(selector, context);
-
-    //https://code.visualstudio.com/docs/editor/codebasics#_folding
-    // const foldingRangeProvider = await textmateService.createFoldingRangeProvider();
-    //https://code.visualstudio.com/docs/editor/editingevolved#_go-to-symbol (Activate with Ctrl+Shift+O)
-    // const documentSymbolProvider = await textmateService.createDocumentSymbolProvider();
-    //https://code.visualstudio.com/docs/editor/editingevolved#_open-symbol-by-name (Activate with Ctrl+T)
-    // const workspaceSymbolProvider = await textmateService.createWorkspaceSymbolProvider();
-    ///https://code.visualstudio.com/api/references/vscode-api#DefinitionProvider (Activate with F12)
-    // const definitionProvider = await textmateService.createDefinitionProvider();
-
-    //
-    // context.subscriptions.push(languages.registerDocumentSymbolProvider(selector, documentSymbolProvider));
-    // context.subscriptions.push(languages.registerFoldingRangeProvider(selector, foldingRangeProvider));
-    // context.subscriptions.push(languages.registerWorkspaceSymbolProvider(workspaceSymbolProvider));
-    // context.subscriptions.push(languages.registerDefinitionProvider(selector, definitionProvider));
-
-
-    // const textmateService = new TextmateLanguageService(selector, context);
-    // const textmateTokenService = await textmateService.initTokenService();
-    // const textDocument = window.activeTextEditor!.document;
-    // const tokens = await textmateTokenService.fetch(textDocument);
 
     const projectObjectService = SimplPlusProjectObjectService.getInstance(context);
     const keywordService = KeywordService.getInstance();
@@ -117,9 +87,6 @@ export async function activate(context: ExtensionContext) {
 
     let thisSignatureHelpProvider = new SimplPlusSignatureHelpProvider(projectObjectService);
     const signatureHelpProvider = languages.registerSignatureHelpProvider({ language: 'simpl-plus' }, thisSignatureHelpProvider, '(', ',');
-
-    // let thisTextmateCompletionProvider = new TextMateCompletionProvider(tokenService);
-    // const textMateCompletionProvider = languages.registerCompletionItemProvider({ language: 'simpl-plus' }, thisTextmateCompletionProvider);
 
     window.onDidChangeActiveTextEditor((e) => {
         updateContextMenu(e.document.uri, projectObjectService);
