@@ -109,6 +109,9 @@ export class SimplPlusFormattingProvider
                                 openBracketDoc[openBracketDoc.length - 1] = openBracketDoc[openBracketDoc.length - 1].trimEnd() + " {";
                             }
                         }
+                        else {
+                            modifiedLines.push("{"); //bracket is the firs in line, let it be;
+                        }
                     }
                 }
                 currentLineChunk = currentLineChunk.substring(currentLineChunk.indexOf("{") + 1);

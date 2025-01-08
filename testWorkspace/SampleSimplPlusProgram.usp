@@ -1,34 +1,16 @@
-#user_library "SampleLibrary"
-#user_simplsharp_library "SampleSimplSharpLibrary"
-
-digital_input Test;
-
-
-SampleClass test2;
-function testFunction(integer test) 
-{
+function testFunction(integer test) {
 	
-	Switch (EXPRESSION) 
-	{
-		case (VALUE): 
-		{
-			Switch (EXPRESSION)
-			{
-				case (VALUE):
+	Switch (EXPRESSION) 	{		case (VALUE): 		{			Switch (EXPRESSION)
+			{				case (VALUE):
 				{
-					somefunction 
-					{
-					}
+					somefunction 	{	}
 				}
 				default:
-				{
-				}
+				{	{}			}
 			}
 		}
 		default: 
-		{
-			
-		}
+		{		}
 	}
 }
 
