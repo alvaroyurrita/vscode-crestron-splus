@@ -44,7 +44,7 @@ export class SimplPlusCompletionProvider implements CompletionItemProvider {
                 const socketVariables = this.getInternalSocketVariables(uri);
                 return socketVariables;
             }
-            const completionItems = this.getRootKeywords(uri);
+            const completionItems = this.getRootKeywords();
             const rootVariables = this.getProjectRootObjects(uri);
             return completionItems.concat(rootVariables);
         }
@@ -52,7 +52,7 @@ export class SimplPlusCompletionProvider implements CompletionItemProvider {
             case CompletionItemKind.Event:
             case CompletionItemKind.Function:
                 if (this._projectObjectService.isPositionAtFunctionParameter(currentBlock, position)) {
-                    const parameterKeywords = this.getParameterKeywords(uri);
+                    const parameterKeywords = this.getParameterKeywords();
                     return parameterKeywords;
                 }
                 let functionKeywords = this.getFunctionKeywords();
@@ -70,7 +70,7 @@ export class SimplPlusCompletionProvider implements CompletionItemProvider {
                 const structureVariables = this.getInternalStructureVariables(uri);
                 return structureVariables.concat(structureKeywords);
             default:
-                return this.getRootKeywords(uri);
+                return this.getRootKeywords();
         }
     }
     public resolveCompletionItem(item: CompletionItem, token: CancellationToken): ProviderResult<CompletionItem> {
@@ -147,7 +147,7 @@ export class SimplPlusCompletionProvider implements CompletionItemProvider {
         functionDefinitions = functionDefinitions.filter(f => f.type !== "void");
         return this._keywordService.getCompletionItemsFromKeywords(keywordDefinitions.concat(functionDefinitions));
     }
-    private getParameterKeywords(uri: Uri): CompletionItem[] {
+    private getParameterKeywords(): CompletionItem[] {
         const functionKeyword: string[] = [
             "Modifier",
             "Variable Declaration",
@@ -188,7 +188,7 @@ export class SimplPlusCompletionProvider implements CompletionItemProvider {
     private getFunctionVariables(functionToken: SimplPlusObject): CompletionItem[] {
         return this._projectObjectService.getCompletionItemsFromObjects(functionToken.children);
     }
-    private getRootKeywords(uri: Uri): CompletionItem[] {
+    private getRootKeywords(): CompletionItem[] {
         const rootKeywords: string[] = [
             "Class",
             "Declaration",

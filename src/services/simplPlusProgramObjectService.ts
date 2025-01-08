@@ -27,6 +27,7 @@ export class SimplPlusProgramObjectService implements Disposable {
         this._documents.clear();
     }
     public getObjects(uri: Uri): SimplPlusObject[] | undefined {
+        if (uri === undefined) { return undefined; }
         const token = this._documents.get(uri.toString());
         if (token === undefined) {return undefined;}
         return this._documents.get(uri.toString());

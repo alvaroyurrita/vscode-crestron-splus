@@ -8,8 +8,9 @@ import {
     window,
     TextDocumentChangeEvent,
     FileSystemWatcher,
-    extensions,
     RelativePattern,
+    EventEmitter,
+    Event
 } from "vscode";
 import { SimplPlusParser } from "../helpers/simplPlusParser";
 import { SimplPlusObject } from "../base/simplPlusObject";
@@ -32,6 +33,8 @@ export class simpPlusLibraryObjectService implements Disposable {
         }
         return simpPlusLibraryObjectService._instance;
     }
+    private onLibraryListUpdatedEventEmitter = new EventEmitter<void>();
+    public onLibraryListUpdated: Event<void> = this.onLibraryListUpdatedEventEmitter.event;
 
     private constructor(ctx: ExtensionContext) {
         const onOpenTextDocument_event = workspace.onDidOpenTextDocument((document) => this.updateOnOpenTextDocument(document));
@@ -53,6 +56,7 @@ export class simpPlusLibraryObjectService implements Disposable {
     }
 
     public getObjects(uri: Uri): SimplPlusObject[] {
+        if (uri===undefined) {return [];}
         const documentTokens: SimplPlusObject[] = [];
         this._programs.get(uri.toString())?.forEach((library) => {
             const tokens = this._libraries.get(library);
@@ -64,6 +68,7 @@ export class simpPlusLibraryObjectService implements Disposable {
     }
 
     public async openLibraries(uri: Uri): Promise<void> {
+        if (uri===undefined) {return; }
         const librariesToOpen = this._programs.get(uri.toString());
         if (librariesToOpen === undefined) { return; }
         librariesToOpen.forEach(async (library) => {
@@ -74,6 +79,7 @@ export class simpPlusLibraryObjectService implements Disposable {
     }
 
     public hasLibraries(uri: Uri): boolean {
+        if (uri===undefined) {return false;}
         const apis = this._programs.get(uri.toString())?.length ?? 0;
         return apis > 0;
     }
@@ -81,6 +87,7 @@ export class simpPlusLibraryObjectService implements Disposable {
     private async updateOnCloseTextDocument(document: TextDocument): Promise<void> {
         if (document.languageId !== this.selector.toString()) { return; }
         this._programs.delete(document.uri.toString());
+        this.onLibraryListUpdatedEventEmitter.fire();
     }
     private async updateOnDidChangeTextDocument(editor: TextDocumentChangeEvent | undefined): Promise<void> {
         if (editor === undefined) { return; }
@@ -92,16 +99,18 @@ export class simpPlusLibraryObjectService implements Disposable {
         if (document.languageId !== this.selector.toString()) { return; }
         await this.tokenize(document);
     }
-    private deleteLibrary(e: Uri) {
+    private deleteLibrary(uri: Uri) {
+        if (uri===undefined) {return; }
         //check if one of the stored USL libraries has been deleted
-        const UslPathToCheck = e.fsPath.slice(0, e.fsPath.lastIndexOf(".")) + ".usl";
+        const UslPathToCheck = uri.fsPath.slice(0, uri.fsPath.lastIndexOf(".")) + ".usl";
         if (!this._libraries.has(UslPathToCheck)) { return; }
         //if it has, remove tokens
         this._libraries.delete(UslPathToCheck);
     }
-    private async updateLibrary(e: Uri) {
+    private async updateLibrary(uri: Uri) {
+        if (uri===undefined) {return; }
         //check if one of the stored USL libraries has been updated or created
-        const UslPath = e.fsPath;
+        const UslPath = uri.fsPath;
         if (!this._libraries.has(UslPath)) { return; }
         // and store them
         //@ts-ignore
@@ -122,7 +131,7 @@ export class simpPlusLibraryObjectService implements Disposable {
             if (lineText.includes("/*")) { inComment = true; }
             if (lineText.includes("*/")) { inComment = false; }
             if (inComment) { continue; }
-            const libraryMatch = lineText.match(/#USER_LIBRARY "(.*)"/);
+            const libraryMatch = lineText.match(/#USER_LIBRARY "(.*)"/i);
             if (libraryMatch) {
                 libraryMatches.push(libraryMatch[1]);
             }
@@ -154,5 +163,7 @@ export class simpPlusLibraryObjectService implements Disposable {
             }
         };
         this._programs.set(document.uri.toString(), uslDocuments);
+        this.onLibraryListUpdatedEventEmitter.fire();
+
     }
 }

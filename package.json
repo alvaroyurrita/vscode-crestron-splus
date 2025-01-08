@@ -50,7 +50,7 @@
       {
         "title": "SIMPL+",
         "properties": {
-          "simpl-plus.SIMPL+.simplDirectory": {
+          "simpl-plus.simplDirectory": {
             "type": "string",
             "default": "C:\\Program Files (x86)\\Crestron\\Simpl",
             "description": "Location of the Crestron SIMPL Directory."

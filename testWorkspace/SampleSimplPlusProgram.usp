@@ -5,7 +5,6 @@ digital_input Test;
 
 
 SampleClass test2;
-
 function testFunction(integer test) 
 {
 	

@@ -89,9 +89,12 @@ export async function activate(context: ExtensionContext) {
     const signatureHelpProvider = languages.registerSignatureHelpProvider({ language: 'simpl-plus' }, thisSignatureHelpProvider, '(', ',');
 
     window.onDidChangeActiveTextEditor((e) => {
+        if (e === undefined) { return; }
         updateContextMenu(e.document.uri, projectObjectService);
     });
-    updateContextMenu(window.activeTextEditor?.document.uri, projectObjectService);
+    projectObjectService.onLibrariesUpdated(() => {
+        updateContextMenu(window.activeTextEditor?.document.uri, projectObjectService);
+    });
 
     context.subscriptions.push(
         formatProvider,
