@@ -1,3 +1,4 @@
+#CATEGORY "4" //Device Interface
 
 DIGITAL_INPUT Test;
 
@@ -30,7 +31,7 @@ push Test
 	SampleClass myLocalClass;
  	print("%i",testStructure.Variable7);
 	 testStructure.structureVar2.structureVar1.Variable;
-	 myClass.sampleSubClassSampleField.SambleSubFunction
+	 myClass
 
 }
 

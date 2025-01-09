@@ -264,6 +264,8 @@ AToSl,Function,Signed_Long_Integer,false
 FileSeek,Function,Signed_Long_Integer,true
 SocketGetPortNumber,Function,Signed_Long_Integer,true
 Break,Keyword,Statement,true
+CSwitch,Keyword,Statement,false
+Switch,Keyword,Statement,false
 Case,Keyword,Statement,false
 Catch,Keyword,Statement,false
 Continue,Keyword,Statement,true

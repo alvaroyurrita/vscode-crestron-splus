@@ -7,7 +7,7 @@ import * as fs from "fs";
 //then it creates a new keywords2.csv file to add a column with hasHelp
 async function parseSimplPlusOnlineHelp(context: ExtensionContext): Promise<void> {
     const helpService = await SimplPlusKeywordHelpService.getInstance();
-    const keywordFilePath = context.asAbsolutePath("src/keywords.csv");
+    const keywordFilePath = context.asAbsolutePath("support/keywords.csv");
     const keywordFile = fs.readFileSync(keywordFilePath).toString();
     let definitions: { name: string, kind: string, type: string, hasHelp: boolean }[] = [];
     for (const entry of keywordFile.split("\n")) {
@@ -27,13 +27,13 @@ async function parseSimplPlusOnlineHelp(context: ExtensionContext): Promise<void
         return Object.values(it).toString();
     }).join('\r\n');
 
-    const newFilePath = context.asAbsolutePath("src/keywords2.csv");
+    const newFilePath = context.asAbsolutePath("support/keywords2.csv");
     fs.writeFileSync(newFilePath, newFile);
 };
 
 export async function parseSimplPlusFunctionReturnFromOnlineHelp(context: ExtensionContext): Promise<void> {
     const helpService = await SimplPlusKeywordHelpService.getInstance();
-    const keywordFilePath = context.asAbsolutePath("src/keywords.csv");
+    const keywordFilePath = context.asAbsolutePath("support/keywords.csv");
     const keywordFile = fs.readFileSync(keywordFilePath).toString();
     let definitions: { name: string, kind: string, type: string, hasHelp: boolean }[] = [];
     for (const entry of keywordFile.split("\n")) {

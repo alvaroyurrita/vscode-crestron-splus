@@ -1,4 +1,4 @@
-import path from "path";
+import * as path from "path";
 import { BuildType } from "./base/build-type";
 import { existsSyncWrapper } from "./helpers/fsExistsSyncWrapper";
 import { readFileSyncWrapper } from "./helpers/fsReadSyncWrapper";

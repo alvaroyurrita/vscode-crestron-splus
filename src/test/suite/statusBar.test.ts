@@ -1,7 +1,7 @@
-import sinon from "sinon";
+import * as sinon from "sinon";
 import { window, TextDocument, Uri, workspace } from 'vscode';
 import { delay, OpenAndShowSPlusDocument, removeWorkspaceCustomSettings } from "../testFunctions";
-import assert from "assert";
+import * as assert from "assert";
 import * as fsExistsWrapper from '../../helpers/fsExistsSyncWrapper';
 import * as fsFileReadWrapper from '../../helpers/fsReadSyncWrapper';
 

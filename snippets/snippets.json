@@ -672,17 +672,6 @@
         ],
         "description": ""
     },
-    "#Category":{
-        "prefix":
-        [
-            "@CD","#Category"
-        ],
-        "body": [
-            "#Category\t${1|Category \"1\" //ANALOG OPERATIONS,Category \"2\" //CONDITIONAL,Category \"3\" //DEBUGGING,Category \"4\" //DEVICE INTERFACE,Category \"5\" //DEVICE SELECTION,Category \"6\" //LIGHTING,Category \"7\" //SEQUENCING OPERATIONS,Category \"8\" //MEDIA RESOURCE,Category \"9\" //MEMORY,Category \"10\" //SERIAL,Category \"11\" //COUNTERS,Category \"12\" //SYSTEM CONTROL,Category \"13\" //TIMERS,Category \"14\" //TOUCHPANEL INTERFACE,Category \"15\" //CNRACK-D OPERATIONS,Category \"16\" //TIME/DATE,Category \"17\" //TRANSPORT DECKS,Category \"18\" //SLIDE PROJECTOR,Category \"19\" //CAMERAS,Category \"20\" //CONFERENCING,Category \"21\" //SECURITY,Category \"22\" //HVAC,Category \"23\" //SWITCHER,Category \"24\" //TV/VIDEO PROJECTOR,Category \"25\" //CURRENT SENSE,Category \"26\" //MULTI-ZONE,Category \"28\" //RECEIVER/PROCESSOR,Category \"29\" //RELAY CONTROL,Category \"30\" //VOLUME,Category \"31\" //DIGITAL OPERATIONS,Category \"32\" //MISCELLANEOUS,Category \"33\" //PROGRAM FORMATTING,Category \"34\" //MIXER,Category \"35\" //E-CONTROL SOFTWARE,Category \"36\" //CRESTRON HOME,Category \"37\" //TUNERS,Category \"38\" //SIGNAL ROUTING,Category \"39\" //DEVICE EXTENDER MODULES,Category \"40\" //INTERFACE-SPECIFIC LOGIC,Category \"41\" //REMOTE SYSTEM INTERFACE,Category \"42\" //DISCONTINUED,Category \"43\" //QM MODULES,Category \"44\" //SHADES/DRAPES,Category \"45\" //ADAGIO,Category \"46\" \"Custom\" //CUSTOM,Category \"47\" //ADAGIO (AMS),Category \"48\" //ADAGIO (AMS-ATP),Category \"49\" //ADAGIO (AES),Category \"50\" //ADAGIO (AADS),Category \"51\" //ADAGIO (AADS-XM),Category \"52\" //CRESTRON STUDIO,Category \"53\" //NEW Category 2,Category \"54\" //NEW Category 3,Category \"55\" //NEW Category 4,Category \"56\" //NEW Category 5,Category \"57\" //REMOTE SYSTEMS,Category \"58\" //FUSION,Category \"59\" //INTELLIGENT VIDEO|}",
-            "$0"
-        ],
-        "description": "A Category is the name of the folder in the Logic Symbols library tree where the module is shown."
-    },
     "#Crestron_Library":{
         "prefix":
         [
@@ -1047,7 +1036,6 @@
             "//\t\t @CD - List Compiler Directive statements",
             "//\t\t @LIB - List Include Library statements",
             "//\t\t @FILL - List statements that include bulk data",
-            "//\t\t #Category - When using snippets, you will be prompted to select from a list of categories",
             "//\t\t #Analog_Serial_Expand and #Digital_Expand - When using snippets, you will be prompted to select from a list of options"
         ],
         "description": "Crestron SIMPL+ Snippets Help"

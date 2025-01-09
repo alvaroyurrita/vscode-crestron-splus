@@ -12,8 +12,6 @@ import {
     CompletionItem,
     CompletionItemKind,
 } from "vscode";
-import * as fs from "fs";
-import path from "path";
 import { KeywordService } from "./services/keywordService";
 const os = require('os');
 
@@ -154,7 +152,6 @@ export class SimplPlusFormattingProvider
             }
         });
         const finalDoc = closeBracketDoc.join(endOfLineCharacter);
-        console.log(finalDoc);
         return finalDoc;
     }
 
@@ -278,10 +275,6 @@ export class SimplPlusFormattingProvider
     private changeCase(document: string): string {
         const formatSetting = workspace.getConfiguration("simpl-plus").keywordCase;
         if (formatSetting === "Unchanged") { return document; }
-        const extensionPath = extensions.getExtension("sentry07.simpl-plus")?.extensionPath;
-        if (extensionPath === undefined) { return; }
-        const keywordDefinitionsPath = path.join(extensionPath, "src", "keywords.csv");
-        if (!fs.existsSync(keywordDefinitionsPath)) { return; };
         const keywordService = KeywordService.getInstance();
         const keywords = keywordService.getAllKeywords();
 

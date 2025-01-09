@@ -204,7 +204,8 @@ export class simplPlusApiObjectService implements Disposable {
             if (!fs.existsSync(simplDirectory)) { reject("SIMPL+ Extension Directory not found. Check configuration"); return; }
             const extensionPath = extensions.getExtension("sentry07.simpl-plus")?.extensionPath;
             if (extensionPath === undefined) { resolve(); }
-            const simpPlusApiGeneratorPath = join(extensionPath, "src", "ApiGenerator", "SimplPlusApiGenerator.exe");
+            const simpPlusApiGeneratorPath = join(extensionPath, "support", "SimplPlusApiGenerator.exe");
+            if (!fs.existsSync(simpPlusApiGeneratorPath)) { reject("SIMPL+ API Generator not found. Reinstall Extension"); return; }
 
             let buildCommand = `.\"${simpPlusApiGeneratorPath}\" \"${CLZLibraryPath}\" \"${simplDirectory}\"`;
 

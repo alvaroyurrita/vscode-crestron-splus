@@ -7,17 +7,13 @@ import {
     Disposable,
     TaskScope,
     ExtensionContext,
-    extensions,
     TaskGroup,
     TaskPanelKind,
     ShellExecution,
     TaskDefinition,
     WorkspaceFolder,
     TaskPresentationOptions,
-    commands,
 } from "vscode";
-import path from "path";
-import * as fsExistsWrapper from './helpers/fsExistsSyncWrapper';
 import { getCompilerPath, getFileName } from "./helpers/helperFunctions";
 import { BuildType } from "./base/build-type";
 

@@ -10,6 +10,7 @@ Integer var;
 Structure myStructure1{
 	Integer test1;
 	Long_Integer test2;
+	
 }
 
 Structure myStructure2{

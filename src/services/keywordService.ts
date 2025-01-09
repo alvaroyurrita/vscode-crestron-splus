@@ -1,30 +1,7 @@
-import { extensions, CompletionItemKind, CompletionItem, CompletionItemLabel } from "vscode";
+import { extensions, CompletionItemKind, CompletionItem, CompletionItemLabel, window } from "vscode";
 import { readFileSyncWrapper } from "../helpers/fsReadSyncWrapper";
 import * as fsExistsWrapper from '../helpers/fsExistsSyncWrapper';
-import path from "path";
-
-
-// export type KeywordType =
-//     "classBuiltIn" |
-//     "constant" |
-//     "declaration" |
-//     "event-handler" |
-//     "eventType" |
-//     "function" |
-//     "functionType" |
-//     "inputType" |
-//     "parameterModifier" |
-//     "variableModifier" |
-//     "functionModifier" |
-//     "outputType" |
-//     "parameterType" |
-//     "statement" |
-//     "structureBuiltIn" |
-//     "type" |
-//     "variable" |
-//     "variableType" |
-//     "voidFunction";
-
+import * as path from "path";
 
 export type Keyword = {
     name: string,
@@ -46,8 +23,10 @@ export class KeywordService {
     private constructor() {
         const extensionPath = extensions.getExtension("sentry07.simpl-plus")?.extensionPath;
         if (extensionPath === undefined) { return; }
-        const keywordDefinitionsPath = path.join(extensionPath, "src", "keywords.csv");
-        if (!fsExistsWrapper.existsSyncWrapper(keywordDefinitionsPath)) { return; };
+        const keywordDefinitionsPath = path.join(extensionPath, "support", "keywords.csv");
+        if (!fsExistsWrapper.existsSyncWrapper(keywordDefinitionsPath)) {
+            window.showErrorMessage("SIMPL+ Keywords not found. Reinstall Extension");
+        };
         const keywordDefinitionsContent = readFileSyncWrapper(keywordDefinitionsPath);
         for (const entry of keywordDefinitionsContent.split("\n")) {
             const elements = entry.split(",");
@@ -73,7 +52,7 @@ export class KeywordService {
         return keywords;
     }
 
-    public getAllKeywords(): Keyword[] {return this._keywordDefinitions;}
+    public getAllKeywords(): Keyword[] { return this._keywordDefinitions; }
 
     public getKeyword(name: string): Keyword | undefined {
         return this._keywordDefinitions.find(kd => kd.name.toLowerCase() === name.toLowerCase());

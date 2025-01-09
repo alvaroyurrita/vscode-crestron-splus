@@ -1,10 +1,14 @@
 import * as fs from 'fs';
-import path from 'path';
+import * as path from 'path';
 import { extensions, Position, QuickPickItem, QuickPickOptions, window } from 'vscode';
 export async function insertCategory() {
     const extensionPath = extensions.getExtension("sentry07.simpl-plus")?.extensionPath;
     if (extensionPath === undefined) { return; }
-    const categoriesPath = path.join(extensionPath, "categories.json");
+    const categoriesPath = path.join(extensionPath, "support", "categories.json");
+    if (!fs.existsSync(categoriesPath)) {
+        window.showErrorMessage("Categories file not found. Reinstall Extension");
+        return;
+    }
     const categories = JSON.parse(fs.readFileSync(categoriesPath, 'utf8')) as QuickPickItem[];
     const quickPickOptions: QuickPickOptions = {
         canPickMany: false,
