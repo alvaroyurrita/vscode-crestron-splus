@@ -7,6 +7,7 @@ import {
     env,
     Uri,
     DocumentSelector,
+    tasks
 } from "vscode";
 
 import { SimplPlusFormattingProvider } from './simplPlusFormattingProvider';
@@ -36,7 +37,9 @@ export async function activate(context: ExtensionContext) {
     const keywordService = KeywordService.getInstance();
 
     const simplPlusStatusBar = SimplPlusStatusBar.getInstance(context);
+
     const simplPlusTasks = SimplPlusTasks.getInstance(context);
+    let taskProvider = tasks.registerTaskProvider("simpl-plus", simplPlusTasks);
 
     let localHelp_command = commands.registerCommand("simpl-plus.localHelp", () => {
         const helpLocation = `${workspace.getConfiguration("simpl-plus").simplDirectory}\\Simpl+lr.chm`;
@@ -55,7 +58,15 @@ export async function activate(context: ExtensionContext) {
         const activeEditor = window.activeTextEditor;
         if (activeEditor !== undefined) {
             const currentBuildTargets = simplPlusStatusBar.GetDocumentBuildTargets(activeEditor.document);
-            simplPlusTasks.simplPlusCompileCurrent(currentBuildTargets);
+            simplPlusTasks.CompileCurrentSimplPlusFile(currentBuildTargets);
+        }
+    });
+
+    let rebuild_command = commands.registerCommand("simpl-plus.rebuild", () => {
+        const activeEditor = window.activeTextEditor;
+        if (activeEditor !== undefined) {
+            const currentBuildTargets = simplPlusStatusBar.GetDocumentBuildTargets(activeEditor.document);
+            simplPlusTasks.CompileCurrentSimplPlusFile(currentBuildTargets, true);
         }
     });
 
@@ -104,13 +115,14 @@ export async function activate(context: ExtensionContext) {
         localHelp_command,
         webHelp_command,
         build_command,
+        rebuild_command,
         showCategories_command,
-        simplPlusTasks,
         completionProvider,
         dotCompletionProvider,
         quoteCompletionProvider,
         signatureHelpProvider,
-        projectObjectService
+        projectObjectService,
+        taskProvider
         // textMateCompletionProvider
     );
 }

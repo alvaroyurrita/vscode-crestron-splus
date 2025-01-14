@@ -22,7 +22,7 @@ suite('With Keyword Service', () => {
     });
     test('gets 108 Keyword Kind Keywords', () => {
         const keywords = keywordService.getKeywordsByKind(([CompletionItemKind.Keyword]));
-        assert.strictEqual(keywords.length, 108);
+        assert.strictEqual(keywords.length, 110);
     });
     test('gets 10 Variable Kind Keywords', () => {
         const keywords = keywordService.getKeywordsByKind(([CompletionItemKind.Variable]));

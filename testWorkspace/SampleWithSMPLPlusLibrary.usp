@@ -25,16 +25,17 @@ STRUCTURE myStruct3 //test
                                          
 myStruct3 testStructure;
 
-SampleClass myClass;
+SampleClass MyClass;
 push Test
 {
 	SampleClass myLocalClass;
  	print("%i",testStructure.Variable7);
 	 testStructure.structureVar2.structureVar1.Variable;
-	 myClass
+	 testStructure.structureVar2.structureVar1.Variable
 
 }
 
 function myFunction(Integer test, Long_Integer test2){
 	myFunction()
+	MyClass.
 }

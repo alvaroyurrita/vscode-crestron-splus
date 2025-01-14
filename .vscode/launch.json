@@ -18,6 +18,17 @@
         ]
       },
       {
+        "name": "Extension Full On",
+        "type": "extensionHost",
+        "request": "launch",
+        "runtimeExecutable": "${execPath}",
+        "args": [
+          "${workspaceFolder}/testworkspace",
+          "--log debug",
+          "--extensionDevelopmentPath=${workspaceFolder}"
+        ]
+      },
+      {
         "name": "Extension Tests",
         "type": "extensionHost",
         "request": "launch",

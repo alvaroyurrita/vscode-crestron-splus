@@ -1,20 +1,23 @@
 function testFunction(integer test) {
 	
-	Switch (EXPRESSION) 	{		case (VALUE): 		{			Switch (EXPRESSION)
-			{				case (VALUE):
-				{
-					somefunction 	{	}
+	Switch (EXPRESSION) {
+		case (VALUE): {
+			Switch (EXPRESSION) {
+				case (VALUE): {
+					somefunction {
+					}
 				}
-				default:
-				{	{}			}
+				default: {
+					{
+					}
+				}
 			}
 		}
-		default: 
-		{		}
+		default: {
+		}
 	}
 }
 
-structure myStructure 
-{
+structure myStructure {
 	integer test;
 };

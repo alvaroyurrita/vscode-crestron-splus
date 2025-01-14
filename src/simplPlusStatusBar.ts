@@ -50,7 +50,7 @@ export class SimplPlusStatusBar {
 
         const activeEditor = window.activeTextEditor;
         if (activeEditor === undefined || activeEditor.document.languageId !== "simpl-plus") {
-            this.updateBuildTargetsStatusBar(BuildType.None);
+            this.updateBuildTargetsStatusBar([]);
             return;
         }
 
@@ -78,7 +78,7 @@ export class SimplPlusStatusBar {
     }
     private updateOnChangeActiveTextEditor(editor: TextEditor | undefined) {
         if (editor === undefined || editor.document.languageId !== "simpl-plus") {
-            this.updateBuildTargetsStatusBar(BuildType.None);
+            this.updateBuildTargetsStatusBar([]);
             return;
         }
         const currentBuildTargets = this._simplPlusDocuments.GetSimplPlusDocumentBuildTargets(editor.document);
@@ -86,48 +86,48 @@ export class SimplPlusStatusBar {
     };
     private updateOnOpenTextDocument(document: TextDocument) {
         if (document.languageId !== "simpl-plus") {
-            this.updateBuildTargetsStatusBar(BuildType.None);
+            this.updateBuildTargetsStatusBar([]);
             return;
         }
         const currentBuildTargets = this._simplPlusDocuments.GetSimplPlusDocumentBuildTargets(document);
         this.updateBuildTargetsStatusBar(currentBuildTargets);
     }
 
-    private updateBuildTargetsStatusBar(targets: BuildType): void {
-        if (targets === BuildType.None) {
+    private updateBuildTargetsStatusBar(targets: BuildType[]): void {
+        if (targets.length === 0) {
             this._statusBar.hide();
             return;
         }
         let buildTasks = "";
-        buildTasks = buildTasks.concat((targets & BuildType.Series2) === BuildType.Series2 ? "$(target-two)" : "");
-        buildTasks = buildTasks.concat((targets & BuildType.Series3) === BuildType.Series3 ? "$(target-three)" : "");
-        buildTasks = buildTasks.concat((targets & BuildType.Series4) === BuildType.Series4 ? "$(target-four)" : "");
+        buildTasks = buildTasks.concat(targets.includes("Series2") ? "$(target-two)" : "");
+        buildTasks = buildTasks.concat(targets.includes("Series3") ? "$(target-three)" : "");
+        buildTasks = buildTasks.concat(targets.includes("Series4") ? "$(target-four)" : "");
         this._statusBar.text = `Targets: ${buildTasks}`;
         this._statusBar.show();
     }
 
-    private async showBuildTargetsQuickPick(currentTypes: BuildType): Promise<BuildType | undefined> {
+    private async showBuildTargetsQuickPick(currentTypes: BuildType[]): Promise<BuildType[]> {
         const quickPickItems: QuickPickItem[] = [
-            { label: "2-Series", description: "Control System Target", picked: (currentTypes & BuildType.Series2) === BuildType.Series2 },
-            { label: "3-Series", description: "Control System Target", picked: (currentTypes & BuildType.Series3) === BuildType.Series3 },
-            { label: "4-Series", description: "Control System Target", picked: (currentTypes & BuildType.Series4) === BuildType.Series4 }
+            { label: "2-Series", description: "Control System Target", picked: currentTypes.includes("Series2") },
+            { label: "3-Series", description: "Control System Target", picked: currentTypes.includes("Series3") },
+            { label: "4-Series", description: "Control System Target", picked: currentTypes.includes("Series4") }
         ];
         const quickPickOptions: QuickPickOptions = {
             canPickMany: true,
             placeHolder: "Select Compile Target Option"
         };
         const selection = await window.showQuickPick<any>(quickPickItems, quickPickOptions) as QuickPickItem[];
-        let buildType = BuildType.None;
+        let buildTypes = [];
         if (selection) {
-            buildType |= selection.some((item) => item.label === "2-Series") ? BuildType.Series2 : BuildType.None;
-            buildType |= selection.some((item) => item.label === "3-Series") ? BuildType.Series3 : BuildType.None;
-            buildType |= selection.some((item) => item.label === "4-Series") ? BuildType.Series4 : BuildType.None;
-            return buildType;
+            selection.some((item) => item.label === "2-Series") ? buildTypes.push("Series2") : null;
+            selection.some((item) => item.label === "3-Series") ? buildTypes.push("Series3") : null;;
+            selection.some((item) => item.label === "4-Series") ? buildTypes.push("Series4") : null;;
+            return buildTypes;
         }
         return undefined;
     }
 
-    public GetDocumentBuildTargets(document: TextDocument | undefined): BuildType {
+    public GetDocumentBuildTargets(document: TextDocument | undefined): BuildType[] {
         return this._simplPlusDocuments.GetSimplPlusDocumentBuildTargets(document);
     }
 }

@@ -2,7 +2,7 @@
   "name": "simpl-plus",
   "displayName": "SIMPL+",
   "description": "Syntax highlighting, formatting, build tasks.",
-  "version": "1.0.0-alpha",
+  "version": "1.0.0-alpha1",
   "publisher": "sentry07",
   "icon": "icons/crestron.png",
   "repository": {
@@ -154,6 +154,11 @@
         "command": "simpl-plus.build",
         "key": "F12",
         "when": "resourceLangId == simpl-plus"
+      },
+      {
+        "command": "simpl-plus.rebuild",
+        "key": "shift+F12",
+        "when": "resourceLangId == simpl-plus"
       }
     ],
     "languages": [
@@ -234,8 +239,21 @@
       {
         "type": "simpl-plus",
         "properties": {
-          "label": {
-            "type": "string"
+          "buildTypes": {
+            "type": "array",
+            "description": "Target Build Type"
+          },
+          "files": {
+            "type": "array",
+            "description": "Files to build"
+          },
+          "directory": {
+            "type": "string",
+            "description": "Directory where the files to build are located"
+          },
+          "rebuild": {
+            "type": "boolean",
+            "description": "Rebuild the files even if no change have been made to the usp"
           }
         }
       }
@@ -245,7 +263,8 @@
         "name": "SIMPL+",
         "owner": "simpl-plus",
         "fileLocation": [
-          "absolute"
+          "relative",
+          "${workspaceFolder}"
         ],
         "pattern": {
           "regexp": "\\[([^\\]]*)\\]\\s*(?:Error)\\s*\\d*\\s*\\(Line (\\d*)\\)\\s*-\\s*(.*)$",

@@ -4,238 +4,226 @@ import {
     tasks,
     Task,
     OutputChannel,
-    Disposable,
     TaskScope,
     ExtensionContext,
     TaskGroup,
     TaskPanelKind,
     ShellExecution,
     TaskDefinition,
-    WorkspaceFolder,
-    TaskPresentationOptions,
+    TaskRevealKind,
+    TaskProvider,
+    CancellationToken,
+    Pseudoterminal,
+    Event,
+    TerminalDimensions,
+    EventEmitter,
+    Terminal,
+    ShellExecutionOptions,
 } from "vscode";
-import { getCompilerPath, getFileName } from "./helpers/helperFunctions";
+import { getFileName } from "./helpers/helperFunctions";
 import { BuildType } from "./base/build-type";
+import * as path from "path";
+import * as fs from 'fs';
 
-export class SimplPlusTasks implements Disposable {
+
+export class SimplPlusTasks implements TaskProvider {
+    static SimplPlusType: string = "simpl-plus";
+    private simpPlusTasks: Task[] | undefined = undefined;
+    // private simplPlusPromise: Thenable<Task[]> | undefined = undefined;
     private static _instance: SimplPlusTasks;
-    private _extensionTasks: Disposable | undefined;
+    // private _extensionTasks: Disposable | undefined;
     public static getInstance(ctx?: ExtensionContext): SimplPlusTasks {
         if (!SimplPlusTasks._instance) {
             SimplPlusTasks._instance = new SimplPlusTasks(ctx);
         }
         return SimplPlusTasks._instance;
     }
-    private constructor(ctx?: ExtensionContext) {
-        this.buildExtensionTasks();
-        let onDidChangeConfiguration = workspace.onDidChangeConfiguration(() => this.buildExtensionTasks());
-        let onDidOpenTextDocument = workspace.onDidOpenTextDocument(() => this.buildExtensionTasks());
-        let onDidSaveTextDocument = workspace.onDidSaveTextDocument(() => this.buildExtensionTasks());
 
+    private constructor(ctx?: ExtensionContext) {
+        const workspaceRoot = (workspace.workspaceFolders && (workspace.workspaceFolders.length > 0))
+            ? workspace.workspaceFolders[0].uri.fsPath : undefined;
+        if (!workspaceRoot) {
+            return;
+        }
+        const simplPlusFiles = path.join(workspaceRoot, "*.usp");
+        const fileWatcher = workspace.createFileSystemWatcher(simplPlusFiles);
+        // Simpl Plus task should only be displayed when there is a .usp file in the workspace.  
+        // This will clear the list of tasks every time a .usp file is created or deleted.
+        fileWatcher.onDidCreate(() => this.simpPlusTasks = undefined);
+        fileWatcher.onDidDelete(() => this.simpPlusTasks = undefined);
         ctx?.subscriptions.push(
-            onDidSaveTextDocument,
-            onDidChangeConfiguration,
-            onDidOpenTextDocument,
+            fileWatcher
         );
     }
 
-    private buildExtensionTasks(): void {
-        if (this._extensionTasks) {
-            this._extensionTasks.dispose();
-            this._extensionTasks = undefined;
+    public async provideTasks(token: CancellationToken): Promise<Task[]> {
+        if (!this.simpPlusTasks) {
+            this.simpPlusTasks = await this.getSimplPlusTasks();
         }
-        if (!this._extensionTasks && window?.activeTextEditor?.document.languageId === "simpl-plus") {
-            let splusPromise: Thenable<Task[]> | undefined = undefined;
-            this._extensionTasks = tasks.registerTaskProvider('simpl-plus', {
-                provideTasks: () => {
-                    if (!splusPromise) {
-                        splusPromise = this.getSimplPlusComputedTasks();
-                    }
-                    return splusPromise;
-                },
-                resolveTask: () => {
-                    return undefined;
-                }
-            });
-        }
+        return this.simpPlusTasks;
     }
 
-    private async getSimplPlusComputedTasks(): Promise<Task[]> {
-        let result: Task[] = [];
-        let activeEditor = window.activeTextEditor;
-        let activeDocument = activeEditor?.document;
-        let emptyTasks: Task[] = [];
+    public resolveTask(task: Task, token: CancellationToken): Task | undefined {
+        const buildTypes: BuildType[] = task.definition.buildTypes;
+        const taskDefinition: SimplPlusTaskDefinition = <any>task.definition;
 
-        if (activeDocument === undefined) { return emptyTasks; }
-        let workspaceFolder = workspace.getWorkspaceFolder(activeDocument.uri);
-        if (!workspaceFolder) {
-            return emptyTasks;
-        }
+        let [label, _, execution] = this.getBuildParameters(taskDefinition.buildTypes, taskDefinition.files, taskDefinition.directory, taskDefinition.rebuild);
+        let resolvedTask = this.TaskCreator(label, taskDefinition, execution);
+        return resolvedTask;
+    }
 
-        let workspaceRoot = workspaceFolder.uri.fsPath;
-        if (!workspaceRoot) {
-            return emptyTasks;
-        }
-
-        try {
-            result = result.concat(...this.simplPlusCompileTasks());
+    //returns tasks only if there is a .usp file in the workspace
+    private async getSimplPlusTasks(): Promise<Task[]> {
+        const workspaceFolders = workspace.workspaceFolders;
+        const result: Task[] = [];
+        if (!workspaceFolders || workspaceFolders.length === 0) {
             return result;
         }
-        catch (err) {
-            let channel = this.getOutputChannel();
-            console.error("Error while calculating Simpl Plus Tasks", err);
-
-            if (err instanceof Error) {
-                channel.appendLine(err.message);
+        let workspaceHasUsp = false;
+        for (const workspaceFolder of workspaceFolders) {
+            console.log("workspaceFolder", workspaceFolder);
+            const folderString = workspaceFolder.uri.fsPath;
+            if (!folderString) {
+                continue;
             }
-
-            channel.appendLine('SIMPL+ compile failed');
-            channel.show(true);
-            return emptyTasks;
+            if (!await this.uspExists(folderString)) {
+                continue;
+            }
+            workspaceHasUsp = true;
         }
-    }
-
-    private _channel: OutputChannel | undefined;
-    private getOutputChannel(): OutputChannel {
-        if (!this._channel) {
-            this._channel = window.createOutputChannel("SIMPL+ Compile");
+        if (!workspaceHasUsp) {
+            return result;
         }
-        return this._channel;
-    }
-
-    private simplPlusCompileTasks(): Task[] {
         let tasks: Task[] = [];
-        let emptyTasks: Task[] = [];
-        const fileName = getFileName();
-        const compilerPath = getCompilerPath();
+        let fileInfo = getFileName();
+        if (fileInfo === undefined) {
+            fileInfo.directory = workspaceFolders[0].uri.fsPath;
+            fileInfo.name = "placeholder.usp";
+        }
+        if (!fileInfo.name.endsWith(".usp")) {
+            fileInfo.name = "placeholder.usp";
+        }
 
-        let buildTypes: BuildType = BuildType.None;;
-        buildTypes |= workspace.getConfiguration("simpl-plus").enable2series === true ? BuildType.Series2 : BuildType.None;
-        buildTypes |= workspace.getConfiguration("simpl-plus").enable3series === true ? BuildType.Series3 : BuildType.None;
-        buildTypes |= workspace.getConfiguration("simpl-plus").enable4series === true ? BuildType.Series4 : BuildType.None;
+        let buildTypes: BuildType[] = [];
+        buildTypes.push("Series2");
+        buildTypes.push("Series3");
+        buildTypes.push("Series4");
 
-        if (fileName === undefined) { return emptyTasks; }
-        switch (buildTypes) {
-            case BuildType.None:
-                return emptyTasks;
-            case BuildType.Series2:
-                tasks.push(this.getBuildTaskByType(buildTypes, compilerPath, fileName));
-                break;
-            case BuildType.Series3:
-                tasks.push(this.getBuildTaskByType(buildTypes, compilerPath, fileName));
-                break;
-            case BuildType.Series4:
-                tasks.push(this.getBuildTaskByType(buildTypes, compilerPath, fileName));
-                break;
-            case BuildType.Series2 | BuildType.Series3:
-                tasks.push(this.getBuildTaskByType(BuildType.Series2, compilerPath, fileName));
-                tasks.push(this.getBuildTaskByType(BuildType.Series3, compilerPath, fileName));
-                tasks.push(this.getBuildTaskByType(buildTypes, compilerPath, fileName));
-                break;
-            case BuildType.Series2 | BuildType.Series4:
-                tasks.push(this.getBuildTaskByType(BuildType.Series2, compilerPath, fileName));
-                tasks.push(this.getBuildTaskByType(BuildType.Series4, compilerPath, fileName));
-                tasks.push(this.getBuildTaskByType(buildTypes, compilerPath, fileName));
-                break;
-            case BuildType.Series3 | BuildType.Series4:
-                tasks.push(this.getBuildTaskByType(BuildType.Series3, compilerPath, fileName));
-                tasks.push(this.getBuildTaskByType(BuildType.Series4, compilerPath, fileName));
-                tasks.push(this.getBuildTaskByType(buildTypes, compilerPath, fileName));
-                break;
-            case BuildType.Series2 | BuildType.Series3 | BuildType.Series4:
-            case BuildType.All:
-                tasks.push(this.getBuildTaskByType(BuildType.Series2, compilerPath, fileName));
-                tasks.push(this.getBuildTaskByType(BuildType.Series3, compilerPath, fileName));
-                tasks.push(this.getBuildTaskByType(BuildType.Series4, compilerPath, fileName));
-                tasks.push(this.getBuildTaskByType(buildTypes, compilerPath, fileName));
-                break;
+        let combinations = this.getBuildTaskCombinations(buildTypes);
+        for (let combination of combinations) {
+            if (combination.length === 0) { continue; }
+            let [label, definition, execution] = this.getBuildParameters(combination, [fileInfo.name], fileInfo.directory);
+            let task = this.TaskCreator(label, definition, execution);
+            tasks.push(task);
         }
         tasks.sort((a, b) => a.name.localeCompare(b.name));
         return tasks;
     }
 
-    private getBuildTaskByType(buildType: BuildType, compilerPath: string, fileName: string): Task {
-        let [label, buildCommand] = this.getBuildParameters(buildType, compilerPath, fileName);
-
-        const taskProperties: TaskArguments = {
-            name: label,
-            scope: TaskScope.Workspace,
-            source: 'SIMPL+',
-            taskDefinition: { type: "shell" },
-            execution: new ShellExecution(`\"${buildCommand}\"`, { executable: 'C:\\Windows\\System32\\cmd.exe', shellArgs: ['/c'] }),
-            problemMatchers: ["$SIMPL+"],
-            group: TaskGroup.Build,
-            presentationOptions: { panel: TaskPanelKind.Shared, focus: true, clear: true }
-        };
-        let task = this.TaskCreator(taskProperties);
-        return task;
+    private uspExists(folder: string): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            fs.readdir(folder, (err, files) => {
+                if (err) {
+                    resolve(false);
+                }
+                for (const file of files) {
+                    if (file.endsWith(".usp")) {
+                        resolve(true);
+                    }
+                }
+                resolve(false);
+            });
+        });
     }
 
+    private getBuildTaskCombinations(buildTypes: BuildType[]): BuildType[][] {
+        let result: BuildType[][] = [];
+        if (buildTypes.length === 0) {
+            return result;
+        }
+        if (buildTypes.length === 1) {
+            return [buildTypes];
+        }
+        function backtrack(start: number, current: BuildType[]) {
+            result.push([...current]); // Add current combination to result
+            for (let i = start; i < buildTypes.length; i++) {
+                current.push(buildTypes[i]); // Add element to current combination
+                backtrack(i + 1, current); // Recursively call backtrack
+                current.pop(); // Remove last element from current combination
+            }
+        }
+        backtrack(0, []);
+        return result;
+    }
 
-
-    private getBuildParameters(buildType: BuildType, compilerPath: string, fileName: string): [label: string, command: string] {
+    private getBuildParameters(buildType: BuildType[], fileNames: string[], directory: string, rebuild: boolean = false):
+        [name: string, definition: SimplPlusTaskDefinition, execution: ShellExecution] {
 
         let commandArguments: string[] = [];
         let seriesTargets: string[] = [];
+        const dosExecutable = "C:\\Windows\\System32\\cmd.exe";
+        const compilerPath = `${workspace.getConfiguration("simpl-plus").simplDirectory}\\SPlusCC.exe`;
 
-        commandArguments.push("\\rebuild");
-        commandArguments.push(fileName);
+        const compileCommand = rebuild ? "\\rebuild" : "\\build";
+        commandArguments.push(compileCommand);
+        fileNames.forEach(fileName => {
+            commandArguments.push(`${fileName}`);
+        });
+
         commandArguments.push("\\target");
-
-        if ((buildType & BuildType.Series2) === BuildType.Series2) {
-            seriesTargets.push("2");
-            commandArguments.push("series2");
-        }
-        if ((buildType & BuildType.Series3) === BuildType.Series3) {
-            seriesTargets.push("3");
-            commandArguments.push("series3");
-        }
-        if ((buildType & BuildType.Series4) === BuildType.Series4) {
-            seriesTargets.push("4");
-            commandArguments.push("series4");
-        }
+        buildType.forEach(type => {
+            seriesTargets.push(type.replace("Series", ""));
+            commandArguments.push(type.toLowerCase());
+        });
 
         let label = `Compile ${seriesTargets.join(" & ")} Series`;
-        let command = `${compilerPath} ${commandArguments.join(" ")}`;
-        return [label, command];
+        let command = `\"${compilerPath}\" ${commandArguments.join(" ")}`;
+        const definition: SimplPlusTaskDefinition = {
+            type: SimplPlusTasks.SimplPlusType,
+            buildTypes: buildType,
+            files: fileNames,
+            directory,
+            rebuild
+        };
+        // setting ShellExecution Options so it runs on cmd.exe 
+        // executable, the executable to run (cmd)
+        // shellArgs, the arguments to pass to the executable for cmd  /C  Carries out the command specified by string and then terminates. cwd: current working directory
+        const shellOptions: ShellExecutionOptions = { executable: dosExecutable, shellArgs: ["/C"], cwd: directory };
+        const execution = new ShellExecution(command, shellOptions);
+        return [label, definition, execution];
     }
 
-    public async simplPlusCompileCurrent(buildTypes: BuildType): Promise<void> {
-        const fileName = getFileName();
-        const compilerPath = getCompilerPath();
-        if (fileName === undefined) { return; }
-        const task = this.getBuildTaskByType(buildTypes, compilerPath, fileName);
+    public async CompileCurrentSimplPlusFile(buildTypes: BuildType[], rebuild:boolean = false): Promise<void> {
+        const fileInfo = getFileName();
+        if (fileInfo === undefined) { return; }
+        if (!fileInfo.name.endsWith(".usp")) {
+            window.showErrorMessage("Active file is not a .usp file");
+        }
+        let [label, definition, execution] = this.getBuildParameters(buildTypes, [fileInfo.name], fileInfo.directory, rebuild);
+        let task = this.TaskCreator(label, definition, execution);
         await tasks.executeTask(task);
     }
 
-
-    private TaskCreator(taskProperties: TaskArguments): Task {
+    private TaskCreator(name: string, definition: SimplPlusTaskDefinition, execution: ShellExecution): Task {
         const task = new Task(
-            taskProperties.taskDefinition,
-            taskProperties.scope,
-            taskProperties.name,
-            taskProperties.source,
-            taskProperties.execution,
-            taskProperties.problemMatchers
+            definition,
+            TaskScope.Workspace,
+            name,
+            SimplPlusTasks.SimplPlusType,
+            execution,
+            ["$SIMPL+"]
         );
-        task.group = taskProperties.group;
-        task.presentationOptions = taskProperties.presentationOptions;
+        task.group = TaskGroup.Build;
+        task.presentationOptions = { reveal: TaskRevealKind.Always, panel: TaskPanelKind.Shared, focus: true, clear: true };
         return task;
     }
-
-    dispose() {
-        this._extensionTasks?.dispose();
-    }
-
 }
 
-interface TaskArguments {
-    taskDefinition: TaskDefinition;
-    scope: TaskScope.Global | TaskScope.Workspace | WorkspaceFolder;
-    name: string;
-    source: string;
-    execution: ShellExecution;
-    problemMatchers: string[];
-    group: TaskGroup | undefined;
-    presentationOptions: TaskPresentationOptions;
+interface SimplPlusTaskDefinition extends TaskDefinition {
+    type: string;
+    buildTypes: BuildType[];
+    files: string[];
+    directory: string;
+    rebuild: boolean;
 }
+

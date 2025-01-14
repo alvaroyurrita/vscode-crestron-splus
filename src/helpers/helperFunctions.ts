@@ -1,13 +1,13 @@
 import { window, workspace } from "vscode";
+import * as path from "path";
 
-export function getCompilerPath(): string {
-    return `\"${workspace.getConfiguration("simpl-plus").simplDirectory}\\SPlusCC.exe\"`;
-}
 
-export function getFileName(): string | undefined {
-    const activeEditor = window.activeTextEditor;
-    const activeDocument = activeEditor?.document;
-    return activeDocument?.fileName;
+export function getFileName(): {name: string, directory: string} | undefined {
+    const fileNamePath = window.activeTextEditor?.document.fileName?? undefined;
+    if (fileNamePath === undefined) { return undefined; }
+    const directory = path.dirname(fileNamePath);
+    const fileName = path.basename(fileNamePath);
+    return  {name: fileName, directory: directory} ;
 }
 
 export function objectChain(text: string): string[] | undefined {

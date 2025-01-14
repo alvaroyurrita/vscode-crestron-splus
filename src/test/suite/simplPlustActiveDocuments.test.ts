@@ -1,8 +1,7 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { TextDocument, Uri, workspace } from 'vscode';
+import { TextDocument, Uri } from 'vscode';
 import { SimplPlusActiveDocuments } from '../../simplPlusActiveDocuments';
-import { BuildType } from '../../base/build-type';
 import * as fsExistsWrapper from '../../helpers/fsExistsSyncWrapper';
 import * as fsFileReadWrapper from '../../helpers/fsReadSyncWrapper';
 import { removeWorkspaceCustomSettings, } from '../testFunctions';
@@ -40,10 +39,10 @@ suite('SimplPlusActiveDocuments', () => {
 
     test('should return global values BuildType.Series3 and 4 for a new document', () => {
         const buildType = simplPlusActiveDocuments.GetSimplPlusDocumentBuildTargets(mockDocument);
-        assert.strictEqual(buildType, BuildType.Series3 | BuildType.Series4);
+        assert.strictEqual(buildType.length,2);
+        assert.ok(buildType.includes("Series3"));
+        assert.ok(buildType.includes("Series4"));
     });
-
-
 
     test('should return global values BuildType.Series3 and 4 for an untitled', () => {
         mockDocument = {
@@ -63,7 +62,9 @@ suite('SimplPlusActiveDocuments', () => {
             fileName: 'test.usp'
         } as unknown as TextDocument;
         const buildType = simplPlusActiveDocuments.GetSimplPlusDocumentBuildTargets(mockDocument);
-        assert.strictEqual(buildType, BuildType.Series3 | BuildType.Series4);
+        assert.strictEqual(buildType.length,2);
+        assert.ok(buildType.includes("Series3"));
+        assert.ok(buildType.includes("Series4"));
     });
 
     test('should add a new document to SimpPlusDocuments', () => {
@@ -79,13 +80,14 @@ suite('SimplPlusActiveDocuments', () => {
 
     test('should update targets for an existing document', () => {
         simplPlusActiveDocuments.GetSimplPlusDocumentBuildTargets(mockDocument);
-        const updatedBuildType = simplPlusActiveDocuments.UpdateSimpPlusDocumentBuildTargets(mockDocument, BuildType.Series3);
-        assert.strictEqual(updatedBuildType, BuildType.Series3 );
+        const updatedBuildType = simplPlusActiveDocuments.UpdateSimpPlusDocumentBuildTargets(mockDocument, ["Series3"]);
+        assert.strictEqual(updatedBuildType.length,1);
+        assert.ok(updatedBuildType.includes("Series3"));
     });
 
     test('should return undefined when updating targets for a non-existing document', () => {
         const updatedBuildType = simplPlusActiveDocuments.UpdateSimpPlusDocumentBuildTargets(mockDocument);
-        assert.strictEqual(updatedBuildType, undefined);
+        assert.ok(updatedBuildType === undefined);
     });
 });
 
@@ -95,35 +97,35 @@ suite('with existing document with ush contents', function ()  {
     const targetsToTest = [
         {
             input: "Inclusions_CDS=5",
-            expected: 1
+            expected: ["Series2"]
         },
         {
             input: "Inclusions_CDS=6",
-            expected: 2
+            expected: ["Series3"]
         },
         {
             input: "Inclusions_CDS=7",
-            expected: 4
+            expected: ["Series4"]
         },
         {
             input: "Inclusions_CDS=5,6",
-            expected: 1|2
+            expected: ["Series2","Series3"]
         },
         {
             input: "Inclusions_CDS=5,7",
-            expected: 1|4
+            expected:  ["Series2","Series4"]
         },
         {
             input: "Inclusions_CDS=6,7",
-            expected: 2|4
+            expected:  ["Series3","Series4"]
         },
         {
             input: "Inclusions_CDS=5,6,7",
-            expected: 1|2|4
+            expected: ["Series2","Series3","Series4"]
         },
         {
             input: "should return global",
-            expected: 2|4
+            expected: ["Series3","Series4"]
         }
     ];
     setup(() => {
@@ -159,7 +161,7 @@ suite('with existing document with ush contents', function ()  {
             const buildType = simplPlusActiveDocuments.GetSimplPlusDocumentBuildTargets(mockDocument);
             fakeReadFile.restore();
             fsExistSyncStub.restore();
-            assert.strictEqual(buildType, target.expected);
+            assert.deepEqual(buildType, target.expected);
         });
     });
 });

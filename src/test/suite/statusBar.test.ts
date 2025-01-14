@@ -53,6 +53,7 @@ suite("Status Bar ", () => {
         await window.showTextDocument(dirtyDocument);
         await delay(1000);
         var statusBarItem = statusBarSpy.returnValues[0];
+        assert.ok(statusBarItem!==undefined);
         assert.strictEqual(statusBarItem.text, "Targets: $(target-four)");
         assert.strictEqual(statusBarItem.tooltip, "Click to select SIMPL+ compilation targets");
         assert.strictEqual(statusBarItem.command, "simpl-plus.showQuickPick");

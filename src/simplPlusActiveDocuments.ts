@@ -2,40 +2,38 @@ import * as path from "path";
 import { BuildType } from "./base/build-type";
 import { existsSyncWrapper } from "./helpers/fsExistsSyncWrapper";
 import { readFileSyncWrapper } from "./helpers/fsReadSyncWrapper";
-import { workspace, TextDocument, Uri , Disposable } from 'vscode';
+import { workspace, TextDocument, Uri, Disposable } from 'vscode';
 
 class SimplPlusDocumentBuildTargets {
     private _document: TextDocument | undefined;
-    public get Document(){ return this._document;}
+    public get Document() { return this._document; }
 
-    private buildType: BuildType = BuildType.None;
-    public get BuildType() {return this.buildType;}
+    private buildTypes: BuildType[] = [];
+    public get BuildType() { return this.buildTypes; }
 
-    public constructor(document: TextDocument | undefined ) {
-        if (document === undefined) {return;}
-        if (document.languageId !== "simpl-plus") { return;}
+    public constructor(document: TextDocument | undefined) {
+        if (document === undefined) { return; }
+        if (document.languageId !== "simpl-plus") { return; }
         this._document = document;
         this.UpdatedBuildTargets(document);
     }
 
-    public UpdatedBuildTargets(document: TextDocument, newTargets?: BuildType ): BuildType | undefined
-    {
-        if (this._document !== document) {return undefined;}
+    public UpdatedBuildTargets(document: TextDocument, newTargets?: BuildType[]): BuildType[] | undefined {
+        if (this._document !== document) { return undefined; }
         if (newTargets !== undefined) {
-            this.buildType = newTargets;
-            return this.buildType;
+            this.buildTypes = newTargets;
+            return this.buildTypes;
         }
-        if (this._document.isUntitled){
-            this.buildType = this.getBuildTargetsFromPreferences();
+        if (this._document.isUntitled) {
+            this.buildTypes = this.getBuildTargetsFromPreferences();
             return;
         }
-        if (this.isUshFileExists(this._document.uri))
-        {
-            this.buildType = this.getBuildTargetsFromUshFile(this._document.uri);
+        if (this.isUshFileExists(this._document.uri)) {
+            this.buildTypes = this.getBuildTargetsFromUshFile(this._document.uri);
             return;
         }
-        this.buildType = this.getBuildTargetsFromPreferences();
-        return this.buildType;
+        this.buildTypes = this.getBuildTargetsFromPreferences();
+        return this.buildTypes;
     }
 
     private isUshFileExists(filePath: Uri): boolean {
@@ -45,7 +43,7 @@ class SimplPlusDocumentBuildTargets {
         return existsSyncWrapper(ushFilePath);
     }
 
-    private getBuildTargetsFromUshFile(filePath: Uri): BuildType {
+    private getBuildTargetsFromUshFile(filePath: Uri): BuildType[] {
         if (filePath === undefined) { return; }
         const docPath = path.parse(filePath.fsPath);
         const ushFilePath = path.join(docPath.dir, docPath.name + ".ush");
@@ -53,22 +51,22 @@ class SimplPlusDocumentBuildTargets {
         const regex = /(?:Inclusions_CDS=)(.*)/;
         const match = ushContent.match(regex);
         if (match && match[1]) {
-            let fileBuildType: BuildType = BuildType.None;
-            fileBuildType |= match[1].includes("5") ? BuildType.Series2 : BuildType.None;
-            fileBuildType |= match[1].includes("6") ? BuildType.Series3 : BuildType.None;
-            fileBuildType |= match[1].includes("7") ? BuildType.Series4 : BuildType.None;
-            return fileBuildType;
+            let fileBuildTypes: BuildType[] = [];
+            if (match[1].includes("5")) { fileBuildTypes.push("Series2"); }
+            if (match[1].includes("6")) { fileBuildTypes.push("Series3"); }
+            if (match[1].includes("7")) { fileBuildTypes.push("Series4"); }
+            return fileBuildTypes;
         }
         return this.getBuildTargetsFromPreferences();
     }
 
-    private getBuildTargetsFromPreferences(): BuildType {
-        let fileBuildType: BuildType = BuildType.None;
+    private getBuildTargetsFromPreferences(): BuildType[] {
+        let fileBuildTypes: BuildType[] = [];
         const simplConfig = workspace.getConfiguration("simpl-plus");
-        fileBuildType |= simplConfig.get("enable2series") ? BuildType.Series2 : BuildType.None;
-        fileBuildType |= simplConfig.get("enable3series") ? BuildType.Series3 : BuildType.None;
-        fileBuildType |= simplConfig.get("enable4series") ? BuildType.Series4 : BuildType.None;
-        return fileBuildType;
+        workspace.getConfiguration("simpl-plus").enable2series === true ? fileBuildTypes.push("Series2") : null;
+        workspace.getConfiguration("simpl-plus").enable3series === true ? fileBuildTypes.push("Series3") : null;
+        workspace.getConfiguration("simpl-plus").enable4series === true ? fileBuildTypes.push("Series4") : null;
+        return fileBuildTypes;
     }
 }
 
@@ -76,7 +74,7 @@ export class SimplPlusActiveDocuments implements Disposable {
 
     private SimpPlusDocuments: SimplPlusDocumentBuildTargets[] = [];
 
-    public GetSimplPlusDocumentBuildTargets(document: TextDocument | undefined): BuildType {
+    public GetSimplPlusDocumentBuildTargets(document: TextDocument | undefined): BuildType[] {
         let simplPlusDocument = this.SimpPlusDocuments.find(sd => sd.Document?.fileName === document?.fileName);
         if (simplPlusDocument === undefined) {
             simplPlusDocument = new SimplPlusDocumentBuildTargets(document);
@@ -88,11 +86,10 @@ export class SimplPlusActiveDocuments implements Disposable {
     public RemoveSimpPlusDocument(document: TextDocument): void {
         let simplPlusDocumentIndex = this.SimpPlusDocuments.findIndex(sd => sd.Document?.fileName === document.fileName);
         if (simplPlusDocumentIndex === -1) { return; }
-        this.SimpPlusDocuments.splice(simplPlusDocumentIndex,1);
+        this.SimpPlusDocuments.splice(simplPlusDocumentIndex, 1);
     }
 
-    public UpdateSimpPlusDocumentBuildTargets(document: TextDocument, newTarget?: BuildType): BuildType | undefined
-    {
+    public UpdateSimpPlusDocumentBuildTargets(document: TextDocument, newTarget?: BuildType[]): BuildType[] | undefined {
         let simplPlusDocument = this.SimpPlusDocuments.find(sd => sd.Document?.fileName === document.fileName);
         if (simplPlusDocument === undefined) { return undefined; }
         return simplPlusDocument.UpdatedBuildTargets(document, newTarget);
