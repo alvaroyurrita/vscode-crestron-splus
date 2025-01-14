@@ -15,7 +15,7 @@ import { BuildType } from './base/build-type';
 export class SimplPlusStatusBar {
     private _statusBar: StatusBarItem;
     public static instance: SimplPlusStatusBar;
-    private _simplPlusDocuments;
+    private _simplPlusDocuments: SimplPlusActiveDocuments;
 
     public static getInstance(ctx?: ExtensionContext): SimplPlusStatusBar {
         if (!SimplPlusStatusBar.instance && ctx) {
@@ -34,13 +34,12 @@ export class SimplPlusStatusBar {
 
         let showQuickPick_command = commands.registerCommand("simpl-plus.showQuickPick", async () => this.showQuickPick());
 
-        let onOpenTextDocument_event = workspace.onDidOpenTextDocument((document) => this.updateOnOpenTextDocument(document));
         let onChangeActiveTextEditor_event = window.onDidChangeActiveTextEditor((editor) => this.updateOnChangeActiveTextEditor(editor));
         let onCloseTextDocument_event = workspace.onDidCloseTextDocument((document) => this.updateOnCloseTextDocument(document));
 
         ctx?.subscriptions.push(
             showQuickPick_command,
-            onOpenTextDocument_event,
+            // onOpenTextDocument_event,
             onChangeActiveTextEditor_event,
             onCloseTextDocument_event,
             this._statusBar,
@@ -84,14 +83,6 @@ export class SimplPlusStatusBar {
         const currentBuildTargets = this._simplPlusDocuments.GetSimplPlusDocumentBuildTargets(editor.document);
         this.updateBuildTargetsStatusBar(currentBuildTargets);
     };
-    private updateOnOpenTextDocument(document: TextDocument) {
-        if (document.languageId !== "simpl-plus") {
-            this.updateBuildTargetsStatusBar([]);
-            return;
-        }
-        const currentBuildTargets = this._simplPlusDocuments.GetSimplPlusDocumentBuildTargets(document);
-        this.updateBuildTargetsStatusBar(currentBuildTargets);
-    }
 
     private updateBuildTargetsStatusBar(targets: BuildType[]): void {
         if (targets.length === 0) {

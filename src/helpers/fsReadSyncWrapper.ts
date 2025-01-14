@@ -1,6 +1,6 @@
 // fsWrapper.ts
-import { readFileSync as fsreadFileSync } from 'fs';
+import { readFileSync as fsReadFileSync } from 'fs';
 
-export const readFileSyncWrapper = (filePath: string): string => {
-    return fsreadFileSync(filePath, 'utf8');
+export function readFileSyncWrapper (filePath: string): string  {
+    return fsReadFileSync(filePath, 'utf8');
 };

@@ -81,7 +81,6 @@ export class SimplPlusTasks implements TaskProvider {
         }
         let workspaceHasUsp = false;
         for (const workspaceFolder of workspaceFolders) {
-            console.log("workspaceFolder", workspaceFolder);
             const folderString = workspaceFolder.uri.fsPath;
             if (!folderString) {
                 continue;

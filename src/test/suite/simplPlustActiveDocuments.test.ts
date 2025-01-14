@@ -69,13 +69,13 @@ suite('SimplPlusActiveDocuments', () => {
 
     test('should add a new document to SimpPlusDocuments', () => {
         simplPlusActiveDocuments.GetSimplPlusDocumentBuildTargets(mockDocument);
-        assert.strictEqual(simplPlusActiveDocuments['SimpPlusDocuments'].length, 1);
+        assert.strictEqual(simplPlusActiveDocuments['_SimpPlusDocuments'].length, 1);
     });
 
     test('should remove a document from SimpPlusDocuments', () => {
         simplPlusActiveDocuments.GetSimplPlusDocumentBuildTargets(mockDocument);
         simplPlusActiveDocuments.RemoveSimpPlusDocument(mockDocument);
-        assert.strictEqual(simplPlusActiveDocuments['SimpPlusDocuments'].length, 0);
+        assert.strictEqual(simplPlusActiveDocuments['_SimpPlusDocuments'].length, 0);
     });
 
     test('should update targets for an existing document', () => {

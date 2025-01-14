@@ -72,30 +72,30 @@ class SimplPlusDocumentBuildTargets {
 
 export class SimplPlusActiveDocuments implements Disposable {
 
-    private SimpPlusDocuments: SimplPlusDocumentBuildTargets[] = [];
+    private _SimpPlusDocuments: SimplPlusDocumentBuildTargets[] = [];
 
     public GetSimplPlusDocumentBuildTargets(document: TextDocument | undefined): BuildType[] {
-        let simplPlusDocument = this.SimpPlusDocuments.find(sd => sd.Document?.fileName === document?.fileName);
+        let simplPlusDocument = this._SimpPlusDocuments.find(sd => sd.Document?.fileName === document?.fileName);
         if (simplPlusDocument === undefined) {
             simplPlusDocument = new SimplPlusDocumentBuildTargets(document);
-            this.SimpPlusDocuments.push(simplPlusDocument);
+            this._SimpPlusDocuments.push(simplPlusDocument);
         }
         return simplPlusDocument.BuildType;
     }
 
     public RemoveSimpPlusDocument(document: TextDocument): void {
-        let simplPlusDocumentIndex = this.SimpPlusDocuments.findIndex(sd => sd.Document?.fileName === document.fileName);
+        let simplPlusDocumentIndex = this._SimpPlusDocuments.findIndex(sd => sd.Document?.fileName === document.fileName);
         if (simplPlusDocumentIndex === -1) { return; }
-        this.SimpPlusDocuments.splice(simplPlusDocumentIndex, 1);
+        this._SimpPlusDocuments.splice(simplPlusDocumentIndex, 1);
     }
 
     public UpdateSimpPlusDocumentBuildTargets(document: TextDocument, newTarget?: BuildType[]): BuildType[] | undefined {
-        let simplPlusDocument = this.SimpPlusDocuments.find(sd => sd.Document?.fileName === document.fileName);
+        let simplPlusDocument = this._SimpPlusDocuments.find(sd => sd.Document?.fileName === document.fileName);
         if (simplPlusDocument === undefined) { return undefined; }
         return simplPlusDocument.UpdatedBuildTargets(document, newTarget);
     }
     RemoveAllSimpPlusDocuments() {
-        this.SimpPlusDocuments = [];
+        this._SimpPlusDocuments = [];
     }
     dispose() {
         this.RemoveAllSimpPlusDocuments();
