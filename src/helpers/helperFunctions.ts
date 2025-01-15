@@ -2,9 +2,11 @@ import { window, workspace } from "vscode";
 import * as path from "path";
 
 
-export function getFileName(): {name: string, directory: string} | undefined {
+export function getFileName(): {name: string, directory: string}  {
     const fileNamePath = window.activeTextEditor?.document.fileName?? undefined;
-    if (fileNamePath === undefined) { return undefined; }
+    if (fileNamePath === undefined) { 
+        return {name: "", directory: ""}; 
+    }
     const directory = path.dirname(fileNamePath);
     const fileName = path.basename(fileNamePath);
     return  {name: fileName, directory: directory} ;

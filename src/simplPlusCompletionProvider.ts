@@ -78,7 +78,9 @@ export class SimplPlusCompletionProvider implements CompletionItemProvider {
             const uri = window.activeTextEditor?.document.uri;
             const itemLabel = typeof item.label === "string" ? item.label : item.label.label;
             let functionInfo = this._projectObjectService.getFunctionInfo(uri, itemLabel);
+            console.log("keyword?", functionInfo);
             if (functionInfo === undefined) {
+                //if item is from a keyword, add help from the Online help service
                 const keyword = this._keywordService.getKeyword(itemLabel);
                 if (keyword === undefined || !keyword.hasHelp) { resolve(item); return; }
                 const helpDefinitions = await SimplPlusKeywordHelpService.getInstance();
@@ -87,10 +89,16 @@ export class SimplPlusCompletionProvider implements CompletionItemProvider {
                     item.documentation = helpContent;
                     if (keyword.kind === CompletionItemKind.Function) {
                         functionInfo = helpDefinitions.GetFunctionInfoFromHelp(itemLabel, helpContent);
+                        const functionItem = this._projectObjectService.getCompletionItemsFromObjects([functionInfo])[0];
+                        item.label = functionItem.label;
+                        item.documentation = functionItem.documentation;
+                        item.insertText = functionItem.insertText;
+                        item.command = functionItem.command;
+                        item.kind = functionItem.kind;
                     }
                 }
             }
-            else {
+            if (functionInfo !== undefined) {
                 let functionDocs = `${functionInfo.dataType} ${functionInfo.name}(`;
                 const functionParams = functionInfo.children.filter(ch => ch.kind === CompletionItemKind.TypeParameter);
                 if (functionParams.length > 0) {
@@ -103,6 +111,7 @@ export class SimplPlusCompletionProvider implements CompletionItemProvider {
                 };
                 item.label = functionLabel;
             }
+            console.log("i", item);
             resolve(item);
         });
     }

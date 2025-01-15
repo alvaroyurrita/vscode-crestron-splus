@@ -19,6 +19,8 @@ import {
     EventEmitter,
     Terminal,
     ShellExecutionOptions,
+    ShellQuotedString,
+    ShellQuoting,
 } from "vscode";
 import { getFileName } from "./helpers/helperFunctions";
 import { BuildType } from "./base/build-type";
@@ -95,7 +97,7 @@ export class SimplPlusTasks implements TaskProvider {
         }
         let tasks: Task[] = [];
         let fileInfo = getFileName();
-        if (fileInfo === undefined) {
+        if (fileInfo.name === "") {
             fileInfo.directory = workspaceFolders[0].uri.fsPath;
             fileInfo.name = "placeholder.usp";
         }
@@ -155,28 +157,33 @@ export class SimplPlusTasks implements TaskProvider {
         return result;
     }
 
+    private getShellQuote(arg: string): ShellQuotedString {
+        return {
+            quoting: ShellQuoting.Strong,
+            value: arg
+        };
+    }
+
     private getBuildParameters(buildType: BuildType[], fileNames: string[], directory: string, rebuild: boolean = false):
         [name: string, definition: SimplPlusTaskDefinition, execution: ShellExecution] {
 
-        let commandArguments: string[] = [];
+        let commandArguments: ShellQuotedString[] = [];
         let seriesTargets: string[] = [];
         const dosExecutable = "C:\\Windows\\System32\\cmd.exe";
         const compilerPath = `${workspace.getConfiguration("simpl-plus").simplDirectory}\\SPlusCC.exe`;
 
         const compileCommand = rebuild ? "\\rebuild" : "\\build";
-        commandArguments.push(compileCommand);
+        commandArguments.push(this.getShellQuote(compileCommand));
         fileNames.forEach(fileName => {
-            commandArguments.push(`${fileName}`);
+            commandArguments.push(this.getShellQuote(`${fileName}`));
         });
-
-        commandArguments.push("\\target");
+        commandArguments.push(this.getShellQuote("\\target"));
         buildType.forEach(type => {
-            seriesTargets.push(type.replace("Series", ""));
-            commandArguments.push(type.toLowerCase());
+            commandArguments.push(this.getShellQuote(type.toLowerCase()));
+
         });
 
         let label = `Compile ${seriesTargets.join(" & ")} Series`;
-        let command = `\"${compilerPath}\" ${commandArguments.join(" ")}`;
         const definition: SimplPlusTaskDefinition = {
             type: SimplPlusTasks.SimplPlusType,
             buildTypes: buildType,
@@ -184,17 +191,18 @@ export class SimplPlusTasks implements TaskProvider {
             directory,
             rebuild
         };
+        const command = this.getShellQuote(compilerPath);
         // setting ShellExecution Options so it runs on cmd.exe 
         // executable, the executable to run (cmd)
         // shellArgs, the arguments to pass to the executable for cmd  /C  Carries out the command specified by string and then terminates. cwd: current working directory
         const shellOptions: ShellExecutionOptions = { executable: dosExecutable, shellArgs: ["/C"], cwd: directory };
-        const execution = new ShellExecution(command, shellOptions);
+        const execution = new ShellExecution(command, commandArguments, shellOptions);
         return [label, definition, execution];
     }
 
-    public async CompileCurrentSimplPlusFile(buildTypes: BuildType[], rebuild:boolean = false): Promise<void> {
+    public async CompileCurrentSimplPlusFile(buildTypes: BuildType[], rebuild: boolean = false): Promise<void> {
         const fileInfo = getFileName();
-        if (fileInfo === undefined) { return; }
+        if (fileInfo.name === "") { return; }
         if (!fileInfo.name.endsWith(".usp")) {
             window.showErrorMessage("Active file is not a .usp file");
         }
@@ -213,7 +221,7 @@ export class SimplPlusTasks implements TaskProvider {
             ["$SIMPL+"]
         );
         task.group = TaskGroup.Build;
-        task.presentationOptions = { reveal: TaskRevealKind.Always, panel: TaskPanelKind.Shared, focus: true, clear: true };
+        task.presentationOptions = { reveal: TaskRevealKind.Always, panel: TaskPanelKind.Shared, focus: true, clear: false };
         return task;
     }
 }

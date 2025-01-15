@@ -2,7 +2,7 @@
   "name": "simpl-plus",
   "displayName": "SIMPL+",
   "description": "Syntax highlighting, formatting, build tasks.",
-  "version": "1.0.0-alpha1",
+  "version": "1.0.0-alpha7",
   "publisher": "sentry07",
   "icon": "icons/crestron.png",
   "repository": {
@@ -35,7 +35,7 @@
       },
       {
         "command": "simpl-plus.insertCategory",
-        "title": "SIMPL+: Insert #CATEGORY..."
+        "title": "SIMPL+: Insert #CATEGORY... at the beginning of the file"
       },
       {
         "command": "simpl-plus.openApis",
@@ -63,17 +63,17 @@
           "simpl-plus.enable2series": {
             "type": "boolean",
             "default": false,
-            "description": "Default Build Target to Series 2 for new or unknown SIMPL+ files"
+            "description": "Enables Series 2 build target for new or unknown SIMPL+ files"
           },
           "simpl-plus.enable3series": {
             "type": "boolean",
             "default": true,
-            "description": "Default Build Target to Series 3 for new or unknown SIMPL+ files"
+            "description": "Enables Series 3 build target for new or unknown SIMPL+ files"
           },
           "simpl-plus.enable4series": {
             "type": "boolean",
             "default": true,
-            "description": "Default Build Target to Series 4 for new or unknown SIMPL+ files"
+            "description": "Enables Series 4 build target for new or unknown SIMPL+ files"
           }
         }
       },
@@ -95,7 +95,7 @@
               "Leave Keywords unchanged"
             ],
             "default": "Unchanged",
-            "description": "When performing autoformat, change built-in keywords, statements, etc to selected case"
+            "description": "Case used when performing autoformat of built-in keywords, statements, etc "
           },
           "simpl-plus.braceLine": {
             "type": "boolean",

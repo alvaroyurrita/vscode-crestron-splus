@@ -181,6 +181,7 @@ export class SimplPlusProjectObjectService implements Disposable {
         if (objects === undefined) { return []; }
         const items: CompletionItem[] = objects.map(o => {
             let descriptionPrefix = "";
+            //prefixes the libray name to the description if the object is not in the active document
             if (o.uri !== activeDocUri) {
                 const currentObjectUri = o.uri ?? "";
                 if (currentObjectUri !== "") {

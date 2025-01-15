@@ -38,19 +38,22 @@ export class SimplPlusSignatureHelpProvider implements SignatureHelpProvider {
             }
             const functionName = match[1];
             const lastCompletionItem = this._tokenService.getFunctionAtPosition(document,position);
+            console.log("lc",lastCompletionItem);
             if (lastCompletionItem && lastCompletionItem.name === functionName) {
                 functionToken = lastCompletionItem;
             }
             if (!functionToken) {
                 const keywordService = KeywordService.getInstance();
                 const keyword = keywordService.getKeyword(functionName);
-                if (keyword === undefined || !keyword.hasHelp || !(keyword.type === "function" || keyword.type === "voidFunction")) {
+                console.log("Helper Keyword:",keyword);
+                if (keyword === undefined || !keyword.hasHelp || keyword.kind !== CompletionItemKind.Function) {
                     return undefined;
                 }
                 const helpService = await SimplPlusKeywordHelpService.getInstance();
                 const functionHelp = await helpService.GetSimplHelp(functionName);
                 functionToken = helpService.GetFunctionInfoFromHelp(functionName, functionHelp);
             }
+            console.log("Helper token:",functionToken); 
             const signatureHelp = new SignatureHelp();
             let functionText = `${functionToken.dataType} ${functionToken.name}(`;
             const parameters: ParameterInformation[] = [];
