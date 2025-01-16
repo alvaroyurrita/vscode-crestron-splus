@@ -167,6 +167,20 @@ function getGlobalFunctions(tokens: TextmateToken[]): SimplPlusObject[] {
                     };
                     return parameter;
                 });
+                //if no parameters are found, create a single empty parameter that stores the parameter block range
+            if (functionParameters === undefined || functionParameters.length === 0) { 
+                functionParameters = [{
+                    name: "",
+                    kind: CompletionItemKind.TypeParameter,
+                    nameRange: new Range(new Position(0, 0), new Position(0, 0)),
+                    dataType: "",
+                    dataTypeModifier: "",
+                    children: [],
+                    blockRange: parameterBlockRange,
+                    uri: programUri,
+                    parent: fun
+                }]; 
+            }
         }
         fun.children = [...functionParameters, ...functionVariables];
         return fun;

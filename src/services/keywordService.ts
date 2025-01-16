@@ -60,6 +60,7 @@ export class KeywordService {
 
     public getCompletionItemsFromKeywords(keywords: Keyword[]): CompletionItem[] {
         const items: CompletionItem[] = keywords.map(kd => {
+            kd.name = kd.name.replace(/^\#/g, "");
             let description = `BuiltIn: ${kd.type.toString()}`;
             if (kd.kind === CompletionItemKind.Keyword) {
                 description = `Keyword: ${kd.type.toString()}`;

@@ -20,7 +20,7 @@ export async function insertCategory() {
         const activeTextDocument = window.activeTextEditor?.document;
         if (activeTextDocument === undefined) { return; }
         const activeEditorContents = activeTextDocument.getText();
-        const regex = /#CATEGORY/i;
+        const regex = /#category/i;
         const match = activeEditorContents.match(regex);
         let insertionPoint = new Position(0, 0);
         let insertionText = `\"${selection.label}\"`;
@@ -35,7 +35,7 @@ export async function insertCategory() {
             insertionText = `${insertionText} \"${customCategory}\"`;
         }
         await window.activeTextEditor?.edit((editBuilder) => {
-            editBuilder.insert(insertionPoint, `#CATEGORY ${insertionText} \/\/${selection.description}\n`);
+            editBuilder.insert(insertionPoint, `#Category ${insertionText} \/\/${selection.description}\n`);
         });
     }
 

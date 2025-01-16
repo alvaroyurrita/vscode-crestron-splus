@@ -36,8 +36,8 @@ export class SimplPlusProgramObjectService implements Disposable {
         const objects = this.getObjects(uri);
         let object = objects.find(o=>o.blockRange?.contains(position)??false);
         //check if the position is inside a parameter
-        if (!object){
-            object = objects.filter(o=>o.kind===CompletionItemKind.Function).find(f=>f.children.some(ch=>ch.kind===CompletionItemKind.TypeParameter && (ch.blockRange?.contains(position)??false)));
+        if (object === undefined) {
+            object = objects.filter(o=>o.kind===CompletionItemKind.Function).find(f=>f.children.some(ch=>ch.kind===(CompletionItemKind.TypeParameter??false) && (ch.blockRange?.contains(position)??false)));
         }
         return object;
     }

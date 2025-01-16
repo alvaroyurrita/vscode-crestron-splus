@@ -15,15 +15,17 @@ This is a language package for programming Crestron SIMPL+ module. It features:
     *   Create your own [Custom Build task](https://code.visualstudio.com/docs/editor/tasks#_custom-tasks) for one or many SIMPL+ files through VS Code tasks.json
 *  [Support for building current file using F12, or force build using Shift+F12.](#target-build-of-a-single-file)
 *  Remembers build targets from previously build SIMPL+ files the same way Crestron's SIMPL+ IDE does.
-*  Hover over help for SIMPL+ functions, leveraging the SIMPL+ online help file.
-*  Automatic API file generation for SIMPL# libraries
-*  Autocomplete support for local variables, functions, SIMPL# classes and enums, SIMPL+ library functions, keywords, and built-in functions.
-*  Function Signature Helper
-*  Snippets for common SIMPL+ functions
-*  SIMPL+ category insertion through right click context menu
-*  [Added Extension commands](#extension-commands)
-*  [Added Extension settings](#extension-settings)
-*  [Added Keybindings and Menus](#keybindings-and-menus)
+*  [Hover over help for SIMPL+ functions, leveraging the SIMPL+ online help file.](#hover-over-help)
+*  [Context Sensitive Autocomplete](#context-sensitive-autocomplete) support for local variables, functions, SIMPL# classes and enums, SIMPL+ library functions, keywords, and built-in functions.
+*  [Function Signature Helper](#function-signature-helper)
+*  [SIMPL+ category insertion through right click context menu](#simpl-category-insertion)
+*  [Automatic API file generation for SIMPL# libraries](#api-auto-build-and-auto-complete)
+*  Snippets for many SIMPL+ functions
+
+The extension also add teh following:
+* [Extension Commands](#extension-commands)
+* [Extension Settings](#extension-settings)
+* [Keybindings and Menus](#keybindings-and-menus)
 
 
 ## Autoformatting
@@ -47,7 +49,7 @@ Configure your preferred case for keywords, statements, etc. Default is `Unchang
 
 Create one or many custom build task using the VS Code tasks.json file. The extension will automatically detect the workspace and suggest the relevant SIMPL+ build task.
 
-![alt text](readmeImages/Custom-Task.gif)
+![Custom Tasks Detection](readmeImages/Custom-Task.gif)
 
 Modify the tasks.json file to include 1 or many files.  The json file schema is as follows:
 
@@ -138,7 +140,7 @@ A json file like this:
 
 will show up when pressing ctrl+shift+b like this
 
-![alt text](readmeImages/custom-tasks.png)
+![Custom Tasks](readmeImages/custom-tasks.png)
 
 The first option will launch a terminal command:
 
@@ -156,7 +158,39 @@ the second will look like this:
 
 Easily change the target of a single file by clicking on the target in the status bar.  The target will be saved using the same mechanism as Crestron's SIMPL+ IDE.  And next time the document is open the settings will be persevered. Build the currently open file by pressing F12, or force a build by pressing Shift+F12.
 
-![alt text](readmeImages/QuickPick.gif)
+![Compile Menu](readmeImages/QuickPick.gif)
+
+## Hover Over Help
+
+Online help is provided for SIMPL+ functions.  Hover over a function to see the help. (not all functions or keywords have help)
+
+![Hover Over Help Example](readmeImages/HoverHelp.gif)
+
+## Context Sensitive AutoComplete
+
+The extension will suggest possible completions depending on the context the cursor is in. For example it will not suggest functions if the cursor is inside a structure block, or will only suggest variable type if it is inside the parameters section of a function.
+
+![Auto Complete Example](readmeImages/AutoComplete.gif)
+
+## Function Signature Helper
+
+Provides help in filling in arguments for Built-in as well as User Defined functions.
+
+![alt text](readmeImages/Function-Signature-Help.gif)
+
+## SIMPL+ category insertion 
+
+Insert a SIMPL+ category at the beginning of the file by right clicking in the editor and selecting `Insert Category`.
+
+![Insert Category](readmeImages/Insert-Category.gif)
+
+## API Auto build and Auto Complete
+
+Drag a SIMPL# Library (*.CLZ) to the project folders, reference it in the SIMPL+ file, and the extension will automatically generate the API file. Open if using the right click context menu.  The  extension will then suggest completions for the library functions.
+
+![API AutoComplete](readmeImages/API-Autocomplete.gif)
+
+The extension is also aware of referenced SIMPL+ libraries and will suggest functions and structures from them.
 
 ## Extension Commands
 

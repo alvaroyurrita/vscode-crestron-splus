@@ -2,7 +2,7 @@
   "name": "simpl-plus",
   "displayName": "SIMPL+",
   "description": "Syntax highlighting, formatting, build tasks.",
-  "version": "1.0.0-alpha7",
+  "version": "1.0.0-alpha8",
   "publisher": "sentry07",
   "icon": "icons/crestron.png",
   "repository": {
@@ -35,7 +35,7 @@
       },
       {
         "command": "simpl-plus.insertCategory",
-        "title": "SIMPL+: Insert #CATEGORY... at the beginning of the file"
+        "title": "SIMPL+: Insert #Category..."
       },
       {
         "command": "simpl-plus.openApis",
